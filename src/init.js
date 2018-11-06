@@ -1,5 +1,4 @@
 // @flow
-"use strict";
 import Package from "./package";
 import path from "path";
 import * as fs from "fs-extra";
@@ -28,7 +27,7 @@ export let infos = {
   validModuleField: "module field is valid. No change required"
 };
 
-async function doInit(pkg /*:Package*/) {
+async function doInit(pkg: Package) {
   let usableName = pkg.name.replace(/.*\//, "");
   try {
     require.resolve(path.join(pkg.directory, "src"));
@@ -70,12 +69,12 @@ async function doInit(pkg /*:Package*/) {
   await pkg.save();
 }
 
-export default async function init(directory /*: string*/) {
+export default async function init(directory: string) {
   let pkg = await Package.create(path.join(directory));
   // do more stuff with checking whether the repo is yarn workspaces or bolt monorepo
 
   // todo: figure out why this is empty without the declaration
-  let workspaces /*:null|Array<Package>*/ = await pkg.packages();
+  let workspaces: null | Array<Package> = await pkg.packages();
   if (workspaces === null) {
     await doInit(pkg);
   } else {

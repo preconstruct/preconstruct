@@ -1,6 +1,5 @@
 // @flow
 // based on https://github.com/jamiebuilds/std-pkg but reading fewer things, adding setters and reading the file
-"use strict";
 import is from "sarcastic";
 import nodePath from "path";
 import * as fs from "fs-extra";

@@ -3,8 +3,8 @@ import fixturez from "fixturez";
 import path from "path";
 import * as fs from "fs-extra";
 import init, { confirms, infos, errors } from "../src/init";
-let prompt /*: any */ = require("../src/prompt");
-let logger /*: any */ = require("../src/logger");
+let prompt: any = require("../src/prompt");
+let logger: any = require("../src/logger");
 
 const f = fixturez(__dirname);
 

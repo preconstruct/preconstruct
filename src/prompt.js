@@ -1,7 +1,7 @@
 // @flow
 import inquirer from "inquirer";
 
-export async function promptConfirm(message /*:string*/) /*: boolean*/ {
+export async function promptConfirm(message: string): boolean {
   let { confirm } = await inquirer.prompt([
     {
       type: "confirm",

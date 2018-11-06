@@ -1,6 +1,4 @@
 // @flow
-"use strict";
-
 import meow from "meow";
 import init from "./init";
 import { error } from "./logger";
