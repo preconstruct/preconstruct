@@ -66,7 +66,7 @@ async function doInit(pkg /*:Package*/) {
     info(infos.validModuleField);
   }
   // ask if user wants umd build
-  // check if there is a browser option and if it's invalid
+  // check if there is a browser option and if it's invalid, offer to fix it
   await pkg.save();
 }
 

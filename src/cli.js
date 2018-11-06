@@ -11,9 +11,10 @@ let { input } = meow(
 Usage
   $ preconstruct [command]
 Commands
-  init         init preconstruct
+  init         initialise preconstruct
   build        build the package(s)
   watch        start a watch process to build the package(s)
+  validate     validate the package(s)
 `,
   {}
 );
