@@ -66,7 +66,7 @@ module.exports = class Package {
   get configPackages() {
     return is(this.config.packages, arrayOfString);
   }
-  async workspaces() /*: Promise<null | Array<Package>>*/ {
+  async packages() /*: Promise<null | Array<Package>>*/ {
     // support yarn workspaces later
     // probably bolt too
     // maybe lerna though probably not

@@ -41,12 +41,14 @@ async function doInit(pkg /*:Package*/) {
 
 module.exports = exports = async function init(directory /*: string*/) {
   let pkg = await Package.create(path.join(directory));
+  // do more stuff with checking whether the repo is yarn workspaces or bolt monorepo
+
   // todo: figure out why this is empty without the declaration
-  let workspaces /*:null|Array<Package>*/ = await pkg.workspaces();
+  let workspaces /*:null|Array<Package>*/ = await pkg.packages();
   if (workspaces === null) {
     await doInit(pkg);
   } else {
-    // todo: figure out a way to make the validation parallel(how should the prompts work? batch them?)
+    // todo: figure out a way to make the validation parallel(how should the prompts work? batch all prompts of the same type? dataloader-style)
     for (let workspace of workspaces) {
       await doInit(workspace);
     }
