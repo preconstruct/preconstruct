@@ -1,13 +1,13 @@
 // @flow
 "use strict";
-let Package = require("./package");
-let path = require("path");
-let fs = require("fs-extra");
-let { promptConfirm } = require("./prompt");
-let { FatalError } = require("./errors");
-let { success, error, info } = require("./logger");
+import Package from "./package";
+import path from "path";
+import * as fs from "fs-extra";
+import { promptConfirm } from "./prompt";
+import { FatalError } from "./errors";
+import { success, error, info } from "./logger";
 
-let errors = {
+export let errors = {
   noEntryPoint:
     "No entrypoint was provided. Please create a file at src/index.js",
   deniedWriteMainField: "Changing the main field is required...",
@@ -15,7 +15,7 @@ let errors = {
     "The module field is in an invalid state. Initialiation cannot continue unless it is fixed"
 };
 
-let confirms = {
+export let confirms = {
   writeMainField:
     "preconstruct is going to change the main field in your package.json, are you okay with that?",
   writeModuleField:
@@ -23,7 +23,7 @@ let confirms = {
   fixModuleField: "Would you like to fix the module field?"
 };
 
-let infos = {
+export let infos = {
   validMainField: "main field is valid. No change required",
   validModuleField: "module field is valid. No change required"
 };
@@ -70,7 +70,7 @@ async function doInit(pkg /*:Package*/) {
   await pkg.save();
 }
 
-module.exports = exports = async function init(directory /*: string*/) {
+export default async function init(directory /*: string*/) {
   let pkg = await Package.create(path.join(directory));
   // do more stuff with checking whether the repo is yarn workspaces or bolt monorepo
 
@@ -85,6 +85,4 @@ module.exports = exports = async function init(directory /*: string*/) {
     }
   }
   success("Initialised package!");
-};
-
-Object.assign(exports, { confirms, errors, infos });
+}

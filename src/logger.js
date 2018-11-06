@@ -1,19 +1,17 @@
 // @flow
 "use strict";
-let chalk = require("chalk");
+import chalk from "chalk";
 
 let preconstructEmoji = "🎁 ";
 
-function error(error /*:string*/) {
+export function error(error /*:string*/) {
   console.error(preconstructEmoji + chalk.red("error"), error);
 }
 
-function success(message /*:string*/) {
+export function success(message /*:string*/) {
   console.log(preconstructEmoji + chalk.green("success"), message);
 }
 
-function info(message /*:string*/) {
+export function info(message /*:string*/) {
   console.log(preconstructEmoji + chalk.cyan("info"), message);
 }
-
-module.exports = { error, success, info };

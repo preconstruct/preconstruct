@@ -1,10 +1,7 @@
 // @flow
-"use strict";
-let inquirer = require("inquirer");
+import inquirer from "inquirer";
 
-exports.promptConfirm = async function promptConfirm(
-  message /*:string*/
-) /*: boolean*/ {
+export async function promptConfirm(message /*:string*/) /*: boolean*/ {
   let { confirm } = await inquirer.prompt([
     {
       type: "confirm",
@@ -14,4 +11,4 @@ exports.promptConfirm = async function promptConfirm(
   ]);
   // $FlowFixMe
   return confirm;
-};
+}

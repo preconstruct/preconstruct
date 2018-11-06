@@ -1,6 +1,4 @@
 // @flow
 "use strict";
 
-class FatalError extends Error {}
-
-module.exports = { FatalError };
+export class FatalError extends Error {}

@@ -1,11 +1,12 @@
 // @flow
-const f = require("fixturez")(__dirname);
-let path = require("path");
-let fs = require("fs-extra");
-const init = require("../src/init");
+import fixturez from "fixturez";
+import path from "path";
+import * as fs from "fs-extra";
+import init, { confirms, infos, errors } from "../src/init";
 let prompt /*: any */ = require("../src/prompt");
-let globby = require("globby");
 let logger /*: any */ = require("../src/logger");
+
+const f = fixturez(__dirname);
 
 let unsafeRequire = require;
 
@@ -27,7 +28,7 @@ test("no entrypoint", async () => {
   try {
     await init(tmpPath);
   } catch (error) {
-    expect(error.message).toBe(init.errors.noEntryPoint);
+    expect(error.message).toBe(errors.noEntryPoint);
   }
 });
 
@@ -36,7 +37,7 @@ test("do not allow write", async () => {
 
   prompt.promptConfirm.mockImplementation(question => {
     switch (question) {
-      case init.confirms.writeMainField: {
+      case confirms.writeMainField: {
         return false;
       }
       default: {
@@ -47,7 +48,7 @@ test("do not allow write", async () => {
   try {
     await init(tmpPath);
   } catch (error) {
-    expect(error.message).toBe(init.errors.deniedWriteMainField);
+    expect(error.message).toBe(errors.deniedWriteMainField);
   }
   expect(prompt.promptConfirm).toBeCalledTimes(1);
 });
@@ -57,10 +58,10 @@ test("set only main field", async () => {
 
   prompt.promptConfirm.mockImplementation(question => {
     switch (question) {
-      case init.confirms.writeMainField: {
+      case confirms.writeMainField: {
         return true;
       }
-      case init.confirms.writeModuleField: {
+      case confirms.writeModuleField: {
         return false;
       }
       default: {
@@ -88,10 +89,10 @@ test("set main and module field", async () => {
 
   prompt.promptConfirm.mockImplementation(question => {
     switch (question) {
-      case init.confirms.writeMainField: {
+      case confirms.writeMainField: {
         return true;
       }
-      case init.confirms.writeModuleField: {
+      case confirms.writeModuleField: {
         return true;
       }
       default: {
@@ -121,10 +122,10 @@ test("scoped package", async () => {
 
   prompt.promptConfirm.mockImplementation(question => {
     switch (question) {
-      case init.confirms.writeMainField: {
+      case confirms.writeMainField: {
         return true;
       }
-      case init.confirms.writeModuleField: {
+      case confirms.writeModuleField: {
         return true;
       }
       default: {
@@ -158,10 +159,10 @@ test("monorepo", async () => {
 
   prompt.promptConfirm.mockImplementation(question => {
     switch (question) {
-      case init.confirms.writeMainField: {
+      case confirms.writeMainField: {
         return true;
       }
-      case init.confirms.writeModuleField: {
+      case confirms.writeModuleField: {
         return true;
       }
       default: {

@@ -1,10 +1,10 @@
 // @flow
 "use strict";
 
-let meow = require("meow");
-let init = require("./init");
-let { error } = require("./logger");
-let { FatalError } = require("./errors");
+import meow from "meow";
+import init from "./init";
+import { error } from "./logger";
+import { FatalError } from "./errors";
 
 let { input } = meow(
   `
