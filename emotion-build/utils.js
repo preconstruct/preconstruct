@@ -163,7 +163,6 @@ function getUMDOutputConfig(pkg) {
     format: "umd",
     sourcemap: true,
     file: UMDPath,
-    name,
-    globals: { react: "React", "@emotion/core": "emotionCore" }
+    name
   };
 }

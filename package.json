@@ -4,8 +4,13 @@
   "description": "A smart bundler for libraries",
   "main": "src/index.js",
   "files": [
-    "src"
+    "src",
+    "index.js",
+    "bin.js"
   ],
+  "bin": {
+    "preconstruct": "./bin.js"
+  },
   "repository": "https://github.com/mitchellhamilton/preconstruct",
   "license": "MIT",
   "dependencies": {

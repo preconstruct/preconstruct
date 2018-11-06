@@ -1,8 +1,10 @@
 // @flow
+"use strict";
 let Package = require("./package");
 let path = require("path");
 let fs = require("fs-extra");
 let { promptConfirm } = require("./prompt");
+let { FatalError } = require("./errors");
 
 let errors = {
   noEntryPoint:
@@ -22,14 +24,14 @@ async function doInit(pkg /*:Package*/) {
     require.resolve(path.join(pkg.directory, "src"));
   } catch (e) {
     if (e.code === "MODULE_NOT_FOUND") {
-      throw new Error(errors.noEntryPoint);
+      throw new FatalError(errors.noEntryPoint);
     }
     throw e;
   }
 
   let canWriteMainField = await promptConfirm(confirms.writeMainField);
   if (!canWriteMainField) {
-    throw new Error(errors.deniedWriteMainField);
+    throw new FatalError(errors.deniedWriteMainField);
   }
   pkg.main = `dist/${pkg.name.replace(/.*\//, "")}.cjs.js`;
   let canWriteModuleField = await promptConfirm(confirms.writeModuleField);

@@ -1,5 +1,6 @@
 // @flow
 // based on https://github.com/jamiebuilds/std-pkg but reading fewer things, adding setters and reading the file
+"use strict";
 let is = require("sarcastic");
 let nodePath = require("path");
 let fs = require("fs-extra");

@@ -1,4 +1,5 @@
 // @flow
+"use strict";
 let inquirer = require("inquirer");
 
 exports.promptConfirm = async function promptConfirm(
