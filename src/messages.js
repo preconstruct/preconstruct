@@ -18,5 +18,10 @@ export let confirms = {
 
 export let infos = {
   validMainField: "main field is valid. No change required",
-  validModuleField: "module field is valid. No change required"
+  validModuleField: "module field is valid. No change required",
+  validEntrypoint: "a valid entry point exists."
+};
+
+export let successes = {
+  validPackage: "package is valid!"
 };

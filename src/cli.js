@@ -1,6 +1,7 @@
 // @flow
 import meow from "meow";
 import init from "./init";
+import validate from "./validate";
 import { error } from "./logger";
 import { FatalError } from "./errors";
 
@@ -21,23 +22,32 @@ let errors = {
   commandNotFound: "Command not found"
 };
 
+class CommandNotFoundError extends Error {}
+
 (async () => {
   if (input.length === 1) {
-    switch (input[0]) {
-      case "init": {
-        try {
+    try {
+      switch (input[0]) {
+        case "init": {
           await init(process.cwd());
-        } catch (err) {
-          if (err instanceof FatalError) {
-            error(err.message);
-          } else {
-            throw err;
-          }
+          return;
         }
-        break;
+        case "validate": {
+          await validate(process.cwd());
+          return;
+        }
+
+        default: {
+          throw new CommandNotFoundError();
+        }
       }
-      default: {
+    } catch (err) {
+      if (err instanceof FatalError) {
+        error(err.message);
+      } else if (err instanceof CommandNotFoundError) {
         error(errors.commandNotFound);
+      } else {
+        throw err;
       }
     }
   } else {

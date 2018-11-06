@@ -1,9 +1,10 @@
 // @flow
 import Package from "./package";
 import path from "path";
-import { errors } from "./messages";
+import { errors, successes, infos } from "./messages";
 import { FatalError, ValidationError } from "./errors";
 import { getValidModuleField, getValidMainField } from "./utils";
+import * as logger from "./logger";
 
 // this doesn't offer to fix anything
 // just does validation
@@ -34,8 +35,25 @@ export function validateModuleField(pkg: Package) {
 
 async function validatePackage(pkg: Package) {
   validateEntrypoint(pkg);
-  validateMainField(pkg);
-  validateModuleField(pkg);
+  logger.info(infos.validEntrypoint);
+  try {
+    validateMainField(pkg);
+  } catch (e) {
+    if (e instanceof ValidationError) {
+      throw new FatalError(e.message);
+    }
+    throw e;
+  }
+  logger.info(infos.validMainField);
+  try {
+    validateModuleField(pkg);
+  } catch (e) {
+    if (e instanceof ValidationError) {
+      throw new FatalError(e.message);
+    }
+    throw e;
+  }
+  logger.info(infos.validModuleField);
 }
 
 export default async function validate(directory: string) {
@@ -49,4 +67,6 @@ export default async function validate(directory: string) {
       validatePackage(workspace);
     }
   }
+
+  logger.success(successes.validPackage);
 }

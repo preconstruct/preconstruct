@@ -31,8 +31,8 @@ async function doInit(pkg: Package) {
   try {
     validateModuleField(pkg);
     info(infos.validModuleField);
-  } catch (error) {
-    if (error instanceof ValidationError) {
+  } catch (err) {
+    if (err instanceof ValidationError) {
       let canWriteModuleField = await promptConfirm(confirms.writeModuleField);
       let validModuleField = getValidModuleField(pkg);
       if (canWriteModuleField) {
@@ -46,7 +46,7 @@ async function doInit(pkg: Package) {
         pkg.module = validModuleField;
       }
     }
-    throw error;
+    throw err;
   }
 
   // ask if user wants umd build
