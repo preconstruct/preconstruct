@@ -5,6 +5,7 @@ let fs = require("fs-extra");
 const init = require("../src/init");
 let prompt /*: any */ = require("../src/prompt");
 let globby = require("globby");
+let logger /*: any */ = require("../src/logger");
 
 let unsafeRequire = require;
 
@@ -15,6 +16,7 @@ async function getPkg(filepath) {
 }
 
 jest.mock("../src/prompt");
+jest.mock("../src/logger");
 
 afterEach(() => {
   jest.resetAllMocks();
@@ -193,5 +195,25 @@ Object {
   "private": true,
   "version": "1.0.0",
 }
+`);
+});
+
+test("does not prompt or modify if already valid", async () => {
+  let tmpPath = f.copy("valid-package");
+  let original = await getPkg(tmpPath);
+
+  await init(tmpPath);
+  let current = await getPkg(tmpPath);
+  expect(original).toEqual(current);
+  expect(prompt.promptConfirm).not.toBeCalled();
+  expect(logger.info.mock.calls).toMatchInlineSnapshot(`
+Array [
+  Array [
+    "main field is valid. No change required",
+  ],
+  Array [
+    "module field is valid. No change required",
+  ],
+]
 `);
 });

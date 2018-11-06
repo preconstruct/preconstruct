@@ -12,4 +12,8 @@ function success(message /*:string*/) {
   console.log(preconstructEmoji + chalk.green("success"), message);
 }
 
-module.exports = { error, success };
+function info(message /*:string*/) {
+  console.log(preconstructEmoji + chalk.cyan("info"), message);
+}
+
+module.exports = { error, success, info };

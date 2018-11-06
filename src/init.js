@@ -5,22 +5,31 @@ let path = require("path");
 let fs = require("fs-extra");
 let { promptConfirm } = require("./prompt");
 let { FatalError } = require("./errors");
-let { success } = require("./logger");
+let { success, error, info } = require("./logger");
 
 let errors = {
   noEntryPoint:
     "No entrypoint was provided. Please create a file at src/index.js",
-  deniedWriteMainField: "Changing the main field is required..."
+  deniedWriteMainField: "Changing the main field is required...",
+  invalidModuleField:
+    "The module field is in an invalid state. Initialiation cannot continue unless it is fixed"
 };
 
 let confirms = {
   writeMainField:
     "preconstruct is going to change the main field in your package.json, are you okay with that?",
   writeModuleField:
-    "Would you like to generate module builds? This will write to the module field in your package.json"
+    "Would you like to generate module builds? This will write to the module field in your package.json",
+  fixModuleField: "Would you like to fix the module field?"
+};
+
+let infos = {
+  validMainField: "main field is valid. No change required",
+  validModuleField: "module field is valid. No change required"
 };
 
 async function doInit(pkg /*:Package*/) {
+  let usableName = pkg.name.replace(/.*\//, "");
   try {
     require.resolve(path.join(pkg.directory, "src"));
   } catch (e) {
@@ -29,15 +38,32 @@ async function doInit(pkg /*:Package*/) {
     }
     throw e;
   }
-
-  let canWriteMainField = await promptConfirm(confirms.writeMainField);
-  if (!canWriteMainField) {
-    throw new FatalError(errors.deniedWriteMainField);
+  let correctMainField = `dist/${usableName}.cjs.js`;
+  if (correctMainField !== pkg.main) {
+    let canWriteMainField = await promptConfirm(confirms.writeMainField);
+    if (!canWriteMainField) {
+      throw new FatalError(errors.deniedWriteMainField);
+    }
+  } else {
+    info(infos.validMainField);
   }
-  pkg.main = `dist/${pkg.name.replace(/.*\//, "")}.cjs.js`;
-  let canWriteModuleField = await promptConfirm(confirms.writeModuleField);
-  if (canWriteModuleField) {
-    pkg.module = `dist/${pkg.name.replace(/.*\//, "")}.esm.js`;
+
+  pkg.main = correctMainField;
+  let correctModuleField = `dist/${usableName}.esm.js`;
+  if (correctModuleField !== pkg.module) {
+    let canWriteModuleField = await promptConfirm(confirms.writeModuleField);
+    if (canWriteModuleField) {
+      pkg.module = correctModuleField;
+    } else if (pkg.module) {
+      error(errors.invalidModuleField);
+      let shouldFixModuleField = await promptConfirm(confirms.fixModuleField);
+      if (!shouldFixModuleField) {
+        throw new FatalError(errors.invalidModuleField);
+      }
+      pkg.module = correctModuleField;
+    }
+  } else {
+    info(infos.validModuleField);
   }
   await pkg.save();
 }
@@ -59,4 +85,4 @@ module.exports = exports = async function init(directory /*: string*/) {
   success("Initialised package!");
 };
 
-Object.assign(exports, { confirms, errors });
+Object.assign(exports, { confirms, errors, infos });

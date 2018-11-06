@@ -1,0 +1,8 @@
+{
+  "name": "valid-package",
+  "version": "1.0.0",
+  "main": "dist/valid-package.cjs.js",
+  "license": "MIT",
+  "private": true,
+  "module": "dist/valid-package.esm.js"
+}
