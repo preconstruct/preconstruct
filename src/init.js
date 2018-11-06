@@ -5,6 +5,7 @@ let path = require("path");
 let fs = require("fs-extra");
 let { promptConfirm } = require("./prompt");
 let { FatalError } = require("./errors");
+let { success } = require("./logger");
 
 let errors = {
   noEntryPoint:
@@ -55,6 +56,7 @@ module.exports = exports = async function init(directory /*: string*/) {
       await doInit(workspace);
     }
   }
+  success("Initialised package!");
 };
 
 Object.assign(exports, { confirms, errors });

@@ -8,4 +8,8 @@ function error(error /*:string*/) {
   console.error(preconstructEmoji + chalk.red("error"), error);
 }
 
-module.exports = { error };
+function success(message /*:string*/) {
+  console.log(preconstructEmoji + chalk.green("success"), message);
+}
+
+module.exports = { error, success };
