@@ -3,13 +3,13 @@
 let inquirer = require("inquirer");
 
 exports.promptConfirm = async function promptConfirm(
-  question /*:string*/
+  message /*:string*/
 ) /*: boolean*/ {
   let { confirm } = await inquirer.prompt([
     {
       type: "confirm",
       name: "confirm",
-      question
+      message
     }
   ]);
   // $FlowFixMe
