@@ -17,10 +17,9 @@ let confirms = {
     "Would you like to generate module builds? This will write to the module field in your package.json"
 };
 
-module.exports = exports = async function init(directory /*: string*/) {
-  let pkg = await Package.create(path.join(directory, "package.json"));
+async function doInit(pkg /*:Package*/) {
   try {
-    require.resolve(path.join(directory, "src"));
+    require.resolve(path.join(pkg.directory, "src"));
   } catch (e) {
     if (e.code === "MODULE_NOT_FOUND") {
       throw new Error(errors.noEntryPoint);
@@ -38,6 +37,20 @@ module.exports = exports = async function init(directory /*: string*/) {
     pkg.module = `dist/${pkg.name.replace(/.*\//, "")}.esm.js`;
   }
   await pkg.save();
+}
+
+module.exports = exports = async function init(directory /*: string*/) {
+  let pkg = await Package.create(path.join(directory));
+  // todo: figure out why this is empty without the declaration
+  let workspaces /*:null|Array<Package>*/ = await pkg.workspaces();
+  if (workspaces === null) {
+    await doInit(pkg);
+  } else {
+    // todo: figure out a way to make the validation parallel(how should the prompts work? batch them?)
+    for (let workspace of workspaces) {
+      await doInit(workspace);
+    }
+  }
 };
 
 Object.assign(exports, { confirms, errors });

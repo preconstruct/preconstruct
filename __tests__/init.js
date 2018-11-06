@@ -4,6 +4,7 @@ let path = require("path");
 let fs = require("fs-extra");
 const init = require("../src/init");
 let prompt /*: any */ = require("../src/prompt");
+let globby = require("globby");
 
 let unsafeRequire = require;
 
@@ -140,6 +141,55 @@ Object {
   "main": "dist/some-package.cjs.js",
   "module": "dist/some-package.esm.js",
   "name": "@some-scope/some-package",
+  "private": true,
+  "version": "1.0.0",
+}
+`);
+});
+
+test("monorepo", async () => {
+  let tmpPath = f.copy("monorepo");
+  // throw await globby(["packages/*"], {
+  //   cwd: tmpPath,
+  //   onlyDirectories: true
+  // });
+
+  prompt.promptConfirm.mockImplementation(question => {
+    switch (question) {
+      case init.confirms.writeMainField: {
+        return true;
+      }
+      case init.confirms.writeModuleField: {
+        return true;
+      }
+      default: {
+        throw new Error("unexpected case: " + question);
+      }
+    }
+  });
+
+  await init(tmpPath);
+  expect(prompt.promptConfirm).toBeCalledTimes(4);
+  let pkg1 = await getPkg(path.join(tmpPath, "packages", "package-one"));
+  let pkg2 = await getPkg(path.join(tmpPath, "packages", "package-two"));
+
+  expect(pkg1).toMatchInlineSnapshot(`
+Object {
+  "license": "MIT",
+  "main": "dist/package-one.cjs.js",
+  "module": "dist/package-one.esm.js",
+  "name": "@some-scope/package-one",
+  "private": true,
+  "version": "1.0.0",
+}
+`);
+
+  expect(pkg2).toMatchInlineSnapshot(`
+Object {
+  "license": "MIT",
+  "main": "dist/package-two.cjs.js",
+  "module": "dist/package-two.esm.js",
+  "name": "@some-scope/package-two",
   "private": true,
   "version": "1.0.0",
 }
