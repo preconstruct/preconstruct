@@ -3,67 +3,52 @@ import Package from "./package";
 import path from "path";
 import * as fs from "fs-extra";
 import { promptConfirm } from "./prompt";
-import { FatalError } from "./errors";
+import { FatalError, ValidationError } from "./errors";
 import { success, error, info } from "./logger";
-
-export let errors = {
-  noEntryPoint:
-    "No entrypoint was provided. Please create a file at src/index.js",
-  deniedWriteMainField: "Changing the main field is required...",
-  invalidModuleField:
-    "The module field is in an invalid state. Initialiation cannot continue unless it is fixed"
-};
-
-export let confirms = {
-  writeMainField:
-    "preconstruct is going to change the main field in your package.json, are you okay with that?",
-  writeModuleField:
-    "Would you like to generate module builds? This will write to the module field in your package.json",
-  fixModuleField: "Would you like to fix the module field?"
-};
-
-export let infos = {
-  validMainField: "main field is valid. No change required",
-  validModuleField: "module field is valid. No change required"
-};
+import { infos, confirms, errors } from "./messages";
+import { getValidModuleField, getValidMainField } from "./utils";
+import {
+  validateEntrypoint,
+  validateMainField,
+  validateModuleField
+} from "./validate";
 
 async function doInit(pkg: Package) {
-  let usableName = pkg.name.replace(/.*\//, "");
+  validateEntrypoint(pkg);
   try {
-    require.resolve(path.join(pkg.directory, "src"));
-  } catch (e) {
-    if (e.code === "MODULE_NOT_FOUND") {
-      throw new FatalError(errors.noEntryPoint);
-    }
-    throw e;
-  }
-  let correctMainField = `dist/${usableName}.cjs.js`;
-  if (correctMainField !== pkg.main) {
-    let canWriteMainField = await promptConfirm(confirms.writeMainField);
-    if (!canWriteMainField) {
-      throw new FatalError(errors.deniedWriteMainField);
-    }
-  } else {
+    validateMainField(pkg);
     info(infos.validMainField);
+  } catch (error) {
+    if (error instanceof ValidationError) {
+      let canWriteMainField = await promptConfirm(confirms.writeMainField);
+      if (!canWriteMainField) {
+        throw new FatalError(errors.deniedWriteMainField);
+      }
+      pkg.main = getValidMainField(pkg);
+    }
+    throw error;
+  }
+  try {
+    validateModuleField(pkg);
+    info(infos.validModuleField);
+  } catch (error) {
+    if (error instanceof ValidationError) {
+      let canWriteModuleField = await promptConfirm(confirms.writeModuleField);
+      let validModuleField = getValidModuleField(pkg);
+      if (canWriteModuleField) {
+        pkg.module = validModuleField;
+      } else if (pkg.module) {
+        error(errors.invalidModuleField);
+        let shouldFixModuleField = await promptConfirm(confirms.fixModuleField);
+        if (!shouldFixModuleField) {
+          throw new FatalError(errors.invalidModuleField);
+        }
+        pkg.module = validModuleField;
+      }
+    }
+    throw error;
   }
 
-  pkg.main = correctMainField;
-  let correctModuleField = `dist/${usableName}.esm.js`;
-  if (correctModuleField !== pkg.module) {
-    let canWriteModuleField = await promptConfirm(confirms.writeModuleField);
-    if (canWriteModuleField) {
-      pkg.module = correctModuleField;
-    } else if (pkg.module) {
-      error(errors.invalidModuleField);
-      let shouldFixModuleField = await promptConfirm(confirms.fixModuleField);
-      if (!shouldFixModuleField) {
-        throw new FatalError(errors.invalidModuleField);
-      }
-      pkg.module = correctModuleField;
-    }
-  } else {
-    info(infos.validModuleField);
-  }
   // ask if user wants umd build
   // check if there is a browser option and if it's invalid, offer to fix it
   await pkg.save();
@@ -73,8 +58,7 @@ export default async function init(directory: string) {
   let pkg = await Package.create(path.join(directory));
   // do more stuff with checking whether the repo is yarn workspaces or bolt monorepo
 
-  // todo: figure out why this is empty without the declaration
-  let workspaces: null | Array<Package> = await pkg.packages();
+  let workspaces = await pkg.packages();
   if (workspaces === null) {
     await doInit(pkg);
   } else {

@@ -2,7 +2,9 @@
 import fixturez from "fixturez";
 import path from "path";
 import * as fs from "fs-extra";
-import init, { confirms, infos, errors } from "../src/init";
+import init from "../src/init";
+import { infos, confirms, errors } from "../src/messages";
+
 let prompt: any = require("../src/prompt");
 let logger: any = require("../src/logger");
 

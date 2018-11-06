@@ -29,8 +29,8 @@ module.exports = function(babel) {
           path.node.body.body.unshift(
             babel.template`
               class Thing {
-                constructor(props) {
-                  super(props);
+                constructor(props, context, updater) {
+                  super(props, context, updater);
                 }
               }
             `({}).body.body[0]

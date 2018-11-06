@@ -23,7 +23,7 @@ export default class Package {
     this.path = filePath;
     this.directory = nodePath.dirname(filePath);
   }
-  static async create(directory: string) {
+  static async create(directory: string): Promise<Package> {
     let filePath = nodePath.join(directory, "package.json");
     let contents: string = await fs.readFile(filePath, "utf-8");
     return new Package(filePath, contents);
