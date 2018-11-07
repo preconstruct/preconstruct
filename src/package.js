@@ -52,6 +52,12 @@ export default class Package {
   set browser(option: string | { [key: string]: string }) {
     this.json.module = option;
   }
+  get dependencies() {
+    is(this.json.dependencies, is.maybe(objectOfString));
+  }
+  get peerDependencies() {
+    is(this.json.peerDependencies, is.maybe(objectOfString));
+  }
   get config() {
     // in the future we might want to merge from parent configs
     return is(
@@ -64,6 +70,7 @@ export default class Package {
   get configPackages() {
     return is(this.config.packages, arrayOfString);
   }
+
   async packages(): Promise<null | Array<Package>> {
     // support yarn workspaces later
     // probably bolt too

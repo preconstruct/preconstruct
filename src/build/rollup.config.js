@@ -6,8 +6,11 @@ const babel = require("rollup-plugin-babel");
 const alias = require("rollup-plugin-alias");
 const cjs = require("rollup-plugin-commonjs");
 const replace = require("rollup-plugin-replace");
-const lernaAliases = require("lerna-alias").rollup;
+// const lernaAliases = require("lerna-alias").rollup;
+
 const chalk = require("chalk");
+import builtInModules from "builtin-modules";
+import Package from "../package";
 
 // this makes sure nested imports of external packages are external
 const makeExternalPredicate = externalArr => {
@@ -28,10 +31,10 @@ let pkgJsonsAllowedToFail = [
 ];
 
 function getChildPeerDeps(
-  finalPeerDeps /*: Array<string> */,
-  isUMD /*: boolean */,
-  depKeys /*: Array<string> */,
-  doneDeps /*: Array<string> */
+  finalPeerDeps: Array<string>,
+  isUMD: boolean,
+  depKeys: Array<string>,
+  doneDeps: Array<string>
 ) {
   depKeys.filter(x => !doneDeps.includes(x)).forEach(key => {
     let pkgJson;
@@ -69,25 +72,21 @@ function getChildPeerDeps(
   });
 }
 
-/*::
-
-import type { Package } from './types'
-*/
 module.exports = (
-  data /*: Package */,
+  pkg: Package,
+  entrypoint: string,
   {
     isUMD,
     isBrowser,
     isProd,
     shouldMinifyButStillBePretty
-  } /*: {
+  }: {
     isUMD: boolean,
     isBrowser: boolean,
     isProd: boolean,
     shouldMinifyButStillBePretty: boolean
-  } */
+  }
 ) => {
-  const { pkg } = data;
   let external = [];
   if (pkg.peerDependencies) {
     external.push(...Object.keys(pkg.peerDependencies));
@@ -103,23 +102,22 @@ module.exports = (
     ),
     []
   );
-  external.push("fs", "path");
-  if (data.name === "react-emotion") {
-    external = external.filter(name => name !== "emotion");
+  if (!isBrowser) {
+    external.push(...builtInModules);
   }
-  let packageAliases = lernaAliases();
+  // let packageAliases = lernaAliases();
 
   const config = {
-    input: data.input,
+    input: entrypoint,
     external: makeExternalPredicate(external),
-    onwarn: (warning /*: * */) => {
+    onwarn: (warning: *) => {
       switch (warning.code) {
         case "UNUSED_EXTERNAL_IMPORT": {
           break;
         }
         default: {
           console.error(chalk.red(warning.toString()));
-          throw new Error(`There was an error compiling ${data.name}`);
+          throw new Error(`There was an error compiling ${pkg.name}`);
         }
       }
     },
@@ -158,7 +156,7 @@ module.exports = (
           "typeof document": JSON.stringify("object"),
           "typeof window": JSON.stringify("object")
         }),
-      isUMD && alias(packageAliases),
+      // isUMD && alias(packageAliases),
       isUMD && resolve(),
       (isUMD || isProd) &&
         replace({

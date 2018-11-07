@@ -122,14 +122,6 @@ function getPath(
 
 exports.getPath = getPath;
 
-function getDevPath(cjsPath /*: string */) {
-  return cjsPath.replace(".js", ".dev.js");
-}
-
-function getProdPath(cjsPath /*: string */) {
-  return cjsPath.replace(".js", ".prod.js");
-}
-
 Object.assign(exports, {
   getPath,
   getDevPath,
