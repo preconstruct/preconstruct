@@ -57,7 +57,10 @@ async function doInit(pkg: Package) {
       pkg.umdMain = getValidUmdMainField(pkg);
       let umdName = await promptInput(inputs.getUmdName);
       pkg.umdName = umdName;
-    } else if (!isUmdMainFieldValid(pkg) || !isUmdNameSpecified(pkg)) {
+    } else if (
+      pkg.umdMain !== null &&
+      (!isUmdMainFieldValid(pkg) || !isUmdNameSpecified(pkg))
+    ) {
       throw new FatalError(errors.invalidUmdMainField);
     }
   }

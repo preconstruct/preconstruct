@@ -28,6 +28,10 @@ Array [
     "module field is valid",
   ],
   Array [
+    "🎁 info valid-package",
+    "umd:main field is valid",
+  ],
+  Array [
     "🎁 success",
     "package is valid!",
   ],

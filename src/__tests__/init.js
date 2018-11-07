@@ -65,6 +65,9 @@ test("set only main field", async () => {
       case confirms.writeModuleField: {
         return false;
       }
+      case confirms.writeUmdBuilds: {
+        return false;
+      }
       default: {
         throw new Error("unexpected case: " + question);
       }
@@ -72,7 +75,7 @@ test("set only main field", async () => {
   });
 
   await init(tmpPath);
-  expect(prompt.promptConfirm).toBeCalledTimes(2);
+  expect(prompt.promptConfirm).toBeCalledTimes(3);
   let pkg = await getPkg(tmpPath);
   expect(pkg).toMatchInlineSnapshot(`
 Object {
@@ -96,6 +99,9 @@ test("set main and module field", async () => {
       case confirms.writeModuleField: {
         return true;
       }
+      case confirms.writeUmdBuilds: {
+        return false;
+      }
       default: {
         throw new Error("unexpected case: " + question);
       }
@@ -103,7 +109,7 @@ test("set main and module field", async () => {
   });
 
   await init(tmpPath);
-  expect(prompt.promptConfirm).toBeCalledTimes(2);
+  expect(prompt.promptConfirm).toBeCalledTimes(3);
   let pkg = await getPkg(tmpPath);
 
   expect(pkg).toMatchInlineSnapshot(`
@@ -129,6 +135,9 @@ test("scoped package", async () => {
       case confirms.writeModuleField: {
         return true;
       }
+      case confirms.writeUmdBuilds: {
+        return false;
+      }
       default: {
         throw new Error("unexpected case: " + question);
       }
@@ -136,7 +145,7 @@ test("scoped package", async () => {
   });
 
   await init(tmpPath);
-  expect(prompt.promptConfirm).toBeCalledTimes(2);
+  expect(prompt.promptConfirm).toBeCalledTimes(3);
   let pkg = await getPkg(tmpPath);
 
   expect(pkg).toMatchInlineSnapshot(`
@@ -153,10 +162,6 @@ Object {
 
 test("monorepo", async () => {
   let tmpPath = f.copy("monorepo");
-  // throw await globby(["packages/*"], {
-  //   cwd: tmpPath,
-  //   onlyDirectories: true
-  // });
 
   prompt.promptConfirm.mockImplementation(question => {
     switch (question) {
@@ -166,6 +171,9 @@ test("monorepo", async () => {
       case confirms.writeModuleField: {
         return true;
       }
+      case confirms.writeUmdBuilds: {
+        return false;
+      }
       default: {
         throw new Error("unexpected case: " + question);
       }
@@ -173,7 +181,7 @@ test("monorepo", async () => {
   });
 
   await init(tmpPath);
-  expect(prompt.promptConfirm).toBeCalledTimes(4);
+  expect(prompt.promptConfirm).toBeCalledTimes(6);
   let pkg1 = await getPkg(path.join(tmpPath, "packages", "package-one"));
   let pkg2 = await getPkg(path.join(tmpPath, "packages", "package-two"));
 
@@ -237,6 +245,9 @@ test("invalid fields", async () => {
       case confirms.writeModuleField: {
         return true;
       }
+      case confirms.writeUmdBuilds: {
+        return false;
+      }
       default: {
         throw new Error("unexpected case: " + question);
       }
@@ -244,7 +255,7 @@ test("invalid fields", async () => {
   });
 
   await init(tmpPath);
-  expect(prompt.promptConfirm).toBeCalledTimes(2);
+  expect(prompt.promptConfirm).toBeCalledTimes(3);
   let pkg = await getPkg(tmpPath);
 
   expect(pkg).toMatchInlineSnapshot(`

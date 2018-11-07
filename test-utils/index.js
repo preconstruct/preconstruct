@@ -27,6 +27,9 @@ export async function initBasic(directory: string) {
       case confirms.writeModuleField: {
         return true;
       }
+      case confirms.writeUmdBuilds: {
+        return false;
+      }
       default: {
         throw new Error("unexpected case: " + question);
       }
