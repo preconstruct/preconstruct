@@ -2,9 +2,9 @@
 import fixturez from "fixturez";
 import path from "path";
 import * as fs from "fs-extra";
-import validate from "../src/validate";
-import { infos, confirms, errors, successes } from "../src/messages";
-import * as logger from "../src/logger";
+import validate from "../validate";
+import { infos, confirms, errors, successes } from "../messages";
+import * as logger from "../logger";
 
 jest.mock("../src/logger");
 

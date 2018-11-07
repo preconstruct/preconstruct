@@ -2,11 +2,11 @@
 import fixturez from "fixturez";
 import path from "path";
 import * as fs from "fs-extra";
-import init from "../src/init";
-import { infos, confirms, errors } from "../src/messages";
+import init from "../init";
+import { infos, confirms, errors } from "../messages";
 
-let prompt: any = require("../src/prompt");
-let logger: any = require("../src/logger");
+let prompt: any = require("../prompt");
+let logger: any = require("../logger");
 
 const f = fixturez(__dirname);
 

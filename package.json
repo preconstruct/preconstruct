@@ -13,7 +13,7 @@
     "preconstruct": "./bin.js"
   },
   "scripts": {
-    "build": "babel src --out-dir lib"
+    "build": "babel src --out-dir lib --ignore '**/__tests__/**/*'"
   },
   "repository": "https://github.com/mitchellhamilton/preconstruct",
   "license": "MIT",
