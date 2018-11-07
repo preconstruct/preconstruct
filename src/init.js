@@ -1,6 +1,5 @@
 // @flow
 import Package from "./package";
-import path from "path";
 import * as fs from "fs-extra";
 import { promptConfirm } from "./prompt";
 import { FatalError, ValidationError } from "./errors";
@@ -57,7 +56,7 @@ async function doInit(pkg: Package) {
 }
 
 export default async function init(directory: string) {
-  let pkg = await Package.create(path.join(directory));
+  let pkg = await Package.create(directory);
   // do more stuff with checking whether the repo is yarn workspaces or bolt monorepo
 
   let workspaces = await pkg.packages();

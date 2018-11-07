@@ -57,7 +57,7 @@ async function validatePackage(pkg: Package) {
 }
 
 export default async function validate(directory: string) {
-  let pkg = await Package.create(path.join(directory));
+  let pkg = await Package.create(directory);
 
   let workspaces = await pkg.packages();
   if (workspaces === null) {
