@@ -1,15 +1,21 @@
 // @flow
 import { Package } from "./package";
 import * as fs from "fs-extra";
-import { promptConfirm } from "./prompt";
+import { promptConfirm, promptInput } from "./prompt";
 import { FatalError, ValidationError } from "./errors";
 import { success, error, info } from "./logger";
-import { infos, confirms, errors } from "./messages";
-import { getValidModuleField, getValidMainField } from "./utils";
+import { infos, confirms, errors, inputs } from "./messages";
+import {
+  getValidModuleField,
+  getValidMainField,
+  getValidUmdMainField
+} from "./utils";
 import {
   validateEntrypoint,
   isMainFieldValid,
-  isModuleFieldValid
+  isModuleFieldValid,
+  isUmdMainFieldValid,
+  isUmdNameSpecified
 } from "./validate";
 
 async function doInit(pkg: Package) {
@@ -41,7 +47,21 @@ async function doInit(pkg: Package) {
     info(infos.validModuleField, pkg);
   }
 
-  // ask if user wants umd build
+  if (
+    pkg.umdMain === null ||
+    !isUmdMainFieldValid(pkg) ||
+    !isUmdNameSpecified(pkg)
+  ) {
+    let shouldWriteUMDBuilds = await promptConfirm(confirms.writeUmdBuilds);
+    if (shouldWriteUMDBuilds) {
+      pkg.umdMain = getValidUmdMainField(pkg);
+      let umdName = await promptInput(inputs.getUmdName);
+      pkg.umdName = umdName;
+    } else if (!isUmdMainFieldValid(pkg) || !isUmdNameSpecified(pkg)) {
+      throw new FatalError(errors.invalidUmdMainField);
+    }
+  }
+
   // check if there is a browser option and if it's invalid, offer to fix it
   await pkg.save();
 }

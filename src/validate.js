@@ -33,14 +33,12 @@ export function isModuleFieldValid(pkg: Package) {
   return pkg.module === getValidModuleField(pkg);
 }
 
-export function isUMDValid(pkg: Package): string | true {
-  if (pkg.umdMain !== getValidUmdMainField(pkg)) {
-    return errors.invalidUmdMainField;
-  }
-  if (pkg.config.umdName === null) {
-    return errors.umdNameNotSpecified;
-  }
-  return true;
+export function isUmdMainFieldValid(pkg: Package) {
+  return pkg.umdMain === getValidUmdMainField(pkg);
+}
+
+export function isUmdNameSpecified(pkg: Package) {
+  return pkg.config.umdName !== null;
 }
 
 export function validatePackage(pkg: Package) {
@@ -59,11 +57,14 @@ export function validatePackage(pkg: Package) {
     }
   }
   if (pkg.umdMain !== null) {
-    let umdValidMessage = isUMDValid(pkg);
-    if (umdValidMessage === true) {
-      logger.info(infos.validUmdMainField, pkg);
+    if (isUmdMainFieldValid(pkg)) {
+      if (isUmdNameSpecified(pkg)) {
+        logger.info(infos.validUmdMainField, pkg);
+      } else {
+        throw new FatalError(errors.umdNameNotSpecified);
+      }
     } else {
-      throw new FatalError(umdValidMessage);
+      throw new FatalError(errors.invalidUmdMainField);
     }
   }
 }

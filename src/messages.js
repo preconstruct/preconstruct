@@ -17,7 +17,12 @@ export let confirms = {
     "preconstruct is going to change the main field in your package.json, are you okay with that?",
   writeModuleField:
     "would you like to generate module builds? this will write to the module field in your package.json",
-  fixModuleField: "would you like to fix the module field?"
+  fixModuleField: "would you like to fix the module field?",
+  writeUmdBuilds: "would you like to generate UMD builds?"
+};
+
+export let inputs = {
+  getUmdName: "what should the name used for UMD bundles be?"
 };
 
 export let infos = {

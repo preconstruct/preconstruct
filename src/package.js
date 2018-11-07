@@ -77,12 +77,31 @@ export class Package {
       )
     );
   }
+
   get configPackages(): Array<string> {
     return is(this.config.packages, arrayOfString);
   }
 
   get umdMain(): string | null {
     return is(this.json["umd:main"], is.maybe(is.string));
+  }
+  set umdMain(path: string) {
+    this.json["umd:main"] = path;
+  }
+  get undName(): null | string {
+    return this.config.umdName;
+  }
+  set umdName(umdName: null | string) {
+    if (umdName === null) {
+      delete this.json.preconstruct.umdName;
+      if (Object.keys(this.json.preconstruct).length === 0) {
+        delete this.json.preconstruct;
+      }
+    }
+    if (!this.json.preconstruct) {
+      this.json.preconstruct = {};
+    }
+    this.json.preconstruct.umdName = umdName;
   }
 
   async packages(): Promise<null | Array<Package>> {
