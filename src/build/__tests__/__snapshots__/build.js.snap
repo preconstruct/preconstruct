@@ -53,3 +53,14 @@ exports[`monorepo: package-two.esm.js 1`] = `
 export default index;
 "
 `;
+
+exports[`no module: no-module.cjs.js 1`] = `
+"'use strict';
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+var index = \\"this does not have a module build\\";
+
+exports.default = index;
+"
+`;

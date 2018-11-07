@@ -60,17 +60,29 @@ export class Package {
   get peerDependencies(): null | { [key: string]: string } {
     return is(this.json.peerDependencies, is.maybe(objectOfString));
   }
-  get config(): { packages: null | Array<string> } {
+
+  get config(): { packages: null | Array<string>, umdName: string | null } {
     // in the future we might want to merge from parent configs
     return is(
       this.json.preconstruct,
-      is.default(is.shape({ packages: is.maybe(arrayOfString) }), {
-        packages: null
-      })
+      is.default(
+        is.shape({
+          packages: is.maybe(arrayOfString),
+          umdName: is.maybe(is.string)
+        }),
+        {
+          packages: null,
+          umdName: null
+        }
+      )
     );
   }
   get configPackages(): Array<string> {
     return is(this.config.packages, arrayOfString);
+  }
+
+  get umdMain(): string | null {
+    return is(this.json["umd:main"], is.maybe(is.string));
   }
 
   async packages(): Promise<null | Array<Package>> {

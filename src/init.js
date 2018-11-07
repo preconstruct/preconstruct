@@ -8,46 +8,37 @@ import { infos, confirms, errors } from "./messages";
 import { getValidModuleField, getValidMainField } from "./utils";
 import {
   validateEntrypoint,
-  validateMainField,
-  validateModuleField
+  isMainFieldValid,
+  isModuleFieldValid
 } from "./validate";
 
 async function doInit(pkg: Package) {
   validateEntrypoint(pkg);
-  try {
-    validateMainField(pkg);
+  if (isMainFieldValid(pkg)) {
     info(infos.validMainField, pkg);
-  } catch (error) {
-    if (error instanceof ValidationError) {
-      let canWriteMainField = await promptConfirm(confirms.writeMainField);
-      if (!canWriteMainField) {
-        throw new FatalError(errors.deniedWriteMainField);
-      }
-      pkg.main = getValidMainField(pkg);
-    } else {
-      throw error;
+  } else {
+    let canWriteMainField = await promptConfirm(confirms.writeMainField);
+    if (!canWriteMainField) {
+      throw new FatalError(errors.deniedWriteMainField);
     }
+    pkg.main = getValidMainField(pkg);
   }
-  try {
-    validateModuleField(pkg);
-    info(infos.validModuleField, pkg);
-  } catch (err) {
-    if (err instanceof ValidationError) {
-      let canWriteModuleField = await promptConfirm(confirms.writeModuleField);
-      let validModuleField = getValidModuleField(pkg);
-      if (canWriteModuleField) {
-        pkg.module = validModuleField;
-      } else if (pkg.module) {
-        error(errors.invalidModuleField, pkg);
-        let shouldFixModuleField = await promptConfirm(confirms.fixModuleField);
-        if (!shouldFixModuleField) {
-          throw new FatalError(errors.invalidModuleField);
-        }
-        pkg.module = validModuleField;
+
+  if (pkg.module === null || !isModuleFieldValid(pkg)) {
+    let canWriteModuleField = await promptConfirm(confirms.writeModuleField);
+    let validModuleField = getValidModuleField(pkg);
+    if (canWriteModuleField) {
+      pkg.module = validModuleField;
+    } else if (pkg.module) {
+      error(errors.invalidModuleField, pkg);
+      let shouldFixModuleField = await promptConfirm(confirms.fixModuleField);
+      if (!shouldFixModuleField) {
+        throw new FatalError(errors.invalidModuleField);
       }
-    } else {
-      throw error;
+      pkg.module = validModuleField;
     }
+  } else {
+    info(infos.validModuleField, pkg);
   }
 
   // ask if user wants umd build

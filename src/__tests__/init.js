@@ -211,17 +211,50 @@ test("does not prompt or modify if already valid", async () => {
   expect(logMock.log.mock.calls).toMatchInlineSnapshot(`
 Array [
   Array [
-    "🎁 info valid-package ",
-    "main field is valid. No change required",
+    "🎁 info valid-package",
+    "main field is valid",
   ],
   Array [
-    "🎁 info valid-package ",
-    "module field is valid. No change required",
+    "🎁 info valid-package",
+    "module field is valid",
   ],
   Array [
-    "🎁 success ",
+    "🎁 success",
     "Initialised package!",
   ],
 ]
+`);
+});
+
+test("invalid fields", async () => {
+  let tmpPath = f.copy("invalid-fields");
+
+  prompt.promptConfirm.mockImplementation(question => {
+    switch (question) {
+      case confirms.writeMainField: {
+        return true;
+      }
+      case confirms.writeModuleField: {
+        return true;
+      }
+      default: {
+        throw new Error("unexpected case: " + question);
+      }
+    }
+  });
+
+  await init(tmpPath);
+  expect(prompt.promptConfirm).toBeCalledTimes(2);
+  let pkg = await getPkg(tmpPath);
+
+  expect(pkg).toMatchInlineSnapshot(`
+Object {
+  "license": "MIT",
+  "main": "dist/invalid-fields.cjs.js",
+  "module": "dist/invalid-fields.esm.js",
+  "name": "invalid-fields",
+  "private": true,
+  "version": "1.0.0",
+}
 `);
 });

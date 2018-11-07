@@ -3,7 +3,11 @@ import { Package } from "./package";
 import path from "path";
 import { errors, successes, infos } from "./messages";
 import { FatalError, ValidationError } from "./errors";
-import { getValidModuleField, getValidMainField } from "./utils";
+import {
+  getValidModuleField,
+  getValidMainField,
+  getValidUmdMainField
+} from "./utils";
 import * as logger from "./logger";
 
 // this doesn't offer to fix anything
@@ -21,39 +25,47 @@ export function validateEntrypoint(pkg: Package) {
   }
 }
 
-export function validateMainField(pkg: Package) {
-  if (pkg.main !== getValidMainField(pkg)) {
-    throw new ValidationError(errors.invalidMainField);
-  }
+export function isMainFieldValid(pkg: Package) {
+  return pkg.main === getValidMainField(pkg);
 }
 
-export function validateModuleField(pkg: Package) {
-  if (pkg.module !== getValidModuleField(pkg)) {
-    throw new ValidationError(errors.invalidModuleField);
+export function isModuleFieldValid(pkg: Package) {
+  return pkg.module === getValidModuleField(pkg);
+}
+
+export function isUMDValid(pkg: Package): string | true {
+  if (pkg.umdMain !== getValidUmdMainField(pkg)) {
+    return errors.invalidUmdMainField;
   }
+  if (pkg.config.umdName === null) {
+    return errors.umdNameNotSpecified;
+  }
+  return true;
 }
 
 export function validatePackage(pkg: Package) {
   validateEntrypoint(pkg);
   logger.info(infos.validEntrypoint, pkg);
-  try {
-    validateMainField(pkg);
-  } catch (e) {
-    if (e instanceof ValidationError) {
-      throw new FatalError(e.message);
-    }
-    throw e;
+  if (!isMainFieldValid(pkg)) {
+    throw new FatalError(errors.invalidMainField);
   }
+
   logger.info(infos.validMainField, pkg);
-  try {
-    validateModuleField(pkg);
-  } catch (e) {
-    if (e instanceof ValidationError) {
-      throw new FatalError(e.message);
+  if (pkg.module !== null) {
+    if (isModuleFieldValid(pkg)) {
+      logger.info(infos.validModuleField, pkg);
+    } else {
+      throw new FatalError(errors.invalidMainField);
     }
-    throw e;
   }
-  logger.info(infos.validModuleField, pkg);
+  if (pkg.umdMain !== null) {
+    let umdValidMessage = isUMDValid(pkg);
+    if (umdValidMessage === true) {
+      logger.info(infos.validUmdMainField, pkg);
+    } else {
+      throw new FatalError(umdValidMessage);
+    }
+  }
 }
 
 export default async function validate(directory: string) {

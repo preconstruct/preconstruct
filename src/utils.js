@@ -15,6 +15,11 @@ export function getValidModuleField(pkg: Package) {
   return `dist/${nameForDist}.esm.js`;
 }
 
+export function getValidUmdMainField(pkg: Package) {
+  let nameForDist = getNameForDist(pkg.name);
+  return `dist/${nameForDist}.min.js`;
+}
+
 function getDevPath(cjsPath: string) {
   return cjsPath.replace(/\.js$/, ".dev.js");
 }

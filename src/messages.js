@@ -2,23 +2,28 @@
 
 export let errors = {
   noEntryPoint:
-    "No entrypoint was provided. Please create a file at src/index.js",
-  deniedWriteMainField: "Changing the main field is required...",
-  invalidModuleField: "The module field is in an invalid state.",
-  invalidMainField: "The main field is in an invalid state."
+    "no entrypoint was provided, please create a file at src/index.js",
+  deniedWriteMainField:
+    "changing the main field is required for preconstruct to build",
+  invalidModuleField: "module field is invalid",
+  invalidMainField: "main field is invalid",
+  invalidUmdMainField: "umd:main field is invalid",
+  umdNameNotSpecified:
+    "the umd:main field is specified but a umdName option is not specified. please add it to the preconstruct field in your package.json"
 };
 
 export let confirms = {
   writeMainField:
     "preconstruct is going to change the main field in your package.json, are you okay with that?",
   writeModuleField:
-    "Would you like to generate module builds? This will write to the module field in your package.json",
-  fixModuleField: "Would you like to fix the module field?"
+    "would you like to generate module builds? this will write to the module field in your package.json",
+  fixModuleField: "would you like to fix the module field?"
 };
 
 export let infos = {
-  validMainField: "main field is valid. No change required",
-  validModuleField: "module field is valid. No change required",
+  validMainField: "main field is valid",
+  validModuleField: "module field is valid",
+  validUmdMainField: "umd:main field is valid",
   validEntrypoint: "a valid entry point exists."
 };
 
