@@ -9,8 +9,8 @@ exports[`add-basic-constructor-to-react-component basic 1`] = `
       ↓ ↓ ↓ ↓ ↓ ↓
 
 class Thing extends React.Component {
-  constructor(props, state, updater) {
-    super(props, state, updater);
+  constructor(props, context, updater) {
+    super(props, context, updater);
     this.thing = true;
   }
 

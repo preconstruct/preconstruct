@@ -25,8 +25,9 @@ async function doInit(pkg: Package) {
         throw new FatalError(errors.deniedWriteMainField);
       }
       pkg.main = getValidMainField(pkg);
+    } else {
+      throw error;
     }
-    throw error;
   }
   try {
     validateModuleField(pkg);
@@ -45,8 +46,9 @@ async function doInit(pkg: Package) {
         }
         pkg.module = validModuleField;
       }
+    } else {
+      throw error;
     }
-    throw err;
   }
 
   // ask if user wants umd build

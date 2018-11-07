@@ -6,7 +6,7 @@ import validate from "../validate";
 import { infos, confirms, errors, successes } from "../messages";
 import * as logger from "../logger";
 
-jest.mock("../src/logger");
+jest.mock("../logger");
 
 const f = fixturez(__dirname);
 

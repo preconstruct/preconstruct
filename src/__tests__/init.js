@@ -18,8 +18,8 @@ async function getPkg(filepath) {
   );
 }
 
-jest.mock("../src/prompt");
-jest.mock("../src/logger");
+jest.mock("../prompt");
+jest.mock("../logger");
 
 afterEach(() => {
   jest.resetAllMocks();

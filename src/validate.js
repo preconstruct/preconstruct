@@ -28,8 +28,8 @@ export function validateMainField(pkg: Package) {
 }
 
 export function validateModuleField(pkg: Package) {
-  if (pkg.module !== getValidMainField(pkg)) {
-    throw new ValidationError(errors.invalidMainField);
+  if (pkg.module !== getValidModuleField(pkg)) {
+    throw new ValidationError(errors.invalidModuleField);
   }
 }
 
