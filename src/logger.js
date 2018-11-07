@@ -1,16 +1,24 @@
 // @flow
 import chalk from "chalk";
+import { Package } from "./package";
 
 let preconstructEmoji = "🎁 ";
 
-export function error(error: string) {
-  console.error(preconstructEmoji + chalk.red("error"), error);
+function suffix(pkg?: Package) {
+  return pkg !== undefined ? ` ${pkg.name} ` : " ";
 }
 
-export function success(message: string) {
-  console.log(preconstructEmoji + chalk.green("success"), message);
+export function error(error: string, pkg?: Package) {
+  console.error(preconstructEmoji + chalk.red("error") + suffix(pkg), error);
 }
 
-export function info(message: string) {
-  console.log(preconstructEmoji + chalk.cyan("info"), message);
+export function success(message: string, pkg?: Package) {
+  console.log(
+    preconstructEmoji + chalk.green("success") + suffix(pkg),
+    message
+  );
+}
+
+export function info(message: string, pkg?: Package) {
+  console.log(preconstructEmoji + chalk.cyan("info") + suffix(pkg), message);
 }

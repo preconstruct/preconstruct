@@ -4,9 +4,9 @@ import path from "path";
 import * as fs from "fs-extra";
 import init from "../init";
 import { infos, confirms, errors } from "../messages";
+import { logMock } from "../../test-utils";
 
 let prompt: any = require("../prompt");
-let logger: any = require("../logger");
 
 const f = fixturez(__dirname);
 
@@ -19,7 +19,6 @@ async function getPkg(filepath) {
 }
 
 jest.mock("../prompt");
-jest.mock("../logger");
 
 afterEach(() => {
   jest.resetAllMocks();
@@ -209,13 +208,19 @@ test("does not prompt or modify if already valid", async () => {
   let current = await getPkg(tmpPath);
   expect(original).toEqual(current);
   expect(prompt.promptConfirm).not.toBeCalled();
-  expect(logger.info.mock.calls).toMatchInlineSnapshot(`
+  expect(logMock.log.mock.calls).toMatchInlineSnapshot(`
 Array [
   Array [
+    "🎁 info valid-package ",
     "main field is valid. No change required",
   ],
   Array [
+    "🎁 info valid-package ",
     "module field is valid. No change required",
+  ],
+  Array [
+    "🎁 success ",
+    "Initialised package!",
   ],
 ]
 `);

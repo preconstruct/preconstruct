@@ -1,5 +1,5 @@
 // @flow
-import Package from "./package";
+import { Package } from "./package";
 
 export function getNameForDist(name: string): string {
   return name.replace(/.*\//, "");

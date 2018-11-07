@@ -1,5 +1,5 @@
 // @flow
-import Package from "./package";
+import { Package } from "./package";
 import * as fs from "fs-extra";
 import { promptConfirm } from "./prompt";
 import { FatalError, ValidationError } from "./errors";
@@ -16,7 +16,7 @@ async function doInit(pkg: Package) {
   validateEntrypoint(pkg);
   try {
     validateMainField(pkg);
-    info(infos.validMainField);
+    info(infos.validMainField, pkg);
   } catch (error) {
     if (error instanceof ValidationError) {
       let canWriteMainField = await promptConfirm(confirms.writeMainField);
@@ -30,7 +30,7 @@ async function doInit(pkg: Package) {
   }
   try {
     validateModuleField(pkg);
-    info(infos.validModuleField);
+    info(infos.validModuleField, pkg);
   } catch (err) {
     if (err instanceof ValidationError) {
       let canWriteModuleField = await promptConfirm(confirms.writeModuleField);
@@ -38,7 +38,7 @@ async function doInit(pkg: Package) {
       if (canWriteModuleField) {
         pkg.module = validModuleField;
       } else if (pkg.module) {
-        error(errors.invalidModuleField);
+        error(errors.invalidModuleField, pkg);
         let shouldFixModuleField = await promptConfirm(confirms.fixModuleField);
         if (!shouldFixModuleField) {
           throw new FatalError(errors.invalidModuleField);
@@ -57,16 +57,17 @@ async function doInit(pkg: Package) {
 
 export default async function init(directory: string) {
   let pkg = await Package.create(directory);
-  // do more stuff with checking whether the repo is yarn workspaces or bolt monorepo
+  // do more stuff with checking whether the repo is using yarn workspaces or bolt
 
-  let workspaces = await pkg.packages();
-  if (workspaces === null) {
+  let packages = await pkg.packages();
+  if (packages === null) {
     await doInit(pkg);
+    success("Initialised package!");
   } else {
     // todo: figure out a way to make the validation parallel(how should the prompts work? batch all prompts of the same type? dataloader-style)
-    for (let workspace of workspaces) {
-      await doInit(workspace);
+    for (let pkg of packages) {
+      await doInit(pkg);
     }
+    success("Initialised packages!");
   }
-  success("Initialised package!");
 }

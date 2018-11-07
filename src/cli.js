@@ -2,6 +2,7 @@
 import meow from "meow";
 import init from "./init";
 import validate from "./validate";
+import build from "./build";
 import { error } from "./logger";
 import { FatalError } from "./errors";
 
@@ -34,6 +35,10 @@ class CommandNotFoundError extends Error {}
         }
         case "validate": {
           await validate(process.cwd());
+          return;
+        }
+        case "build": {
+          await build(process.cwd());
           return;
         }
 

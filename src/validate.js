@@ -1,5 +1,5 @@
 // @flow
-import Package from "./package";
+import { Package } from "./package";
 import path from "path";
 import { errors, successes, infos } from "./messages";
 import { FatalError, ValidationError } from "./errors";
@@ -33,9 +33,9 @@ export function validateModuleField(pkg: Package) {
   }
 }
 
-async function validatePackage(pkg: Package) {
+export function validatePackage(pkg: Package) {
   validateEntrypoint(pkg);
-  logger.info(infos.validEntrypoint);
+  logger.info(infos.validEntrypoint, pkg);
   try {
     validateMainField(pkg);
   } catch (e) {
@@ -44,7 +44,7 @@ async function validatePackage(pkg: Package) {
     }
     throw e;
   }
-  logger.info(infos.validMainField);
+  logger.info(infos.validMainField, pkg);
   try {
     validateModuleField(pkg);
   } catch (e) {
@@ -53,18 +53,18 @@ async function validatePackage(pkg: Package) {
     }
     throw e;
   }
-  logger.info(infos.validModuleField);
+  logger.info(infos.validModuleField, pkg);
 }
 
 export default async function validate(directory: string) {
   let pkg = await Package.create(directory);
 
-  let workspaces = await pkg.packages();
-  if (workspaces === null) {
+  let packages = await pkg.packages();
+  if (packages === null) {
     validatePackage(pkg);
   } else {
-    for (let workspace of workspaces) {
-      validatePackage(workspace);
+    for (let pkg of packages) {
+      validatePackage(pkg);
     }
   }
 

@@ -3,6 +3,7 @@
 import is from "sarcastic";
 import nodePath from "path";
 import * as fs from "fs-extra";
+import { validatePackage } from "./validate";
 // move this to the flow-typed folder later
 let globby: (
   globs: string | Array<string>,
@@ -13,13 +14,14 @@ let objectOfString = is.objectOf(is.string);
 
 let arrayOfString = is.arrayOf(is.string);
 
-export default class Package {
+export class Package {
   json: Object;
   path: string;
   directory: string;
-
+  _contents: string;
   constructor(filePath: string, contents: string) {
     this.json = is(JSON.parse(contents), is.object);
+    this._contents = contents;
     this.path = filePath;
     this.directory = nodePath.dirname(filePath);
   }
@@ -28,37 +30,37 @@ export default class Package {
     let contents: string = await fs.readFile(filePath, "utf-8");
     return new Package(filePath, contents);
   }
-  get name() {
+  get name(): string {
     return is(this.json.name, is.string);
   }
   set name(name: string) {
     this.json.name = name;
   }
-  get main() {
+  get main(): string | null {
     return is(this.json.main, is.maybe(is.string));
   }
   set main(path: string) {
     this.json.main = path;
   }
-  get module() {
+  get module(): string | null {
     return is(this.json.module, is.maybe(is.string));
   }
   set module(path: string) {
     this.json.module = path;
   }
-  get browser() {
+  get browser(): null | string | { [key: string]: string } {
     return is(this.json.module, is.maybe(is.either(is.string, objectOfString)));
   }
   set browser(option: string | { [key: string]: string }) {
     this.json.module = option;
   }
-  get dependencies() {
-    is(this.json.dependencies, is.maybe(objectOfString));
+  get dependencies(): null | { [key: string]: string } {
+    return is(this.json.dependencies, is.maybe(objectOfString));
   }
-  get peerDependencies() {
-    is(this.json.peerDependencies, is.maybe(objectOfString));
+  get peerDependencies(): null | { [key: string]: string } {
+    return is(this.json.peerDependencies, is.maybe(objectOfString));
   }
-  get config() {
+  get config(): { packages: null | Array<string> } {
     // in the future we might want to merge from parent configs
     return is(
       this.json.preconstruct,
@@ -67,7 +69,7 @@ export default class Package {
       })
     );
   }
-  get configPackages() {
+  get configPackages(): Array<string> {
     return is(this.config.packages, arrayOfString);
   }
 
@@ -105,7 +107,20 @@ export default class Package {
       throw error;
     }
   }
+  strict(): StrictPackage {
+    validatePackage(this);
+    return new StrictPackage(this.path, this._contents);
+  }
   async save() {
     await fs.writeFile(this.path, JSON.stringify(this.json, null, 2));
+  }
+}
+
+export class StrictPackage extends Package {
+  get main(): string {
+    return is(this.json.main, is.string);
+  }
+  set main(path: string) {
+    this.json.main = path;
   }
 }

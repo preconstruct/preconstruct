@@ -9,8 +9,10 @@ const replace = require("rollup-plugin-replace");
 // const lernaAliases = require("lerna-alias").rollup;
 
 const chalk = require("chalk");
+import path from "path";
 import builtInModules from "builtin-modules";
-import Package from "../package";
+import { Package } from "../package";
+import { rollup as _rollup } from "rollup";
 
 // this makes sure nested imports of external packages are external
 const makeExternalPredicate = externalArr => {
@@ -18,7 +20,7 @@ const makeExternalPredicate = externalArr => {
     return () => false;
   }
   const pattern = new RegExp(`^(${externalArr.join("|")})($|/)`);
-  return (id /*: string */) => pattern.test(id);
+  return (id: string) => pattern.test(id);
 };
 
 let unsafeRequire = require;
@@ -72,9 +74,14 @@ function getChildPeerDeps(
   });
 }
 
-module.exports = (
+import type { RollupSingleFileBuild } from "./types";
+
+export let rollup: RollupConfig => Promise<RollupSingleFileBuild> = _rollup;
+
+export opaque type RollupConfig = Object;
+
+export let getRollupConfig = (
   pkg: Package,
-  entrypoint: string,
   {
     isUMD,
     isBrowser,
@@ -86,7 +93,11 @@ module.exports = (
     isProd: boolean,
     shouldMinifyButStillBePretty: boolean
   }
-) => {
+): RollupConfig => {
+  if (isUMD) {
+    throw new Error("UMD builds are not currently supported");
+  }
+
   let external = [];
   if (pkg.peerDependencies) {
     external.push(...Object.keys(pkg.peerDependencies));
@@ -108,7 +119,7 @@ module.exports = (
   // let packageAliases = lernaAliases();
 
   const config = {
-    input: entrypoint,
+    input: path.join(pkg.directory, "src", "index.js"),
     external: makeExternalPredicate(external),
     onwarn: (warning: *) => {
       switch (warning.code) {
