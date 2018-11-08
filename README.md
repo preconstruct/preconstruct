@@ -46,3 +46,10 @@ preconstruct watch
 - use users babel config
 - allow for other entrypoints, automatically generate folders with package.json
 - opinionated dist folder structure with verification if it's wrong
+
+# Thanks/Inspiration
+
+- [microbundle](https://github.com/developit/microbundle) was a huge inspiration for this! ❤️
+- [rollup](https://rollupjs.org)
+- [bolt](https://github.com/boltpkg/bolt) - lots of utils and things in this project were inspired by things in bolt
+- all the people who wrote all the dependencies for this project!
