@@ -9,14 +9,6 @@ import { type Aliases, getAliases } from "./aliases";
 import is from "sarcastic";
 import * as fs from "fs-extra";
 
-function getOutputConfigs(pkg: StrictPackage): Array<OutputOptions> {
-  let configs = [];
-  if (pkg.module) {
-    configs.push();
-  }
-  return configs;
-}
-
 function getDevPath(cjsPath: string) {
   return cjsPath.replace(/\.js$/, ".dev.js");
 }
