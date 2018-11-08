@@ -24,7 +24,7 @@ exports[`basic: valid-package.umd.min.js 1`] = `
 "
 `;
 
-exports[`basic: valid-package.umd.min.js.map 1`] = `"{\\"version\\":3,\\"file\\":\\"valid-package.umd.min.js\\",\\"sources\\":[\\"../src/index.js\\"],\\"sourcesContent\\":[\\"// @flow\\\\n\\\\nexport default \\\\\\"something\\\\\\";\\\\n\\"],\\"names\\":[],\\"mappings\\":\\"8LAEe\\"}"`;
+exports[`basic: valid-package.umd.min.js.map 1`] = `"{\\"version\\":3,\\"file\\":\\"valid-package.umd.min.js\\",\\"sources\\":[\\"../src/index.js\\"],\\"sourcesContent\\":[\\"export default \\\\\\"something\\\\\\";\\\\n\\"],\\"names\\":[],\\"mappings\\":\\"8LAAe\\"}"`;
 
 exports[`clears dist folder: already-has-things-in-dist.cjs.js 1`] = `
 "'use strict';
@@ -34,6 +34,39 @@ Object.defineProperty(exports, '__esModule', { value: true });
 var index = \\"something\\";
 
 exports.default = index;
+"
+`;
+
+exports[`flow: flow.cjs.js 1`] = `
+"'use strict';
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+var a = \\"wow\\";
+
+function doSomething(arg) {
+  return \\"something\\";
+}
+
+exports.doSomething = doSomething;
+exports.something = a;
+"
+`;
+
+exports[`flow: flow.cjs.js.flow 1`] = `
+"// @flow
+export * from \\"../src/index.js\\";
+"
+`;
+
+exports[`flow: flow.esm.js 1`] = `
+"var a = \\"wow\\";
+
+function doSomething(arg) {
+  return \\"something\\";
+}
+
+export { doSomething, a as something };
 "
 `;
 

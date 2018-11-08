@@ -7,6 +7,7 @@ import { type RollupConfig, getRollupConfig, rollup } from "./rollup";
 import type { OutputOptions } from "./types";
 import { type Aliases, getAliases } from "./aliases";
 import is from "sarcastic";
+import * as fs from "fs-extra";
 import del from "del";
 
 function getOutputConfigs(pkg: StrictPackage): Array<OutputOptions> {
@@ -57,20 +58,31 @@ async function buildPackage(pkg: StrictPackage, aliases: Aliases) {
     force: true
   });
 
-  let someBundle;
-
-  await Promise.all(
+  let bundles = await Promise.all(
     configs.map(async ({ config, outputs }) => {
+      // $FlowFixMe this is not a problem with flow, i did something wrong but it's not worth fixing right now
       const bundle = await rollup(config);
-      if (!someBundle) someBundle = bundle;
 
       await Promise.all(
         outputs.map(outputConfig => {
           return bundle.write(outputConfig);
         })
       );
+      return bundle;
     })
   );
+  if (bundles[0].modules[0].originalCode.includes("@flow")) {
+    let hasDefaultExport = bundles[0].exports.includes("default");
+    await fs.writeFile(
+      // flow only resolves via the main field so
+      // we only have to write a flow file for the main field
+      path.resolve(pkg.directory, pkg.main) + ".flow",
+      `// @flow
+export * from "../src/index.js";${
+        hasDefaultExport ? `\nexport { default } from "../src/index.js";` : ""
+      }\n`
+    );
+  }
 }
 
 async function retryableBuild(pkg: StrictPackage, aliases: Aliases) {

@@ -99,3 +99,11 @@ test("clears dist folder", async () => {
 
   await snapshotDistFiles(tmpPath);
 });
+
+test("flow", async () => {
+  let tmpPath = f.copy("flow");
+
+  await build(tmpPath);
+
+  await snapshotDistFiles(tmpPath);
+});
