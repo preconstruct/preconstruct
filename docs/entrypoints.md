@@ -1,5 +1,16 @@
 # Entrypoints
 
+The entrypoints config would essentially default to 
+```json
+{
+  "preconstruct": {
+    "entrypoints": {
+      ".": "src"
+    }
+  }
+}
+```
+
 ```json
 {
   "preconstruct": {
