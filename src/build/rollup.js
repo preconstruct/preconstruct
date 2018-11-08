@@ -6,13 +6,13 @@ const babel = require("rollup-plugin-babel");
 const alias = require("rollup-plugin-alias");
 const cjs = require("rollup-plugin-commonjs");
 const replace = require("rollup-plugin-replace");
-// const lernaAliases = require("lerna-alias").rollup;
 
 const chalk = require("chalk");
 import path from "path";
 import builtInModules from "builtin-modules";
-import { Package } from "../package";
+import { StrictPackage } from "../package";
 import { rollup as _rollup } from "rollup";
+import type { Aliases } from "./aliases";
 
 // this makes sure nested imports of external packages are external
 const makeExternalPredicate = externalArr => {
@@ -80,43 +80,31 @@ export let rollup: RollupConfig => Promise<RollupSingleFileBuild> = _rollup;
 
 export opaque type RollupConfig = Object;
 
-export let getRollupConfig = (
-  pkg: Package,
-  {
-    isUMD,
-    isBrowser,
-    isProd,
-    shouldMinifyButStillBePretty
-  }: {
-    isUMD: boolean,
-    isBrowser: boolean,
-    isProd: boolean,
-    shouldMinifyButStillBePretty: boolean
-  }
-): RollupConfig => {
-  if (isUMD) {
-    throw new Error("UMD builds are not currently supported");
-  }
+export type RollupConfigType = "umd" | "browser" | "node-dev" | "node-prod";
 
+export let getRollupConfig = (
+  pkg: StrictPackage,
+  aliases: Aliases,
+  type: RollupConfigType
+): RollupConfig => {
   let external = [];
   if (pkg.peerDependencies) {
     external.push(...Object.keys(pkg.peerDependencies));
   }
-  if (pkg.dependencies && !isUMD) {
+  if (pkg.dependencies && type !== "umd") {
     external.push(...Object.keys(pkg.dependencies));
   }
   getChildPeerDeps(
     external,
-    isUMD,
+    type === "umd",
     external.concat(
-      isUMD && pkg.dependencies ? Object.keys(pkg.dependencies) : []
+      type === "umd" && pkg.dependencies ? Object.keys(pkg.dependencies) : []
     ),
     []
   );
-  if (!isBrowser) {
+  if (type === "node-dev" || type === "node-prod") {
     external.push(...builtInModules);
   }
-  // let packageAliases = lernaAliases();
 
   const config = {
     input: path.join(pkg.directory, "src", "index.js"),
@@ -154,32 +142,32 @@ export let getRollupConfig = (
           require("./fix-dce-for-classes-with-statics"),
           [
             "@babel/plugin-proposal-object-rest-spread",
-            { loose: true, useBuiltIns: !isUMD }
+            { loose: true, useBuiltIns: type !== "umd" }
           ],
-          !isUMD && "babel-plugin-transform-import-object-assign"
+          type !== "umd" && "babel-plugin-transform-import-object-assign"
         ].filter(Boolean),
         configFile: false,
         babelrc: false
       }),
       cjs(),
-      isBrowser &&
+      (type === "browser" || type === "umd") &&
         replace({
           "typeof document": JSON.stringify("object"),
           "typeof window": JSON.stringify("object")
         }),
-      // isUMD && alias(packageAliases),
-      isUMD && resolve(),
-      (isUMD || isProd) &&
+      type === "umd" && alias(aliases),
+      type === "umd" && resolve(),
+      (type === "umd" || type === "node-prod") &&
         replace({
           "process.env.NODE_ENV": '"production"'
         }),
 
-      isUMD && uglify(),
-      shouldMinifyButStillBePretty &&
+      type === "umd" && uglify(),
+      type === "node-prod" &&
         uglify({
           mangle: false
         }),
-      shouldMinifyButStillBePretty && prettier({ parser: "babylon" })
+      type === "node-prod" && prettier({ parser: "babylon" })
     ].filter(Boolean)
   };
 

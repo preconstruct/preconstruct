@@ -18,6 +18,14 @@ export default index;
 "
 `;
 
+exports[`basic: valid-package.min.js 1`] = `
+"!function(e,t){\\"object\\"==typeof exports&&\\"undefined\\"!=typeof module?module.exports=t():\\"function\\"==typeof define&&define.amd?define(t):e.validPackage=t()}(this,function(){\\"use strict\\";return\\"something\\"});
+//# sourceMappingURL=valid-package.min.js.map
+"
+`;
+
+exports[`basic: valid-package.min.js.map 1`] = `"{\\"version\\":3,\\"file\\":\\"valid-package.min.js\\",\\"sources\\":[\\"../src/index.js\\"],\\"sourcesContent\\":[\\"// @flow\\\\n\\\\nexport default \\\\\\"something\\\\\\";\\\\n\\"],\\"names\\":[],\\"mappings\\":\\"8LAEe\\"}"`;
+
 exports[`monorepo: package-one.cjs.js 1`] = `
 "'use strict';
 

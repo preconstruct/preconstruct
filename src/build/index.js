@@ -5,6 +5,8 @@ import path from "path";
 import { validatePackage } from "../validate";
 import { type RollupConfig, getRollupConfig, rollup } from "./rollup";
 import type { OutputOptions } from "./types";
+import { type Aliases, getAliases } from "./aliases";
+import is from "sarcastic";
 
 function getOutputConfigs(pkg: StrictPackage): Array<OutputOptions> {
   let configs = [
@@ -23,21 +25,31 @@ function getOutputConfigs(pkg: StrictPackage): Array<OutputOptions> {
   return configs;
 }
 
-async function buildPackage(pkg: StrictPackage) {
+async function buildPackage(pkg: StrictPackage, aliases: Aliases) {
   let configs: Array<{
     config: RollupConfig,
     outputs: Array<OutputOptions>
   }> = [];
 
   configs.push({
-    config: getRollupConfig(pkg, {
-      isUMD: false,
-      isBrowser: false,
-      shouldMinifyButStillBePretty: false,
-      isProd: false
-    }),
+    config: getRollupConfig(pkg, aliases, "node-dev"),
     outputs: getOutputConfigs(pkg)
   });
+  let { umdMain } = pkg;
+  if (umdMain !== null) {
+    let umdName = is(pkg.config.umdName, is.string);
+    configs.push({
+      config: getRollupConfig(pkg, aliases, "umd"),
+      outputs: [
+        {
+          format: "umd",
+          sourcemap: true,
+          file: path.join(pkg.directory, umdMain),
+          name: umdName
+        }
+      ]
+    });
+  }
 
   let someBundle;
 
@@ -62,10 +74,11 @@ export default async function build(directory: string) {
   let packages = await pkg.packages();
   if (packages === null) {
     let strictPackage = pkg.strict();
-    await buildPackage(strictPackage);
+    await buildPackage(strictPackage, {});
   } else {
     let strictPackages = packages.map(x => x.strict());
-    await Promise.all(strictPackages.map(buildPackage));
+    let aliases = getAliases(strictPackages);
+    await Promise.all(strictPackages.map(pkg => buildPackage(pkg, aliases)));
   }
   logger.success("built bundles!");
 }
