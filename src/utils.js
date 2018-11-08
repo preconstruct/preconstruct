@@ -17,7 +17,7 @@ export function getValidModuleField(pkg: Package) {
 
 export function getValidUmdMainField(pkg: Package) {
   let nameForDist = getNameForDist(pkg.name);
-  return `dist/${nameForDist}.min.js`;
+  return `dist/${nameForDist}.umd.min.js`;
 }
 
 function getDevPath(cjsPath: string) {

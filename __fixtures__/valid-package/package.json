@@ -5,7 +5,7 @@
   "license": "MIT",
   "private": true,
   "module": "dist/valid-package.esm.js",
-  "umd:main": "dist/valid-package.min.js",
+  "umd:main": "dist/valid-package.umd.min.js",
   "preconstruct": {
     "umdName": "validPackage"
   }
