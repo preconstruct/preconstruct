@@ -1,6 +1,6 @@
 // @flow
 import inquirer from "inquirer";
-import throttle from "@jcoreio/async-throttle";
+import pLimit from "p-limit";
 /*::
 // this has to be in a comment because dependency import order reasons...
 import { Package } from "./package";
@@ -50,22 +50,24 @@ export function createPromptConfirmLoader(
   return ret;
 }
 
+let limit = pLimit(1);
+
+let doPromptInput = async (message: string, pkg: Package): Promise<string> => {
+  let { input } = await inquirer.prompt([
+    {
+      type: "input",
+      name: "input",
+      message,
+      prefix: pkg.name
+    }
+  ]);
+  return input;
+};
 // $FlowFixMe
 export let promptInput: JestMockFn<
   [string, Package],
   string | Promise<string>
-> = throttle(
-  async (message: string, pkg: Package): Promise<string> => {
-    let { input } = await inquirer.prompt([
-      {
-        type: "input",
-        name: "input",
-        message
-      }
-    ]);
-    return input;
-  }
-);
+> = (message: string, pkg: Package) => limit(() => doPromptInput(message, pkg));
 
 if (isTest) {
   promptInput = jest.fn<[string, Package], string | Promise<string>>();
