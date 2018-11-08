@@ -134,6 +134,7 @@ export let getRollupConfig = (
                     installPeers: false
                   })
                 );
+                await pkg.refresh();
               } else {
                 throw new FatalError(
                   `object-assign should be in dependencies of ${pkg.name}`

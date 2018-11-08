@@ -30,6 +30,16 @@ export class Package {
     let contents: string = await fs.readFile(filePath, "utf-8");
     return new Package(filePath, contents);
   }
+  async refresh() {
+    let contents: string = await fs.readFile(this.path, "utf-8");
+    this.json = is(JSON.parse(contents), is.object);
+    this._contents = contents;
+    if (this._strict) {
+      validatePackage(this);
+      this._strict.json = this.json;
+      this._strict._contents = this._contents;
+    }
+  }
   get name(): string {
     return is(this.json.name, is.string);
   }
@@ -138,9 +148,15 @@ export class Package {
       throw error;
     }
   }
+  _strict: StrictPackage;
   strict(): StrictPackage {
     validatePackage(this);
-    return new StrictPackage(this.path, this._contents);
+    if (!this._strict) {
+      this._strict = new StrictPackage(this.path, this._contents);
+      // $FlowFixMe
+      this._strict.refresh = this.refresh.bind(this);
+    }
+    return this._strict;
   }
   async save() {
     await fs.writeFile(this.path, JSON.stringify(this.json, null, 2));
