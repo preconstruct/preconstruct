@@ -91,3 +91,11 @@ test("object-assign installed", async () => {
 
   await snapshotDistFiles(tmpPath);
 });
+
+test("clears dist folder", async () => {
+  let tmpPath = f.copy("already-has-things-in-dist");
+
+  await build(tmpPath);
+
+  await snapshotDistFiles(tmpPath);
+});

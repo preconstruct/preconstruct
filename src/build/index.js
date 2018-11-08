@@ -7,6 +7,7 @@ import { type RollupConfig, getRollupConfig, rollup } from "./rollup";
 import type { OutputOptions } from "./types";
 import { type Aliases, getAliases } from "./aliases";
 import is from "sarcastic";
+import del from "del";
 
 function getOutputConfigs(pkg: StrictPackage): Array<OutputOptions> {
   let configs = [
@@ -50,6 +51,11 @@ async function buildPackage(pkg: StrictPackage, aliases: Aliases) {
       ]
     });
   }
+
+  await del(path.join(pkg.directory, "dist"), {
+    cwd: pkg.directory,
+    force: true
+  });
 
   let someBundle;
 
