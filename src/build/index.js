@@ -74,6 +74,7 @@ async function retryableBuild(pkg: StrictPackage, aliases: Aliases) {
     if (err instanceof Promise) {
       await err;
       await retryableBuild(pkg, aliases);
+      return;
     }
     throw err;
   }
