@@ -2,7 +2,6 @@
 // wanted to make a tree view of a directory with the contents of the files
 // for testing but gonna finish it later
 // based on https://github.com/egoist/tre/blob/master/src/index.js
-import { type Stats } from "fs";
 import * as fs from "fs-extra";
 import path from "path";
 
@@ -11,17 +10,6 @@ const CHARS = {
   end: "└──",
   line: "│"
 };
-
-function flatten(arr, depth = 0) {
-  let res = [];
-  for (const item of arr) {
-    res.push({ type: item.type, name: item.name, depth });
-    if (item.children) {
-      res = res.concat(flatten(item.children, depth + 1));
-    }
-  }
-  return res;
-}
 
 function repeat(char, count) {
   let res = "";
@@ -59,7 +47,6 @@ async function getData(
 export default async function printDirectory(directory: string) {
   let data = [];
   await getData(directory, 0, data);
-  let opts = {};
 
   return (
     `.\n` +

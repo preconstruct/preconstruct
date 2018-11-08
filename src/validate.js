@@ -2,7 +2,7 @@
 import { Package } from "./package";
 import path from "path";
 import { errors, successes, infos } from "./messages";
-import { FatalError, ValidationError } from "./errors";
+import { FatalError } from "./errors";
 import {
   getValidModuleField,
   getValidMainField,

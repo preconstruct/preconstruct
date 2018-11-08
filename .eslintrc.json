@@ -1,0 +1,8 @@
+{
+  "parser": "babel-eslint",
+  "plugins": ["prettier"],
+  "rules": {
+    "no-unused-vars": "error",
+    "prettier/prettier": "error"
+  }
+}

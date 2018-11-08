@@ -49,8 +49,11 @@
   "devDependencies": {
     "@babel/cli": "^7.1.2",
     "babel-core": "^7.0.0-bridge.0",
+    "babel-eslint": "^10.0.1",
     "babel-jest": "^23.6.0",
     "codecov": "^3.1.0",
+    "eslint": "^5.8.0",
+    "eslint-plugin-prettier": "^3.0.0",
     "fixturez": "^1.1.0",
     "flow-bin": "^0.85.0",
     "jest": "^23.6.0",

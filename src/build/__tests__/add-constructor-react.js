@@ -1,23 +1,23 @@
 // @flow
-import cases from 'jest-in-case'
-import * as babel from '@babel/core'
-import plugin from '../add-basic-constructor-to-react-component'
+import cases from "jest-in-case";
+import * as babel from "@babel/core";
+import plugin from "../add-basic-constructor-to-react-component";
 
-const separator = '\n\n      ↓ ↓ ↓ ↓ ↓ ↓\n\n'
+const separator = "\n\n      ↓ ↓ ↓ ↓ ↓ ↓\n\n";
 
 cases(
-  'add-basic-constructor-to-react-component',
+  "add-basic-constructor-to-react-component",
   opts => {
     const { code } = babel.transformSync(opts.code, {
       plugins: [
         plugin,
-        ['@babel/plugin-proposal-class-properties', { loose: true }]
+        ["@babel/plugin-proposal-class-properties", { loose: true }]
       ],
       babelrc: false,
       configFile: false,
       filename: __filename
-    })
-    expect(`${opts.code}${separator}${code}`).toMatchSnapshot()
+    });
+    expect(`${opts.code}${separator}${code}`).toMatchSnapshot();
   },
   {
     basic: {
@@ -26,7 +26,7 @@ cases(
         thing = true;
       }`
     },
-    'does not modify if there is already a constructor': {
+    "does not modify if there is already a constructor": {
       code: `class Thing2 extends React.Component {
         constructor(props, otherThing) {
           super(props, otherThing);
@@ -34,7 +34,7 @@ cases(
         ok = true;
       }`
     },
-    'does not modify other non react components': {
+    "does not modify other non react components": {
       code: `      class Thing3 {
             ok = true;
           }
@@ -46,4 +46,4 @@ cases(
           }`
     }
   }
-)
+);

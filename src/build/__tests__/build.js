@@ -3,8 +3,7 @@ import build from "../";
 import fixturez from "fixturez";
 import path from "path";
 import * as fs from "fs-extra";
-import { logMock, initBasic } from "../../../test-utils";
-import installPackages from "install-packages";
+import { initBasic } from "../../../test-utils";
 import { confirms } from "../../messages";
 import { FatalError } from "../../errors";
 

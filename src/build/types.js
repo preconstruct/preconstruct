@@ -21,6 +21,7 @@ export type OutputOptions = {
 
 // https://github.com/rollup/rollup/blob/7746e0fd90a58e9ffa250e92c48410f49055584c/src/rollup/types.d.ts
 // this is here for reference, i'm defining more strict types to use
+// eslint-disable-next-line no-unused-vars
 type ActualOutputOptions = {
   // only required for bundle.write
   file: string,

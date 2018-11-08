@@ -2,7 +2,6 @@
 import { Package, StrictPackage } from "../package";
 import * as logger from "../logger";
 import path from "path";
-import { validatePackage } from "../validate";
 import { type RollupConfig, getRollupConfig, rollup } from "./rollup";
 import type { OutputOptions } from "./types";
 import { type Aliases, getAliases } from "./aliases";

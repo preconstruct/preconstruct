@@ -3,14 +3,10 @@ import fixturez from "fixturez";
 import path from "path";
 import * as fs from "fs-extra";
 import init from "../init";
-import { infos, confirms, errors } from "../messages";
+import { confirms, errors } from "../messages";
 import { logMock } from "../../test-utils";
 
-let prompt: any = require("../prompt");
-
 const f = fixturez(__dirname);
-
-let unsafeRequire = require;
 
 async function getPkg(filepath) {
   return JSON.parse(

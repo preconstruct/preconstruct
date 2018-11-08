@@ -1,8 +1,7 @@
 // @flow
 import { Package } from "./package";
-import * as fs from "fs-extra";
 import { promptInput } from "./prompt";
-import { FatalError, ValidationError } from "./errors";
+import { FatalError } from "./errors";
 import { success, error, info } from "./logger";
 import { infos, confirms, errors, inputs } from "./messages";
 import {
