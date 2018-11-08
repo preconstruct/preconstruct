@@ -26,6 +26,9 @@ export let confirms = {
   ),
   writeUmdBuilds: createPromptConfirmLoader(
     "would you like to generate UMD builds?"
+  ),
+  shouldInstallObjectAssign: createPromptConfirmLoader(
+    "Object.assign is polyfilled with object-assign to reduce bundle size when used with react. would you like to install object-assign automatically?"
   )
 };
 

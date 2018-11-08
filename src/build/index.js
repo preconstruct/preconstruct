@@ -67,6 +67,18 @@ async function buildPackage(pkg: StrictPackage, aliases: Aliases) {
   );
 }
 
+async function retryableBuild(pkg: StrictPackage, aliases: Aliases) {
+  try {
+    await buildPackage(pkg, aliases);
+  } catch (err) {
+    if (err instanceof Promise) {
+      await err;
+      await retryableBuild(pkg, aliases);
+    }
+    throw err;
+  }
+}
+
 export default async function build(directory: string) {
   let pkg = await Package.create(directory);
   // do more stuff with checking whether the repo is using yarn workspaces or bolt
@@ -74,11 +86,11 @@ export default async function build(directory: string) {
   let packages = await pkg.packages();
   if (packages === null) {
     let strictPackage = pkg.strict();
-    await buildPackage(strictPackage, {});
+    await retryableBuild(strictPackage, {});
   } else {
     let strictPackages = packages.map(x => x.strict());
     let aliases = getAliases(strictPackages);
-    await Promise.all(strictPackages.map(pkg => buildPackage(pkg, aliases)));
+    await Promise.all(strictPackages.map(pkg => retryableBuild(pkg, aliases)));
   }
   logger.success("built bundles!");
 }

@@ -13,7 +13,7 @@ let isTest = process.env.NODE_ENV === "test";
 
 export function createPromptConfirmLoader(
   message: string
-): JestMockFn<[Package], Promise<boolean> | boolean> {
+): (pkg: Package) => boolean {
   let loader = new DataLoader<Package, boolean>(
     async pkgs => {
       if (pkgs.length === 1) {
@@ -44,7 +44,7 @@ export function createPromptConfirmLoader(
   let ret = (pkg: Package) => loader.load(pkg);
   if (isTest) {
     // maybe do this in __mocks__ later
-    ret = jest.fn<[Package], Promise<boolean> | boolean>();
+    ret = jest.fn<any, any>();
   }
   // $FlowFixMe
   return ret;
@@ -63,11 +63,8 @@ let doPromptInput = async (message: string, pkg: Package): Promise<string> => {
   ]);
   return input;
 };
-// $FlowFixMe
-export let promptInput: JestMockFn<
-  [string, Package],
-  string | Promise<string>
-> = (message: string, pkg: Package) => limit(() => doPromptInput(message, pkg));
+export let promptInput = (message: string, pkg: Package) =>
+  limit(() => doPromptInput(message, pkg));
 
 if (isTest) {
   promptInput = jest.fn<[string, Package], string | Promise<string>>();

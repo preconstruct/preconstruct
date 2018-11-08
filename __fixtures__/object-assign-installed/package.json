@@ -1,0 +1,10 @@
+{
+  "name": "object-assign-installed",
+  "version": "1.0.0",
+  "main": "dist/object-assign-installed.cjs.js",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "object-assign": "^4.1.1"
+  }
+}

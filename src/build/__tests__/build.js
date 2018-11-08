@@ -4,12 +4,23 @@ import fixturez from "fixturez";
 import path from "path";
 import * as fs from "fs-extra";
 import { logMock, initBasic } from "../../../test-utils";
+import installPackages from "install-packages";
+import { confirms } from "../../messages";
+import { FatalError } from "../../errors";
 
 const f = fixturez(__dirname);
 
 async function snapshotDistFiles(tmpPath: string) {
   let distPath = path.join(tmpPath, "dist");
-  let distFiles = await fs.readdir(distPath);
+  let distFiles;
+  try {
+    distFiles = await fs.readdir(distPath);
+  } catch (err) {
+    if (err.code === "ENOENT") {
+      throw new Error("no dist directory exists");
+    }
+    throw err;
+  }
 
   await Promise.all(
     distFiles.map(async x => {
@@ -19,6 +30,8 @@ async function snapshotDistFiles(tmpPath: string) {
     })
   );
 }
+
+jest.mock("install-packages");
 
 let unsafeRequire = require;
 
@@ -55,4 +68,26 @@ test("no module", async () => {
   expect(unsafeRequire(tmpPath).default).toBe(
     "this does not have a module build"
   );
+});
+
+test("uses obj spread", async () => {
+  let tmpPath = f.copy("use-obj-spread");
+  confirms.shouldInstallObjectAssign.mockReturnValue(Promise.resolve(false));
+
+  try {
+    await build(tmpPath);
+  } catch (err) {
+    expect(err).toBeInstanceOf(FatalError);
+    expect(err.message).toBe(
+      "object-assign should be in dependencies of use-object-spread"
+    );
+  }
+});
+
+test("object-assign installed", async () => {
+  let tmpPath = f.copy("object-assign-installed");
+
+  await build(tmpPath);
+
+  await snapshotDistFiles(tmpPath);
 });

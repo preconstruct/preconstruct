@@ -13,6 +13,10 @@ import builtInModules from "builtin-modules";
 import { StrictPackage } from "../package";
 import { rollup as _rollup } from "rollup";
 import type { Aliases } from "./aliases";
+import { FatalError } from "../errors";
+import { confirms } from "../messages";
+import installPackages from "install-packages";
+import pLimit from "p-limit";
 
 // this makes sure nested imports of external packages are external
 const makeExternalPredicate = externalArr => {
@@ -74,6 +78,8 @@ function getChildPeerDeps(
   });
 }
 
+let limit = pLimit(1);
+
 import type { RollupSingleFileBuild } from "./types";
 
 export let rollup: RollupConfig => Promise<RollupSingleFileBuild> = _rollup;
@@ -114,9 +120,34 @@ export let getRollupConfig = (
         case "UNUSED_EXTERNAL_IMPORT": {
           break;
         }
+        case "UNRESOLVED_IMPORT": {
+          if (warning.source === "object-assign") {
+            throw (async () => {
+              let shouldInstallObjectAssign = await confirms.shouldInstallObjectAssign(
+                pkg
+              );
+              if (shouldInstallObjectAssign) {
+                await limit(() =>
+                  installPackages({
+                    packages: ["object-assign"],
+                    cwd: pkg.directory,
+                    installPeers: false
+                  })
+                );
+              } else {
+                throw new FatalError(
+                  `object-assign should be in dependencies of ${pkg.name}`
+                );
+              }
+            })();
+          }
+        }
         default: {
-          console.error(chalk.red(warning.toString()));
-          throw new Error(`There was an error compiling ${pkg.name}`);
+          throw new Error(
+            `There was an error compiling ${pkg.name}: ${chalk.red(
+              warning.toString()
+            )}`
+          );
         }
       }
     },

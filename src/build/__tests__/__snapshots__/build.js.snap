@@ -72,3 +72,20 @@ var index = \\"this does not have a module build\\";
 exports.default = index;
 "
 `;
+
+exports[`object-assign installed: object-assign-installed.cjs.js 1`] = `
+"'use strict';
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
+
+var _objectAssign = _interopDefault(require('object-assign'));
+
+var something = _objectAssign({}, {
+  something: true
+});
+
+exports.something = something;
+"
+`;
