@@ -37,6 +37,7 @@
     "inquirer": "^6.2.0",
     "install-packages": "^0.2.5",
     "meow": "^5.0.0",
+    "ms": "^2.1.1",
     "p-limit": "^2.0.0",
     "rollup": "^0.63.4",
     "rollup-plugin-alias": "^1.4.0",

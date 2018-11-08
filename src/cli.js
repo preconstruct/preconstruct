@@ -3,6 +3,7 @@ import meow from "meow";
 import init from "./init";
 import validate from "./validate";
 import build from "./build";
+import watch from "./build/watch";
 import { error } from "./logger";
 import { FatalError } from "./errors";
 
@@ -39,6 +40,10 @@ class CommandNotFoundError extends Error {}
         }
         case "build": {
           await build(process.cwd());
+          return;
+        }
+        case "watch": {
+          await watch(process.cwd());
           return;
         }
 

@@ -51,5 +51,6 @@ export let infos = {
 };
 
 export let successes = {
-  validPackage: "package is valid!"
+  validPackage: "package is valid!",
+  startedWatching: "started watching!"
 };

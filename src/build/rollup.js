@@ -86,6 +86,10 @@ export let rollup: RollupConfig => Promise<RollupSingleFileBuild> = _rollup;
 
 export opaque type RollupConfig = Object;
 
+export function toUnsafeRollupConfig(config: RollupConfig): Object {
+  return config;
+}
+
 export type RollupConfigType = "umd" | "browser" | "node-dev" | "node-prod";
 
 export let getRollupConfig = (
