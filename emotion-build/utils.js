@@ -1,4 +1,3 @@
-// @flow
 const path = require("path");
 const del = require("del");
 const { promisify } = require("util");
