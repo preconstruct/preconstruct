@@ -37,10 +37,10 @@ export * from "../src/index.js";${
       `'use strict';
 
 if (process.env.NODE_ENV === "production") {
-module.exports = require("./${path.basename(getProdPath(pkg.main))}");
+  module.exports = require("./${path.basename(getProdPath(pkg.main))}");
 } else {
-module.exports = require("./${path.basename(getDevPath(pkg.main))}");
-}`
+  module.exports = require("./${path.basename(getDevPath(pkg.main))}");
+}\n`
     )
   );
   return Promise.all(promises);

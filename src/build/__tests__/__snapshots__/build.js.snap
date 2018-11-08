@@ -18,7 +18,8 @@ if (process.env.NODE_ENV === \\"production\\") {
   module.exports = require(\\"./valid-package.cjs.prod.js\\");
 } else {
   module.exports = require(\\"./valid-package.cjs.dev.js\\");
-}"
+}
+"
 `;
 
 exports[`basic: valid-package.cjs.prod.js 1`] = `
@@ -110,7 +111,8 @@ if (process.env.NODE_ENV === \\"production\\") {
   module.exports = require(\\"./valid-package.cjs.prod.js\\");
 } else {
   module.exports = require(\\"./valid-package.cjs.dev.js\\");
-}"
+}
+"
 `;
 
 exports[`browser: valid-package.cjs.prod.js 1`] = `
@@ -159,7 +161,8 @@ if (process.env.NODE_ENV === \\"production\\") {
   module.exports = require(\\"./already-has-things-in-dist.cjs.prod.js\\");
 } else {
   module.exports = require(\\"./already-has-things-in-dist.cjs.dev.js\\");
-}"
+}
+"
 `;
 
 exports[`clears dist folder: already-has-things-in-dist.cjs.prod.js 1`] = `
@@ -193,7 +196,8 @@ if (process.env.NODE_ENV === \\"production\\") {
   module.exports = require(\\"./flow.cjs.prod.js\\");
 } else {
   module.exports = require(\\"./flow.cjs.dev.js\\");
-}"
+}
+"
 `;
 
 exports[`flow: flow.cjs.js.flow 1`] = `
@@ -246,7 +250,8 @@ if (process.env.NODE_ENV === \\"production\\") {
   module.exports = require(\\"./flow-export-default.cjs.prod.js\\");
 } else {
   module.exports = require(\\"./flow-export-default.cjs.dev.js\\");
-}"
+}
+"
 `;
 
 exports[`flow: flow-export-default.cjs.js.flow 1`] = `
@@ -296,7 +301,8 @@ if (process.env.NODE_ENV === \\"production\\") {
   module.exports = require(\\"./package-one.cjs.prod.js\\");
 } else {
   module.exports = require(\\"./package-one.cjs.dev.js\\");
-}"
+}
+"
 `;
 
 exports[`monorepo: package-one.cjs.prod.js 1`] = `
@@ -332,7 +338,8 @@ if (process.env.NODE_ENV === \\"production\\") {
   module.exports = require(\\"./package-two.cjs.prod.js\\");
 } else {
   module.exports = require(\\"./package-two.cjs.dev.js\\");
-}"
+}
+"
 `;
 
 exports[`monorepo: package-two.cjs.prod.js 1`] = `
@@ -368,7 +375,8 @@ if (process.env.NODE_ENV === \\"production\\") {
   module.exports = require(\\"./no-module.cjs.prod.js\\");
 } else {
   module.exports = require(\\"./no-module.cjs.dev.js\\");
-}"
+}
+"
 `;
 
 exports[`no module: no-module.cjs.prod.js 1`] = `
@@ -403,7 +411,8 @@ if (process.env.NODE_ENV === \\"production\\") {
   module.exports = require(\\"./object-assign-installed.cjs.prod.js\\");
 } else {
   module.exports = require(\\"./object-assign-installed.cjs.dev.js\\");
-}"
+}
+"
 `;
 
 exports[`object-assign installed: object-assign-installed.cjs.prod.js 1`] = `
@@ -442,7 +451,8 @@ if (process.env.NODE_ENV === \\"production\\") {
   module.exports = require(\\"./prod-checks.cjs.prod.js\\");
 } else {
   module.exports = require(\\"./prod-checks.cjs.dev.js\\");
-}"
+}
+"
 `;
 
 exports[`prod checks: prod-checks.cjs.prod.js 1`] = `
