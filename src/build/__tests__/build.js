@@ -70,7 +70,7 @@ test("no module", async () => {
   );
 });
 
-test("uses obj spread", async () => {
+test.skip("uses obj spread", async () => {
   let tmpPath = f.copy("use-obj-spread");
   confirms.shouldInstallObjectAssign.mockReturnValue(Promise.resolve(false));
 
@@ -102,6 +102,14 @@ test("clears dist folder", async () => {
 
 test("flow", async () => {
   let tmpPath = f.copy("flow");
+
+  await build(tmpPath);
+
+  await snapshotDistFiles(tmpPath);
+});
+
+test("flow", async () => {
+  let tmpPath = f.copy("flow-export-default");
 
   await build(tmpPath);
 

@@ -8,7 +8,6 @@ import type { OutputOptions } from "./types";
 import { type Aliases, getAliases } from "./aliases";
 import is from "sarcastic";
 import * as fs from "fs-extra";
-import del from "del";
 
 function getOutputConfigs(pkg: StrictPackage): Array<OutputOptions> {
   let configs = [];
@@ -76,10 +75,7 @@ async function buildPackage(pkg: StrictPackage, aliases: Aliases) {
     });
   }
 
-  await del(path.join(pkg.directory, "dist"), {
-    cwd: pkg.directory,
-    force: true
-  });
+  await fs.remove(path.join(pkg.directory, "dist"));
 
   let bundles = await Promise.all(
     configs.map(async ({ config, outputs }) => {
