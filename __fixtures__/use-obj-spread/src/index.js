@@ -1,0 +1,3 @@
+export let something = {
+  ...wow
+};

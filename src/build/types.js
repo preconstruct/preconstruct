@@ -66,6 +66,25 @@ type ActualOutputOptions = {
   moduleId?: string
 };
 
+export interface RollupError {
+  message: string;
+  code?: string;
+  name?: string;
+  url?: string;
+  id?: string;
+  loc?: {
+    file?: string,
+    line: number,
+    column: number
+  };
+  stack?: string;
+  frame?: string;
+  pos?: number;
+  plugin?: string;
+  pluginCode?: string;
+  hook?: string;
+}
+
 interface SerializablePluginCache {
   [key: string]: [number, any];
 }

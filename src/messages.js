@@ -12,13 +12,21 @@ export let errors = {
     "the umd:main field is specified but a umdName option is not specified. please add it to the preconstruct field in your package.json"
 };
 
+import { createPromptConfirmLoader } from "./prompt";
+
 export let confirms = {
-  writeMainField:
-    "preconstruct is going to change the main field in your package.json, are you okay with that?",
-  writeModuleField:
-    "would you like to generate module builds? this will write to the module field in your package.json",
-  fixModuleField: "would you like to fix the module field?",
-  writeUmdBuilds: "would you like to generate UMD builds?"
+  writeMainField: createPromptConfirmLoader(
+    "preconstruct is going to change the main field in your package.json, are you okay with that?"
+  ),
+  writeModuleField: createPromptConfirmLoader(
+    "would you like to generate module builds? this will write to the module field in your package.json"
+  ),
+  fixModuleField: createPromptConfirmLoader(
+    "would you like to fix the module field?"
+  ),
+  writeUmdBuilds: createPromptConfirmLoader(
+    "would you like to generate UMD builds?"
+  )
 };
 
 export let inputs = {

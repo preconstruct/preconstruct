@@ -14,27 +14,13 @@ export let logMock = {
 import init from "../src/init";
 import { confirms } from "../src/messages";
 
-jest.mock("../src/prompt");
-
-let prompt: any = require("../src/prompt");
-
 export async function initBasic(directory: string) {
-  prompt.promptConfirm.mockImplementation(question => {
-    switch (question) {
-      case confirms.writeMainField: {
-        return true;
-      }
-      case confirms.writeModuleField: {
-        return true;
-      }
-      case confirms.writeUmdBuilds: {
-        return false;
-      }
-      default: {
-        throw new Error("unexpected case: " + question);
-      }
-    }
-  });
+  confirms.writeMainField.mockReturnValue(true);
+  confirms.writeModuleField.mockReturnValue(true);
+  confirms.writeUmdBuilds.mockReturnValue(false);
+
   await init(directory);
-  prompt.promptConfirm.mockReset();
+  confirms.writeMainField.mockReset();
+  confirms.writeModuleField.mockReset();
+  confirms.writeUmdBuilds.mockReset();
 }

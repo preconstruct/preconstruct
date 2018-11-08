@@ -1,7 +1,7 @@
 // @flow
 import { Package } from "./package";
 import * as fs from "fs-extra";
-import { promptConfirm, promptInput } from "./prompt";
+import { promptInput } from "./prompt";
 import { FatalError, ValidationError } from "./errors";
 import { success, error, info } from "./logger";
 import { infos, confirms, errors, inputs } from "./messages";
@@ -23,7 +23,7 @@ async function doInit(pkg: Package) {
   if (isMainFieldValid(pkg)) {
     info(infos.validMainField, pkg);
   } else {
-    let canWriteMainField = await promptConfirm(confirms.writeMainField);
+    let canWriteMainField = await confirms.writeMainField(pkg);
     if (!canWriteMainField) {
       throw new FatalError(errors.deniedWriteMainField);
     }
@@ -31,13 +31,13 @@ async function doInit(pkg: Package) {
   }
 
   if (pkg.module === null || !isModuleFieldValid(pkg)) {
-    let canWriteModuleField = await promptConfirm(confirms.writeModuleField);
+    let canWriteModuleField = await confirms.writeModuleField(pkg);
     let validModuleField = getValidModuleField(pkg);
     if (canWriteModuleField) {
       pkg.module = validModuleField;
     } else if (pkg.module) {
       error(errors.invalidModuleField, pkg);
-      let shouldFixModuleField = await promptConfirm(confirms.fixModuleField);
+      let shouldFixModuleField = await confirms.fixModuleField(pkg);
       if (!shouldFixModuleField) {
         throw new FatalError(errors.invalidModuleField);
       }
@@ -52,10 +52,10 @@ async function doInit(pkg: Package) {
     !isUmdMainFieldValid(pkg) ||
     !isUmdNameSpecified(pkg)
   ) {
-    let shouldWriteUMDBuilds = await promptConfirm(confirms.writeUmdBuilds);
+    let shouldWriteUMDBuilds = await confirms.writeUmdBuilds(pkg);
     if (shouldWriteUMDBuilds) {
       pkg.umdMain = getValidUmdMainField(pkg);
-      let umdName = await promptInput(inputs.getUmdName);
+      let umdName = await promptInput(inputs.getUmdName, pkg);
       pkg.umdName = umdName;
     } else if (
       pkg.umdMain !== null &&
@@ -78,10 +78,8 @@ export default async function init(directory: string) {
     await doInit(pkg);
     success("Initialised package!");
   } else {
-    // todo: figure out a way to make the validation parallel(how should the prompts work? batch all prompts of the same type? dataloader-style)
-    for (let pkg of packages) {
-      await doInit(pkg);
-    }
+    await Promise.all(packages.map(pkg => doInit(pkg)));
+
     success("Initialised packages!");
   }
 }

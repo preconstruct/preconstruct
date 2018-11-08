@@ -18,8 +18,6 @@ async function getPkg(filepath) {
   );
 }
 
-jest.mock("../prompt");
-
 afterEach(() => {
   jest.resetAllMocks();
 });
@@ -36,46 +34,28 @@ test("no entrypoint", async () => {
 test("do not allow write", async () => {
   let tmpPath = f.copy("basic-package");
 
-  prompt.promptConfirm.mockImplementation(question => {
-    switch (question) {
-      case confirms.writeMainField: {
-        return false;
-      }
-      default: {
-        throw new Error("unexpected case: " + question);
-      }
-    }
-  });
+  confirms.writeMainField.mockReturnValue(true);
+
   try {
     await init(tmpPath);
   } catch (error) {
     expect(error.message).toBe(errors.deniedWriteMainField);
   }
-  expect(prompt.promptConfirm).toBeCalledTimes(1);
+  expect(confirms.writeMainField).toBeCalledTimes(1);
 });
 
 test("set only main field", async () => {
   let tmpPath = f.copy("basic-package");
 
-  prompt.promptConfirm.mockImplementation(question => {
-    switch (question) {
-      case confirms.writeMainField: {
-        return true;
-      }
-      case confirms.writeModuleField: {
-        return false;
-      }
-      case confirms.writeUmdBuilds: {
-        return false;
-      }
-      default: {
-        throw new Error("unexpected case: " + question);
-      }
-    }
-  });
+  confirms.writeMainField.mockReturnValue(true);
+  confirms.writeModuleField.mockReturnValue(false);
+  confirms.writeUmdBuilds.mockReturnValue(false);
 
   await init(tmpPath);
-  expect(prompt.promptConfirm).toBeCalledTimes(3);
+  expect(confirms.writeMainField).toBeCalledTimes(1);
+  expect(confirms.writeModuleField).toBeCalledTimes(1);
+  expect(confirms.writeUmdBuilds).toBeCalledTimes(1);
+
   let pkg = await getPkg(tmpPath);
   expect(pkg).toMatchInlineSnapshot(`
 Object {
@@ -91,25 +71,15 @@ Object {
 test("set main and module field", async () => {
   let tmpPath = f.copy("basic-package");
 
-  prompt.promptConfirm.mockImplementation(question => {
-    switch (question) {
-      case confirms.writeMainField: {
-        return true;
-      }
-      case confirms.writeModuleField: {
-        return true;
-      }
-      case confirms.writeUmdBuilds: {
-        return false;
-      }
-      default: {
-        throw new Error("unexpected case: " + question);
-      }
-    }
-  });
+  confirms.writeMainField.mockReturnValue(true);
+  confirms.writeModuleField.mockReturnValue(true);
+  confirms.writeUmdBuilds.mockReturnValue(false);
 
   await init(tmpPath);
-  expect(prompt.promptConfirm).toBeCalledTimes(3);
+  expect(confirms.writeMainField).toBeCalledTimes(1);
+  expect(confirms.writeModuleField).toBeCalledTimes(1);
+  expect(confirms.writeUmdBuilds).toBeCalledTimes(1);
+
   let pkg = await getPkg(tmpPath);
 
   expect(pkg).toMatchInlineSnapshot(`
@@ -127,25 +97,14 @@ Object {
 test("scoped package", async () => {
   let tmpPath = f.copy("scoped");
 
-  prompt.promptConfirm.mockImplementation(question => {
-    switch (question) {
-      case confirms.writeMainField: {
-        return true;
-      }
-      case confirms.writeModuleField: {
-        return true;
-      }
-      case confirms.writeUmdBuilds: {
-        return false;
-      }
-      default: {
-        throw new Error("unexpected case: " + question);
-      }
-    }
-  });
+  confirms.writeMainField.mockReturnValue(true);
+  confirms.writeModuleField.mockReturnValue(true);
+  confirms.writeUmdBuilds.mockReturnValue(false);
 
   await init(tmpPath);
-  expect(prompt.promptConfirm).toBeCalledTimes(3);
+  expect(confirms.writeMainField).toBeCalledTimes(1);
+  expect(confirms.writeModuleField).toBeCalledTimes(1);
+  expect(confirms.writeUmdBuilds).toBeCalledTimes(1);
   let pkg = await getPkg(tmpPath);
 
   expect(pkg).toMatchInlineSnapshot(`
@@ -163,25 +122,15 @@ Object {
 test("monorepo", async () => {
   let tmpPath = f.copy("monorepo");
 
-  prompt.promptConfirm.mockImplementation(question => {
-    switch (question) {
-      case confirms.writeMainField: {
-        return true;
-      }
-      case confirms.writeModuleField: {
-        return true;
-      }
-      case confirms.writeUmdBuilds: {
-        return false;
-      }
-      default: {
-        throw new Error("unexpected case: " + question);
-      }
-    }
-  });
+  confirms.writeMainField.mockReturnValue(true);
+  confirms.writeModuleField.mockReturnValue(true);
+  confirms.writeUmdBuilds.mockReturnValue(false);
 
   await init(tmpPath);
-  expect(prompt.promptConfirm).toBeCalledTimes(6);
+  expect(confirms.writeMainField).toBeCalledTimes(2);
+  expect(confirms.writeModuleField).toBeCalledTimes(2);
+  expect(confirms.writeUmdBuilds).toBeCalledTimes(2);
+
   let pkg1 = await getPkg(path.join(tmpPath, "packages", "package-one"));
   let pkg2 = await getPkg(path.join(tmpPath, "packages", "package-two"));
 
@@ -215,7 +164,6 @@ test("does not prompt or modify if already valid", async () => {
   await init(tmpPath);
   let current = await getPkg(tmpPath);
   expect(original).toEqual(current);
-  expect(prompt.promptConfirm).not.toBeCalled();
   expect(logMock.log.mock.calls).toMatchInlineSnapshot(`
 Array [
   Array [
@@ -237,25 +185,16 @@ Array [
 test("invalid fields", async () => {
   let tmpPath = f.copy("invalid-fields");
 
-  prompt.promptConfirm.mockImplementation(question => {
-    switch (question) {
-      case confirms.writeMainField: {
-        return true;
-      }
-      case confirms.writeModuleField: {
-        return true;
-      }
-      case confirms.writeUmdBuilds: {
-        return false;
-      }
-      default: {
-        throw new Error("unexpected case: " + question);
-      }
-    }
-  });
+  confirms.writeMainField.mockReturnValue(true);
+  confirms.writeModuleField.mockReturnValue(true);
+  confirms.writeUmdBuilds.mockReturnValue(false);
 
   await init(tmpPath);
-  expect(prompt.promptConfirm).toBeCalledTimes(3);
+
+  expect(confirms.writeMainField).toBeCalledTimes(1);
+  expect(confirms.writeModuleField).toBeCalledTimes(1);
+  expect(confirms.writeUmdBuilds).toBeCalledTimes(1);
+
   let pkg = await getPkg(tmpPath);
 
   expect(pkg).toMatchInlineSnapshot(`
