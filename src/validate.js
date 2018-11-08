@@ -6,9 +6,11 @@ import { FatalError } from "./errors";
 import {
   getValidModuleField,
   getValidMainField,
-  getValidUmdMainField
+  getValidUmdMainField,
+  getValidBrowserField
 } from "./utils";
 import * as logger from "./logger";
+import equal from "fast-deep-equal";
 
 // this doesn't offer to fix anything
 // just does validation
@@ -35,6 +37,10 @@ export function isModuleFieldValid(pkg: Package) {
 
 export function isUmdMainFieldValid(pkg: Package) {
   return pkg.umdMain === getValidUmdMainField(pkg);
+}
+
+export function isBrowserFieldValid(pkg: Package): boolean {
+  return equal(pkg.browser, getValidBrowserField(pkg));
 }
 
 export function isUmdNameSpecified(pkg: Package) {
@@ -65,6 +71,13 @@ export function validatePackage(pkg: Package) {
       }
     } else {
       throw new FatalError(errors.invalidUmdMainField);
+    }
+  }
+  if (pkg.browser !== null) {
+    if (typeof pkg.browser === "string" || !isBrowserFieldValid(pkg)) {
+      throw new FatalError(errors.invalidBrowserField);
+    } else {
+      logger.info(infos.validBrowserField, pkg);
     }
   }
 }

@@ -5,6 +5,7 @@ import * as fs from "fs-extra";
 import init from "../init";
 import { confirms, errors } from "../messages";
 import { logMock } from "../../test-utils";
+import { Package } from "../package";
 
 const f = fixturez(__dirname);
 
@@ -200,6 +201,38 @@ Object {
   "module": "dist/invalid-fields.esm.js",
   "name": "invalid-fields",
   "private": true,
+  "version": "1.0.0",
+}
+`);
+});
+
+test("fix browser", async () => {
+  let tmpPath = f.copy("valid-package");
+
+  confirms.addBrowserField.mockReturnValue(true);
+
+  let pkg = await Package.create(tmpPath);
+
+  pkg.browser = "invalid.js";
+
+  await pkg.save();
+  await init(tmpPath);
+
+  expect(await getPkg(tmpPath)).toMatchInlineSnapshot(`
+Object {
+  "browser": Object {
+    "./dist/valid-package.cjs.js": "./dist/valid-package.browser.cjs.js",
+    "./dist/valid-package.esm.js": "./dist/valid-package.browser.esm.js",
+  },
+  "license": "MIT",
+  "main": "dist/valid-package.cjs.js",
+  "module": "dist/valid-package.esm.js",
+  "name": "valid-package",
+  "preconstruct": Object {
+    "umdName": "validPackage",
+  },
+  "private": true,
+  "umd:main": "dist/valid-package.umd.min.js",
   "version": "1.0.0",
 }
 `);

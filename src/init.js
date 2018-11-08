@@ -7,14 +7,16 @@ import { infos, confirms, errors, inputs } from "./messages";
 import {
   getValidModuleField,
   getValidMainField,
-  getValidUmdMainField
+  getValidUmdMainField,
+  getValidBrowserField
 } from "./utils";
 import {
   validateEntrypoint,
   isMainFieldValid,
   isModuleFieldValid,
   isUmdMainFieldValid,
-  isUmdNameSpecified
+  isUmdNameSpecified,
+  isBrowserFieldValid
 } from "./validate";
 
 async function doInit(pkg: Package) {
@@ -64,7 +66,15 @@ async function doInit(pkg: Package) {
     }
   }
 
-  // check if there is a browser option and if it's invalid, offer to fix it
+  if (pkg.browser !== null && !isBrowserFieldValid(pkg)) {
+    let shouldFixBrowserField = await confirms.addBrowserField(pkg);
+    if (shouldFixBrowserField) {
+      pkg.browser = getValidBrowserField(pkg);
+    } else {
+      throw new FatalError(errors.invalidBrowserField);
+    }
+  }
+
   await pkg.save();
 }
 

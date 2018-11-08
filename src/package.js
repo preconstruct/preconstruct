@@ -59,10 +59,13 @@ export class Package {
     this.json.module = path;
   }
   get browser(): null | string | { [key: string]: string } {
-    return is(this.json.module, is.maybe(is.either(is.string, objectOfString)));
+    return is(
+      this.json.browser,
+      is.maybe(is.either(is.string, objectOfString))
+    );
   }
   set browser(option: string | { [key: string]: string }) {
-    this.json.module = option;
+    this.json.browser = option;
   }
   get dependencies(): null | { [key: string]: string } {
     return is(this.json.dependencies, is.maybe(objectOfString));

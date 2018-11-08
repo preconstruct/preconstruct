@@ -7,6 +7,13 @@ import type { OutputOptions } from "./types";
 import { type Aliases, getAliases } from "./aliases";
 import is from "sarcastic";
 import * as fs from "fs-extra";
+import { confirms, errors } from "../messages";
+import { FatalError } from "../errors";
+import {
+  getValidBrowserField,
+  getValidCjsBrowserPath,
+  getValidModuleBrowserPath
+} from "../utils";
 
 function getDevPath(cjsPath: string) {
   return cjsPath.replace(/\.js$/, ".dev.js");
@@ -15,6 +22,8 @@ function getDevPath(cjsPath: string) {
 function getProdPath(cjsPath: string) {
   return cjsPath.replace(/\.js$/, ".prod.js");
 }
+
+let browserPattern = /typeof\s+(window|document)/;
 
 async function buildPackage(pkg: StrictPackage, aliases: Aliases) {
   let configs: Array<{
@@ -66,18 +75,52 @@ async function buildPackage(pkg: StrictPackage, aliases: Aliases) {
     });
   }
 
+  if (pkg.browser !== null) {
+    configs.push({
+      config: getRollupConfig(pkg, aliases, "browser"),
+      outputs: [
+        {
+          format: "cjs",
+          file: path.join(pkg.directory, getValidCjsBrowserPath(pkg)),
+          exports: "named"
+        },
+        {
+          format: "es",
+          file: path.join(pkg.directory, getValidModuleBrowserPath(pkg))
+        }
+      ]
+    });
+  }
+
   await fs.remove(path.join(pkg.directory, "dist"));
+
+  let hasCheckedBrowser = false;
 
   let bundles = await Promise.all(
     configs.map(async ({ config, outputs }) => {
       // $FlowFixMe this is not a problem with flow, i did something wrong but it's not worth fixing right now
       const bundle = await rollup(config);
 
-      await Promise.all(
+      let result = await Promise.all(
         outputs.map(outputConfig => {
           return bundle.write(outputConfig);
         })
       );
+      let thing = result.find(x => x && x.code);
+      if (!hasCheckedBrowser && thing && thing.code) {
+        hasCheckedBrowser = true;
+        if (browserPattern.test(thing.code)) {
+          throw (async () => {
+            let shouldAddBrowserField = await confirms.addBrowserField(pkg);
+            if (shouldAddBrowserField) {
+              pkg.browser = getValidBrowserField(pkg);
+              await pkg.save();
+            } else {
+              throw new FatalError(errors.deniedWriteBrowserField);
+            }
+          })();
+        }
+      }
       return bundle;
     })
   );

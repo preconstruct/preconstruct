@@ -122,3 +122,13 @@ test("prod checks", async () => {
 
   await snapshotDistFiles(tmpPath);
 });
+
+test("browser", async () => {
+  let tmpPath = f.copy("browser");
+
+  confirms.addBrowserField.mockReturnValue(Promise.resolve(true));
+
+  await build(tmpPath);
+
+  await snapshotDistFiles(tmpPath);
+});
