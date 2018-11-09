@@ -14,7 +14,7 @@ let limit = pLimit(1);
 
 // there might be a simpler solution to this than using dataloader but it works so ¯\_(ツ)_/¯
 
-let confirmPrefix = `🎁 ${chalk.green("?")} `;
+let prefix = `🎁 ${chalk.green("?")}   `;
 
 export function createPromptConfirmLoader(
   message: string
@@ -29,7 +29,7 @@ export function createPromptConfirmLoader(
                 type: "confirm",
                 name: "confirm",
                 message,
-                prefix: confirmPrefix + pkgs[0].name
+                prefix: prefix + " " + pkgs[0].name
               }
             ]);
             return [confirm];
@@ -40,7 +40,7 @@ export function createPromptConfirmLoader(
               name: "answers",
               message,
               choices: pkgs.map(pkg => ({ name: pkg.name, checked: true })),
-              prefix: confirmPrefix
+              prefix
             }
           ]);
           return pkgs.map(pkg => {
@@ -66,7 +66,7 @@ let doPromptInput = async (message: string, pkg: Package): Promise<string> => {
       type: "input",
       name: "input",
       message,
-      prefix: pkg.name
+      prefix: prefix + " " + pkg.name
     }
   ]);
   return input;
