@@ -4,18 +4,21 @@ import { watch } from "rollup";
 import chalk from "chalk";
 import path from "path";
 import ms from "ms";
+import * as fs from "fs-extra";
 import { getRollupConfigs } from "./config";
 import { type Aliases, getAliases } from "./aliases";
 import { toUnsafeRollupConfig } from "./rollup";
 import { success, info } from "../logger";
 import { successes } from "../messages";
+import { writeOtherFiles } from "./utils";
 
 function relativePath(id) {
   return path.relative(process.cwd(), id);
 }
 
 async function watchPackage(pkg: StrictPackage, aliases: Aliases) {
-  const _configs = await getRollupConfigs(pkg, aliases);
+  const _configs = getRollupConfigs(pkg, aliases);
+  await fs.remove(path.join(pkg.directory, "dist"));
   let configs = _configs.map(config => {
     return { ...toUnsafeRollupConfig(config.config), output: config.outputs };
   });
@@ -60,6 +63,15 @@ async function watchPackage(pkg: StrictPackage, aliases: Aliases) {
       }
 
       case "BUNDLE_END": {
+        writeOtherFiles(
+          pkg,
+          event.result.modules[0].originalCode.includes("@flow")
+            ? Object.keys(event.result.exports).includes("default")
+              ? "all"
+              : "named"
+            : false
+        );
+
         info(
           chalk.green(
             `created ${chalk.bold(
