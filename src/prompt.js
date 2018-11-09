@@ -9,36 +9,41 @@ import DataLoader from "dataloader";
 
 let isTest = process.env.NODE_ENV === "test";
 
+let limit = pLimit(1);
+
 // there might be a simpler solution to this than using dataloader but it works so ¯\_(ツ)_/¯
 
 export function createPromptConfirmLoader(
   message: string
 ): (pkg: Package) => boolean {
-  let loader = new DataLoader<Package, boolean>(
-    async pkgs => {
-      if (pkgs.length === 1) {
-        let { confirm } = await inquirer.prompt([
-          {
-            type: "confirm",
-            name: "confirm",
-            message
+  let loader = new DataLoader<Package, boolean>(pkgs =>
+    limit(
+      () =>
+        (async () => {
+          if (pkgs.length === 1) {
+            let { confirm } = await inquirer.prompt([
+              {
+                type: "confirm",
+                name: "confirm",
+                message
+              }
+            ]);
+            return [confirm];
           }
-        ]);
-        return [confirm];
-      }
-      let { answers } = await inquirer.prompt([
-        {
-          type: "checkbox",
-          name: "answers",
-          message,
-          choices: pkgs.map(pkg => ({ name: pkg.name, checked: true }))
-        }
-      ]);
-      return pkgs.map(pkg => {
-        return answers.includes(pkg.name);
-      });
-    },
-    { cache: false }
+          let { answers } = await inquirer.prompt([
+            {
+              type: "checkbox",
+              name: "answers",
+              message,
+              choices: pkgs.map(pkg => ({ name: pkg.name, checked: true }))
+            }
+          ]);
+          return pkgs.map(pkg => {
+            return answers.includes(pkg.name);
+          });
+        })(),
+      { cache: false }
+    )
   );
 
   let ret = (pkg: Package) => loader.load(pkg);
@@ -49,8 +54,6 @@ export function createPromptConfirmLoader(
   // $FlowFixMe
   return ret;
 }
-
-let limit = pLimit(1);
 
 let doPromptInput = async (message: string, pkg: Package): Promise<string> => {
   let { input } = await inquirer.prompt([
