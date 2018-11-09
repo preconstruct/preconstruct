@@ -39,7 +39,7 @@ async function buildPackage(pkg: StrictPackage, aliases: Aliases) {
               pkg.browser = getValidBrowserField(pkg);
               await pkg.save();
             } else {
-              throw new FatalError(errors.deniedWriteBrowserField);
+              throw new FatalError(errors.deniedWriteBrowserField, pkg);
             }
           })();
         }

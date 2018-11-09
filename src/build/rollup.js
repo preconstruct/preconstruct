@@ -141,7 +141,8 @@ export let getRollupConfig = (
                 await pkg.refresh();
               } else {
                 throw new FatalError(
-                  `object-assign should be in dependencies of ${pkg.name}`
+                  `object-assign should be in dependencies of ${pkg.name}`,
+                  pkg
                 );
               }
             })();

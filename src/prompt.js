@@ -6,12 +6,15 @@ import pLimit from "p-limit";
 import { Package } from "./package";
 */
 import DataLoader from "dataloader";
+import chalk from "chalk";
 
 let isTest = process.env.NODE_ENV === "test";
 
 let limit = pLimit(1);
 
 // there might be a simpler solution to this than using dataloader but it works so ¯\_(ツ)_/¯
+
+let confirmPrefix = `🎁 ${chalk.green("?")} `;
 
 export function createPromptConfirmLoader(
   message: string
@@ -25,7 +28,8 @@ export function createPromptConfirmLoader(
               {
                 type: "confirm",
                 name: "confirm",
-                message
+                message,
+                prefix: confirmPrefix + pkgs[0].name
               }
             ]);
             return [confirm];
@@ -35,7 +39,8 @@ export function createPromptConfirmLoader(
               type: "checkbox",
               name: "answers",
               message,
-              choices: pkgs.map(pkg => ({ name: pkg.name, checked: true }))
+              choices: pkgs.map(pkg => ({ name: pkg.name, checked: true })),
+              prefix: confirmPrefix
             }
           ]);
           return pkgs.map(pkg => {

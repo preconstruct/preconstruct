@@ -26,7 +26,7 @@ async function doInit(pkg: Package) {
   } else {
     let canWriteMainField = await confirms.writeMainField(pkg);
     if (!canWriteMainField) {
-      throw new FatalError(errors.deniedWriteMainField);
+      throw new FatalError(errors.deniedWriteMainField, pkg);
     }
     pkg.main = getValidMainField(pkg);
   }
@@ -40,7 +40,7 @@ async function doInit(pkg: Package) {
       error(errors.invalidModuleField, pkg);
       let shouldFixModuleField = await confirms.fixModuleField(pkg);
       if (!shouldFixModuleField) {
-        throw new FatalError(errors.invalidModuleField);
+        throw new FatalError(errors.invalidModuleField, pkg);
       }
       pkg.module = validModuleField;
     }
@@ -62,7 +62,7 @@ async function doInit(pkg: Package) {
       pkg.umdMain !== null &&
       (!isUmdMainFieldValid(pkg) || !isUmdNameSpecified(pkg))
     ) {
-      throw new FatalError(errors.invalidUmdMainField);
+      throw new FatalError(errors.invalidUmdMainField, pkg);
     }
   }
 
@@ -71,7 +71,7 @@ async function doInit(pkg: Package) {
     if (shouldFixBrowserField) {
       pkg.browser = getValidBrowserField(pkg);
     } else {
-      throw new FatalError(errors.invalidBrowserField);
+      throw new FatalError(errors.invalidBrowserField, pkg);
     }
   }
 

@@ -21,7 +21,7 @@ export function validateEntrypoint(pkg: Package) {
     require.resolve(path.join(pkg.directory, "src"));
   } catch (e) {
     if (e.code === "MODULE_NOT_FOUND") {
-      throw new FatalError(errors.noEntryPoint);
+      throw new FatalError(errors.noEntryPoint, pkg);
     }
     throw e;
   }
@@ -51,7 +51,7 @@ export function validatePackage(pkg: Package) {
   validateEntrypoint(pkg);
   logger.info(infos.validEntrypoint, pkg);
   if (!isMainFieldValid(pkg)) {
-    throw new FatalError(errors.invalidMainField);
+    throw new FatalError(errors.invalidMainField, pkg);
   }
 
   logger.info(infos.validMainField, pkg);
@@ -59,7 +59,7 @@ export function validatePackage(pkg: Package) {
     if (isModuleFieldValid(pkg)) {
       logger.info(infos.validModuleField, pkg);
     } else {
-      throw new FatalError(errors.invalidMainField);
+      throw new FatalError(errors.invalidMainField, pkg);
     }
   }
   if (pkg.umdMain !== null) {
@@ -67,15 +67,15 @@ export function validatePackage(pkg: Package) {
       if (isUmdNameSpecified(pkg)) {
         logger.info(infos.validUmdMainField, pkg);
       } else {
-        throw new FatalError(errors.umdNameNotSpecified);
+        throw new FatalError(errors.umdNameNotSpecified, pkg);
       }
     } else {
-      throw new FatalError(errors.invalidUmdMainField);
+      throw new FatalError(errors.invalidUmdMainField, pkg);
     }
   }
   if (pkg.browser !== null) {
     if (typeof pkg.browser === "string" || !isBrowserFieldValid(pkg)) {
-      throw new FatalError(errors.invalidBrowserField);
+      throw new FatalError(errors.invalidBrowserField, pkg);
     } else {
       logger.info(infos.validBrowserField, pkg);
     }
