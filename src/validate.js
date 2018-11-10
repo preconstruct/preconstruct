@@ -47,17 +47,22 @@ export function isUmdNameSpecified(pkg: Package) {
   return pkg.config.umdName !== null;
 }
 
-export function validatePackage(pkg: Package) {
+export function validatePackage(pkg: Package, log: boolean) {
   validateEntrypoint(pkg);
-  logger.info(infos.validEntrypoint, pkg);
+  if (log) {
+    logger.info(infos.validEntrypoint, pkg);
+  }
   if (!isMainFieldValid(pkg)) {
     throw new FatalError(errors.invalidMainField, pkg);
   }
-
-  logger.info(infos.validMainField, pkg);
+  if (log) {
+    logger.info(infos.validMainField, pkg);
+  }
   if (pkg.module !== null) {
     if (isModuleFieldValid(pkg)) {
-      logger.info(infos.validModuleField, pkg);
+      if (log) {
+        logger.info(infos.validModuleField, pkg);
+      }
     } else {
       throw new FatalError(errors.invalidMainField, pkg);
     }
@@ -65,7 +70,9 @@ export function validatePackage(pkg: Package) {
   if (pkg.umdMain !== null) {
     if (isUmdMainFieldValid(pkg)) {
       if (isUmdNameSpecified(pkg)) {
-        logger.info(infos.validUmdMainField, pkg);
+        if (log) {
+          logger.info(infos.validUmdMainField, pkg);
+        }
       } else {
         throw new FatalError(errors.umdNameNotSpecified, pkg);
       }
@@ -76,7 +83,7 @@ export function validatePackage(pkg: Package) {
   if (pkg.browser !== null) {
     if (typeof pkg.browser === "string" || !isBrowserFieldValid(pkg)) {
       throw new FatalError(errors.invalidBrowserField, pkg);
-    } else {
+    } else if (log) {
       logger.info(infos.validBrowserField, pkg);
     }
   }
@@ -87,10 +94,10 @@ export default async function validate(directory: string) {
 
   let packages = await pkg.packages();
   if (packages === null) {
-    validatePackage(pkg);
+    validatePackage(pkg, true);
   } else {
     for (let pkg of packages) {
-      validatePackage(pkg);
+      validatePackage(pkg, true);
     }
   }
 

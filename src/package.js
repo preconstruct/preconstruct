@@ -35,7 +35,7 @@ export class Package {
     this.json = is(JSON.parse(contents), is.object);
     this._contents = contents;
     if (this._strict) {
-      validatePackage(this);
+      validatePackage(this, false);
       this._strict.json = this.json;
       this._strict._contents = this._contents;
     }
@@ -153,7 +153,7 @@ export class Package {
   }
   _strict: StrictPackage;
   strict(): StrictPackage {
-    validatePackage(this);
+    validatePackage(this, false);
     if (!this._strict) {
       this._strict = new StrictPackage(this.path, this._contents);
       // $FlowFixMe
