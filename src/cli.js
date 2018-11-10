@@ -4,6 +4,7 @@ import init from "./init";
 import validate from "./validate";
 import build from "./build";
 import watch from "./build/watch";
+import fix from "./fix";
 import { error } from "./logger";
 import { FatalError } from "./errors";
 
@@ -16,6 +17,7 @@ Commands
   build        build the package(s)
   watch        start a watch process to build the package(s)
   validate     validate the package(s)
+  fix          infer as much information as possible and fix package(s)
 `,
   {}
 );
@@ -44,6 +46,10 @@ class CommandNotFoundError extends Error {}
         }
         case "watch": {
           await watch(process.cwd());
+          return;
+        }
+        case "fix": {
+          await fix(process.cwd());
           return;
         }
 
