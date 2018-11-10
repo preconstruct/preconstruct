@@ -34,7 +34,7 @@ export let confirms = {
     "Object.assign is polyfilled with object-assign to reduce bundle size when used with react. would you like to install object-assign automatically?"
   ),
   addBrowserField: createPromptConfirmLoader(
-    "typeof window or typeof document in used in this package. would you like build seperate browser builds for better browser bundle sizes?"
+    "typeof window or typeof document is used in this package. would you like build seperate browser builds for better browser bundle sizes?"
   )
 };
 
