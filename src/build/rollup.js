@@ -173,10 +173,10 @@ export let getRollupConfig = (
         ],
         plugins: [
           "@babel/plugin-transform-flow-strip-types",
-          require("./add-basic-constructor-to-react-component"),
+          require("../babel-plugins/add-basic-constructor-to-react-component"),
           "codegen",
           ["@babel/proposal-class-properties", { loose: true }],
-          require("./fix-dce-for-classes-with-statics"),
+          require("../babel-plugins/fix-dce-for-classes-with-statics"),
           [
             "@babel/plugin-proposal-object-rest-spread",
             { loose: true, useBuiltIns: type !== "umd" }
