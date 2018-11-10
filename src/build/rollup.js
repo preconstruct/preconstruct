@@ -42,40 +42,42 @@ function getChildPeerDeps(
   depKeys: Array<string>,
   doneDeps: Array<string>
 ) {
-  depKeys.filter(x => !doneDeps.includes(x)).forEach(key => {
-    let pkgJson;
-    try {
-      pkgJson = unsafeRequire(key + "/package.json");
-    } catch (err) {
-      if (
-        err.code === "MODULE_NOT_FOUND" &&
-        pkgJsonsAllowedToFail.includes(key)
-      ) {
-        return;
+  depKeys
+    .filter(x => !doneDeps.includes(x))
+    .forEach(key => {
+      let pkgJson;
+      try {
+        pkgJson = unsafeRequire(key + "/package.json");
+      } catch (err) {
+        if (
+          err.code === "MODULE_NOT_FOUND" &&
+          pkgJsonsAllowedToFail.includes(key)
+        ) {
+          return;
+        }
+        throw err;
       }
-      throw err;
-    }
-    if (pkgJson.peerDependencies) {
-      finalPeerDeps.push(...Object.keys(pkgJson.peerDependencies));
-      getChildPeerDeps(
-        finalPeerDeps,
-        isUMD,
-        Object.keys(pkgJson.peerDependencies),
-        doneDeps
-      );
-    }
-    // when we're building a UMD bundle, we're also bundling the dependencies so we need
-    // to get the peerDependencies of dependencies
-    if (pkgJson.dependencies && isUMD) {
-      doneDeps.push(...Object.keys(pkgJson.dependencies));
-      getChildPeerDeps(
-        finalPeerDeps,
-        isUMD,
-        Object.keys(pkgJson.dependencies),
-        doneDeps
-      );
-    }
-  });
+      if (pkgJson.peerDependencies) {
+        finalPeerDeps.push(...Object.keys(pkgJson.peerDependencies));
+        getChildPeerDeps(
+          finalPeerDeps,
+          isUMD,
+          Object.keys(pkgJson.peerDependencies),
+          doneDeps
+        );
+      }
+      // when we're building a UMD bundle, we're also bundling the dependencies so we need
+      // to get the peerDependencies of dependencies
+      if (pkgJson.dependencies && isUMD) {
+        doneDeps.push(...Object.keys(pkgJson.dependencies));
+        getChildPeerDeps(
+          finalPeerDeps,
+          isUMD,
+          Object.keys(pkgJson.dependencies),
+          doneDeps
+        );
+      }
+    });
 }
 
 let limit = pLimit(1);
@@ -149,10 +151,11 @@ export let getRollupConfig = (
           }
         }
         default: {
-          throw new Error(
+          throw new FatalError(
             `There was an error compiling ${pkg.name}: ${chalk.red(
               warning.toString()
-            )}`
+            )}`,
+            pkg
           );
         }
       }
