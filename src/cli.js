@@ -65,8 +65,10 @@ class CommandNotFoundError extends Error {}
       } else {
         throw err;
       }
+      process.exit(1);
     }
   } else {
     error(errors.commandNotFound);
+    process.exit(1);
   }
 })();
