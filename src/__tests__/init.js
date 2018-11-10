@@ -1,19 +1,12 @@
 // @flow
 import fixturez from "fixturez";
 import path from "path";
-import * as fs from "fs-extra";
 import init from "../init";
 import { confirms, errors } from "../messages";
-import { logMock } from "../../test-utils";
+import { logMock, getPkg } from "../../test-utils";
 import { Package } from "../package";
 
 const f = fixturez(__dirname);
-
-async function getPkg(filepath) {
-  return JSON.parse(
-    await fs.readFile(path.join(filepath, "package.json"), "utf-8")
-  );
-}
 
 afterEach(() => {
   jest.resetAllMocks();
