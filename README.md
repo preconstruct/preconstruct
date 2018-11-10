@@ -40,6 +40,14 @@ preconstruct watch
 
 - same as build but watches
 
+```bash
+preconstruct fix
+```
+
+- like init but infers as much as possible
+- made for places that already have build setups
+- e.g. if the package has a umd:main field and it's wrong, fix it and ask for a umdName but if it doesn't hava umd:main field, don't do anything
+
 ## Ideas
 
 - good, reliable caching
