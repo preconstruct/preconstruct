@@ -4,6 +4,7 @@ import is from "sarcastic";
 import nodePath from "path";
 import * as fs from "fs-extra";
 import { validatePackage } from "./validate";
+import { promptInput } from "./prompt";
 // move this to the flow-typed folder later
 let globby: (
   globs: string | Array<string>,
@@ -118,23 +119,32 @@ export class Package {
   }
 
   async packages(): Promise<null | Array<Package>> {
-    // support yarn workspaces later
-    // probably bolt too
-    // maybe lerna though probably not
-    // also support packages option in preconstruct config
-    // if (!this.json.workspaces) {
-    //   return null;
-    // }
-    // let _workspaces;
-    // if (Array.isArray(this.json.workspaces)) {
-    //   _workspaces = this.json.workspaces;
-    // } else if (Array.isArray(this.json.workspaces.packages)) {
-    //   _workspaces = this.json.workspaces.packages;
-    // }
-    // // $FlowFixMe
-    // let workspaces = is(_workspaces, is.arrayOf(is.string));
+    // suport bolt later probably
+    // maybe lerna too though probably not
+    if (this.config.packages === null && this.json.workspaces) {
+      let _workspaces;
+      if (Array.isArray(this.json.workspaces)) {
+        _workspaces = this.json.workspaces;
+      } else if (Array.isArray(this.json.workspaces.packages)) {
+        _workspaces = this.json.workspaces.packages;
+      }
 
-    // for now, only the config option, this is what emotion needs anyway
+      let workspaces = is(_workspaces, is.arrayOf(is.string));
+
+      let packages = await promptInput(
+        "what packages should preconstruct build?",
+        this,
+        workspaces.join(",")
+      );
+
+      if (!this.json.preconstruct) {
+        this.json.preconstruct = {};
+      }
+      this.json.preconstruct.packages = packages.split(",");
+
+      await this.save();
+    }
+
     try {
       let filenames = await globby(this.configPackages, {
         cwd: this.directory,

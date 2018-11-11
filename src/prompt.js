@@ -60,19 +60,28 @@ export function createPromptConfirmLoader(
   return ret;
 }
 
-let doPromptInput = async (message: string, pkg: Package): Promise<string> => {
+let doPromptInput = async (
+  message: string,
+  pkg: Package,
+  defaultAnswer?: string
+): Promise<string> => {
   let { input } = await inquirer.prompt([
     {
       type: "input",
       name: "input",
       message,
-      prefix: prefix + " " + pkg.name
+      prefix: prefix + " " + pkg.name,
+      default: defaultAnswer
     }
   ]);
   return input;
 };
-export let promptInput = (message: string, pkg: Package) =>
-  limit(() => doPromptInput(message, pkg));
+
+export let promptInput = (
+  message: string,
+  pkg: Package,
+  defaultAnswer?: string
+) => limit(() => doPromptInput(message, pkg, defaultAnswer));
 
 if (isTest) {
   promptInput = jest.fn<[string, Package], string | Promise<string>>();
