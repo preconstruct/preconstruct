@@ -17,7 +17,7 @@ async function buildPackage(pkg: StrictPackage, aliases: Aliases) {
   let configs = getRollupConfigs(pkg, aliases);
   await fs.remove(path.join(pkg.directory, "dist"));
 
-  let hasCheckedBrowser = false;
+  let hasCheckedBrowser = pkg.browser !== null;
 
   let bundles = await Promise.all(
     configs.map(async ({ config, outputs }) => {
