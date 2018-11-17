@@ -23,7 +23,7 @@ export class Package {
   path: string;
   directory: string;
   _contents: string;
-  constructor(filePath: string, contents: string, parent?: Package) {
+  constructor(filePath: string, contents: string, parent: Package | null) {
     this.json = is(JSON.parse(contents), is.object);
     this._contents = contents;
     this.path = filePath;
@@ -34,7 +34,7 @@ export class Package {
   static async create(directory: string, parent?: Package): Promise<Package> {
     let filePath = nodePath.join(directory, "package.json");
     let contents: string = await fs.readFile(filePath, "utf-8");
-    return new Package(filePath, contents, parent);
+    return new Package(filePath, contents, parent || null);
   }
   async refresh() {
     let contents: string = await fs.readFile(this.path, "utf-8");
@@ -191,7 +191,7 @@ export class Package {
   strict(): StrictPackage {
     validatePackage(this, false);
     if (!this._strict) {
-      this._strict = new StrictPackage(this.path, this._contents);
+      this._strict = new StrictPackage(this.path, this._contents, this.parent);
       // $FlowFixMe
       this._strict.refresh = this.refresh.bind(this);
     }
