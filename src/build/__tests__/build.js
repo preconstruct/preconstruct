@@ -10,6 +10,8 @@ import { promptInput } from "../../prompt";
 
 const f = fixturez(__dirname);
 
+let unsafePromptInput: any = promptInput;
+
 async function snapshotDistFiles(tmpPath: string) {
   let distPath = path.join(tmpPath, "dist");
   let distFiles;
@@ -125,7 +127,7 @@ test("prod checks", async () => {
 });
 
 // TODO: make it faster so this isn't required
-// jest.setTimeout(20000);
+jest.setTimeout(20000);
 
 test("browser", async () => {
   let tmpPath = f.copy("browser");
@@ -140,7 +142,7 @@ test("browser", async () => {
 test("umd with dep on other module", async () => {
   let tmpPath = f.copy("umd-with-dep");
 
-  (promptInput: any).mockImplementation(async question => {
+  unsafePromptInput.mockImplementation(async question => {
     if (question === `What should the umdName of react be?`) {
       return "React";
     }
@@ -166,6 +168,80 @@ Object {
   },
   "private": true,
   "umd:main": "dist/umd-with-dep.umd.min.js",
+  "version": "1.0.0",
+}
+`);
+});
+
+test("monorepo umd with dep on other module", async () => {
+  let tmpPath = f.copy("monorepo-umd-with-dep");
+  let asked = false;
+  unsafePromptInput.mockImplementation(async question => {
+    if (asked) {
+      throw new Error("only one prompt should happen: " + question);
+    }
+    if (question === `What should the umdName of react be?`) {
+      asked = true;
+      return "React";
+    }
+    throw new Error("unexpected question: " + question);
+  });
+
+  await build(tmpPath);
+
+  await snapshotDistFiles(path.join(tmpPath, "packages", "package-one"));
+  await snapshotDistFiles(path.join(tmpPath, "packages", "package-two"));
+
+  expect(await getPkg(path.join(tmpPath, "packages", "package-one")))
+    .toMatchInlineSnapshot(`
+Object {
+  "license": "MIT",
+  "main": "dist/package-one-umd-with-dep.cjs.js",
+  "name": "@some-scope/package-one-umd-with-dep",
+  "peerDependencies": Object {
+    "react": "^16.6.3",
+  },
+  "preconstruct": Object {
+    "umdName": "packageOne",
+  },
+  "private": true,
+  "umd:main": "dist/package-one-umd-with-dep.umd.min.js",
+  "version": "1.0.0",
+}
+`);
+
+  expect(await getPkg(path.join(tmpPath, "packages", "package-two")))
+    .toMatchInlineSnapshot(`
+Object {
+  "license": "MIT",
+  "main": "dist/package-two-umd-with-dep.cjs.js",
+  "name": "@some-scope/package-two-umd-with-dep",
+  "peerDependencies": Object {
+    "react": "^16.6.3",
+  },
+  "preconstruct": Object {
+    "umdName": "packageTwo",
+  },
+  "private": true,
+  "umd:main": "dist/package-two-umd-with-dep.umd.min.js",
+  "version": "1.0.0",
+}
+`);
+
+  expect(await getPkg(tmpPath)).toMatchInlineSnapshot(`
+Object {
+  "license": "MIT",
+  "main": "index.js",
+  "name": "monorepo-umd-with-dep",
+  "preconstruct": Object {
+    "globals": Object {
+      "react": "React",
+    },
+    "packages": Array [
+      "packages/*",
+    ],
+  },
+  "private": true,
   "version": "1.0.0",
 }
 `);

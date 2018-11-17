@@ -5,6 +5,7 @@ import nodePath from "path";
 import * as fs from "fs-extra";
 import { validatePackage } from "./validate";
 import { promptInput } from "./prompt";
+import pLimit from "p-limit";
 // move this to the flow-typed folder later
 let globby: (
   globs: string | Array<string>,
@@ -16,6 +17,8 @@ let unsafeRequire = require;
 let objectOfString = is.objectOf(is.string);
 
 let arrayOfString = is.arrayOf(is.string);
+
+let askGlobalLimit = pLimit(1);
 
 export class Package {
   json: Object;
@@ -82,8 +85,11 @@ export class Package {
   _config: Object;
 
   global(pkg: string) {
-    if (this._config.globals !== undefined && this._config.globals[pkg]) {
-      return this._config.globals[pkg];
+    if (
+      this.parent._config.globals !== undefined &&
+      this.parent._config.globals[pkg]
+    ) {
+      return this.parent._config.globals[pkg];
     } else {
       try {
         // change this to use internal packages
@@ -96,14 +102,23 @@ export class Package {
           throw err;
         }
       }
-      throw (async () => {
-        let response = await promptInput(
-          `What should the umdName of ${pkg} be?`,
-          this
-        );
-        this.addGlobal(pkg, response);
-        await this.save();
-      })();
+      throw askGlobalLimit(() =>
+        (async () => {
+          // if while we were waiting, that global was added, return
+          if (
+            this.parent._config.globals !== undefined &&
+            this.parent._config.globals[pkg]
+          ) {
+            return;
+          }
+          let response = await promptInput(
+            `What should the umdName of ${pkg} be?`,
+            this
+          );
+          this.addGlobal(pkg, response);
+          await this.save();
+        })()
+      );
     }
   }
 
@@ -116,12 +131,6 @@ export class Package {
   }
   set umdMain(path: string) {
     this.json["umd:main"] = path;
-  }
-  get globals(): { [key: string]: string } {
-    return is(
-      this.parent._config.globals,
-      is.default(is.objectOf(is.string), {})
-    );
   }
   addGlobal(pkg: string, name: string) {
     if (!this.parent._config.globals) {
