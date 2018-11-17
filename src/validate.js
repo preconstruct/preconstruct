@@ -44,7 +44,7 @@ export function isBrowserFieldValid(pkg: Package): boolean {
 }
 
 export function isUmdNameSpecified(pkg: Package) {
-  return pkg.config.umdName !== null;
+  return pkg._config.umdName !== null;
 }
 
 export function validatePackage(pkg: Package, log: boolean) {

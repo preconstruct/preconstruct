@@ -44,7 +44,7 @@ export function getRollupConfigs(pkg: StrictPackage, aliases: Aliases) {
   });
   let { umdMain } = pkg;
   if (umdMain !== null) {
-    let umdName = is(pkg.config.umdName, is.string);
+    let umdName = is(pkg._config.umdName, is.string);
     configs.push({
       config: getRollupConfig(pkg, aliases, "umd"),
       outputs: [
@@ -52,7 +52,8 @@ export function getRollupConfigs(pkg: StrictPackage, aliases: Aliases) {
           format: "umd",
           sourcemap: true,
           file: path.join(pkg.directory, umdMain),
-          name: umdName
+          name: umdName,
+          globals: {}
         }
       ]
     });

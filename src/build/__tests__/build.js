@@ -123,6 +123,9 @@ test("prod checks", async () => {
   await snapshotDistFiles(tmpPath);
 });
 
+// TODO: make it faster so this isn't required
+jest.setTimeout(20000);
+
 test("browser", async () => {
   let tmpPath = f.copy("browser");
 

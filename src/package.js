@@ -11,25 +11,30 @@ let globby: (
   options: Object
 ) => Promise<Array<string>> = require("globby");
 
+let unsafeRequire = require;
+
 let objectOfString = is.objectOf(is.string);
 
 let arrayOfString = is.arrayOf(is.string);
 
 export class Package {
   json: Object;
+  parent: Package;
   path: string;
   directory: string;
   _contents: string;
-  constructor(filePath: string, contents: string) {
+  constructor(filePath: string, contents: string, parent?: Package) {
     this.json = is(JSON.parse(contents), is.object);
     this._contents = contents;
     this.path = filePath;
     this.directory = nodePath.dirname(filePath);
+    this.parent = parent || this;
+    this._config = this.json.preconstruct || {};
   }
-  static async create(directory: string): Promise<Package> {
+  static async create(directory: string, parent?: Package): Promise<Package> {
     let filePath = nodePath.join(directory, "package.json");
     let contents: string = await fs.readFile(filePath, "utf-8");
-    return new Package(filePath, contents);
+    return new Package(filePath, contents, parent);
   }
   async refresh() {
     let contents: string = await fs.readFile(this.path, "utf-8");
@@ -74,26 +79,36 @@ export class Package {
   get peerDependencies(): null | { [key: string]: string } {
     return is(this.json.peerDependencies, is.maybe(objectOfString));
   }
+  _config: Object;
 
-  get config(): { packages: null | Array<string>, umdName: string | null } {
-    // in the future we might want to merge from parent configs
-    return is(
-      this.json.preconstruct,
-      is.default(
-        is.shape({
-          packages: is.maybe(arrayOfString),
-          umdName: is.maybe(is.string)
-        }),
-        {
-          packages: null,
-          umdName: null
+  global(pkg: string) {
+    if (this._config.globals !== undefined && this._config.globals[pkg]) {
+      return this._config.globals[pkg];
+    } else {
+      try {
+        // change this to use internal packages
+        let pkgJson = unsafeRequire(nodePath.join(pkg, "package.json"));
+        if (pkgJson && pkgJson.preconstruct && pkgJson.preconstruct.umdName) {
+          return pkgJson.preconstruct.umdName;
         }
-      )
-    );
+      } catch (err) {
+        if (err.code !== "MODULE_NOT_FOUND") {
+          throw err;
+        }
+      }
+      throw (async () => {
+        let response = await promptInput(
+          `What should the umdName of ${pkg} be?`,
+          this
+        );
+        this.addGlobal(pkg, response);
+        await this.save();
+      })();
+    }
   }
 
   get configPackages(): Array<string> {
-    return is(this.config.packages, arrayOfString);
+    return is(this.parent._config.packages, arrayOfString);
   }
 
   get umdMain(): string | null {
@@ -102,8 +117,20 @@ export class Package {
   set umdMain(path: string) {
     this.json["umd:main"] = path;
   }
+  get globals(): { [key: string]: string } {
+    return is(
+      this.parent._config.globals,
+      is.default(is.objectOf(is.string), {})
+    );
+  }
+  addGlobal(pkg: string, name: string) {
+    if (!this.parent._config.globals) {
+      this.parent._config.globals = {};
+    }
+    this.parent._config.globals[pkg] = name;
+  }
   get undName(): null | string {
-    return this.config.umdName;
+    return is(this._config.umdName, is.maybe(is.string));
   }
   set umdName(umdName: null | string) {
     if (umdName === null) {
@@ -121,7 +148,7 @@ export class Package {
   async packages(): Promise<null | Array<Package>> {
     // suport bolt later probably
     // maybe lerna too though probably not
-    if (this.config.packages === null && this.json.workspaces) {
+    if (this.parent._config == null && this.json.workspaces) {
       let _workspaces;
       if (Array.isArray(this.json.workspaces)) {
         _workspaces = this.json.workspaces;
@@ -137,10 +164,7 @@ export class Package {
         workspaces.join(",")
       );
 
-      if (!this.json.preconstruct) {
-        this.json.preconstruct = {};
-      }
-      this.json.preconstruct.packages = packages.split(",");
+      this.parent._config.packages = packages.split(",");
 
       await this.save();
     }
@@ -152,7 +176,9 @@ export class Package {
         absolute: true
       });
 
-      let packages = await Promise.all(filenames.map(Package.create));
+      let packages = await Promise.all(
+        filenames.map(x => Package.create(x, this))
+      );
       return packages;
     } catch (error) {
       if (error instanceof is.AssertionError) {
@@ -172,7 +198,17 @@ export class Package {
     return this._strict;
   }
   async save() {
+    if (Object.keys(this._config).length) {
+      this.json.preconstruct = this._config;
+    } else {
+      delete this.json.preconstruct;
+    }
     await fs.writeFile(this.path, JSON.stringify(this.json, null, 2));
+    if (this.parent !== this) {
+      await this.parent.save();
+    }
+
+    this._config = this.json.preconstruct || {};
   }
 }
 
