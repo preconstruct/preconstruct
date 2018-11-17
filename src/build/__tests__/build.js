@@ -3,9 +3,10 @@ import build from "../";
 import fixturez from "fixturez";
 import path from "path";
 import * as fs from "fs-extra";
-import { initBasic } from "../../../test-utils";
+import { initBasic, getPkg } from "../../../test-utils";
 import { confirms } from "../../messages";
 import { FatalError } from "../../errors";
+import { promptInput } from "../../prompt";
 
 const f = fixturez(__dirname);
 
@@ -124,7 +125,7 @@ test("prod checks", async () => {
 });
 
 // TODO: make it faster so this isn't required
-jest.setTimeout(20000);
+// jest.setTimeout(20000);
 
 test("browser", async () => {
   let tmpPath = f.copy("browser");
@@ -134,4 +135,38 @@ test("browser", async () => {
   await build(tmpPath);
 
   await snapshotDistFiles(tmpPath);
+});
+
+test("umd with dep on other module", async () => {
+  let tmpPath = f.copy("umd-with-dep");
+
+  (promptInput: any).mockImplementation(async question => {
+    if (question === `What should the umdName of react be?`) {
+      return "React";
+    }
+    throw new Error("unexpected question: " + question);
+  });
+
+  await build(tmpPath);
+
+  await snapshotDistFiles(tmpPath);
+  expect(await getPkg(tmpPath)).toMatchInlineSnapshot(`
+Object {
+  "license": "MIT",
+  "main": "dist/umd-with-dep.cjs.js",
+  "name": "umd-with-dep",
+  "peerDependencies": Object {
+    "react": "^16.6.3",
+  },
+  "preconstruct": Object {
+    "globals": Object {
+      "react": "React",
+    },
+    "umdName": "umdWithDep",
+  },
+  "private": true,
+  "umd:main": "dist/umd-with-dep.umd.min.js",
+  "version": "1.0.0",
+}
+`);
 });

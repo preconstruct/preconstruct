@@ -53,7 +53,13 @@ export function getRollupConfigs(pkg: StrictPackage, aliases: Aliases) {
           sourcemap: true,
           file: path.join(pkg.directory, umdMain),
           name: umdName,
-          globals: {}
+          globals:
+            pkg.peerDependencies === null
+              ? {}
+              : Object.keys(pkg.peerDependencies).reduce((obj, pkgName) => {
+                  obj[pkgName] = pkg.global(pkgName);
+                  return obj;
+                }, {})
         }
       ]
     });

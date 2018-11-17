@@ -464,3 +464,38 @@ Object.defineProperty(exports, \\"__esModule\\", { value: !0 }),
   (exports.thing = thing);
 "
 `;
+
+exports[`umd with dep on other module: umd-with-dep.cjs.dev.js 1`] = `
+"'use strict';
+
+var react = require('react');
+
+react.createElement(\\"div\\", null);
+"
+`;
+
+exports[`umd with dep on other module: umd-with-dep.cjs.js 1`] = `
+"'use strict';
+
+if (process.env.NODE_ENV === \\"production\\") {
+  module.exports = require(\\"./umd-with-dep.cjs.prod.js\\");
+} else {
+  module.exports = require(\\"./umd-with-dep.cjs.dev.js\\");
+}
+"
+`;
+
+exports[`umd with dep on other module: umd-with-dep.cjs.prod.js 1`] = `
+"\\"use strict\\";
+var react = require(\\"react\\");
+react.createElement(\\"div\\", null);
+"
+`;
+
+exports[`umd with dep on other module: umd-with-dep.umd.min.js 1`] = `
+"!function(e,t){\\"object\\"==typeof exports&&\\"undefined\\"!=typeof module?t(require(\\"react\\")):\\"function\\"==typeof define&&define.amd?define([\\"react\\"],t):t(e.React)}(this,function(e){\\"use strict\\";e.createElement(\\"div\\",null)});
+//# sourceMappingURL=umd-with-dep.umd.min.js.map
+"
+`;
+
+exports[`umd with dep on other module: umd-with-dep.umd.min.js.map 1`] = `"{\\"version\\":3,\\"file\\":\\"umd-with-dep.umd.min.js\\",\\"sources\\":[\\"../src/index.js\\"],\\"sourcesContent\\":[\\"import { createElement } from \\\\\\"react\\\\\\";\\\\n\\\\ncreateElement(\\\\\\"div\\\\\\", null);\\\\n\\"],\\"names\\":[],\\"mappings\\":\\"4MAEc,MAAO\\"}"`;
