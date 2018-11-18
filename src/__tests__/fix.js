@@ -7,6 +7,8 @@ import { getPkg, modifyPkg, logMock } from "../../test-utils";
 
 const f = fixturez(__dirname);
 
+jest.mock("../prompt");
+
 test("no entrypoint", async () => {
   let tmpPath = f.copy("no-entrypoint");
   try {

@@ -10,6 +10,8 @@ import { promptInput } from "../../prompt";
 
 const f = fixturez(__dirname);
 
+jest.mock("../../prompt");
+
 let unsafePromptInput: any = promptInput;
 
 async function snapshotDistFiles(tmpPath: string) {

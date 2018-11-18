@@ -8,6 +8,8 @@ import { Package } from "../package";
 
 const f = fixturez(__dirname);
 
+jest.mock("../prompt");
+
 afterEach(() => {
   jest.resetAllMocks();
 });

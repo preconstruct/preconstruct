@@ -8,8 +8,6 @@ import { Package } from "./package";
 import DataLoader from "dataloader";
 import chalk from "chalk";
 
-let isTest = process.env.NODE_ENV === "test";
-
 let limit = pLimit(1);
 
 // there might be a simpler solution to this than using dataloader but it works so ¯\_(ツ)_/¯
@@ -18,7 +16,7 @@ let prefix = `🎁 ${chalk.green("?")}   `;
 
 export function createPromptConfirmLoader(
   message: string
-): (pkg: Package) => boolean {
+): (pkg: Package) => Promise<boolean> {
   let loader = new DataLoader<Package, boolean>(pkgs =>
     limit(
       () =>
@@ -51,13 +49,7 @@ export function createPromptConfirmLoader(
     )
   );
 
-  let ret = (pkg: Package) => loader.load(pkg);
-  if (isTest) {
-    // maybe do this in __mocks__ later
-    ret = jest.fn<any, any>();
-  }
-  // $FlowFixMe
-  return ret;
+  return (pkg: Package) => loader.load(pkg);
 }
 
 let doPromptInput = async (
@@ -82,7 +74,3 @@ export let promptInput = (
   pkg: Package,
   defaultAnswer?: string
 ) => limit(() => doPromptInput(message, pkg, defaultAnswer));
-
-if (isTest) {
-  promptInput = jest.fn<[string, Package], string | Promise<string>>();
-}

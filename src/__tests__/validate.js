@@ -8,6 +8,8 @@ import { errors } from "../messages";
 
 const f = fixturez(__dirname);
 
+jest.mock("../prompt");
+
 afterEach(() => {
   jest.resetAllMocks();
 });
