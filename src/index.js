@@ -29,6 +29,6 @@ export let aliases = {
   },
   webpack(cwd: string = process.cwd()) {
     let pkgs = getPackages(cwd);
-    return getAliases(pkgs, name => `$${name}$`);
+    return getAliases(pkgs, name => `${name}$`);
   }
 };
