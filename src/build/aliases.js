@@ -7,10 +7,13 @@ export type Aliases = {
   [key: string]: string
 };
 
-export function getAliases(packages: Array<StrictPackage>): Aliases {
+export function getAliases(
+  packages: Array<StrictPackage>,
+  getKey: string => string = x => x
+): Aliases {
   let aliases = {};
   packages.forEach(pkg => {
-    aliases[pkg.name] = path.join(pkg.directory, "src", "index.js");
+    aliases[getKey(pkg.name)] = path.join(pkg.directory, "src", "index.js");
   });
   return aliases;
 }

@@ -3,14 +3,15 @@
 import is from "sarcastic";
 import nodePath from "path";
 import * as fs from "fs-extra";
+import { readFileSync } from "fs";
 import { validatePackage } from "./validate";
 import { promptInput } from "./prompt";
 import pLimit from "p-limit";
 // move this to the flow-typed folder later
-let globby: (
-  globs: string | Array<string>,
-  options: Object
-) => Promise<Array<string>> = require("globby");
+let globby: {
+  (globs: string | Array<string>, options: Object): Promise<Array<string>>,
+  sync: (globs: string | Array<string>, options: Object) => Array<string>
+} = require("globby");
 
 let unsafeRequire = require;
 
@@ -36,7 +37,12 @@ export class Package {
   }
   static async create(directory: string, parent?: Package): Promise<Package> {
     let filePath = nodePath.join(directory, "package.json");
-    let contents: string = await fs.readFile(filePath, "utf-8");
+    let contents = await fs.readFile(filePath, "utf-8");
+    return new Package(filePath, contents, parent || null);
+  }
+  static createSync(directory: string, parent?: Package): Package {
+    let filePath = nodePath.join(directory, "package.json");
+    let contents = readFileSync(filePath, "utf-8");
     return new Package(filePath, contents, parent || null);
   }
   async refresh() {
@@ -188,6 +194,22 @@ export class Package {
       let packages = await Promise.all(
         filenames.map(x => Package.create(x, this))
       );
+      return packages;
+    } catch (error) {
+      if (error instanceof is.AssertionError) {
+        return null;
+      }
+      throw error;
+    }
+  }
+  packagesSync(): Array<Package> | null {
+    try {
+      let filenames = globby.sync(this.configPackages, {
+        cwd: this.directory,
+        onlyDirectories: true,
+        absolute: true
+      });
+      let packages = filenames.map(x => Package.createSync(x, this));
       return packages;
     } catch (error) {
       if (error instanceof is.AssertionError) {
