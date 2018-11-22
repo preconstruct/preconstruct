@@ -20,5 +20,6 @@ export default async function build(directory: string) {
       strictPackages.map(pkg => worker.build(pkg.directory, aliases))
     );
   }
+  worker.end();
   logger.success("built bundles!");
 }
