@@ -32,3 +32,10 @@ export let aliases = {
     return getAliases(pkgs, name => `${name}$`);
   }
 };
+
+export { cli as unstable_cli } from "./cli";
+
+import init from "./init";
+import * as messages from "./messages";
+
+export let unstable_internals_do_not_use = { messages, init };

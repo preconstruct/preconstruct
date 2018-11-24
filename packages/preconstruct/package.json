@@ -1,6 +1,5 @@
 {
-  "name": "preconstruct-root",
-  "private": true,
+  "name": "preconstruct",
   "version": "0.0.31",
   "description": "A smart bundler for libraries",
   "main": "lib/index.js",
@@ -49,38 +48,5 @@
     "rollup-plugin-replace": "^2.0.0",
     "rollup-plugin-uglify": "^4.0.0",
     "sarcastic": "^1.5.0"
-  },
-  "devDependencies": {
-    "@babel/cli": "^7.1.2",
-    "babel-core": "^7.0.0-bridge.0",
-    "babel-eslint": "^10.0.1",
-    "babel-jest": "^23.6.0",
-    "codecov": "^3.1.0",
-    "eslint": "^5.8.0",
-    "eslint-plugin-prettier": "^3.0.0",
-    "fixturez": "^1.1.0",
-    "flow-bin": "^0.85.0",
-    "jest": "^23.6.0",
-    "jest-in-case": "^1.0.2",
-    "jest-junit": "^5.2.0",
-    "object-assign": "^4.1.1",
-    "react": "^16.6.3",
-    "rimraf": "^2.6.2"
-  },
-  "bolt": {
-    "workspaces": [
-      "packages/*"
-    ]
-  },
-  "preconstruct": {
-    "packages": [
-      "packages/preconstruct"
-    ]
-  },
-  "jest": {
-    "reporters": [
-      "default",
-      "jest-junit"
-    ]
   }
 }

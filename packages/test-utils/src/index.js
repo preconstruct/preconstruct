@@ -17,8 +17,12 @@ afterEach(() => {
   logMock.error.mockReset();
 });
 
-import init from "../src/init";
-import { confirms } from "../src/messages";
+import { unstable_internals_do_not_use } from "preconstruct";
+
+let {
+  messages: { confirms },
+  init
+} = unstable_internals_do_not_use;
 
 export async function initBasic(directory: string) {
   confirms.writeMainField.mockReturnValue(true);
