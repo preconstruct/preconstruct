@@ -124,3 +124,33 @@ Array [
 ]
 `);
 });
+
+test("valid react-native", async () => {
+  let tmpPath = f.copy("with-react-native-field");
+
+  await validate(tmpPath);
+  expect(logMock.log.mock.calls).toMatchInlineSnapshot(`
+Array [
+  Array [
+    "🎁 info with-react-native-field",
+    "a valid entry point exists.",
+  ],
+  Array [
+    "🎁 info with-react-native-field",
+    "main field is valid",
+  ],
+  Array [
+    "🎁 info with-react-native-field",
+    "module field is valid",
+  ],
+  Array [
+    "🎁 info with-react-native-field",
+    "react-native field is valid",
+  ],
+  Array [
+    "🎁 success",
+    "package is valid!",
+  ],
+]
+`);
+});

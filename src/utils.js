@@ -23,6 +23,14 @@ export function getValidModuleBrowserPath(pkg: Package) {
   return getValidModuleField(pkg).replace("esm", "browser.esm");
 }
 
+export function getValidCjsReactNativePath(pkg: Package) {
+  return getValidMainField(pkg).replace("cjs", "native.cjs");
+}
+
+export function getValidModuleReactNativePath(pkg: Package) {
+  return getValidModuleField(pkg).replace("esm", "native.esm");
+}
+
 export function getValidBrowserField(pkg: Package) {
   let obj = {
     [`./${getValidMainField(pkg)}`]: "./" + getValidCjsBrowserPath(pkg)
@@ -30,6 +38,17 @@ export function getValidBrowserField(pkg: Package) {
   if (pkg.module !== null) {
     obj[`./${getValidModuleField(pkg)}`] =
       "./" + getValidModuleBrowserPath(pkg);
+  }
+  return obj;
+}
+
+export function getValidReactNativeField(pkg: Package) {
+  let obj = {
+    [`./${getValidMainField(pkg)}`]: "./" + getValidCjsReactNativePath(pkg)
+  };
+  if (pkg.module !== null) {
+    obj[`./${getValidModuleField(pkg)}`] =
+      "./" + getValidModuleReactNativePath(pkg);
   }
   return obj;
 }
