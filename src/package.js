@@ -234,7 +234,7 @@ export class Package {
     } else {
       delete this.json.preconstruct;
     }
-    await fs.writeFile(this.path, JSON.stringify(this.json, null, 2));
+    await fs.writeFile(this.path, JSON.stringify(this.json, null, 2) + "\n");
     if (this.parent !== this) {
       await this.parent.save();
     }
