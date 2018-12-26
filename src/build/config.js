@@ -5,7 +5,12 @@ import { type RollupConfig, getRollupConfig } from "./rollup";
 import type { OutputOptions } from "./types";
 import type { Aliases } from "./aliases";
 import is from "sarcastic";
-import { getValidCjsBrowserPath, getValidModuleBrowserPath } from "../utils";
+import {
+  getValidCjsBrowserPath,
+  getValidModuleBrowserPath,
+  getValidCjsReactNativePath,
+  getValidModuleReactNativePath
+} from "../utils";
 import { getDevPath, getProdPath } from "./utils";
 
 export function getRollupConfigs(pkg: StrictPackage, aliases: Aliases) {
@@ -77,6 +82,23 @@ export function getRollupConfigs(pkg: StrictPackage, aliases: Aliases) {
         {
           format: "es",
           file: path.join(pkg.directory, getValidModuleBrowserPath(pkg))
+        }
+      ]
+    });
+  }
+
+  if (pkg.reactNative !== null) {
+    configs.push({
+      config: getRollupConfig(pkg, aliases, "react-native"),
+      outputs: [
+        {
+          format: "cjs",
+          file: path.join(pkg.directory, getValidCjsReactNativePath(pkg)),
+          exports: "named"
+        },
+        {
+          format: "es",
+          file: path.join(pkg.directory, getValidModuleReactNativePath(pkg))
         }
       ]
     });

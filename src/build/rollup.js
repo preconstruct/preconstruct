@@ -49,33 +49,20 @@ function getChildPeerDeps(
       try {
         pkgJson = unsafeRequire(key + "/package.json");
       } catch (err) {
-        if (
-          err.code === "MODULE_NOT_FOUND" &&
-          pkgJsonsAllowedToFail.includes(key)
-        ) {
+        if (err.code === "MODULE_NOT_FOUND" && pkgJsonsAllowedToFail.includes(key)) {
           return;
         }
         throw err;
       }
       if (pkgJson.peerDependencies) {
         finalPeerDeps.push(...Object.keys(pkgJson.peerDependencies));
-        getChildPeerDeps(
-          finalPeerDeps,
-          isUMD,
-          Object.keys(pkgJson.peerDependencies),
-          doneDeps
-        );
+        getChildPeerDeps(finalPeerDeps, isUMD, Object.keys(pkgJson.peerDependencies), doneDeps);
       }
       // when we're building a UMD bundle, we're also bundling the dependencies so we need
       // to get the peerDependencies of dependencies
       if (pkgJson.dependencies && isUMD) {
         doneDeps.push(...Object.keys(pkgJson.dependencies));
-        getChildPeerDeps(
-          finalPeerDeps,
-          isUMD,
-          Object.keys(pkgJson.dependencies),
-          doneDeps
-        );
+        getChildPeerDeps(finalPeerDeps, isUMD, Object.keys(pkgJson.dependencies), doneDeps);
       }
     });
 }
@@ -92,7 +79,7 @@ export function toUnsafeRollupConfig(config: RollupConfig): Object {
   return config;
 }
 
-export type RollupConfigType = "umd" | "browser" | "node-dev" | "node-prod";
+export type RollupConfigType = "umd" | "browser" | "node-dev" | "node-prod" | "react-native";
 
 export let getRollupConfig = (
   pkg: StrictPackage,

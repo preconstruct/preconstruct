@@ -7,7 +7,8 @@ import {
   getValidModuleField,
   getValidMainField,
   getValidUmdMainField,
-  getValidBrowserField
+  getValidBrowserField,
+  getValidReactNativeField
 } from "./utils";
 import {
   validateEntrypoint,
@@ -15,7 +16,8 @@ import {
   isModuleFieldValid,
   isUmdMainFieldValid,
   isUmdNameSpecified,
-  isBrowserFieldValid
+  isBrowserFieldValid,
+  isReactNativeFieldValid
 } from "./validate";
 
 async function fixPackage(pkg: Package) {
@@ -45,6 +47,12 @@ async function fixPackage(pkg: Package) {
     didModify = true;
 
     pkg.browser = getValidBrowserField(pkg);
+  }
+
+  if (pkg.reactNative !== null && !isReactNativeFieldValid(pkg)) {
+    didModify = true;
+
+    pkg.reactNative = getValidReactNativeField(pkg);
   }
 
   await pkg.save();

@@ -196,6 +196,7 @@ Object {
   "module": "dist/invalid-fields.esm.js",
   "name": "invalid-fields",
   "private": true,
+  "react-native": "dist/index.native.js",
   "version": "1.0.0",
 }
 `);

@@ -7,7 +7,8 @@ import {
   getValidModuleField,
   getValidMainField,
   getValidUmdMainField,
-  getValidBrowserField
+  getValidBrowserField,
+  getValidReactNativeField
 } from "./utils";
 import * as logger from "./logger";
 import equal from "fast-deep-equal";
@@ -41,6 +42,10 @@ export function isUmdMainFieldValid(pkg: Package) {
 
 export function isBrowserFieldValid(pkg: Package): boolean {
   return equal(pkg.browser, getValidBrowserField(pkg));
+}
+
+export function isReactNativeFieldValid(pkg: Package): boolean {
+  return equal(pkg.reactNative, getValidReactNativeField(pkg));
 }
 
 export function isUmdNameSpecified(pkg: Package) {
@@ -85,6 +90,13 @@ export function validatePackage(pkg: Package, log: boolean) {
       throw new FatalError(errors.invalidBrowserField, pkg);
     } else if (log) {
       logger.info(infos.validBrowserField, pkg);
+    }
+  }
+  if (pkg.reactNative !== null) {
+    if (typeof pkg.reactNative === "string" || !isReactNativeFieldValid(pkg)) {
+      throw new FatalError(errors.invalidReactNativeField, pkg);
+    } else if (log) {
+      logger.info(infos.validReactNativeField, pkg);
     }
   }
 }

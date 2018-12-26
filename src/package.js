@@ -74,13 +74,16 @@ export class Package {
     this.json.module = path;
   }
   get browser(): null | string | { [key: string]: string } {
-    return is(
-      this.json.browser,
-      is.maybe(is.either(is.string, objectOfString))
-    );
+    return is(this.json.browser, is.maybe(is.either(is.string, objectOfString)));
   }
   set browser(option: string | { [key: string]: string }) {
     this.json.browser = option;
+  }
+  get reactNative(): null | string | { [key: string]: string } {
+    return is(this.json["react-native"], is.maybe(is.either(is.string, objectOfString)));
+  }
+  set reactNative(option: string | { [key: string]: string }) {
+    this.json["react-native"] = option;
   }
   get dependencies(): null | { [key: string]: string } {
     return is(this.json.dependencies, is.maybe(objectOfString));
@@ -91,10 +94,7 @@ export class Package {
   _config: Object;
 
   global(pkg: string) {
-    if (
-      this.parent._config.globals !== undefined &&
-      this.parent._config.globals[pkg]
-    ) {
+    if (this.parent._config.globals !== undefined && this.parent._config.globals[pkg]) {
       return this.parent._config.globals[pkg];
     } else {
       try {
@@ -108,23 +108,15 @@ export class Package {
           throw err;
         }
       }
-      throw askGlobalLimit(() =>
-        (async () => {
+      throw askGlobalLimit(() => (async () => {
           // if while we were waiting, that global was added, return
-          if (
-            this.parent._config.globals !== undefined &&
-            this.parent._config.globals[pkg]
-          ) {
+          if (this.parent._config.globals !== undefined && this.parent._config.globals[pkg]) {
             return;
           }
-          let response = await promptInput(
-            `What should the umdName of ${pkg} be?`,
-            this
-          );
+          let response = await promptInput(`What should the umdName of ${pkg} be?`, this);
           this.addGlobal(pkg, response);
           await this.save();
-        })()
-      );
+        })());
     }
   }
 
@@ -173,11 +165,7 @@ export class Package {
 
       let workspaces = is(_workspaces, is.arrayOf(is.string));
 
-      let packages = await promptInput(
-        "what packages should preconstruct build?",
-        this,
-        workspaces.join(",")
-      );
+      let packages = await promptInput("what packages should preconstruct build?", this, workspaces.join(","));
 
       this.parent._config.packages = packages.split(",");
 
@@ -191,9 +179,9 @@ export class Package {
         absolute: true
       });
 
-      let packages = await Promise.all(
-        filenames.map(x => Package.create(x, this))
-      );
+      let packages = await Promise.all(filenames.map(x =>
+          Package.create(x, this)
+        ));
       return packages;
     } catch (error) {
       if (error instanceof is.AssertionError) {
@@ -209,7 +197,9 @@ export class Package {
         onlyDirectories: true,
         absolute: true
       });
-      let packages = filenames.map(x => Package.createSync(x, this));
+      let packages = filenames.map(x =>
+        Package.createSync(x, this)
+      );
       return packages;
     } catch (error) {
       if (error instanceof is.AssertionError) {
