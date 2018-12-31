@@ -1,0 +1,9 @@
+{
+  "name": "use-babel-runtime",
+  "version": "1.0.0",
+  "main": "dist/use-babel-runtime.cjs.js",
+  "module": "dist/use-babel-runtime.esm.js",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {}
+}

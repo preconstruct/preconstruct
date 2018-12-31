@@ -8,13 +8,13 @@ const cjs = require("rollup-plugin-commonjs");
 const replace = require("rollup-plugin-replace");
 
 const chalk = require("chalk");
-import path from "path";
 import builtInModules from "builtin-modules";
 import { StrictPackage } from "../package";
 import { rollup as _rollup } from "rollup";
 import type { Aliases } from "./aliases";
 import { FatalError } from "../errors";
 import { confirms } from "../messages";
+import rewriteCjsRuntimeHelpers from "../rollup-plugins/rewrite-cjs-runtime-helpers";
 import installPackages from "install-packages";
 import pLimit from "p-limit";
 
@@ -106,7 +106,7 @@ export let getRollupConfig = (
   }
 
   const config = {
-    input: path.join(pkg.directory, "src", "index.js"),
+    input: pkg.source,
     external: makeExternalPredicate(external),
     onwarn: (warning: *) => {
       switch (warning.code) {
@@ -133,6 +133,25 @@ export let getRollupConfig = (
                   `object-assign should be in dependencies of ${pkg.name}`,
                   pkg
                 );
+              }
+            })();
+          }
+
+          if (/^@babel\/runtime\/helpers\//.test(warning.source)) {
+            throw (async () => {
+              let shouldInstallBabelRuntime = await confirms.shouldInstallBabelRuntime(pkg);
+
+              if (shouldInstallBabelRuntime) {
+                await limit(() =>
+                  installPackages({
+                    packages: ["@babel/runtime"],
+                    cwd: pkg.directory,
+                    installPeers: false
+                  })
+                );
+                await pkg.refresh();
+              } else {
+                throw new FatalError(`@babel/runtime should be in dependencies of ${pkg.name}`, pkg);
               }
             })();
           }
@@ -171,10 +190,15 @@ export let getRollupConfig = (
             require.resolve("@babel/plugin-proposal-object-rest-spread"),
             { loose: true, useBuiltIns: type !== "umd" }
           ],
+          [
+            require("@babel/plugin-transform-runtime"),
+            { useESModules: true }
+          ],
           type !== "umd" && require.resolve("babel-plugin-transform-import-object-assign")
         ].filter(Boolean),
         configFile: false,
-        babelrc: false
+        babelrc: false,
+        runtimeHelpers: true,
       }),
       cjs(),
       (type === "browser" || type === "umd") &&
@@ -182,19 +206,28 @@ export let getRollupConfig = (
           "typeof document": JSON.stringify("object"),
           "typeof window": JSON.stringify("object")
         }),
+      rewriteCjsRuntimeHelpers(),
       type === "umd" && alias(aliases),
       type === "umd" && resolve(),
       (type === "umd" || type === "node-prod") &&
         replace({
           "process.env.NODE_ENV": '"production"'
         }),
-
       type === "umd" && uglify(),
       type === "node-prod" &&
         uglify({
           mangle: false
         }),
-      type === "node-prod" && prettier({ parser: "babylon" })
+      type === "node-prod" && (() => {
+        // temporary hack, until mjeanroy/rollup-plugin-prettier#211 gets resolved
+        const prettierPlugin = prettier({ parser: "babylon" });
+        const { transformBundle } = prettierPlugin;
+        delete prettierPlugin.transformBundle;
+        prettierPlugin.renderChunk = function (code, chunkInfo, outputOptions) {
+          return transformBundle.call(this, code, outputOptions)
+        }
+        return prettierPlugin;
+      })()
     ].filter(Boolean)
   };
 

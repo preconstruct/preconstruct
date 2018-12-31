@@ -248,3 +248,36 @@ Object {
 }
 `);
 });
+
+test.skip("uses @babel/runtime", async () => {
+  let tmpPath = f.copy("use-babel-runtime");
+
+  confirms.shouldInstallBabelRuntime.mockReturnValue(
+    Promise.resolve(false)
+  );
+
+  try {
+    await build(tmpPath);
+  } catch (err) {
+    expect(err).toBeInstanceOf(FatalError);
+    expect(err.message).toMatchInlineSnapshot(
+      `"@babel/runtime should be in dependencies of use-babel-runtime"`
+    );
+  }
+});
+
+test("@babel/runtime installed", async () => {
+  let tmpPath = f.copy("babel-runtime-installed");
+
+  await build(tmpPath);
+
+  await snapshotDistFiles(tmpPath);
+});
+
+test("@babel/runtime and object-assign", async () => {
+  let tmpPath = f.copy("babel-runtime-and-object-assign");
+
+  await build(tmpPath);
+
+  await snapshotDistFiles(tmpPath);
+});

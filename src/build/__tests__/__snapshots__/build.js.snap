@@ -1,12 +1,166 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`@babel/runtime and object-assign: babel-runtime-and-object-assign.cjs.dev.js 1`] = `
+"'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+function _interopDefault(ex) {
+  return ex && typeof ex === 'object' && 'default' in ex ? ex['default'] : ex;
+}
+
+var _inheritsLoose = _interopDefault(require(\\"@babel/runtime/helpers/inheritsLoose\\"));
+
+var _objectAssign = _interopDefault(require('object-assign'));
+
+var something = _objectAssign({}, {
+  something: true
+});
+
+var Bar = function Bar() {};
+
+var Foo =
+/*#__PURE__*/
+function (_Bar) {
+  _inheritsLoose(Foo, _Bar);
+
+  function Foo() {
+    return _Bar.apply(this, arguments) || this;
+  }
+
+  return Foo;
+}(Bar);
+
+exports.something = something;
+exports.Foo = Foo;
+"
+`;
+
+exports[`@babel/runtime and object-assign: babel-runtime-and-object-assign.cjs.js 1`] = `
+"'use strict';
+
+if (process.env.NODE_ENV === \\"production\\") {
+  module.exports = require(\\"./babel-runtime-and-object-assign.cjs.prod.js\\");
+} else {
+  module.exports = require(\\"./babel-runtime-and-object-assign.cjs.dev.js\\");
+}
+"
+`;
+
+exports[`@babel/runtime and object-assign: babel-runtime-and-object-assign.cjs.prod.js 1`] = `
+"\\"use strict\\";
+function _interopDefault(ex) {
+  return ex && \\"object\\" == typeof ex && \\"default\\" in ex ? ex.default : ex;
+}
+Object.defineProperty(exports, \\"__esModule\\", { value: !0 });
+var _inheritsLoose = _interopDefault(
+    require(\\"@babel/runtime/helpers/inheritsLoose\\")
+  ),
+  _objectAssign = _interopDefault(require(\\"object-assign\\")),
+  something = _objectAssign({}, { something: !0 }),
+  Bar = function() {},
+  Foo = (function(_Bar) {
+    function Foo() {
+      return _Bar.apply(this, arguments) || this;
+    }
+    return _inheritsLoose(Foo, _Bar), Foo;
+  })(Bar);
+(exports.something = something), (exports.Foo = Foo);
+"
+`;
+
+exports[`@babel/runtime installed: babel-runtime-installed.cjs.dev.js 1`] = `
+"'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+function _interopDefault(ex) {
+  return ex && typeof ex === 'object' && 'default' in ex ? ex['default'] : ex;
+}
+
+var _inheritsLoose = _interopDefault(require(\\"@babel/runtime/helpers/inheritsLoose\\"));
+
+var Bar = function Bar() {};
+
+var Foo =
+/*#__PURE__*/
+function (_Bar) {
+  _inheritsLoose(Foo, _Bar);
+
+  function Foo() {
+    return _Bar.apply(this, arguments) || this;
+  }
+
+  return Foo;
+}(Bar);
+
+exports.Foo = Foo;
+"
+`;
+
+exports[`@babel/runtime installed: babel-runtime-installed.cjs.js 1`] = `
+"'use strict';
+
+if (process.env.NODE_ENV === \\"production\\") {
+  module.exports = require(\\"./babel-runtime-installed.cjs.prod.js\\");
+} else {
+  module.exports = require(\\"./babel-runtime-installed.cjs.dev.js\\");
+}
+"
+`;
+
+exports[`@babel/runtime installed: babel-runtime-installed.cjs.prod.js 1`] = `
+"\\"use strict\\";
+function _interopDefault(ex) {
+  return ex && \\"object\\" == typeof ex && \\"default\\" in ex ? ex.default : ex;
+}
+Object.defineProperty(exports, \\"__esModule\\", { value: !0 });
+var _inheritsLoose = _interopDefault(
+    require(\\"@babel/runtime/helpers/inheritsLoose\\")
+  ),
+  Bar = function() {},
+  Foo = (function(_Bar) {
+    function Foo() {
+      return _Bar.apply(this, arguments) || this;
+    }
+    return _inheritsLoose(Foo, _Bar), Foo;
+  })(Bar);
+exports.Foo = Foo;
+"
+`;
+
+exports[`@babel/runtime installed: babel-runtime-installed.esm.js 1`] = `
+"import _inheritsLoose from '@babel/runtime/helpers/esm/inheritsLoose';
+
+var Bar = function Bar() {};
+
+var Foo =
+/*#__PURE__*/
+function (_Bar) {
+  _inheritsLoose(Foo, _Bar);
+
+  function Foo() {
+    return _Bar.apply(this, arguments) || this;
+  }
+
+  return Foo;
+}(Bar);
+
+export { Foo };
+"
+`;
+
 exports[`basic: valid-package.cjs.dev.js 1`] = `
 "'use strict';
 
-Object.defineProperty(exports, '__esModule', { value: true });
-
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
 var index = \\"something\\";
-
 exports.default = index;
 "
 `;
@@ -38,30 +192,27 @@ export default index;
 `;
 
 exports[`basic: valid-package.umd.min.js 1`] = `
-"!function(e,t){\\"object\\"==typeof exports&&\\"undefined\\"!=typeof module?module.exports=t():\\"function\\"==typeof define&&define.amd?define(t):e.validPackage=t()}(this,function(){\\"use strict\\";return\\"something\\"});
+"!function(e,t){\\"object\\"==typeof exports&&\\"undefined\\"!=typeof module?module.exports=t():\\"function\\"==typeof define&&define.amd?define(t):(e=e||self).validPackage=t()}(this,function(){\\"use strict\\";return\\"something\\"});
 //# sourceMappingURL=valid-package.umd.min.js.map
 "
 `;
 
-exports[`basic: valid-package.umd.min.js.map 1`] = `"{\\"version\\":3,\\"file\\":\\"valid-package.umd.min.js\\",\\"sources\\":[\\"../src/index.js\\"],\\"sourcesContent\\":[\\"export default \\\\\\"something\\\\\\";\\\\n\\"],\\"names\\":[],\\"mappings\\":\\"8LAAe\\"}"`;
+exports[`basic: valid-package.umd.min.js.map 1`] = `"{\\"version\\":3,\\"file\\":\\"valid-package.umd.min.js\\",\\"sources\\":[\\"../src/index.js\\"],\\"sourcesContent\\":[\\"export default \\\\\\"something\\\\\\";\\\\n\\"],\\"names\\":[],\\"mappings\\":\\"wMAAe\\"}"`;
 
 exports[`browser: valid-package.browser.cjs.js 1`] = `
 "'use strict';
 
-Object.defineProperty(exports, '__esModule', { value: true });
-
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
 var thing = \\"wow\\";
-
 {
   thing = \\"something\\";
 }
-
 {
   thing += \\"other\\";
 }
-
 var thing$1 = thing;
-
 exports.default = thing$1;
 "
 `;
@@ -86,8 +237,9 @@ export default thing$1;
 exports[`browser: valid-package.cjs.dev.js 1`] = `
 "'use strict';
 
-Object.defineProperty(exports, '__esModule', { value: true });
-
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
 var thing = \\"wow\\";
 
 if (typeof window !== \\"undefined\\") {
@@ -99,7 +251,6 @@ if (typeof document !== undefined) {
 }
 
 var thing$1 = thing;
-
 exports.default = thing$1;
 "
 `;
@@ -146,10 +297,10 @@ export default thing$1;
 exports[`clears dist folder: already-has-things-in-dist.cjs.dev.js 1`] = `
 "'use strict';
 
-Object.defineProperty(exports, '__esModule', { value: true });
-
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
 var index = \\"something\\";
-
 exports.default = index;
 "
 `;
@@ -176,8 +327,9 @@ exports.default = index;
 exports[`flow: flow.cjs.dev.js 1`] = `
 "'use strict';
 
-Object.defineProperty(exports, '__esModule', { value: true });
-
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
 var a = \\"wow\\";
 
 function doSomething(arg) {
@@ -231,13 +383,15 @@ export { doSomething, a as something };
 exports[`flow: flow-export-default.cjs.dev.js 1`] = `
 "'use strict';
 
-Object.defineProperty(exports, '__esModule', { value: true });
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
 
 function doSomething(arg) {
   return \\"something\\" + arg;
 }
-var index = \\"wow\\";
 
+var index = \\"wow\\";
 exports.doSomething = doSomething;
 exports.default = index;
 "
@@ -311,12 +465,12 @@ react.createElement(\\"div\\", null);
 `;
 
 exports[`monorepo umd with dep on other module: package-one-umd-with-dep.umd.min.js 1`] = `
-"!function(e,t){\\"object\\"==typeof exports&&\\"undefined\\"!=typeof module?t(require(\\"react\\")):\\"function\\"==typeof define&&define.amd?define([\\"react\\"],t):t(e.React)}(this,function(e){\\"use strict\\";e.createElement(\\"div\\",null)});
+"!function(e,t){\\"object\\"==typeof exports&&\\"undefined\\"!=typeof module?t(require(\\"react\\")):\\"function\\"==typeof define&&define.amd?define([\\"react\\"],t):t((e=e||self).React)}(this,function(e){\\"use strict\\";e.createElement(\\"div\\",null)});
 //# sourceMappingURL=package-one-umd-with-dep.umd.min.js.map
 "
 `;
 
-exports[`monorepo umd with dep on other module: package-one-umd-with-dep.umd.min.js.map 1`] = `"{\\"version\\":3,\\"file\\":\\"package-one-umd-with-dep.umd.min.js\\",\\"sources\\":[\\"../src/index.js\\"],\\"sourcesContent\\":[\\"import { createElement } from \\\\\\"react\\\\\\";\\\\n\\\\ncreateElement(\\\\\\"div\\\\\\", null);\\\\n\\"],\\"names\\":[],\\"mappings\\":\\"4MAEc,MAAO\\"}"`;
+exports[`monorepo umd with dep on other module: package-one-umd-with-dep.umd.min.js.map 1`] = `"{\\"version\\":3,\\"file\\":\\"package-one-umd-with-dep.umd.min.js\\",\\"sources\\":[\\"../src/index.js\\"],\\"sourcesContent\\":[\\"import { createElement } from \\\\\\"react\\\\\\";\\\\n\\\\ncreateElement(\\\\\\"div\\\\\\", null);\\\\n\\"],\\"names\\":[],\\"mappings\\":\\"sNAEc,MAAO\\"}"`;
 
 exports[`monorepo umd with dep on other module: package-two-umd-with-dep.cjs.dev.js 1`] = `
 "'use strict';
@@ -346,20 +500,20 @@ react.createElement(\\"h1\\", null);
 `;
 
 exports[`monorepo umd with dep on other module: package-two-umd-with-dep.umd.min.js 1`] = `
-"!function(e,t){\\"object\\"==typeof exports&&\\"undefined\\"!=typeof module?t(require(\\"react\\")):\\"function\\"==typeof define&&define.amd?define([\\"react\\"],t):t(e.React)}(this,function(e){\\"use strict\\";e.createElement(\\"h1\\",null)});
+"!function(e,t){\\"object\\"==typeof exports&&\\"undefined\\"!=typeof module?t(require(\\"react\\")):\\"function\\"==typeof define&&define.amd?define([\\"react\\"],t):t((e=e||self).React)}(this,function(e){\\"use strict\\";e.createElement(\\"h1\\",null)});
 //# sourceMappingURL=package-two-umd-with-dep.umd.min.js.map
 "
 `;
 
-exports[`monorepo umd with dep on other module: package-two-umd-with-dep.umd.min.js.map 1`] = `"{\\"version\\":3,\\"file\\":\\"package-two-umd-with-dep.umd.min.js\\",\\"sources\\":[\\"../src/index.js\\"],\\"sourcesContent\\":[\\"import { createElement } from \\\\\\"react\\\\\\";\\\\n\\\\ncreateElement(\\\\\\"h1\\\\\\", null);\\\\n\\"],\\"names\\":[],\\"mappings\\":\\"4MAEc,KAAM\\"}"`;
+exports[`monorepo umd with dep on other module: package-two-umd-with-dep.umd.min.js.map 1`] = `"{\\"version\\":3,\\"file\\":\\"package-two-umd-with-dep.umd.min.js\\",\\"sources\\":[\\"../src/index.js\\"],\\"sourcesContent\\":[\\"import { createElement } from \\\\\\"react\\\\\\";\\\\n\\\\ncreateElement(\\\\\\"h1\\\\\\", null);\\\\n\\"],\\"names\\":[],\\"mappings\\":\\"sNAEc,KAAM\\"}"`;
 
 exports[`monorepo: package-one.cjs.dev.js 1`] = `
 "'use strict';
 
-Object.defineProperty(exports, '__esModule', { value: true });
-
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
 var index = 1;
-
 exports.default = index;
 "
 `;
@@ -393,10 +547,10 @@ export default index;
 exports[`monorepo: package-two.cjs.dev.js 1`] = `
 "'use strict';
 
-Object.defineProperty(exports, '__esModule', { value: true });
-
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
 var index = 2;
-
 exports.default = index;
 "
 `;
@@ -430,10 +584,10 @@ export default index;
 exports[`no module: no-module.cjs.dev.js 1`] = `
 "'use strict';
 
-Object.defineProperty(exports, '__esModule', { value: true });
-
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
 var index = \\"this does not have a module build\\";
-
 exports.default = index;
 "
 `;
@@ -460,9 +614,13 @@ exports.default = index;
 exports[`object-assign installed: object-assign-installed.cjs.dev.js 1`] = `
 "'use strict';
 
-Object.defineProperty(exports, '__esModule', { value: true });
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
 
-function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
+function _interopDefault(ex) {
+  return ex && typeof ex === 'object' && 'default' in ex ? ex['default'] : ex;
+}
 
 var _objectAssign = _interopDefault(require('object-assign'));
 
@@ -500,7 +658,9 @@ exports.something = something;
 exports[`prod checks: prod-checks.cjs.dev.js 1`] = `
 "'use strict';
 
-Object.defineProperty(exports, '__esModule', { value: true });
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
 
 function thing() {
   if (process.env.NODE_ENV !== \\"production\\") {
@@ -563,9 +723,9 @@ react.createElement(\\"div\\", null);
 `;
 
 exports[`umd with dep on other module: umd-with-dep.umd.min.js 1`] = `
-"!function(e,t){\\"object\\"==typeof exports&&\\"undefined\\"!=typeof module?t(require(\\"react\\")):\\"function\\"==typeof define&&define.amd?define([\\"react\\"],t):t(e.React)}(this,function(e){\\"use strict\\";e.createElement(\\"div\\",null)});
+"!function(e,t){\\"object\\"==typeof exports&&\\"undefined\\"!=typeof module?t(require(\\"react\\")):\\"function\\"==typeof define&&define.amd?define([\\"react\\"],t):t((e=e||self).React)}(this,function(e){\\"use strict\\";e.createElement(\\"div\\",null)});
 //# sourceMappingURL=umd-with-dep.umd.min.js.map
 "
 `;
 
-exports[`umd with dep on other module: umd-with-dep.umd.min.js.map 1`] = `"{\\"version\\":3,\\"file\\":\\"umd-with-dep.umd.min.js\\",\\"sources\\":[\\"../src/index.js\\"],\\"sourcesContent\\":[\\"import { createElement } from \\\\\\"react\\\\\\";\\\\n\\\\ncreateElement(\\\\\\"div\\\\\\", null);\\\\n\\"],\\"names\\":[],\\"mappings\\":\\"4MAEc,MAAO\\"}"`;
+exports[`umd with dep on other module: umd-with-dep.umd.min.js.map 1`] = `"{\\"version\\":3,\\"file\\":\\"umd-with-dep.umd.min.js\\",\\"sources\\":[\\"../src/index.js\\"],\\"sourcesContent\\":[\\"import { createElement } from \\\\\\"react\\\\\\";\\\\n\\\\ncreateElement(\\\\\\"div\\\\\\", null);\\\\n\\"],\\"names\\":[],\\"mappings\\":\\"sNAEc,MAAO\\"}"`;

@@ -34,6 +34,9 @@ export let confirms = {
   shouldInstallObjectAssign: createPromptConfirmLoader(
     "Object.assign is polyfilled with object-assign to reduce bundle size when used with react. would you like to install object-assign automatically?"
   ),
+  shouldInstallBabelRuntime: createPromptConfirmLoader(
+    "Babel helpers (functions inserted by babel transforms) should be imported from a @babel/runtime package (which has to be in your dependencies) to reduce bundle size. would you like to install @babel/runtime automatically?"
+  ),
   addBrowserField: createPromptConfirmLoader(
     "typeof window or typeof document is used in this package. would you like build seperate browser builds for better browser bundle sizes?"
   )
