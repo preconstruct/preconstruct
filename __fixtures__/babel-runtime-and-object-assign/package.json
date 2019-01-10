@@ -1,0 +1,11 @@
+{
+  "name": "babel-runtime-and-object-assign",
+  "version": "1.0.0",
+  "main": "dist/babel-runtime-and-object-assign.cjs.js",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "@babel/runtime": "^7.2.0",
+    "object-assign": "^4.1.1"
+  }
+}

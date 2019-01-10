@@ -19,7 +19,7 @@ async function buildPackage(pkg: StrictPackage, aliases: Aliases) {
 
   let hasCheckedBrowser = pkg.browser !== null;
 
-  let bundles = await Promise.all(
+  const [sampleOutput] = await Promise.all(
     configs.map(async ({ config, outputs }) => {
       // $FlowFixMe this is not a problem with flow, i did something wrong but it's not worth fixing right now
       const bundle = await rollup(config);
@@ -29,10 +29,12 @@ async function buildPackage(pkg: StrictPackage, aliases: Aliases) {
           return bundle.write(outputConfig);
         })
       );
-      let thing = result.find(x => x && x.code);
-      if (!hasCheckedBrowser && thing && thing.code) {
+
+      const nodeDevOutput = result[0].output[0];
+
+      if (!hasCheckedBrowser) {
         hasCheckedBrowser = true;
-        if (browserPattern.test(thing.code)) {
+        if (browserPattern.test(nodeDevOutput.code)) {
           throw (async () => {
             let shouldAddBrowserField = await confirms.addBrowserField(pkg);
             if (shouldAddBrowserField) {
@@ -44,12 +46,16 @@ async function buildPackage(pkg: StrictPackage, aliases: Aliases) {
           })();
         }
       }
-      return bundle;
+
+      return nodeDevOutput;
     })
   );
+
+  const source = await fs.readFile(pkg.source, 'utf8')
+
   let flowMode = false;
-  if (bundles[0].modules[0].originalCode.includes("@flow")) {
-    flowMode = bundles[0].exports.includes("default") ? "all" : "named";
+  if (source.includes("@flow")) {
+    flowMode = sampleOutput.exports.includes("default") ? "all" : "named";
   }
 
   await writeOtherFiles(pkg, flowMode);

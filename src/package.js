@@ -130,6 +130,9 @@ export class Package {
   set umdMain(path: string) {
     this.json["umd:main"] = path;
   }
+  get source(): string {
+    return nodePath.join(this.directory, "src", "index.js");
+  }
   addGlobal(pkg: string, name: string) {
     if (!this.parent._config.globals) {
       this.parent._config.globals = {};
