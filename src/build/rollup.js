@@ -1,7 +1,7 @@
 // @flow
 const prettier = require("rollup-plugin-prettier");
 const resolve = require("rollup-plugin-node-resolve");
-const { uglify } = require("rollup-plugin-uglify");
+const { terser } = require("rollup-plugin-terser");
 const babel = require("rollup-plugin-babel");
 const alias = require("rollup-plugin-alias");
 const cjs = require("rollup-plugin-commonjs");
@@ -49,20 +49,33 @@ function getChildPeerDeps(
       try {
         pkgJson = unsafeRequire(key + "/package.json");
       } catch (err) {
-        if (err.code === "MODULE_NOT_FOUND" && pkgJsonsAllowedToFail.includes(key)) {
+        if (
+          err.code === "MODULE_NOT_FOUND" &&
+          pkgJsonsAllowedToFail.includes(key)
+        ) {
           return;
         }
         throw err;
       }
       if (pkgJson.peerDependencies) {
         finalPeerDeps.push(...Object.keys(pkgJson.peerDependencies));
-        getChildPeerDeps(finalPeerDeps, isUMD, Object.keys(pkgJson.peerDependencies), doneDeps);
+        getChildPeerDeps(
+          finalPeerDeps,
+          isUMD,
+          Object.keys(pkgJson.peerDependencies),
+          doneDeps
+        );
       }
       // when we're building a UMD bundle, we're also bundling the dependencies so we need
       // to get the peerDependencies of dependencies
       if (pkgJson.dependencies && isUMD) {
         doneDeps.push(...Object.keys(pkgJson.dependencies));
-        getChildPeerDeps(finalPeerDeps, isUMD, Object.keys(pkgJson.dependencies), doneDeps);
+        getChildPeerDeps(
+          finalPeerDeps,
+          isUMD,
+          Object.keys(pkgJson.dependencies),
+          doneDeps
+        );
       }
     });
 }
@@ -79,7 +92,12 @@ export function toUnsafeRollupConfig(config: RollupConfig): Object {
   return config;
 }
 
-export type RollupConfigType = "umd" | "browser" | "node-dev" | "node-prod" | "react-native";
+export type RollupConfigType =
+  | "umd"
+  | "browser"
+  | "node-dev"
+  | "node-prod"
+  | "react-native";
 
 export let getRollupConfig = (
   pkg: StrictPackage,
@@ -139,7 +157,9 @@ export let getRollupConfig = (
 
           if (/^@babel\/runtime\/helpers\//.test(warning.source)) {
             throw (async () => {
-              let shouldInstallBabelRuntime = await confirms.shouldInstallBabelRuntime(pkg);
+              let shouldInstallBabelRuntime = await confirms.shouldInstallBabelRuntime(
+                pkg
+              );
 
               if (shouldInstallBabelRuntime) {
                 await limit(() =>
@@ -151,7 +171,10 @@ export let getRollupConfig = (
                 );
                 await pkg.refresh();
               } else {
-                throw new FatalError(`@babel/runtime should be in dependencies of ${pkg.name}`, pkg);
+                throw new FatalError(
+                  `@babel/runtime should be in dependencies of ${pkg.name}`,
+                  pkg
+                );
               }
             })();
           }
@@ -184,21 +207,22 @@ export let getRollupConfig = (
           require.resolve("@babel/plugin-transform-flow-strip-types"),
           require("../babel-plugins/add-basic-constructor-to-react-component"),
           require.resolve("babel-plugin-codegen"),
-          [require.resolve("@babel/plugin-proposal-class-properties"), { loose: true }],
+          [
+            require.resolve("@babel/plugin-proposal-class-properties"),
+            { loose: true }
+          ],
           require("../babel-plugins/fix-dce-for-classes-with-statics"),
           [
             require.resolve("@babel/plugin-proposal-object-rest-spread"),
             { loose: true, useBuiltIns: type !== "umd" }
           ],
-          [
-            require("@babel/plugin-transform-runtime"),
-            { useESModules: true }
-          ],
-          type !== "umd" && require.resolve("babel-plugin-transform-import-object-assign")
+          [require("@babel/plugin-transform-runtime"), { useESModules: true }],
+          type !== "umd" &&
+            require.resolve("babel-plugin-transform-import-object-assign")
         ].filter(Boolean),
         configFile: false,
         babelrc: false,
-        runtimeHelpers: true,
+        runtimeHelpers: true
       }),
       cjs(),
       (type === "browser" || type === "umd") &&
@@ -213,21 +237,26 @@ export let getRollupConfig = (
         replace({
           "process.env.NODE_ENV": '"production"'
         }),
-      type === "umd" && uglify(),
+      type === "umd" && terser(),
       type === "node-prod" &&
-        uglify({
+        terser({
           mangle: false
         }),
-      type === "node-prod" && (() => {
-        // temporary hack, until mjeanroy/rollup-plugin-prettier#211 gets resolved
-        const prettierPlugin = prettier({ parser: "babylon" });
-        const { transformBundle } = prettierPlugin;
-        delete prettierPlugin.transformBundle;
-        prettierPlugin.renderChunk = function (code, chunkInfo, outputOptions) {
-          return transformBundle.call(this, code, outputOptions)
-        }
-        return prettierPlugin;
-      })()
+      type === "node-prod" &&
+        (() => {
+          // temporary hack, until mjeanroy/rollup-plugin-prettier#211 gets resolved
+          const prettierPlugin = prettier({ parser: "babylon" });
+          const { transformBundle } = prettierPlugin;
+          delete prettierPlugin.transformBundle;
+          prettierPlugin.renderChunk = function(
+            code,
+            chunkInfo,
+            outputOptions
+          ) {
+            return transformBundle.call(this, code, outputOptions);
+          };
+          return prettierPlugin;
+        })()
     ].filter(Boolean)
   };
 
