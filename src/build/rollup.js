@@ -6,7 +6,7 @@ const babel = require("rollup-plugin-babel");
 const alias = require("rollup-plugin-alias");
 const cjs = require("rollup-plugin-commonjs");
 const replace = require("rollup-plugin-replace");
-
+const resolveFrom = require("resolve-from");
 const chalk = require("chalk");
 import builtInModules from "builtin-modules";
 import { StrictPackage } from "../package";
@@ -41,7 +41,8 @@ function getChildPeerDeps(
   isUMD: boolean,
   depKeys: Array<string>,
   doneDeps: Array<string>,
-  aliases: Aliases
+  aliases: Aliases,
+  pkg: StrictPackage
 ) {
   depKeys
     .filter(x => !doneDeps.includes(x))
@@ -50,10 +51,15 @@ function getChildPeerDeps(
       try {
         if (aliases[key] !== undefined) {
           pkgJson = unsafeRequire(
-            aliases[key].replace("src/index.js", "package.json")
+            resolveFrom(
+              pkg.directory,
+              aliases[key].replace("src/index.js", "package.json")
+            )
           );
         } else {
-          pkgJson = unsafeRequire(key + "/package.json");
+          pkgJson = unsafeRequire(
+            resolveFrom(pkg.directory, key + "/package.json")
+          );
         }
       } catch (err) {
         if (
@@ -71,7 +77,8 @@ function getChildPeerDeps(
           isUMD,
           Object.keys(pkgJson.peerDependencies),
           doneDeps,
-          aliases
+          aliases,
+          pkg
         );
       }
       // when we're building a UMD bundle, we're also bundling the dependencies so we need
@@ -83,7 +90,8 @@ function getChildPeerDeps(
           isUMD,
           Object.keys(pkgJson.dependencies),
           doneDeps,
-          aliases
+          aliases,
+          pkg
         );
       }
     });
@@ -127,7 +135,8 @@ export let getRollupConfig = (
       type === "umd" && pkg.dependencies ? Object.keys(pkg.dependencies) : []
     ),
     [],
-    aliases
+    aliases,
+    pkg
   );
   if (type === "node-dev" || type === "node-prod") {
     external.push(...builtInModules);

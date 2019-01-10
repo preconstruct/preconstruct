@@ -2,6 +2,7 @@
 import build from "../";
 import fixturez from "fixturez";
 import path from "path";
+import spawn from "spawndamnit";
 import * as fs from "fs-extra";
 import { initBasic, getPkg } from "../../../test-utils";
 import { confirms } from "../../messages";
@@ -13,6 +14,10 @@ const f = fixturez(__dirname);
 jest.mock("../../prompt");
 
 let unsafePromptInput: any = promptInput;
+
+async function install(tmpPath) {
+  await spawn("yarn", ["install"], { cwd: tmpPath });
+}
 
 async function snapshotDistFiles(tmpPath: string) {
   let distPath = path.join(tmpPath, "dist");
@@ -91,6 +96,8 @@ test.skip("uses obj spread", async () => {
 test("object-assign installed", async () => {
   let tmpPath = f.copy("object-assign-installed");
 
+  await install(tmpPath);
+
   await build(tmpPath);
 
   await snapshotDistFiles(tmpPath);
@@ -144,6 +151,8 @@ test("browser", async () => {
 test("umd with dep on other module", async () => {
   let tmpPath = f.copy("umd-with-dep");
 
+  await install(tmpPath);
+
   unsafePromptInput.mockImplementation(async question => {
     if (question === `What should the umdName of react be?`) {
       return "React";
@@ -156,6 +165,9 @@ test("umd with dep on other module", async () => {
   await snapshotDistFiles(tmpPath);
   expect(await getPkg(tmpPath)).toMatchInlineSnapshot(`
 Object {
+  "devDependencies": Object {
+    "react": "^16.6.3",
+  },
   "license": "MIT",
   "main": "dist/umd-with-dep.cjs.js",
   "name": "umd-with-dep",
@@ -188,6 +200,7 @@ test("monorepo umd with dep on other module", async () => {
     }
     throw new Error("unexpected question: " + question);
   });
+  await install(tmpPath);
 
   await build(tmpPath);
 
@@ -197,6 +210,9 @@ test("monorepo umd with dep on other module", async () => {
   expect(await getPkg(path.join(tmpPath, "packages", "package-one")))
     .toMatchInlineSnapshot(`
 Object {
+  "devDependencies": Object {
+    "react": "^16.6.3",
+  },
   "license": "MIT",
   "main": "dist/package-one-umd-with-dep.cjs.js",
   "name": "@some-scope/package-one-umd-with-dep",
@@ -215,6 +231,9 @@ Object {
   expect(await getPkg(path.join(tmpPath, "packages", "package-two")))
     .toMatchInlineSnapshot(`
 Object {
+  "devDependencies": Object {
+    "react": "^16.6.3",
+  },
   "license": "MIT",
   "main": "dist/package-two-umd-with-dep.cjs.js",
   "name": "@some-scope/package-two-umd-with-dep",
@@ -245,6 +264,9 @@ Object {
   },
   "private": true,
   "version": "1.0.0",
+  "workspaces": Array [
+    "packages/*",
+  ],
 }
 `);
 });
@@ -252,9 +274,7 @@ Object {
 test.skip("uses @babel/runtime", async () => {
   let tmpPath = f.copy("use-babel-runtime");
 
-  confirms.shouldInstallBabelRuntime.mockReturnValue(
-    Promise.resolve(false)
-  );
+  confirms.shouldInstallBabelRuntime.mockReturnValue(Promise.resolve(false));
 
   try {
     await build(tmpPath);
@@ -269,6 +289,8 @@ test.skip("uses @babel/runtime", async () => {
 test("@babel/runtime installed", async () => {
   let tmpPath = f.copy("babel-runtime-installed");
 
+  await install(tmpPath);
+
   await build(tmpPath);
 
   await snapshotDistFiles(tmpPath);
@@ -276,6 +298,8 @@ test("@babel/runtime installed", async () => {
 
 test("@babel/runtime and object-assign", async () => {
   let tmpPath = f.copy("babel-runtime-and-object-assign");
+
+  await install(tmpPath);
 
   await build(tmpPath);
 

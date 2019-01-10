@@ -4,6 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "private": true,
+  "workspaces": ["packages/*"],
   "preconstruct": {
     "packages": [
       "packages/*"
