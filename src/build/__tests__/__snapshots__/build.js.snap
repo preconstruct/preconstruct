@@ -11,27 +11,15 @@ function _interopDefault(ex) {
   return ex && typeof ex === 'object' && 'default' in ex ? ex['default'] : ex;
 }
 
-var _inheritsLoose = _interopDefault(require(\\"@babel/runtime/helpers/inheritsLoose\\"));
-
 var _objectAssign = _interopDefault(require('object-assign'));
 
-var something = _objectAssign({}, {
+let something = _objectAssign({}, {
   something: true
 });
 
-var Bar = function Bar() {};
+class Bar {}
 
-var Foo =
-/*#__PURE__*/
-function (_Bar) {
-  _inheritsLoose(Foo, _Bar);
-
-  function Foo() {
-    return _Bar.apply(this, arguments) || this;
-  }
-
-  return Foo;
-}(Bar);
+class Foo extends Bar {}
 
 exports.something = something;
 exports.Foo = Foo;
@@ -55,18 +43,10 @@ function _interopDefault(ex) {
   return ex && \\"object\\" == typeof ex && \\"default\\" in ex ? ex.default : ex;
 }
 Object.defineProperty(exports, \\"__esModule\\", { value: !0 });
-var _inheritsLoose = _interopDefault(
-    require(\\"@babel/runtime/helpers/inheritsLoose\\")
-  ),
-  _objectAssign = _interopDefault(require(\\"object-assign\\")),
-  something = _objectAssign({}, { something: !0 }),
-  Bar = function() {},
-  Foo = (function(_Bar) {
-    function Foo() {
-      return _Bar.apply(this, arguments) || this;
-    }
-    return _inheritsLoose(Foo, _Bar), Foo;
-  })(Bar);
+var _objectAssign = _interopDefault(require(\\"object-assign\\"));
+let something = _objectAssign({}, { something: !0 });
+class Bar {}
+class Foo extends Bar {}
 (exports.something = something), (exports.Foo = Foo);
 "
 `;
@@ -78,25 +58,9 @@ Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-function _interopDefault(ex) {
-  return ex && typeof ex === 'object' && 'default' in ex ? ex['default'] : ex;
-}
+class Bar {}
 
-var _inheritsLoose = _interopDefault(require(\\"@babel/runtime/helpers/inheritsLoose\\"));
-
-var Bar = function Bar() {};
-
-var Foo =
-/*#__PURE__*/
-function (_Bar) {
-  _inheritsLoose(Foo, _Bar);
-
-  function Foo() {
-    return _Bar.apply(this, arguments) || this;
-  }
-
-  return Foo;
-}(Bar);
+class Foo extends Bar {}
 
 exports.Foo = Foo;
 "
@@ -115,40 +79,17 @@ if (process.env.NODE_ENV === \\"production\\") {
 
 exports[`@babel/runtime installed: babel-runtime-installed.cjs.prod.js 1`] = `
 "\\"use strict\\";
-function _interopDefault(ex) {
-  return ex && \\"object\\" == typeof ex && \\"default\\" in ex ? ex.default : ex;
-}
 Object.defineProperty(exports, \\"__esModule\\", { value: !0 });
-var _inheritsLoose = _interopDefault(
-    require(\\"@babel/runtime/helpers/inheritsLoose\\")
-  ),
-  Bar = function() {},
-  Foo = (function(_Bar) {
-    function Foo() {
-      return _Bar.apply(this, arguments) || this;
-    }
-    return _inheritsLoose(Foo, _Bar), Foo;
-  })(Bar);
+class Bar {}
+class Foo extends Bar {}
 exports.Foo = Foo;
 "
 `;
 
 exports[`@babel/runtime installed: babel-runtime-installed.esm.js 1`] = `
-"import _inheritsLoose from '@babel/runtime/helpers/esm/inheritsLoose';
+"class Bar {}
 
-var Bar = function Bar() {};
-
-var Foo =
-/*#__PURE__*/
-function (_Bar) {
-  _inheritsLoose(Foo, _Bar);
-
-  function Foo() {
-    return _Bar.apply(this, arguments) || this;
-  }
-
-  return Foo;
-}(Bar);
+class Foo extends Bar {}
 
 export { Foo };
 "
@@ -205,7 +146,7 @@ exports[`browser: valid-package.browser.cjs.js 1`] = `
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
-var thing = \\"wow\\";
+let thing = \\"wow\\";
 {
   thing = \\"something\\";
 }
@@ -218,7 +159,7 @@ exports.default = thing$1;
 `;
 
 exports[`browser: valid-package.browser.esm.js 1`] = `
-"var thing = \\"wow\\";
+"let thing = \\"wow\\";
 
 {
   thing = \\"something\\";
@@ -240,7 +181,7 @@ exports[`browser: valid-package.cjs.dev.js 1`] = `
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
-var thing = \\"wow\\";
+let thing = \\"wow\\";
 
 if (typeof window !== \\"undefined\\") {
   thing = \\"something\\";
@@ -269,7 +210,7 @@ if (process.env.NODE_ENV === \\"production\\") {
 exports[`browser: valid-package.cjs.prod.js 1`] = `
 "\\"use strict\\";
 Object.defineProperty(exports, \\"__esModule\\", { value: !0 });
-var thing = \\"wow\\";
+let thing = \\"wow\\";
 \\"undefined\\" != typeof window && (thing = \\"something\\"),
   void 0 !== typeof document && (thing += \\"other\\");
 var thing$1 = thing;
@@ -278,7 +219,7 @@ exports.default = thing$1;
 `;
 
 exports[`browser: valid-package.esm.js 1`] = `
-"var thing = \\"wow\\";
+"let thing = \\"wow\\";
 
 if (typeof window !== \\"undefined\\") {
   thing = \\"something\\";
@@ -624,7 +565,7 @@ function _interopDefault(ex) {
 
 var _objectAssign = _interopDefault(require('object-assign'));
 
-var something = _objectAssign({}, {
+let something = _objectAssign({}, {
   something: true
 });
 
@@ -649,8 +590,8 @@ function _interopDefault(ex) {
   return ex && \\"object\\" == typeof ex && \\"default\\" in ex ? ex.default : ex;
 }
 Object.defineProperty(exports, \\"__esModule\\", { value: !0 });
-var _objectAssign = _interopDefault(require(\\"object-assign\\")),
-  something = _objectAssign({}, { something: !0 });
+var _objectAssign = _interopDefault(require(\\"object-assign\\"));
+let something = _objectAssign({}, { something: !0 });
 exports.something = something;
 "
 `;

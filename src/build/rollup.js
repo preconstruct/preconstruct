@@ -191,22 +191,9 @@ export let getRollupConfig = (
     },
     plugins: [
       babel({
-        presets: [
-          [
-            require.resolve("@babel/preset-env"),
-            {
-              loose: true,
-              modules: false,
-              exclude: ["transform-typeof-symbol"]
-            }
-          ],
-          require.resolve("@babel/preset-react"),
-          require.resolve("@babel/preset-flow")
-        ],
         plugins: [
           require.resolve("@babel/plugin-transform-flow-strip-types"),
           require("../babel-plugins/add-basic-constructor-to-react-component"),
-          require.resolve("babel-plugin-codegen"),
           [
             require.resolve("@babel/plugin-proposal-class-properties"),
             { loose: true }
@@ -220,8 +207,6 @@ export let getRollupConfig = (
           type !== "umd" &&
             require.resolve("babel-plugin-transform-import-object-assign")
         ].filter(Boolean),
-        configFile: false,
-        babelrc: false,
         runtimeHelpers: true
       }),
       cjs(),
