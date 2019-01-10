@@ -40,14 +40,21 @@ function getChildPeerDeps(
   finalPeerDeps: Array<string>,
   isUMD: boolean,
   depKeys: Array<string>,
-  doneDeps: Array<string>
+  doneDeps: Array<string>,
+  aliases: Aliases
 ) {
   depKeys
     .filter(x => !doneDeps.includes(x))
     .forEach(key => {
       let pkgJson;
       try {
-        pkgJson = unsafeRequire(key + "/package.json");
+        if (aliases[key] !== undefined) {
+          pkgJson = unsafeRequire(
+            aliases[key].replace("src/index.js", "package.json")
+          );
+        } else {
+          pkgJson = unsafeRequire(key + "/package.json");
+        }
       } catch (err) {
         if (
           err.code === "MODULE_NOT_FOUND" &&
@@ -63,7 +70,8 @@ function getChildPeerDeps(
           finalPeerDeps,
           isUMD,
           Object.keys(pkgJson.peerDependencies),
-          doneDeps
+          doneDeps,
+          aliases
         );
       }
       // when we're building a UMD bundle, we're also bundling the dependencies so we need
@@ -74,7 +82,8 @@ function getChildPeerDeps(
           finalPeerDeps,
           isUMD,
           Object.keys(pkgJson.dependencies),
-          doneDeps
+          doneDeps,
+          aliases
         );
       }
     });
@@ -117,7 +126,8 @@ export let getRollupConfig = (
     external.concat(
       type === "umd" && pkg.dependencies ? Object.keys(pkg.dependencies) : []
     ),
-    []
+    [],
+    aliases
   );
   if (type === "node-dev" || type === "node-prod") {
     external.push(...builtInModules);
