@@ -37,6 +37,7 @@
     "globby": "^8.0.1",
     "inquirer": "^6.2.0",
     "install-packages": "^0.2.5",
+    "jest-worker": "^23.2.0",
     "meow": "^5.0.0",
     "ms": "^2.1.1",
     "p-limit": "^2.0.0",

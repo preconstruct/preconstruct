@@ -51,7 +51,7 @@ async function buildPackage(pkg: StrictPackage, aliases: Aliases) {
     })
   );
 
-  const source = await fs.readFile(pkg.source, 'utf8')
+  const source = await fs.readFile(pkg.source, "utf8");
 
   let flowMode = false;
   if (source.includes("@flow")) {

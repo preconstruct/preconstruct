@@ -2,7 +2,6 @@
 const prettier = require("rollup-plugin-prettier");
 const resolve = require("rollup-plugin-node-resolve");
 const { terser } = require("rollup-plugin-terser");
-const babel = require("rollup-plugin-babel");
 const alias = require("rollup-plugin-alias");
 const cjs = require("rollup-plugin-commonjs");
 const replace = require("rollup-plugin-replace");
@@ -15,6 +14,7 @@ import type { Aliases } from "./aliases";
 import { FatalError } from "../errors";
 import { confirms } from "../messages";
 import rewriteCjsRuntimeHelpers from "../rollup-plugins/rewrite-cjs-runtime-helpers";
+import babel from "../rollup-plugins/babel";
 import installPackages from "install-packages";
 import pLimit from "p-limit";
 
@@ -205,24 +205,28 @@ export let getRollupConfig = (
         ],
         plugins: [
           require.resolve("@babel/plugin-transform-flow-strip-types"),
-          require("../babel-plugins/add-basic-constructor-to-react-component"),
+          require.resolve(
+            "../babel-plugins/add-basic-constructor-to-react-component"
+          ),
           require.resolve("babel-plugin-codegen"),
           [
             require.resolve("@babel/plugin-proposal-class-properties"),
             { loose: true }
           ],
-          require("../babel-plugins/fix-dce-for-classes-with-statics"),
+          require.resolve("../babel-plugins/fix-dce-for-classes-with-statics"),
           [
             require.resolve("@babel/plugin-proposal-object-rest-spread"),
             { loose: true, useBuiltIns: type !== "umd" }
           ],
-          [require("@babel/plugin-transform-runtime"), { useESModules: true }],
+          [
+            require.resolve("@babel/plugin-transform-runtime"),
+            { useESModules: true }
+          ],
           type !== "umd" &&
             require.resolve("babel-plugin-transform-import-object-assign")
         ].filter(Boolean),
         configFile: false,
-        babelrc: false,
-        runtimeHelpers: true
+        babelrc: false
       }),
       cjs(),
       (type === "browser" || type === "umd") &&
