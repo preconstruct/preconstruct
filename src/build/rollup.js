@@ -17,6 +17,7 @@ import babel from "../rollup-plugins/babel";
 import prettier from "../rollup-plugins/prettier";
 import installPackages from "install-packages";
 import pLimit from "p-limit";
+import isCi from "is-ci";
 
 // this makes sure nested imports of external packages are external
 const makeExternalPredicate = externalArr => {
@@ -108,6 +109,8 @@ export opaque type RollupConfig = Object;
 export function toUnsafeRollupConfig(config: RollupConfig): Object {
   return config;
 }
+
+let standardTerserOptions = isCi ? { numWorkers: 1 } : {};
 
 export type RollupConfigType =
   | "umd"
@@ -245,9 +248,10 @@ export let getRollupConfig = (
         replace({
           "process.env.NODE_ENV": '"production"'
         }),
-      type === "umd" && terser(),
+      type === "umd" && terser(standardTerserOptions),
       type === "node-prod" &&
         terser({
+          ...standardTerserOptions,
           mangle: false
         }),
       type === "node-prod" && prettier()
