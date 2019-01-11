@@ -26,7 +26,7 @@ async function snapshotDistFiles(tmpPath: string) {
     distFiles = await fs.readdir(distPath);
   } catch (err) {
     if (err.code === "ENOENT") {
-      throw new Error("no dist directory exists");
+      throw new Error(distPath + " does not exist");
     }
     throw err;
   }
@@ -206,6 +206,7 @@ test("monorepo umd with dep on other module", async () => {
 
   await snapshotDistFiles(path.join(tmpPath, "packages", "package-one"));
   await snapshotDistFiles(path.join(tmpPath, "packages", "package-two"));
+  await snapshotDistFiles(path.join(tmpPath, "packages", "package-three"));
 
   expect(await getPkg(path.join(tmpPath, "packages", "package-one")))
     .toMatchInlineSnapshot(`

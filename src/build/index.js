@@ -1,6 +1,5 @@
 // @flow
 import { Package, StrictPackage } from "../package";
-import * as logger from "../logger";
 import path from "path";
 import { rollup } from "./rollup";
 import { type Aliases, getAliases } from "./aliases";

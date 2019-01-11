@@ -1,6 +1,6 @@
 {
   "name": "preconstruct",
-  "version": "0.0.7-custom-babel",
+  "version": "0.0.8-custom-babel",
   "description": "A smart bundler for libraries",
   "main": "lib/index.js",
   "files": [

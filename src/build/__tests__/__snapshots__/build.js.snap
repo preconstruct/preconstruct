@@ -413,6 +413,38 @@ exports[`monorepo umd with dep on other module: package-one-umd-with-dep.umd.min
 
 exports[`monorepo umd with dep on other module: package-one-umd-with-dep.umd.min.js.map 1`] = `"{\\"version\\":3,\\"file\\":\\"package-one-umd-with-dep.umd.min.js\\",\\"sources\\":[\\"../src/index.js\\"],\\"sourcesContent\\":[\\"import { createElement } from \\\\\\"react\\\\\\";\\\\n\\\\ncreateElement(\\\\\\"div\\\\\\", null);\\\\n\\"],\\"names\\":[],\\"mappings\\":\\"sNAEc,MAAO\\"}"`;
 
+exports[`monorepo umd with dep on other module: package-three-umd-with-dep.cjs.dev.js 1`] = `
+"'use strict';
+
+require('@some-scope/package-one-umd-with-dep');
+"
+`;
+
+exports[`monorepo umd with dep on other module: package-three-umd-with-dep.cjs.js 1`] = `
+"'use strict';
+
+if (process.env.NODE_ENV === \\"production\\") {
+  module.exports = require(\\"./package-three-umd-with-dep.cjs.prod.js\\");
+} else {
+  module.exports = require(\\"./package-three-umd-with-dep.cjs.dev.js\\");
+}
+"
+`;
+
+exports[`monorepo umd with dep on other module: package-three-umd-with-dep.cjs.prod.js 1`] = `
+"\\"use strict\\";
+require(\\"@some-scope/package-one-umd-with-dep\\");
+"
+`;
+
+exports[`monorepo umd with dep on other module: package-three-umd-with-dep.umd.min.js 1`] = `
+"!function(e){\\"function\\"==typeof define&&define.amd?define([\\"@some-scope/package-one-umd-with-dep\\"],e):e()}(function(){});
+//# sourceMappingURL=package-three-umd-with-dep.umd.min.js.map
+"
+`;
+
+exports[`monorepo umd with dep on other module: package-three-umd-with-dep.umd.min.js.map 1`] = `"{\\"version\\":3,\\"file\\":\\"package-three-umd-with-dep.umd.min.js\\",\\"sources\\":[],\\"sourcesContent\\":[],\\"names\\":[],\\"mappings\\":\\"\\"}"`;
+
 exports[`monorepo umd with dep on other module: package-two-umd-with-dep.cjs.dev.js 1`] = `
 "'use strict';
 
