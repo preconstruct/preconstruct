@@ -39,7 +39,7 @@
     "inquirer": "^6.2.0",
     "install-packages": "^0.2.5",
     "is-ci": "^2.0.0",
-    "jest-worker": "^23.2.0",
+    "jest-worker": "24.0.0-alpha.11",
     "lodash.isempty": "^4.4.0",
     "lodash.omitby": "^4.6.0",
     "magic-string": "^0.25.1",

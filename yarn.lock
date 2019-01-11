@@ -3430,6 +3430,14 @@ jest-watcher@^23.4.0:
     chalk "^2.0.1"
     string-length "^2.0.0"
 
+jest-worker@24.0.0-alpha.11:
+  version "24.0.0-alpha.11"
+  resolved "https://registry.yarnpkg.com/jest-worker/-/jest-worker-24.0.0-alpha.11.tgz#3cae89bb8ffcd52a2859164bbd8697fcc160456d"
+  integrity sha512-5rfc/oIw0WrUd5ur7vbmW38R8rRnv+eQ3t8ubyJGgKBXJ3sk9OMP0bC+AdsLjZCNEoNblnrS8kCBztGNRpitHQ==
+  dependencies:
+    merge-stream "^1.0.1"
+    supports-color "^5.5.0"
+
 jest-worker@^23.2.0:
   version "23.2.0"
   resolved "https://registry.yarnpkg.com/jest-worker/-/jest-worker-23.2.0.tgz#faf706a8da36fae60eb26957257fa7b5d8ea02b9"
