@@ -1,9 +1,9 @@
 // @flow
 import { Package, StrictPackage } from "../package";
-import * as logger from "../logger";
 import path from "path";
 import { rollup } from "./rollup";
 import { type Aliases, getAliases } from "./aliases";
+import * as logger from "../logger";
 import * as fs from "fs-extra";
 import { confirms, errors } from "../messages";
 import { FatalError } from "../errors";
@@ -20,7 +20,7 @@ async function buildPackage(pkg: StrictPackage, aliases: Aliases) {
 
   let hasCheckedBrowser = pkg.browser !== null;
 
-  const [sampleOutput] = await Promise.all(
+  let [sampleOutput] = await Promise.all(
     configs.map(async ({ config, outputs }) => {
       // $FlowFixMe this is not a problem with flow, i did something wrong but it's not worth fixing right now
       const bundle = await rollup(config);
@@ -47,7 +47,6 @@ async function buildPackage(pkg: StrictPackage, aliases: Aliases) {
           })();
         }
       }
-
       return nodeDevOutput;
     })
   );
@@ -81,6 +80,7 @@ export default async function build(directory: string) {
   // do more stuff with checking whether the repo is using yarn workspaces or bolt
   try {
     let packages = await pkg.packages();
+    logger.info("building bundles!");
     if (packages === null) {
       let strictPackage = pkg.strict();
       await retryableBuild(strictPackage, {});

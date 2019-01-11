@@ -4,7 +4,7 @@ const { terser } = require("rollup-plugin-terser");
 const alias = require("rollup-plugin-alias");
 const cjs = require("rollup-plugin-commonjs");
 const replace = require("rollup-plugin-replace");
-
+const resolveFrom = require("resolve-from");
 const chalk = require("chalk");
 import builtInModules from "builtin-modules";
 import { StrictPackage } from "../package";
@@ -40,14 +40,27 @@ function getChildPeerDeps(
   finalPeerDeps: Array<string>,
   isUMD: boolean,
   depKeys: Array<string>,
-  doneDeps: Array<string>
+  doneDeps: Array<string>,
+  aliases: Aliases,
+  pkg: StrictPackage
 ) {
   depKeys
     .filter(x => !doneDeps.includes(x))
     .forEach(key => {
       let pkgJson;
       try {
-        pkgJson = unsafeRequire(key + "/package.json");
+        if (aliases[key] !== undefined) {
+          pkgJson = unsafeRequire(
+            resolveFrom(
+              pkg.directory,
+              aliases[key].replace("src/index.js", "package.json")
+            )
+          );
+        } else {
+          pkgJson = unsafeRequire(
+            resolveFrom(pkg.directory, key + "/package.json")
+          );
+        }
       } catch (err) {
         if (
           err.code === "MODULE_NOT_FOUND" &&
@@ -63,7 +76,9 @@ function getChildPeerDeps(
           finalPeerDeps,
           isUMD,
           Object.keys(pkgJson.peerDependencies),
-          doneDeps
+          doneDeps,
+          aliases,
+          pkg
         );
       }
       // when we're building a UMD bundle, we're also bundling the dependencies so we need
@@ -74,7 +89,9 @@ function getChildPeerDeps(
           finalPeerDeps,
           isUMD,
           Object.keys(pkgJson.dependencies),
-          doneDeps
+          doneDeps,
+          aliases,
+          pkg
         );
       }
     });
@@ -117,7 +134,9 @@ export let getRollupConfig = (
     external.concat(
       type === "umd" && pkg.dependencies ? Object.keys(pkg.dependencies) : []
     ),
-    []
+    [],
+    aliases,
+    pkg
   );
   if (type === "node-dev" || type === "node-prod") {
     external.push(...builtInModules);
@@ -191,24 +210,11 @@ export let getRollupConfig = (
     },
     plugins: [
       babel({
-        presets: [
-          [
-            require.resolve("@babel/preset-env"),
-            {
-              loose: true,
-              modules: false,
-              exclude: ["transform-typeof-symbol"]
-            }
-          ],
-          require.resolve("@babel/preset-react"),
-          require.resolve("@babel/preset-flow")
-        ],
         plugins: [
           require.resolve("@babel/plugin-transform-flow-strip-types"),
           require.resolve(
             "../babel-plugins/add-basic-constructor-to-react-component"
           ),
-          require.resolve("babel-plugin-codegen"),
           [
             require.resolve("@babel/plugin-proposal-class-properties"),
             { loose: true }
@@ -224,9 +230,7 @@ export let getRollupConfig = (
           ],
           type !== "umd" &&
             require.resolve("babel-plugin-transform-import-object-assign")
-        ].filter(Boolean),
-        configFile: false,
-        babelrc: false
+        ].filter(Boolean)
       }),
       cjs(),
       (type === "browser" || type === "umd") &&

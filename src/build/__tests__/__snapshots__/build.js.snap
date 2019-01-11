@@ -11,27 +11,15 @@ function _interopDefault(ex) {
   return ex && typeof ex === 'object' && 'default' in ex ? ex['default'] : ex;
 }
 
-var _inheritsLoose = _interopDefault(require(\\"@babel/runtime/helpers/inheritsLoose\\"));
-
 var _objectAssign = _interopDefault(require('object-assign'));
 
-var something = _objectAssign({}, {
+let something = _objectAssign({}, {
   something: true
 });
 
-var Bar = function Bar() {};
+class Bar {}
 
-var Foo =
-/*#__PURE__*/
-function (_Bar) {
-  _inheritsLoose(Foo, _Bar);
-
-  function Foo() {
-    return _Bar.apply(this, arguments) || this;
-  }
-
-  return Foo;
-}(Bar);
+class Foo extends Bar {}
 
 exports.something = something;
 exports.Foo = Foo;
@@ -55,18 +43,10 @@ function _interopDefault(ex) {
   return ex && \\"object\\" == typeof ex && \\"default\\" in ex ? ex.default : ex;
 }
 Object.defineProperty(exports, \\"__esModule\\", { value: !0 });
-var _inheritsLoose = _interopDefault(
-    require(\\"@babel/runtime/helpers/inheritsLoose\\")
-  ),
-  _objectAssign = _interopDefault(require(\\"object-assign\\")),
-  something = _objectAssign({}, { something: !0 }),
-  Bar = function() {},
-  Foo = (function(_Bar) {
-    function Foo() {
-      return _Bar.apply(this, arguments) || this;
-    }
-    return _inheritsLoose(Foo, _Bar), Foo;
-  })(Bar);
+var _objectAssign = _interopDefault(require(\\"object-assign\\"));
+let something = _objectAssign({}, { something: !0 });
+class Bar {}
+class Foo extends Bar {}
 (exports.something = something), (exports.Foo = Foo);
 "
 `;
@@ -78,25 +58,9 @@ Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-function _interopDefault(ex) {
-  return ex && typeof ex === 'object' && 'default' in ex ? ex['default'] : ex;
-}
+class Bar {}
 
-var _inheritsLoose = _interopDefault(require(\\"@babel/runtime/helpers/inheritsLoose\\"));
-
-var Bar = function Bar() {};
-
-var Foo =
-/*#__PURE__*/
-function (_Bar) {
-  _inheritsLoose(Foo, _Bar);
-
-  function Foo() {
-    return _Bar.apply(this, arguments) || this;
-  }
-
-  return Foo;
-}(Bar);
+class Foo extends Bar {}
 
 exports.Foo = Foo;
 "
@@ -115,40 +79,17 @@ if (process.env.NODE_ENV === \\"production\\") {
 
 exports[`@babel/runtime installed: babel-runtime-installed.cjs.prod.js 1`] = `
 "\\"use strict\\";
-function _interopDefault(ex) {
-  return ex && \\"object\\" == typeof ex && \\"default\\" in ex ? ex.default : ex;
-}
 Object.defineProperty(exports, \\"__esModule\\", { value: !0 });
-var _inheritsLoose = _interopDefault(
-    require(\\"@babel/runtime/helpers/inheritsLoose\\")
-  ),
-  Bar = function() {},
-  Foo = (function(_Bar) {
-    function Foo() {
-      return _Bar.apply(this, arguments) || this;
-    }
-    return _inheritsLoose(Foo, _Bar), Foo;
-  })(Bar);
+class Bar {}
+class Foo extends Bar {}
 exports.Foo = Foo;
 "
 `;
 
 exports[`@babel/runtime installed: babel-runtime-installed.esm.js 1`] = `
-"import _inheritsLoose from '@babel/runtime/helpers/esm/inheritsLoose';
+"class Bar {}
 
-var Bar = function Bar() {};
-
-var Foo =
-/*#__PURE__*/
-function (_Bar) {
-  _inheritsLoose(Foo, _Bar);
-
-  function Foo() {
-    return _Bar.apply(this, arguments) || this;
-  }
-
-  return Foo;
-}(Bar);
+class Foo extends Bar {}
 
 export { Foo };
 "
@@ -205,7 +146,7 @@ exports[`browser: valid-package.browser.cjs.js 1`] = `
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
-var thing = \\"wow\\";
+let thing = \\"wow\\";
 {
   thing = \\"something\\";
 }
@@ -218,7 +159,7 @@ exports.default = thing$1;
 `;
 
 exports[`browser: valid-package.browser.esm.js 1`] = `
-"var thing = \\"wow\\";
+"let thing = \\"wow\\";
 
 {
   thing = \\"something\\";
@@ -240,7 +181,7 @@ exports[`browser: valid-package.cjs.dev.js 1`] = `
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
-var thing = \\"wow\\";
+let thing = \\"wow\\";
 
 if (typeof window !== \\"undefined\\") {
   thing = \\"something\\";
@@ -269,7 +210,7 @@ if (process.env.NODE_ENV === \\"production\\") {
 exports[`browser: valid-package.cjs.prod.js 1`] = `
 "\\"use strict\\";
 Object.defineProperty(exports, \\"__esModule\\", { value: !0 });
-var thing = \\"wow\\";
+let thing = \\"wow\\";
 \\"undefined\\" != typeof window && (thing = \\"something\\"),
   void 0 !== typeof document && (thing += \\"other\\");
 var thing$1 = thing;
@@ -278,7 +219,7 @@ exports.default = thing$1;
 `;
 
 exports[`browser: valid-package.esm.js 1`] = `
-"var thing = \\"wow\\";
+"let thing = \\"wow\\";
 
 if (typeof window !== \\"undefined\\") {
   thing = \\"something\\";
@@ -437,6 +378,38 @@ export { doSomething };
 "
 `;
 
+exports[`monorepo umd with dep on other module: package-four-umd-with-dep.cjs.dev.js 1`] = `
+"'use strict';
+
+require('@some-scope/package-one-umd-with-dep');
+"
+`;
+
+exports[`monorepo umd with dep on other module: package-four-umd-with-dep.cjs.js 1`] = `
+"'use strict';
+
+if (process.env.NODE_ENV === \\"production\\") {
+  module.exports = require(\\"./package-four-umd-with-dep.cjs.prod.js\\");
+} else {
+  module.exports = require(\\"./package-four-umd-with-dep.cjs.dev.js\\");
+}
+"
+`;
+
+exports[`monorepo umd with dep on other module: package-four-umd-with-dep.cjs.prod.js 1`] = `
+"\\"use strict\\";
+require(\\"@some-scope/package-one-umd-with-dep\\");
+"
+`;
+
+exports[`monorepo umd with dep on other module: package-four-umd-with-dep.umd.min.js 1`] = `
+"!function(e,t){\\"object\\"==typeof exports&&\\"undefined\\"!=typeof module?t(require(\\"react\\")):\\"function\\"==typeof define&&define.amd?define([\\"react\\"],t):t((e=e||self).React)}(this,function(e){\\"use strict\\";e.createElement(\\"div\\",null)});
+//# sourceMappingURL=package-four-umd-with-dep.umd.min.js.map
+"
+`;
+
+exports[`monorepo umd with dep on other module: package-four-umd-with-dep.umd.min.js.map 1`] = `"{\\"version\\":3,\\"file\\":\\"package-four-umd-with-dep.umd.min.js\\",\\"sources\\":[\\"../../package-one/src/index.js\\"],\\"sourcesContent\\":[\\"import { createElement } from \\\\\\"react\\\\\\";\\\\n\\\\ncreateElement(\\\\\\"div\\\\\\", null);\\\\n\\"],\\"names\\":[],\\"mappings\\":\\"sNAEc,MAAO\\"}"`;
+
 exports[`monorepo umd with dep on other module: package-one-umd-with-dep.cjs.dev.js 1`] = `
 "'use strict';
 
@@ -471,6 +444,38 @@ exports[`monorepo umd with dep on other module: package-one-umd-with-dep.umd.min
 `;
 
 exports[`monorepo umd with dep on other module: package-one-umd-with-dep.umd.min.js.map 1`] = `"{\\"version\\":3,\\"file\\":\\"package-one-umd-with-dep.umd.min.js\\",\\"sources\\":[\\"../src/index.js\\"],\\"sourcesContent\\":[\\"import { createElement } from \\\\\\"react\\\\\\";\\\\n\\\\ncreateElement(\\\\\\"div\\\\\\", null);\\\\n\\"],\\"names\\":[],\\"mappings\\":\\"sNAEc,MAAO\\"}"`;
+
+exports[`monorepo umd with dep on other module: package-three-umd-with-dep.cjs.dev.js 1`] = `
+"'use strict';
+
+require('@some-scope/package-one-umd-with-dep');
+"
+`;
+
+exports[`monorepo umd with dep on other module: package-three-umd-with-dep.cjs.js 1`] = `
+"'use strict';
+
+if (process.env.NODE_ENV === \\"production\\") {
+  module.exports = require(\\"./package-three-umd-with-dep.cjs.prod.js\\");
+} else {
+  module.exports = require(\\"./package-three-umd-with-dep.cjs.dev.js\\");
+}
+"
+`;
+
+exports[`monorepo umd with dep on other module: package-three-umd-with-dep.cjs.prod.js 1`] = `
+"\\"use strict\\";
+require(\\"@some-scope/package-one-umd-with-dep\\");
+"
+`;
+
+exports[`monorepo umd with dep on other module: package-three-umd-with-dep.umd.min.js 1`] = `
+"!function(e){\\"function\\"==typeof define&&define.amd?define([\\"@some-scope/package-one-umd-with-dep\\"],e):e()}(function(){});
+//# sourceMappingURL=package-three-umd-with-dep.umd.min.js.map
+"
+`;
+
+exports[`monorepo umd with dep on other module: package-three-umd-with-dep.umd.min.js.map 1`] = `"{\\"version\\":3,\\"file\\":\\"package-three-umd-with-dep.umd.min.js\\",\\"sources\\":[],\\"sourcesContent\\":[],\\"names\\":[],\\"mappings\\":\\"\\"}"`;
 
 exports[`monorepo umd with dep on other module: package-two-umd-with-dep.cjs.dev.js 1`] = `
 "'use strict';
@@ -624,7 +629,7 @@ function _interopDefault(ex) {
 
 var _objectAssign = _interopDefault(require('object-assign'));
 
-var something = _objectAssign({}, {
+let something = _objectAssign({}, {
   something: true
 });
 
@@ -649,8 +654,8 @@ function _interopDefault(ex) {
   return ex && \\"object\\" == typeof ex && \\"default\\" in ex ? ex.default : ex;
 }
 Object.defineProperty(exports, \\"__esModule\\", { value: !0 });
-var _objectAssign = _interopDefault(require(\\"object-assign\\")),
-  something = _objectAssign({}, { something: !0 });
+var _objectAssign = _interopDefault(require(\\"object-assign\\"));
+let something = _objectAssign({}, { something: !0 });
 exports.something = something;
 "
 `;

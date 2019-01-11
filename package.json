@@ -73,7 +73,8 @@
     "jest-junit": "^5.2.0",
     "object-assign": "^4.1.1",
     "react": "^16.6.3",
-    "rimraf": "^2.6.2"
+    "rimraf": "^2.6.2",
+    "spawndamnit": "^2.0.0"
   },
   "jest": {
     "reporters": [
