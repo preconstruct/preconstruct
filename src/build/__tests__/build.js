@@ -207,6 +207,7 @@ test("monorepo umd with dep on other module", async () => {
   await snapshotDistFiles(path.join(tmpPath, "packages", "package-one"));
   await snapshotDistFiles(path.join(tmpPath, "packages", "package-two"));
   await snapshotDistFiles(path.join(tmpPath, "packages", "package-three"));
+  await snapshotDistFiles(path.join(tmpPath, "packages", "package-four"));
 
   expect(await getPkg(path.join(tmpPath, "packages", "package-one")))
     .toMatchInlineSnapshot(`
