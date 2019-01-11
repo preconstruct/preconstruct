@@ -3,6 +3,7 @@ import { Package, StrictPackage } from "../package";
 import path from "path";
 import { rollup } from "./rollup";
 import { type Aliases, getAliases } from "./aliases";
+import * as logger from "../logger";
 import * as fs from "fs-extra";
 import { confirms, errors } from "../messages";
 import { FatalError } from "../errors";
@@ -80,6 +81,7 @@ export default async function build(directory: string) {
   // do more stuff with checking whether the repo is using yarn workspaces or bolt
   try {
     let packages = await pkg.packages();
+    logger.info("building bundles!");
     if (packages === null) {
       let strictPackage = pkg.strict();
       await retryableBuild(strictPackage, {});
