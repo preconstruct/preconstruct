@@ -11,6 +11,7 @@ import { toUnsafeRollupConfig } from "./rollup";
 import { success, info } from "../logger";
 import { successes } from "../messages";
 import { writeOtherFiles } from "./utils";
+import { startWorker } from "../worker-client";
 
 function relativePath(id) {
   return path.relative(process.cwd(), id);
@@ -114,6 +115,7 @@ async function retryableWatch(
 }
 
 export default async function build(directory: string) {
+  startWorker();
   let pkg = await Package.create(directory);
   // do more stuff with checking whether the repo is using yarn workspaces or bolt
 

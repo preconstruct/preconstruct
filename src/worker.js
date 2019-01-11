@@ -5,9 +5,9 @@ exports.transformBabel = function transformBabel(code, options) {
   options = JSON.parse(options);
   let result = babel.transformSync(code, options);
 
-  return { code: result.code, map: result.map };
+  return Promise.resolve({ code: result.code, map: result.map });
 };
 
 exports.transformPrettier = function transformPrettier(code) {
-  return prettier.format(code, { parser: "babylon" });
+  return Promise.resolve(prettier.format(code, { parser: "babylon" }));
 };
