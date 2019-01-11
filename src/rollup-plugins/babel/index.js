@@ -1,13 +1,11 @@
 // @flow
 import * as babel from "@babel/core";
 import { createFilter } from "rollup-pluginutils";
-import Worker from "jest-worker";
+import { getWorker } from "../../worker-client";
 
 const regExpCharactersRegExp = /[\\^$.*+?()[\]{}|]/g;
 const escapeRegExpCharacters = (str: string) =>
   str.replace(regExpCharactersRegExp, "\\$&");
-
-let worker = new Worker(require.resolve("./worker"));
 
 const unpackOptions = ({
   extensions = babel.DEFAULT_EXTENSIONS,
@@ -47,7 +45,8 @@ let rollupPluginBabel = (pluginOptions: *) => {
     transform(code: string, filename: string) {
       if (!filter(filename)) return Promise.resolve(null);
       let options = JSON.stringify({ ...babelOptions, filename });
-      return worker.transform(code, options);
+
+      return getWorker().transformBabel(code, options);
     }
   };
 };

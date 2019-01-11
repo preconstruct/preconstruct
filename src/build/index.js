@@ -10,6 +10,7 @@ import { FatalError } from "../errors";
 import { getValidBrowserField } from "../utils";
 import { getRollupConfigs } from "./config";
 import { writeOtherFiles } from "./utils";
+import { createWorker, destroyWorker } from "../worker-client";
 
 let browserPattern = /typeof\s+(window|document)/;
 
@@ -75,17 +76,23 @@ async function retryableBuild(pkg: StrictPackage, aliases: Aliases) {
 }
 
 export default async function build(directory: string) {
+  createWorker();
   let pkg = await Package.create(directory);
   // do more stuff with checking whether the repo is using yarn workspaces or bolt
-
-  let packages = await pkg.packages();
-  if (packages === null) {
-    let strictPackage = pkg.strict();
-    await retryableBuild(strictPackage, {});
-  } else {
-    let strictPackages = packages.map(x => x.strict());
-    let aliases = getAliases(strictPackages);
-    await Promise.all(strictPackages.map(pkg => retryableBuild(pkg, aliases)));
+  try {
+    let packages = await pkg.packages();
+    if (packages === null) {
+      let strictPackage = pkg.strict();
+      await retryableBuild(strictPackage, {});
+    } else {
+      let strictPackages = packages.map(x => x.strict());
+      let aliases = getAliases(strictPackages);
+      await Promise.all(
+        strictPackages.map(pkg => retryableBuild(pkg, aliases))
+      );
+    }
+    logger.success("built bundles!");
+  } finally {
+    destroyWorker();
   }
-  logger.success("built bundles!");
 }
