@@ -9,7 +9,7 @@ test("jest aliases", () => {
 
   let jestAliases = aliases.jest(tmpPath);
 
-  expect(Object.keys(jestAliases)).toHaveLength(3);
+  expect(Object.keys(jestAliases)).toHaveLength(4);
 
   expect(jestAliases).toEqual({
     "^@some-scope/package-one-umd-with-dep$": expect.stringContaining(
@@ -20,6 +20,9 @@ test("jest aliases", () => {
     ),
     "^@some-scope/package-three-umd-with-dep$": expect.stringContaining(
       "__fixtures__/monorepo-umd-with-dep/packages/package-three/src/index.js"
+    ),
+    "^@some-scope/package-four-umd-with-dep$": expect.stringContaining(
+      "__fixtures__/monorepo-umd-with-dep/packages/package-four/src/index.js"
     )
   });
 });
