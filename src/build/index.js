@@ -10,7 +10,6 @@ import { getValidBrowserField } from "../utils";
 import { getRollupConfigs } from "./config";
 import { writeOtherFiles } from "./utils";
 import { createWorker, destroyWorker } from "../worker-client";
-import ora from "ora";
 
 let browserPattern = /typeof\s+(window|document)/;
 
@@ -82,27 +81,16 @@ export default async function build(directory: string) {
   try {
     let packages = await pkg.packages();
     if (packages === null) {
-      const spinner = ora("building bundles").start();
       let strictPackage = pkg.strict();
       await retryableBuild(strictPackage, {});
-      spinner.succeed("built bundles!");
     } else {
       let strictPackages = packages.map(x => x.strict());
       let aliases = getAliases(strictPackages);
-      let completedPackages = 0;
-      let text = () =>
-        `[${completedPackages}/${strictPackages.length}] building bundles`;
-      const spinner = ora(text()).start();
       await Promise.all(
-        strictPackages.map(pkg =>
-          retryableBuild(pkg, aliases).then(() => {
-            completedPackages++;
-            spinner.text = text();
-          })
-        )
+        strictPackages.map(pkg => retryableBuild(pkg, aliases))
       );
-      spinner.succeed("built bundles!");
     }
+    logger.success("built bundles!");
   } finally {
     destroyWorker();
   }
