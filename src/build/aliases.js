@@ -13,7 +13,7 @@ export function getAliases(
 ): Aliases {
   let aliases = {};
   packages.forEach(pkg => {
-    aliases[getKey(pkg.name)] = path.join(pkg.directory, "src", "index.js");
+    aliases[getKey(pkg.name)] = path.join(pkg.name, "src", "index.js");
   });
   return aliases;
 }

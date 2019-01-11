@@ -27,12 +27,7 @@ function getChildDeps(
     .filter(x => !doneDeps.includes(x))
     .forEach(key => {
       let pkgJson = unsafeRequire(
-        resolveFrom(
-          pkg.directory,
-          aliases[key] !== undefined
-            ? aliases[key].replace("src/index.js", "package.json")
-            : key + "/package.json"
-        )
+        resolveFrom(pkg.directory, key + "/package.json")
       );
 
       if (pkgJson.peerDependencies) {

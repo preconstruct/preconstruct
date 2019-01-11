@@ -57,6 +57,7 @@ test("basic", async () => {
 test("monorepo", async () => {
   let tmpPath = f.copy("monorepo");
   await initBasic(tmpPath);
+  await install(tmpPath);
   await build(tmpPath);
   let counter = 1;
   for (let pkg of ["package-one", "package-two"]) {
@@ -201,7 +202,6 @@ test("monorepo umd with dep on other module", async () => {
     throw new Error("unexpected question: " + question);
   });
   await install(tmpPath);
-
   await build(tmpPath);
 
   await snapshotDistFiles(path.join(tmpPath, "packages", "package-one"));
@@ -306,4 +306,16 @@ test("@babel/runtime and object-assign", async () => {
   await build(tmpPath);
 
   await snapshotDistFiles(tmpPath);
+});
+
+test("monorepo single package", async () => {
+  let tmpPath = f.copy("monorepo-single-package");
+  await initBasic(tmpPath);
+  await install(tmpPath);
+
+  await build(tmpPath);
+  let pkgPath = path.join(tmpPath, "packages", "package-two");
+  await snapshotDistFiles(pkgPath);
+
+  expect(unsafeRequire(pkgPath).default).toBe(2);
 });

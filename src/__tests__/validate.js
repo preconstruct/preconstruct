@@ -154,3 +154,25 @@ Array [
 ]
 `);
 });
+
+test("monorepo single package", async () => {
+  let tmpPath = f.copy("monorepo-single-package");
+
+  await validate(tmpPath);
+  expect(logMock.log.mock.calls).toMatchInlineSnapshot(`
+Array [
+  Array [
+    "🎁 info @some-scope/package-two-single-package",
+    "a valid entry point exists.",
+  ],
+  Array [
+    "🎁 info @some-scope/package-two-single-package",
+    "main field is valid",
+  ],
+  Array [
+    "🎁 success",
+    "package is valid!",
+  ],
+]
+`);
+});

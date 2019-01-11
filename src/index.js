@@ -23,10 +23,6 @@ export let aliases = {
     let pkgs = getPackages(cwd);
     return getAliases(pkgs, name => `^${name}$`);
   },
-  rollup(cwd: string = process.cwd()) {
-    let pkgs = getPackages(cwd);
-    return getAliases(pkgs);
-  },
   webpack(cwd: string = process.cwd()) {
     let pkgs = getPackages(cwd);
     return getAliases(pkgs, name => `${name}$`);

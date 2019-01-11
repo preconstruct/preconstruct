@@ -15,6 +15,7 @@ import { confirms } from "../messages";
 import rewriteCjsRuntimeHelpers from "../rollup-plugins/rewrite-cjs-runtime-helpers";
 import babel from "../rollup-plugins/babel";
 import prettier from "../rollup-plugins/prettier";
+
 import installPackages from "install-packages";
 import pLimit from "p-limit";
 import isCi from "is-ci";
@@ -50,18 +51,9 @@ function getChildPeerDeps(
     .forEach(key => {
       let pkgJson;
       try {
-        if (aliases[key] !== undefined) {
-          pkgJson = unsafeRequire(
-            resolveFrom(
-              pkg.directory,
-              aliases[key].replace("src/index.js", "package.json")
-            )
-          );
-        } else {
-          pkgJson = unsafeRequire(
-            resolveFrom(pkg.directory, key + "/package.json")
-          );
-        }
+        pkgJson = unsafeRequire(
+          resolveFrom(pkg.directory, key + "/package.json")
+        );
       } catch (err) {
         if (
           err.code === "MODULE_NOT_FOUND" &&
@@ -144,6 +136,12 @@ export let getRollupConfig = (
   if (type === "node-dev" || type === "node-prod") {
     external.push(...builtInModules);
   }
+
+  let rollupAliases = { ...aliases };
+
+  Object.keys(rollupAliases).forEach(key => {
+    rollupAliases[key] = resolveFrom(pkg.directory, rollupAliases[key]);
+  });
 
   const config = {
     input: pkg.source,
@@ -242,7 +240,7 @@ export let getRollupConfig = (
           "typeof window": JSON.stringify("object")
         }),
       rewriteCjsRuntimeHelpers(),
-      type === "umd" && alias(aliases),
+      type === "umd" && alias(rollupAliases),
       type === "umd" && resolve(),
       (type === "umd" || type === "node-prod") &&
         replace({

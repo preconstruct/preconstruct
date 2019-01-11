@@ -1,12 +1,12 @@
 {
-  "name": "monorepo",
+  "name": "monorepo-single-package",
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
   "private": true,
   "preconstruct": {
     "packages": [
-      "packages/*"
+      "packages/package-two"
     ]
   },
   "workspaces": [

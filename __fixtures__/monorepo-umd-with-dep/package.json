@@ -4,10 +4,15 @@
   "main": "index.js",
   "license": "MIT",
   "private": true,
-  "workspaces": ["packages/*"],
+  "workspaces": [
+    "packages/*"
+  ],
   "preconstruct": {
     "packages": [
       "packages/*"
-    ]
+    ],
+    "globals": {
+      "react": "React"
+    }
   }
 }

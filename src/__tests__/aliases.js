@@ -12,17 +12,13 @@ test("jest aliases", () => {
   expect(Object.keys(jestAliases)).toHaveLength(4);
 
   expect(jestAliases).toEqual({
-    "^@some-scope/package-one-umd-with-dep$": expect.stringContaining(
-      "__fixtures__/monorepo-umd-with-dep/packages/package-one/src/index.js"
-    ),
-    "^@some-scope/package-two-umd-with-dep$": expect.stringContaining(
-      "__fixtures__/monorepo-umd-with-dep/packages/package-two/src/index.js"
-    ),
-    "^@some-scope/package-three-umd-with-dep$": expect.stringContaining(
-      "__fixtures__/monorepo-umd-with-dep/packages/package-three/src/index.js"
-    ),
-    "^@some-scope/package-four-umd-with-dep$": expect.stringContaining(
-      "__fixtures__/monorepo-umd-with-dep/packages/package-four/src/index.js"
-    )
+    "^@some-scope/package-one-umd-with-dep$":
+      "@some-scope/package-one-umd-with-dep/src/index.js",
+    "^@some-scope/package-two-umd-with-dep$":
+      "@some-scope/package-two-umd-with-dep/src/index.js",
+    "^@some-scope/package-three-umd-with-dep$":
+      "@some-scope/package-three-umd-with-dep/src/index.js",
+    "^@some-scope/package-four-umd-with-dep$":
+      "@some-scope/package-four-umd-with-dep/src/index.js"
   });
 });
