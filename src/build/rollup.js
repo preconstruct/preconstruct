@@ -1,5 +1,4 @@
 // @flow
-const prettier = require("rollup-plugin-prettier");
 const resolve = require("rollup-plugin-node-resolve");
 const { terser } = require("rollup-plugin-terser");
 const alias = require("rollup-plugin-alias");
@@ -15,6 +14,7 @@ import { FatalError } from "../errors";
 import { confirms } from "../messages";
 import rewriteCjsRuntimeHelpers from "../rollup-plugins/rewrite-cjs-runtime-helpers";
 import babel from "../rollup-plugins/babel";
+import prettier from "../rollup-plugins/prettier";
 import installPackages from "install-packages";
 import pLimit from "p-limit";
 
@@ -250,21 +250,7 @@ export let getRollupConfig = (
         terser({
           mangle: false
         }),
-      type === "node-prod" &&
-        (() => {
-          // temporary hack, until mjeanroy/rollup-plugin-prettier#211 gets resolved
-          const prettierPlugin = prettier({ parser: "babylon" });
-          const { transformBundle } = prettierPlugin;
-          delete prettierPlugin.transformBundle;
-          prettierPlugin.renderChunk = function(
-            code,
-            chunkInfo,
-            outputOptions
-          ) {
-            return transformBundle.call(this, code, outputOptions);
-          };
-          return prettierPlugin;
-        })()
+      type === "node-prod" && prettier()
     ].filter(Boolean)
   };
 
