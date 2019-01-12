@@ -1,6 +1,5 @@
 // @flow
 const resolve = require("rollup-plugin-node-resolve");
-const { terser } = require("rollup-plugin-terser");
 const alias = require("rollup-plugin-alias");
 const cjs = require("rollup-plugin-commonjs");
 const replace = require("rollup-plugin-replace");
@@ -15,6 +14,7 @@ import { confirms } from "../messages";
 import rewriteCjsRuntimeHelpers from "../rollup-plugins/rewrite-cjs-runtime-helpers";
 import babel from "../rollup-plugins/babel";
 import prettier from "../rollup-plugins/prettier";
+import terser from "../rollup-plugins/terser";
 
 import installPackages from "install-packages";
 import pLimit from "p-limit";
