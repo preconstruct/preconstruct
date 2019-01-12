@@ -23,6 +23,23 @@ export let aliases = {
     let pkgs = getPackages(cwd);
     return getAliases(pkgs, name => `^${name}$`);
   },
+  rollup(cwd: string = process.cwd()) {
+    // why is this different to the other two?
+    // in the other two, we're able to be more strict
+    // about the paths that get matched
+    // but in rollup-plugin-alias we're not able to
+    // so we return the absolute path here
+    // why don't we always return the absolute path?
+    // because we want to be more strict about imports
+    // so a package can only be imported if it can be resolved
+    // through normal node_modules stuff
+    let pkgs = getPackages(cwd);
+    let rollupAliases = {};
+    pkgs.forEach(pkg => {
+      rollupAliases[pkg.name] = pkg.source;
+    });
+    return rollupAliases;
+  },
   webpack(cwd: string = process.cwd()) {
     let pkgs = getPackages(cwd);
     return getAliases(pkgs, name => `${name}$`);
