@@ -100,8 +100,6 @@ export function toUnsafeRollupConfig(config: RollupConfig): Object {
   return config;
 }
 
-let standardTerserOptions = isCi ? { numWorkers: 1 } : {};
-
 export type RollupConfigType =
   | "umd"
   | "browser"
@@ -252,10 +250,9 @@ export let getRollupConfig = (
         replace({
           "process.env.NODE_ENV": '"production"'
         }),
-      type === "umd" && terser(standardTerserOptions),
+      type === "umd" && terser(),
       type === "node-prod" &&
         terser({
-          ...standardTerserOptions,
           mangle: false
         }),
       type === "node-prod" && prettier()
