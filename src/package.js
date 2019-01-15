@@ -212,7 +212,8 @@ export class Package {
       let filenames = await globby(this.configPackages, {
         cwd: this.directory,
         onlyDirectories: true,
-        absolute: true
+        absolute: true,
+        expandDirectories: false
       });
 
       let packages = await Promise.all(
@@ -231,7 +232,8 @@ export class Package {
       let filenames = globby.sync(this.configPackages, {
         cwd: this.directory,
         onlyDirectories: true,
-        absolute: true
+        absolute: true,
+        expandDirectories: false
       });
       let packages = filenames.map(x => Package.createSync(x, this));
       return packages;
