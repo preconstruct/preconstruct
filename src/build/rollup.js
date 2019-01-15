@@ -134,9 +134,9 @@ export let getRollupConfig = (
 
   let rollupAliases = {};
 
-  Object.keys(alias).forEach(key => {
+  Object.keys(aliases).forEach(key => {
     try {
-      rollupAliases[key] = resolveFrom(pkg.directory, rollupAliases[key]);
+      rollupAliases[key] = resolveFrom(pkg.directory, aliases[key]);
     } catch (err) {
       if (err.code !== "MODULE_NOT_FOUND") {
         throw err;
