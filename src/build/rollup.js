@@ -18,7 +18,6 @@ import terser from "../rollup-plugins/terser";
 import { limit } from "../prompt";
 
 import installPackages from "install-packages";
-import isCi from "is-ci";
 
 // this makes sure nested imports of external packages are external
 const makeExternalPredicate = externalArr => {
