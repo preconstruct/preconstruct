@@ -142,6 +142,16 @@ export class Package {
   get configPackages(): Array<string> {
     return is(this.parent._config.packages, arrayOfString);
   }
+  // probably gonna be irrelevant later but i want it for now
+  get isBolt(): boolean {
+    // we only want to return true when there is bolt config
+    // AND no yarn workspaces config
+    // because emotion has a bolt config and yarn workspaces
+    // and if you have both, you probably want workspaces
+    let hasBolt = !!this.parent.json.bolt;
+    let hasYarnWorkspaces = !!this.parent.json.workspaces;
+    return hasBolt && !hasYarnWorkspaces;
+  }
 
   get umdMain(): string | null {
     return is(this.json["umd:main"], is.maybe(is.string));

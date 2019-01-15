@@ -15,9 +15,9 @@ import rewriteCjsRuntimeHelpers from "../rollup-plugins/rewrite-cjs-runtime-help
 import babel from "../rollup-plugins/babel";
 import prettier from "../rollup-plugins/prettier";
 import terser from "../rollup-plugins/terser";
+import { limit } from "../prompt";
 
 import installPackages from "install-packages";
-import pLimit from "p-limit";
 import isCi from "is-ci";
 
 // this makes sure nested imports of external packages are external
@@ -90,8 +90,6 @@ function getChildPeerDeps(
     });
 }
 
-let limit = pLimit(1);
-
 import type { RollupSingleFileBuild } from "./types";
 
 export let rollup: RollupConfig => Promise<RollupSingleFileBuild> = _rollup;
@@ -137,10 +135,16 @@ export let getRollupConfig = (
     external.push(...builtInModules);
   }
 
-  let rollupAliases = { ...aliases };
+  let rollupAliases = {};
 
-  Object.keys(rollupAliases).forEach(key => {
-    rollupAliases[key] = resolveFrom(pkg.directory, rollupAliases[key]);
+  Object.keys(alias).forEach(key => {
+    try {
+      rollupAliases[key] = resolveFrom(pkg.directory, rollupAliases[key]);
+    } catch (err) {
+      if (err.code !== "MODULE_NOT_FOUND") {
+        throw err;
+      }
+    }
   });
 
   const config = {
@@ -162,7 +166,8 @@ export let getRollupConfig = (
                   installPackages({
                     packages: ["object-assign"],
                     cwd: pkg.directory,
-                    installPeers: false
+                    installPeers: false,
+                    packageManager: pkg.isBolt ? "bolt" : undefined
                   })
                 );
                 await pkg.refresh();
@@ -186,7 +191,8 @@ export let getRollupConfig = (
                   installPackages({
                     packages: ["@babel/runtime"],
                     cwd: pkg.directory,
-                    installPeers: false
+                    installPeers: false,
+                    packageManager: pkg.isBolt ? "bolt" : undefined
                   })
                 );
                 await pkg.refresh();
