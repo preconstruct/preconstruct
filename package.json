@@ -16,7 +16,7 @@
     "release": "yarn build && npm publish && git push && git push --tags",
     "test": "jest"
   },
-  "repository": "https://github.com/mitchellhamilton/preconstruct",
+  "repository": "https://github.com/preconstruct/preconstruct",
   "license": "MIT",
   "dependencies": {
     "@babel/code-frame": "^7.0.0",
