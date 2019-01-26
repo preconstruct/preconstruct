@@ -27,7 +27,6 @@
     "@babel/preset-flow": "^7.0.0",
     "@babel/preset-react": "^7.0.0",
     "babel-plugin-codegen": "^3.0.0",
-    "babel-plugin-transform-import-object-assign": "^0.1.0",
     "builtin-modules": "^3.0.0",
     "chalk": "^2.3.2",
     "dataloader": "^1.4.0",
@@ -60,6 +59,7 @@
   },
   "devDependencies": {
     "@babel/cli": "^7.1.2",
+    "@babel/plugin-proposal-object-rest-spread": "^7.2.0",
     "@babel/runtime": "^7.2.0",
     "babel-core": "^7.0.0-bridge.0",
     "babel-eslint": "^10.0.1",

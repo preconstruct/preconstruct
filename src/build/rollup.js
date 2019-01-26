@@ -153,30 +153,6 @@ export let getRollupConfig = (
           break;
         }
         case "UNRESOLVED_IMPORT": {
-          if (warning.source === "object-assign") {
-            throw (async () => {
-              let shouldInstallObjectAssign = await confirms.shouldInstallObjectAssign(
-                pkg
-              );
-              if (shouldInstallObjectAssign) {
-                await limit(() =>
-                  installPackages({
-                    packages: ["object-assign"],
-                    cwd: pkg.directory,
-                    installPeers: false,
-                    packageManager: pkg.isBolt ? "bolt" : undefined
-                  })
-                );
-                await pkg.refresh();
-              } else {
-                throw new FatalError(
-                  `object-assign should be in dependencies of ${pkg.name}`,
-                  pkg
-                );
-              }
-            })();
-          }
-
           if (/^@babel\/runtime\/helpers\//.test(warning.source)) {
             throw (async () => {
               let shouldInstallBabelRuntime = await confirms.shouldInstallBabelRuntime(
@@ -225,16 +201,10 @@ export let getRollupConfig = (
           ],
           require.resolve("../babel-plugins/fix-dce-for-classes-with-statics"),
           [
-            require.resolve("@babel/plugin-proposal-object-rest-spread"),
-            { loose: true, useBuiltIns: type !== "umd" }
-          ],
-          [
             require.resolve("@babel/plugin-transform-runtime"),
             { useESModules: true }
-          ],
-          type !== "umd" &&
-            require.resolve("babel-plugin-transform-import-object-assign")
-        ].filter(Boolean)
+          ]
+        ]
       }),
       cjs(),
       (type === "browser" || type === "umd") &&

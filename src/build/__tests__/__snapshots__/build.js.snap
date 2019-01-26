@@ -1,56 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`@babel/runtime and object-assign: babel-runtime-and-object-assign.cjs.dev.js 1`] = `
-"'use strict';
-
-Object.defineProperty(exports, '__esModule', {
-  value: true
-});
-
-function _interopDefault(ex) {
-  return ex && typeof ex === 'object' && 'default' in ex ? ex['default'] : ex;
-}
-
-var _objectAssign = _interopDefault(require('object-assign'));
-
-let something = _objectAssign({}, {
-  something: true
-});
-
-class Bar {}
-
-class Foo extends Bar {}
-
-exports.something = something;
-exports.Foo = Foo;
-"
-`;
-
-exports[`@babel/runtime and object-assign: babel-runtime-and-object-assign.cjs.js 1`] = `
-"'use strict';
-
-if (process.env.NODE_ENV === \\"production\\") {
-  module.exports = require(\\"./babel-runtime-and-object-assign.cjs.prod.js\\");
-} else {
-  module.exports = require(\\"./babel-runtime-and-object-assign.cjs.dev.js\\");
-}
-"
-`;
-
-exports[`@babel/runtime and object-assign: babel-runtime-and-object-assign.cjs.prod.js 1`] = `
-"\\"use strict\\";
-function _interopDefault(ex) {
-  return ex && \\"object\\" == typeof ex && \\"default\\" in ex ? ex.default : ex;
-}
-Object.defineProperty(exports, \\"__esModule\\", { value: !0 });
-var _objectAssign = _interopDefault(require(\\"object-assign\\"));
-let something = _objectAssign({}, { something: !0 });
-class Bar {}
-class Foo extends Bar {}
-(exports.something = something), (exports.Foo = Foo);
-"
-`;
-
 exports[`@babel/runtime installed: babel-runtime-installed.cjs.dev.js 1`] = `
 "'use strict';
 
@@ -650,50 +599,6 @@ exports[`no module: no-module.cjs.prod.js 1`] = `
 Object.defineProperty(exports, \\"__esModule\\", { value: !0 });
 var index = \\"this does not have a module build\\";
 exports.default = index;
-"
-`;
-
-exports[`object-assign installed: object-assign-installed.cjs.dev.js 1`] = `
-"'use strict';
-
-Object.defineProperty(exports, '__esModule', {
-  value: true
-});
-
-function _interopDefault(ex) {
-  return ex && typeof ex === 'object' && 'default' in ex ? ex['default'] : ex;
-}
-
-var _objectAssign = _interopDefault(require('object-assign'));
-
-let something = _objectAssign({}, {
-  something: true
-});
-
-exports.something = something;
-"
-`;
-
-exports[`object-assign installed: object-assign-installed.cjs.js 1`] = `
-"'use strict';
-
-if (process.env.NODE_ENV === \\"production\\") {
-  module.exports = require(\\"./object-assign-installed.cjs.prod.js\\");
-} else {
-  module.exports = require(\\"./object-assign-installed.cjs.dev.js\\");
-}
-"
-`;
-
-exports[`object-assign installed: object-assign-installed.cjs.prod.js 1`] = `
-"\\"use strict\\";
-function _interopDefault(ex) {
-  return ex && \\"object\\" == typeof ex && \\"default\\" in ex ? ex.default : ex;
-}
-Object.defineProperty(exports, \\"__esModule\\", { value: !0 });
-var _objectAssign = _interopDefault(require(\\"object-assign\\"));
-let something = _objectAssign({}, { something: !0 });
-exports.something = something;
 "
 `;
 

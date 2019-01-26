@@ -94,16 +94,6 @@ test.skip("uses obj spread", async () => {
   }
 });
 
-test("object-assign installed", async () => {
-  let tmpPath = f.copy("object-assign-installed");
-
-  await install(tmpPath);
-
-  await build(tmpPath);
-
-  await snapshotDistFiles(tmpPath);
-});
-
 test("clears dist folder", async () => {
   let tmpPath = f.copy("already-has-things-in-dist");
 
@@ -298,8 +288,8 @@ test("@babel/runtime installed", async () => {
   await snapshotDistFiles(tmpPath);
 });
 
-test("@babel/runtime and object-assign", async () => {
-  let tmpPath = f.copy("babel-runtime-and-object-assign");
+test.skip("@babel/runtime", async () => {
+  let tmpPath = f.copy("babel-runtime-custom-babel");
 
   await install(tmpPath);
 
