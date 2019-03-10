@@ -1,5 +1,6 @@
 // @flow
 import { Package } from "./package";
+import { Entrypoint } from "./entrypoint";
 import path from "path";
 import { errors, successes, infos } from "./messages";
 import { FatalError } from "./errors";
@@ -17,43 +18,43 @@ import equal from "fast-deep-equal";
 // just does validation
 // used in build and watch
 
-export function validateEntrypoint(pkg: Package) {
+export function validateEntrypointSource(entrypoint: Entrypoint) {
   try {
-    require.resolve(path.join(pkg.directory, "src"));
+    require.resolve(path.join(entrypoint.directory, "src"));
   } catch (e) {
     if (e.code === "MODULE_NOT_FOUND") {
-      throw new FatalError(errors.noEntryPoint, pkg);
+      throw new FatalError(errors.noEntryPoint, entrypoint);
     }
     throw e;
   }
 }
 
-export function isMainFieldValid(pkg: Package) {
-  return pkg.main === getValidMainField(pkg);
+export function isMainFieldValid(entrypoint: Entrypoint) {
+  return entrypoint.main === getValidMainField(entrypoint);
 }
 
-export function isModuleFieldValid(pkg: Package) {
-  return pkg.module === getValidModuleField(pkg);
+export function isModuleFieldValid(entrypoint: Entrypoint) {
+  return entrypoint.module === getValidModuleField(entrypoint);
 }
 
-export function isUmdMainFieldValid(pkg: Package) {
-  return pkg.umdMain === getValidUmdMainField(pkg);
+export function isUmdMainFieldValid(entrypoint: Entrypoint) {
+  return entrypoint.umdMain === getValidUmdMainField(entrypoint);
 }
 
-export function isBrowserFieldValid(pkg: Package): boolean {
-  return equal(pkg.browser, getValidBrowserField(pkg));
+export function isBrowserFieldValid(entrypoint: Entrypoint): boolean {
+  return equal(entrypoint.browser, getValidBrowserField(entrypoint));
 }
 
-export function isReactNativeFieldValid(pkg: Package): boolean {
-  return equal(pkg.reactNative, getValidReactNativeField(pkg));
+export function isReactNativeFieldValid(entrypoint: Entrypoint): boolean {
+  return equal(entrypoint.reactNative, getValidReactNativeField(entrypoint));
 }
 
-export function isUmdNameSpecified(pkg: Package) {
-  return pkg._config.umdName !== null;
+export function isUmdNameSpecified(entrypoint: Entrypoint) {
+  return entrypoint._config.umdName !== null;
 }
 
-export function validatePackage(pkg: Package, log: boolean) {
-  validateEntrypoint(pkg);
+export function validateEntrypoint(entrypoint: Entrypoint, log: boolean) {
+  validateEntrypoint(entrypoint);
   if (log) {
     logger.info(infos.validEntrypoint, pkg);
   }

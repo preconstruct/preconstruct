@@ -1,59 +1,61 @@
 // @flow
-import { Package } from "./package";
+import { Entrypoint } from "./entrypoint";
 
 export function getNameForDist(name: string): string {
   return name.replace(/.*\//, "");
 }
 
-export function getValidMainField(pkg: Package) {
-  let nameForDist = getNameForDist(pkg.name);
+export function getValidMainField(entrypoint: Entrypoint) {
+  let nameForDist = getNameForDist(entrypoint.pkg.name);
   return `dist/${nameForDist}.cjs.js`;
 }
 
-export function getValidModuleField(pkg: Package) {
-  let nameForDist = getNameForDist(pkg.name);
+export function getValidModuleField(entrypoint: Entrypoint) {
+  let nameForDist = getNameForDist(entrypoint.pkg.name);
   return `dist/${nameForDist}.esm.js`;
 }
 
-export function getValidCjsBrowserPath(pkg: Package) {
-  return getValidMainField(pkg).replace("cjs", "browser.cjs");
+export function getValidCjsBrowserPath(entrypoint: Entrypoint) {
+  return getValidMainField(entrypoint).replace("cjs", "browser.cjs");
 }
 
-export function getValidModuleBrowserPath(pkg: Package) {
-  return getValidModuleField(pkg).replace("esm", "browser.esm");
+export function getValidModuleBrowserPath(entrypoint: Entrypoint) {
+  return getValidModuleField(entrypoint).replace("esm", "browser.esm");
 }
 
-export function getValidCjsReactNativePath(pkg: Package) {
-  return getValidMainField(pkg).replace("cjs", "native.cjs");
+export function getValidCjsReactNativePath(entrypoint: Entrypoint) {
+  return getValidMainField(entrypoint).replace("cjs", "native.cjs");
 }
 
-export function getValidModuleReactNativePath(pkg: Package) {
-  return getValidModuleField(pkg).replace("esm", "native.esm");
+export function getValidModuleReactNativePath(entrypoint: Entrypoint) {
+  return getValidModuleField(entrypoint).replace("esm", "native.esm");
 }
 
-export function getValidBrowserField(pkg: Package) {
+export function getValidBrowserField(entrypoint: Entrypoint) {
   let obj = {
-    [`./${getValidMainField(pkg)}`]: "./" + getValidCjsBrowserPath(pkg)
+    [`./${getValidMainField(entrypoint)}`]:
+      "./" + getValidCjsBrowserPath(entrypoint)
   };
-  if (pkg.module !== null) {
-    obj[`./${getValidModuleField(pkg)}`] =
-      "./" + getValidModuleBrowserPath(pkg);
+  if (entrypoint.module !== null) {
+    obj[`./${getValidModuleField(entrypoint)}`] =
+      "./" + getValidModuleBrowserPath(entrypoint);
   }
   return obj;
 }
 
-export function getValidReactNativeField(pkg: Package) {
+export function getValidReactNativeField(entrypoint: Entrypoint) {
   let obj = {
-    [`./${getValidMainField(pkg)}`]: "./" + getValidCjsReactNativePath(pkg)
+    [`./${getValidMainField(entrypoint)}`]:
+      "./" + getValidCjsReactNativePath(entrypoint)
   };
-  if (pkg.module !== null) {
-    obj[`./${getValidModuleField(pkg)}`] =
-      "./" + getValidModuleReactNativePath(pkg);
+  if (entrypoint.module !== null) {
+    obj[`./${getValidModuleField(entrypoint)}`] =
+      "./" + getValidModuleReactNativePath(entrypoint);
   }
   return obj;
 }
 
-export function getValidUmdMainField(pkg: Package) {
-  let nameForDist = getNameForDist(pkg.name);
+export function getValidUmdMainField(entrypoint: Entrypoint) {
+  let nameForDist = getNameForDist(entrypoint.pkg.name);
   return `dist/${nameForDist}.umd.min.js`;
 }
