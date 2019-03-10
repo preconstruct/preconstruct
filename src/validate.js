@@ -1,6 +1,5 @@
 // @flow
 import { Package } from "./package";
-import path from "path";
 import { errors, successes, infos } from "./messages";
 import { FatalError } from "./errors";
 import {
@@ -19,9 +18,11 @@ import equal from "fast-deep-equal";
 
 export function validateEntrypoint(pkg: Package) {
   try {
-    require.resolve(path.join(pkg.directory, "src"));
+    pkg.entrypoints("absolute", "absolute");
   } catch (e) {
     if (e.code === "MODULE_NOT_FOUND") {
+      // TODO: improve this error message since
+      // it's inaccurate now
       throw new FatalError(errors.noEntryPoint, pkg);
     }
     throw e;
