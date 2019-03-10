@@ -1,16 +1,16 @@
 # Alternative entrypoints proposal
 
-> not 100% sure about the name entrypoints but it's the best name i've got so far
+> not 100% sure about the name entrypoints but it's the best name I've got so far
 
 ## What problem is this proposal addressing?
 
-You have a package and you want people to be able to import from multiple different entry points in the package. e.g. `react-dom` and `react-dom/server`
+You have a package, and you want people to be able to import from multiple different entry points in the package. e.g. `react-dom` and `react-dom/server`
 
 ## Concepts
 
-After this proposal, there will be a new concept in preconstruct, an entrypoint. This proposal also creates a clear distinction between projects and packages which wasn't there previously. Note that all of these concepts are represented by package.jsons, in some projects all three concepts will be in a single package.json, in some projects, they will all be represented by different package.jsons or somewhere in between.
+After this proposal, there will be a new concept in preconstruct, an entrypoint. This proposal also creates a clear distinction between projects and packages which wasn't there previously. Note that all of these concepts are represented by package.jsons, in some projects all three concepts will be in a single package.json; in some projects, they will all be represented by different package.jsons or somewhere in between.
 
-There are some options which will cascade from projects down to packages and from packages to entrypoints. Currently the only option like this is `globals` which is what specifies the global names for peerDependencies which are excluded in UMD builds and thus preconstruct has to know the global names for.
+There are some options which will cascade from projects down to packages and from packages to entrypoints. Currently, the only option like this is `globals` which is what specifies the global names for peerDependencies which are excluded in UMD builds and thus preconstruct has to know the global names.
 
 ### Projects
 
@@ -18,7 +18,7 @@ Projects are the largest unit in preconstruct. In a monorepo, the options for th
 
 ### Packages
 
-Preconstruct packages map 1:1 with npm packages and are composed of a number of entrypoints. The entrypoints are defined with the `entrypoints` option in a package's preconstruct config. The `entrypoints` option can be specified as a glob. Packages are also responsible for specifying dependencies which is important for bundling UMD bundles and ensuring that packages will have all of their required dependencies when installed through npm.
+Preconstruct packages map 1:1 with npm packages and are composed of a number of entrypoints. The entrypoints are defined with the `entrypoints` option in a package's preconstruct config. The option is an array of globs which lead to entrypoints. Packages are also responsible for specifying dependencies which is important for bundling UMD bundles and ensuring that packages will have all of their required dependencies when installed through npm.
 
 ### Entrypoints
 
@@ -26,7 +26,7 @@ Entrypoints are the lowest level concept and represent a set of bundles for a pa
 
 ## Examples
 
-Note that all of these examples are for single package repos because the examples don't really change with monorepos, the only difference is that the root package.json specifies the preconstruct packages and that already works. This also doesn't show UMD or module builds for the simplicity of these examples but UMD and module builds will also work.
+Note that all of these examples are for single package repos because the examples don't really change with monorepos, the only difference is that the root package.json specifies the preconstruct packages and that already works. The examples also don't show UMD or module builds for the simplicity of these examples but UMD and module builds will also work.
 
 ### Single package repo custom source
 
@@ -195,10 +195,10 @@ exports.multiply = (a, b) => (0, common).identity(a * b);
 
 In two words, common dependencies.
 
-Let's say we have module A, B and C. Module A and B are entrypoints and they both depend on C. You don't want module C to be duplicated in both A and B, module C should be in it's own bundle which should be imported by modules A and B. Because of this, we need both the concepts so that preconstruct can know where package boundaries are and thus where to bundle.
+Let's say we have module A, B and C. Module A and B are entrypoints and they both depend on C. You don't want module C to be duplicated in both A and B. Module C should be in it's own bundle which should be imported by modules A and B. Because of this, we need both the concepts so that preconstruct can know where package boundaries are and thus where to bundle.
 
 ## Open Questions
 
 ### Will there be a single dist folder with all the bundles in a single package or a dist folder per entrypoint?
 
-I'm not sure about this and I think it's not worth thinking about until implementing this because this is probably dependant on how rollup works and other things I haven't yet considered and it doesn't really affect consumers.
+I'm not sure about this, and I think it's not worth thinking about until implementing this because this is probably dependant on how rollup works and other things I haven't yet considered, and it doesn't affect consumers.
