@@ -6,7 +6,7 @@ The entrypoints config would essentially default to
 {
   "preconstruct": {
     "entrypoints": {
-      "src": "."
+      ".": "src"
     }
   }
 }
@@ -16,7 +16,7 @@ The entrypoints config would essentially default to
 {
   "preconstruct": {
     "entrypoints": {
-      "src/something": "something"
+      "something": "src/something"
     }
   }
 }
