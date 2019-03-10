@@ -1,0 +1,38 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`monorepo: non-default-src.cjs.dev.js 1`] = `
+"'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+let wow = \\"something\\";
+exports.wow = wow;
+"
+`;
+
+exports[`monorepo: non-default-src.cjs.js 1`] = `
+"'use strict';
+
+if (process.env.NODE_ENV === \\"production\\") {
+  module.exports = require(\\"./non-default-src.cjs.prod.js\\");
+} else {
+  module.exports = require(\\"./non-default-src.cjs.dev.js\\");
+}
+"
+`;
+
+exports[`monorepo: non-default-src.cjs.prod.js 1`] = `
+"\\"use strict\\";
+Object.defineProperty(exports, \\"__esModule\\", { value: !0 });
+let wow = \\"something\\";
+exports.wow = wow;
+"
+`;
+
+exports[`monorepo: non-default-src.esm.js 1`] = `
+"let wow = \\"something\\";
+
+export { wow };
+"
+`;

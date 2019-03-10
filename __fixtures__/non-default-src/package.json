@@ -1,0 +1,12 @@
+{
+  "name": "non-default-src",
+  "version": "1.0.0",
+  "main": "dist/non-default-src.cjs.js",
+  "license": "MIT",
+  "private": true,
+  "preconstruct": {
+    "entrypoints": {
+      ".": "modules"
+    }
+  }
+}
