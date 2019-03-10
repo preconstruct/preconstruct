@@ -64,7 +64,7 @@
     "eslint": "^5.8.0",
     "eslint-plugin-prettier": "^3.0.0",
     "fixturez": "^1.1.0",
-    "flow-bin": "^0.85.0",
+    "flow-bin": "^0.94.0",
     "jest": "^24.0.0",
     "jest-in-case": "^1.0.2",
     "jest-junit": "^6.1.0",
