@@ -1,0 +1,11 @@
+{
+  "name": "non-default-src",
+  "version": "1.0.0",
+  "license": "MIT",
+  "private": true,
+  "preconstruct": {
+    "entrypoints": {
+      "something": "src"
+    }
+  }
+}

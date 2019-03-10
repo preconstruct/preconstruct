@@ -7,7 +7,7 @@ jest.mock("../../prompt");
 
 const f = fixturez(__dirname);
 
-test("monorepo", async () => {
+test("non default src", async () => {
   let tmpPath = f.copy("non-default-src");
   await initBasic(tmpPath);
   await build(tmpPath);
