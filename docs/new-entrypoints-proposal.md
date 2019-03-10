@@ -4,11 +4,11 @@
 
 ## What problem is this proposal addressing?
 
-The entrypoints
+You have a package and you want people to be able to import from multiple different entry points in the package. e.g. `react-dom` and `react-dom/server`
 
 ## Concepts
 
-After this proposal, there will be a new concept in preconstruct, an entrypoint. This proposal also creates a clear distinction between projects and packages. Note that all of these concepts are represented by package.jsons, in some projects all three concepts will be in a single package.json, in some projects, they will all be represented by different package.jsons or somewhere in between.
+After this proposal, there will be a new concept in preconstruct, an entrypoint. This proposal also creates a clear distinction between projects and packages which wasn't there previously. Note that all of these concepts are represented by package.jsons, in some projects all three concepts will be in a single package.json, in some projects, they will all be represented by different package.jsons or somewhere in between.
 
 There are some options which will cascade from projects down to packages and from packages to entrypoints. Currently the only option like this is `globals` which is what specifies the global names for peerDependencies which are excluded in UMD builds and thus preconstruct has to know the global names for.
 
