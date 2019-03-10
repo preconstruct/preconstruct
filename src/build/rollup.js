@@ -145,7 +145,7 @@ export let getRollupConfig = (
   });
 
   const config = {
-    input: pkg.source,
+    input: Object.values(pkg.entrypoints("package", "absolute")),
     external: makeExternalPredicate(external),
     onwarn: (warning: *) => {
       switch (warning.code) {

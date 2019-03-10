@@ -20,7 +20,10 @@ function getAbsoluteAliases(cwd, converter = x => x) {
   let pkgs = getPackages(cwd);
   let aliases = {};
   pkgs.forEach(pkg => {
-    aliases[converter(pkg.name)] = pkg.source;
+    let pkgEntrypoints = pkg.entrypoints("package", "absolute");
+    Object.keys(pkgEntrypoints).forEach(entry => {
+      aliases[converter(entry)] = pkgEntrypoints[entry];
+    });
   });
   return aliases;
 }

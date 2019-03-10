@@ -22,6 +22,12 @@ let arrayOfString = is.arrayOf(is.string);
 
 let askGlobalLimit = pLimit(1);
 
+type ResolvingType =
+  // e.g. /.../emotion/packages/core to /.../emotion/packages/core/src/index.js
+  | "absolute"
+  // e.g. @emotion/core to @emotion/core/src/index.js
+  | "package";
+
 export class Package {
   json: Object;
   parent: Package;
@@ -159,8 +165,39 @@ export class Package {
   set umdMain(path: string) {
     this.json["umd:main"] = path;
   }
-  get source(): string {
-    return nodePath.join(this.directory, "src", "index.js");
+  get rawEntrypoints(): { [string]: string } {
+    return is(
+      this._config.entrypoints,
+      is.default(is.objectOf(is.string), {
+        ".": "src"
+      })
+    );
+  }
+  entrypoints(
+    entryResolvingType: ResolvingType,
+    srcResolvingType: ResolvingType
+  ): { [string]: string } {
+    let entrypoints = this.rawEntrypoints;
+    let resolvedEntrypoints = {};
+    let resolvingPaths = { absolute: this.directory, package: this.name };
+
+    Object.keys(entrypoints).map(entrypoint => {
+      let resolvedEntry = resolveFrom(
+        this.directory,
+        "./" + nodePath.join(".", entrypoints[entrypoint])
+      );
+      let relativeResolvedEntry = nodePath.relative(
+        this.directory,
+        resolvedEntry
+      );
+      resolvedEntrypoints[
+        nodePath.join(resolvingPaths[entryResolvingType], entrypoint)
+      ] = nodePath.join(
+        resolvingPaths[srcResolvingType],
+        relativeResolvedEntry
+      );
+    });
+    return resolvedEntrypoints;
   }
   addGlobal(pkg: string, name: string) {
     if (!this.parent._config.globals) {
