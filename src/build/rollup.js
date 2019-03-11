@@ -6,7 +6,7 @@ const replace = require("rollup-plugin-replace");
 const resolveFrom = require("resolve-from");
 const chalk = require("chalk");
 import builtInModules from "builtin-modules";
-import { StrictPackage } from "../package";
+import { Package } from "../package";
 import { rollup as _rollup } from "rollup";
 import type { Aliases } from "./aliases";
 import { FatalError } from "../errors";
@@ -43,7 +43,7 @@ function getChildPeerDeps(
   depKeys: Array<string>,
   doneDeps: Array<string>,
   aliases: Aliases,
-  pkg: StrictPackage
+  pkg: Package
 ) {
   depKeys
     .filter(x => !doneDeps.includes(x))
@@ -107,7 +107,7 @@ export type RollupConfigType =
   | "react-native";
 
 export let getRollupConfig = (
-  pkg: StrictPackage,
+  pkg: Package,
   aliases: Aliases,
   type: RollupConfigType
 ): RollupConfig => {
@@ -145,7 +145,7 @@ export let getRollupConfig = (
   });
 
   const config = {
-    input: pkg.source,
+    input: pkg.entrypoints.map(x => x.strict())[0].source,
     external: makeExternalPredicate(external),
     onwarn: (warning: *) => {
       switch (warning.code) {

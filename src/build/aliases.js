@@ -1,6 +1,6 @@
 // @flow
 
-import { StrictPackage } from "../package";
+import { Project } from "../project";
 import path from "path";
 
 export type Aliases = {
@@ -8,12 +8,19 @@ export type Aliases = {
 };
 
 export function getAliases(
-  packages: Array<StrictPackage>,
+  project: Project,
   getKey: string => string = x => x
 ): Aliases {
   let aliases = {};
-  packages.forEach(pkg => {
-    aliases[getKey(pkg.name)] = path.join(pkg.name, "src", "index.js");
+  project.packages.forEach(pkg => {
+    pkg.entrypoints
+      .map(x => x.strict())
+      .forEach(entrypoint => {
+        aliases[getKey(entrypoint.name)] = path.join(
+          pkg.name,
+          path.relative(entrypoint.directory, entrypoint.source)
+        );
+      });
   });
   return aliases;
 }

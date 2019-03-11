@@ -6,17 +6,18 @@
 // used for bundling will be used for aliasing
 import { Project } from "./project";
 
-function getPackages(cwd) {
-  let project = Project.createSync(cwd);
-  return project.packages.map(x => x.strict());
-}
-
 function getAbsoluteAliases(cwd, converter = x => x) {
-  let pkgs = getPackages(cwd);
+  let project = Project.createSync(cwd);
   let aliases = {};
-  pkgs.forEach(pkg => {
-    aliases[converter(pkg.name)] = pkg.source;
+
+  project.packages.forEach(pkg => {
+    pkg.entrypoints
+      .map(x => x.strict())
+      .forEach(entrypoint => {
+        aliases[converter(entrypoint.name)] = entrypoint.source;
+      });
   });
+
   return aliases;
 }
 

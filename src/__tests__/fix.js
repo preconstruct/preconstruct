@@ -92,7 +92,7 @@ Object {
 `);
 });
 
-test("does modify if already valid", async () => {
+test("does not modify if already valid", async () => {
   let tmpPath = f.copy("valid-package");
   let original = await getPkg(tmpPath);
 

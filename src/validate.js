@@ -1,6 +1,6 @@
 // @flow
 import { Project } from "./project";
-import { Package } from "./package";
+import { Entrypoint } from "./entrypoint";
 import path from "path";
 import { errors, successes, infos } from "./messages";
 import { FatalError } from "./errors";
@@ -18,86 +18,92 @@ import equal from "fast-deep-equal";
 // just does validation
 // used in build and watch
 
-export function validateEntrypoint(pkg: Package) {
+export function validateEntrypointSource(entrypoint: Entrypoint) {
   try {
-    require.resolve(path.join(pkg.directory, "src"));
+    require.resolve(path.join(entrypoint.directory, "src"));
   } catch (e) {
     if (e.code === "MODULE_NOT_FOUND") {
-      throw new FatalError(errors.noEntryPoint, pkg);
+      throw new FatalError(errors.noEntryPoint, entrypoint);
     }
     throw e;
   }
 }
 
-export function isMainFieldValid(pkg: Package) {
-  return pkg.main === getValidMainField(pkg);
+export function isMainFieldValid(entrypoint: Entrypoint) {
+  return entrypoint.main === getValidMainField(entrypoint);
 }
 
-export function isModuleFieldValid(pkg: Package) {
-  return pkg.module === getValidModuleField(pkg);
+export function isModuleFieldValid(entrypoint: Entrypoint) {
+  return entrypoint.module === getValidModuleField(entrypoint);
 }
 
-export function isUmdMainFieldValid(pkg: Package) {
-  return pkg.umdMain === getValidUmdMainField(pkg);
+export function isUmdMainFieldValid(entrypoint: Entrypoint) {
+  return entrypoint.umdMain === getValidUmdMainField(entrypoint);
 }
 
-export function isBrowserFieldValid(pkg: Package): boolean {
-  return equal(pkg.browser, getValidBrowserField(pkg));
+export function isBrowserFieldValid(entrypoint: Entrypoint): boolean {
+  return equal(entrypoint.browser, getValidBrowserField(entrypoint));
 }
 
-export function isReactNativeFieldValid(pkg: Package): boolean {
-  return equal(pkg.reactNative, getValidReactNativeField(pkg));
+export function isReactNativeFieldValid(entrypoint: Entrypoint): boolean {
+  return equal(entrypoint.reactNative, getValidReactNativeField(entrypoint));
 }
 
-export function isUmdNameSpecified(pkg: Package) {
-  return pkg._config.umdName !== null;
+export function isUmdNameSpecified(entrypoint: Entrypoint) {
+  return entrypoint._config.umdName !== null;
 }
 
-export function validatePackage(pkg: Package, log: boolean) {
-  validateEntrypoint(pkg);
+export function validateEntrypoint(entrypoint: Entrypoint, log: boolean) {
+  validateEntrypointSource(entrypoint);
   if (log) {
-    logger.info(infos.validEntrypoint, pkg);
+    logger.info(infos.validEntrypoint, entrypoint);
   }
-  if (!isMainFieldValid(pkg)) {
-    throw new FatalError(errors.invalidMainField, pkg);
+  if (!isMainFieldValid(entrypoint)) {
+    throw new FatalError(errors.invalidMainField, entrypoint);
   }
   if (log) {
-    logger.info(infos.validMainField, pkg);
+    logger.info(infos.validMainField, entrypoint);
   }
-  if (pkg.module !== null) {
-    if (isModuleFieldValid(pkg)) {
+  if (entrypoint.module !== null) {
+    if (isModuleFieldValid(entrypoint)) {
       if (log) {
-        logger.info(infos.validModuleField, pkg);
+        logger.info(infos.validModuleField, entrypoint);
       }
     } else {
-      throw new FatalError(errors.invalidMainField, pkg);
+      throw new FatalError(errors.invalidMainField, entrypoint);
     }
   }
-  if (pkg.umdMain !== null) {
-    if (isUmdMainFieldValid(pkg)) {
-      if (isUmdNameSpecified(pkg)) {
+  if (entrypoint.umdMain !== null) {
+    if (isUmdMainFieldValid(entrypoint)) {
+      if (isUmdNameSpecified(entrypoint)) {
         if (log) {
-          logger.info(infos.validUmdMainField, pkg);
+          logger.info(infos.validUmdMainField, entrypoint);
         }
       } else {
-        throw new FatalError(errors.umdNameNotSpecified, pkg);
+        throw new FatalError(errors.umdNameNotSpecified, entrypoint);
       }
     } else {
-      throw new FatalError(errors.invalidUmdMainField, pkg);
+      throw new FatalError(errors.invalidUmdMainField, entrypoint);
     }
   }
-  if (pkg.browser !== null) {
-    if (typeof pkg.browser === "string" || !isBrowserFieldValid(pkg)) {
-      throw new FatalError(errors.invalidBrowserField, pkg);
+  if (entrypoint.browser !== null) {
+    if (
+      typeof entrypoint.browser === "string" ||
+      !isBrowserFieldValid(entrypoint)
+    ) {
+      throw new FatalError(errors.invalidBrowserField, entrypoint);
     } else if (log) {
-      logger.info(infos.validBrowserField, pkg);
+      logger.info(infos.validBrowserField, entrypoint);
     }
   }
-  if (pkg.reactNative !== null) {
-    if (typeof pkg.reactNative === "string" || !isReactNativeFieldValid(pkg)) {
-      throw new FatalError(errors.invalidReactNativeField, pkg);
+  if (entrypoint.reactNative !== null) {
+    if (
+      typeof entrypoint.reactNative === "string" ||
+      !isReactNativeFieldValid(entrypoint)
+    ) {
+      throw new FatalError(errors.invalidReactNativeField, entrypoint);
     } else if (log) {
-      logger.info(infos.validReactNativeField, pkg);
+      logger.info(infos.validReactNativeField, entrypoint);
     }
   }
 }
@@ -106,7 +112,9 @@ export default async function validate(directory: string) {
   let project = await Project.create(directory);
 
   for (let pkg of project.packages) {
-    validatePackage(pkg, true);
+    for (let entrypoint of pkg.entrypoints) {
+      validateEntrypoint(entrypoint, true);
+    }
   }
 
   logger.success(successes.validPackage);

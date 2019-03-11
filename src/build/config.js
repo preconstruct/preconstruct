@@ -1,5 +1,5 @@
 // @flow
-import { StrictPackage } from "../package";
+import { Package } from "../package";
 import path from "path";
 import { type RollupConfig, getRollupConfig } from "./rollup";
 import type { OutputOptions } from "./types";
@@ -21,7 +21,7 @@ function getChildDeps(
   depKeys: Array<string>,
   doneDeps: Array<string>,
   aliases: Aliases,
-  pkg: StrictPackage
+  pkg: Package
 ) {
   depKeys
     .filter(x => !doneDeps.includes(x))
@@ -46,7 +46,7 @@ function getChildDeps(
     });
 }
 
-function getGlobals(pkg: StrictPackage, aliases) {
+function getGlobals(pkg: Package, aliases) {
   let stuff = [];
 
   if (pkg.peerDependencies) {
@@ -72,25 +72,27 @@ function getGlobals(pkg: StrictPackage, aliases) {
   }, {});
 }
 
-export function getRollupConfigs(pkg: StrictPackage, aliases: Aliases) {
+export function getRollupConfigs(pkg: Package, aliases: Aliases) {
   let configs: Array<{
     config: RollupConfig,
     outputs: Array<OutputOptions>
   }> = [];
+
+  let entry = pkg.entrypoints[0].strict();
 
   configs.push({
     config: getRollupConfig(pkg, aliases, "node-dev"),
     outputs: [
       {
         format: "cjs",
-        file: path.join(pkg.directory, getDevPath(pkg.main)),
+        file: path.join(entry.directory, getDevPath(entry.main)),
         exports: "named"
       },
-      ...(pkg.module
+      ...(entry.module
         ? [
             {
               format: "es",
-              file: path.join(pkg.directory, pkg.module)
+              file: path.join(entry.directory, entry.module)
             }
           ]
         : [])
@@ -101,21 +103,21 @@ export function getRollupConfigs(pkg: StrictPackage, aliases: Aliases) {
     outputs: [
       {
         format: "cjs",
-        file: path.join(pkg.directory, getProdPath(pkg.main)),
+        file: path.join(entry.directory, getProdPath(entry.main)),
         exports: "named"
       }
     ]
   });
-  let { umdMain } = pkg;
+  let { umdMain } = entry;
   if (umdMain !== null) {
-    let umdName = is(pkg._config.umdName, is.string);
+    let umdName = is(entry._config.umdName, is.string);
     configs.push({
       config: getRollupConfig(pkg, aliases, "umd"),
       outputs: [
         {
           format: "umd",
           sourcemap: true,
-          file: path.join(pkg.directory, umdMain),
+          file: path.join(entry.directory, umdMain),
           name: umdName,
           globals: getGlobals(pkg, aliases)
         }
@@ -123,35 +125,35 @@ export function getRollupConfigs(pkg: StrictPackage, aliases: Aliases) {
     });
   }
 
-  if (pkg.browser !== null) {
+  if (entry.browser !== null) {
     configs.push({
       config: getRollupConfig(pkg, aliases, "browser"),
       outputs: [
         {
           format: "cjs",
-          file: path.join(pkg.directory, getValidCjsBrowserPath(pkg)),
+          file: path.join(entry.directory, getValidCjsBrowserPath(entry)),
           exports: "named"
         },
         {
           format: "es",
-          file: path.join(pkg.directory, getValidModuleBrowserPath(pkg))
+          file: path.join(entry.directory, getValidModuleBrowserPath(entry))
         }
       ]
     });
   }
 
-  if (pkg.reactNative !== null) {
+  if (entry.reactNative !== null) {
     configs.push({
       config: getRollupConfig(pkg, aliases, "react-native"),
       outputs: [
         {
           format: "cjs",
-          file: path.join(pkg.directory, getValidCjsReactNativePath(pkg)),
+          file: path.join(entry.directory, getValidCjsReactNativePath(entry)),
           exports: "named"
         },
         {
           format: "es",
-          file: path.join(pkg.directory, getValidModuleReactNativePath(pkg))
+          file: path.join(entry.directory, getValidModuleReactNativePath(entry))
         }
       ]
     });
