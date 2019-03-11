@@ -1,7 +1,6 @@
 // @flow
 import { Project } from "./project";
 import { Entrypoint } from "./entrypoint";
-import path from "path";
 import { errors, successes, infos } from "./messages";
 import { FatalError } from "./errors";
 import {
@@ -20,7 +19,7 @@ import equal from "fast-deep-equal";
 
 export function validateEntrypointSource(entrypoint: Entrypoint) {
   try {
-    require.resolve(path.join(entrypoint.directory, "src"));
+    require.resolve(entrypoint.source);
   } catch (e) {
     if (e.code === "MODULE_NOT_FOUND") {
       throw new FatalError(errors.noEntryPoint, entrypoint);

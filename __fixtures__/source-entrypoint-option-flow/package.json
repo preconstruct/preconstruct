@@ -1,0 +1,10 @@
+{
+  "name": "source-entrypoint-option-flow",
+  "version": "1.0.0",
+  "main": "dist/source-entrypoint-option-flow.cjs.js",
+  "license": "MIT",
+  "private": true,
+  "preconstruct": {
+    "source": "modules"
+  }
+}
