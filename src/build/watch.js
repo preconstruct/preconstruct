@@ -65,14 +65,16 @@ async function watchPackage(pkg: Package, aliases: Aliases) {
       }
 
       case "BUNDLE_END": {
-        writeOtherFiles(
-          pkg,
-          event.result.modules[0].originalCode.includes("@flow")
-            ? Object.keys(event.result.exports).includes("default")
-              ? "all"
-              : "named"
-            : false
-        );
+        pkg.entrypoints.forEach(entrypoint => {
+          writeOtherFiles(
+            entrypoint.strict(),
+            event.result.modules[0].originalCode.includes("@flow")
+              ? Object.keys(event.result.exports).includes("default")
+                ? "all"
+                : "named"
+              : false
+          );
+        });
 
         info(
           chalk.green(

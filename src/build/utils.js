@@ -11,6 +11,7 @@ export function getProdPath(cjsPath: string) {
   return cjsPath.replace(/\.js$/, ".prod.js");
 }
 
+// TODO: consider putting this into rollup somehow
 export function writeOtherFiles(
   entrypoint: StrictEntrypoint,
   flowMode: "named" | "all" | false
