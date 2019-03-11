@@ -79,12 +79,11 @@ export default async function build(directory: string) {
   try {
     createWorker();
 
-    let { packages } = await Project.create(directory);
+    let project: Project = await Project.create(directory);
 
     logger.info("building bundles!");
 
-    let strictPackages = packages.map(x => x.strict());
-    let aliases = getAliases(strictPackages);
+    let aliases = getAliases(project);
     await Promise.all(strictPackages.map(pkg => retryableBuild(pkg, aliases)));
 
     logger.success("built bundles!");

@@ -11,8 +11,10 @@ export class Entrypoint extends Item {
   package: Package;
 
   get name(): string {
-    // TODO: add info about the specific entrypoint
-    return this.package.name;
+    return nodePath.join(
+      this.package.name,
+      nodePath.relative(this.package.directory, this.directory)
+    );
   }
 
   get main(): string | null {
