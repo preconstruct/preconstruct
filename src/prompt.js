@@ -4,6 +4,8 @@ import pLimit from "p-limit";
 /*::
 // this has to be in a comment because dependency import order reasons...
 import { Package } from "./package";
+import { Project } from "./project";
+
 */
 import DataLoader from "dataloader";
 import chalk from "chalk";
@@ -12,7 +14,7 @@ export let limit = pLimit(1);
 
 // there might be a simpler solution to this than using dataloader but it works so ¯\_(ツ)_/¯
 
-type ItemUnion = Package;
+type ItemUnion = Package | Project;
 
 let prefix = `🎁 ${chalk.green("?")}   `;
 

@@ -1,4 +1,5 @@
 // @flow
+import { Project } from "./project";
 import { Package } from "./package";
 import path from "path";
 import { errors, successes, infos } from "./messages";
@@ -102,15 +103,10 @@ export function validatePackage(pkg: Package, log: boolean) {
 }
 
 export default async function validate(directory: string) {
-  let pkg = await Package.create(directory);
+  let project = await Project.create(directory);
 
-  let packages = await pkg.packages();
-  if (packages === null) {
+  for (let pkg of project.packages) {
     validatePackage(pkg, true);
-  } else {
-    for (let pkg of packages) {
-      validatePackage(pkg, true);
-    }
   }
 
   logger.success(successes.validPackage);

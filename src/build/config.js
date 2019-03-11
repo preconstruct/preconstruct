@@ -67,7 +67,7 @@ function getGlobals(pkg: StrictPackage, aliases) {
   getChildDeps(finalPeerDeps, stuff, [], aliases, pkg);
 
   return finalPeerDeps.reduce((obj, pkgName) => {
-    obj[pkgName] = pkg.global(pkgName);
+    obj[pkgName] = pkg.project.global(pkgName);
     return obj;
   }, {});
 }

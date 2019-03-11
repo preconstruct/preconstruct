@@ -1,5 +1,6 @@
 // @flow
-import { Package, StrictPackage } from "../package";
+import { StrictPackage } from "../package";
+import { Project } from "../project";
 import path from "path";
 import { rollup } from "./rollup";
 import { type Aliases, getAliases } from "./aliases";
@@ -74,22 +75,18 @@ async function retryableBuild(pkg: StrictPackage, aliases: Aliases) {
 }
 
 export default async function build(directory: string) {
-  createWorker();
-  let pkg = await Package.create(directory);
   // do more stuff with checking whether the repo is using yarn workspaces or bolt
   try {
-    let packages = await pkg.packages();
+    createWorker();
+
+    let { packages } = await Project.create(directory);
+
     logger.info("building bundles!");
-    if (packages === null) {
-      let strictPackage = pkg.strict();
-      await retryableBuild(strictPackage, {});
-    } else {
-      let strictPackages = packages.map(x => x.strict());
-      let aliases = getAliases(strictPackages);
-      await Promise.all(
-        strictPackages.map(pkg => retryableBuild(pkg, aliases))
-      );
-    }
+
+    let strictPackages = packages.map(x => x.strict());
+    let aliases = getAliases(strictPackages);
+    await Promise.all(strictPackages.map(pkg => retryableBuild(pkg, aliases)));
+
     logger.success("built bundles!");
   } finally {
     destroyWorker();
