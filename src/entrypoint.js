@@ -55,7 +55,8 @@ export class Entrypoint extends Item {
     this.json["umd:main"] = path;
   }
   get source(): string {
-    return nodePath.join(this.directory, "src", "index.js");
+    let source = is(this._config.source, is.default(is.string, "src"));
+    return require.resolve(nodePath.join(this.directory, source));
   }
   get umdName(): null | string {
     return is(this._config.umdName, is.maybe(is.string));

@@ -3,8 +3,7 @@ import build from "../";
 import fixturez from "fixturez";
 import path from "path";
 import spawn from "spawndamnit";
-import * as fs from "fs-extra";
-import { initBasic, getPkg } from "../../../test-utils";
+import { initBasic, getPkg, snapshotDistFiles } from "../../../test-utils";
 import { confirms } from "../../messages";
 import { FatalError } from "../../errors";
 import { promptInput } from "../../prompt";
@@ -17,27 +16,6 @@ let unsafePromptInput: any = promptInput;
 
 async function install(tmpPath) {
   await spawn("yarn", ["install"], { cwd: tmpPath });
-}
-
-async function snapshotDistFiles(tmpPath: string) {
-  let distPath = path.join(tmpPath, "dist");
-  let distFiles;
-  try {
-    distFiles = await fs.readdir(distPath);
-  } catch (err) {
-    if (err.code === "ENOENT") {
-      throw new Error(distPath + " does not exist");
-    }
-    throw err;
-  }
-
-  await Promise.all(
-    distFiles.map(async x => {
-      expect(
-        await fs.readFile(path.join(distPath, x), "utf-8")
-      ).toMatchSnapshot(x);
-    })
-  );
 }
 
 jest.mock("install-packages");
