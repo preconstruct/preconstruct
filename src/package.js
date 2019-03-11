@@ -25,16 +25,6 @@ let askGlobalLimit = pLimit(1);
 export class Package extends Item {
   parent: Package = this;
 
-  async refresh() {
-    let contents: string = await fs.readFile(this.path, "utf-8");
-    this.json = is(JSON.parse(contents), is.object);
-    this._contents = contents;
-    if (this._strict) {
-      validatePackage(this, false);
-      this._strict.json = this.json;
-      this._strict._contents = this._contents;
-    }
-  }
   get name(): string {
     return is(this.json.name, is.string);
   }
