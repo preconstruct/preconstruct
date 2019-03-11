@@ -6,7 +6,7 @@ import type { ItemUnion } from './types'
 
 export class FatalError extends Error {
   item: ItemUnion;
-  constructor(message: string, item: Item) {
+  constructor(message: string, item: ItemUnion) {
     super(message);
     this.item = item;
   }

@@ -1,7 +1,7 @@
 // @flow
 import is from "sarcastic";
 import nodePath from "path";
-import { validatePackage } from "./validate";
+import { validateEntrypoint } from "./validate";
 import { Item } from "./item";
 /*::
 import { Package } from './package'
@@ -73,7 +73,7 @@ export class Entrypoint extends Item {
 
   _strict: StrictEntrypoint;
   strict(): StrictEntrypoint {
-    validatePackage(this, false);
+    validateEntrypoint(this, false);
     if (!this._strict) {
       this._strict = new StrictEntrypoint(this.path, this._contents);
       this._strict.package = this.package;
@@ -91,6 +91,6 @@ export class StrictEntrypoint extends Entrypoint {
   }
   updater(json: Object) {
     super.updater(json);
-    validatePackage(this, false);
+    validateEntrypoint(this, false);
   }
 }
