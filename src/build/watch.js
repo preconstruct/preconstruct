@@ -1,6 +1,6 @@
 // @flow
-import { StrictPackage } from "../package";
 import { Project } from "../project";
+import { Package } from "../package";
 import { watch } from "rollup";
 import chalk from "chalk";
 import path from "path";
@@ -18,7 +18,7 @@ function relativePath(id) {
   return path.relative(process.cwd(), id);
 }
 
-async function watchPackage(pkg: StrictPackage, aliases: Aliases) {
+async function watchPackage(pkg: Package, aliases: Aliases) {
   const _configs = getRollupConfigs(pkg, aliases);
   await fs.remove(path.join(pkg.directory, "dist"));
   let configs = _configs.map(config => {
@@ -94,7 +94,7 @@ async function watchPackage(pkg: StrictPackage, aliases: Aliases) {
 }
 
 async function retryableWatch(
-  pkg: StrictPackage,
+  pkg: Package,
   aliases: Aliases,
   getPromises: ({ start: Promise<*> }) => mixed,
   depth: number
@@ -117,21 +117,20 @@ async function retryableWatch(
 
 export default async function build(directory: string) {
   createWorker();
-  let { packages } = await Project.create(directory);
+  let project = await Project.create(directory);
   // do more stuff with checking whether the repo is using yarn workspaces or bolt
 
-  let strictPackages = packages.map(x => x.strict());
-  let aliases = getAliases(strictPackages);
+  let aliases = getAliases(project);
   let startCount = 0;
   await Promise.all(
-    strictPackages.map(pkg =>
+    project.packages.map(pkg =>
       retryableWatch(
         pkg,
         aliases,
         async ({ start }) => {
           await start;
           startCount++;
-          if (startCount === strictPackages.length) {
+          if (startCount === project.packages.length) {
             success(successes.startedWatching);
           }
         },
