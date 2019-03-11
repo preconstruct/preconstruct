@@ -18,7 +18,10 @@ export function writeOtherFiles(
 ) {
   let promises = [];
   if (flowMode !== false) {
-    let relativeToSource = path.relative(entrypoint.main, entrypoint.source);
+    let relativeToSource = path.relative(
+      path.dirname(path.join(entrypoint.directory, entrypoint.main)),
+      entrypoint.source
+    );
     promises.push(
       fs.writeFile(
         // flow only resolves via the main field so
