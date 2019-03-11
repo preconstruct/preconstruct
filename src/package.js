@@ -3,11 +3,11 @@
 import is from "sarcastic";
 import nodePath from "path";
 import * as fs from "fs-extra";
-import { readFileSync } from "fs";
 import { validatePackage } from "./validate";
 import { promptInput } from "./prompt";
 import pLimit from "p-limit";
 import resolveFrom from "resolve-from";
+import { Item } from "./item";
 // move this to the flow-typed folder later
 let globby: {
   (globs: string | Array<string>, options: Object): Promise<Array<string>>,
@@ -22,30 +22,9 @@ let arrayOfString = is.arrayOf(is.string);
 
 let askGlobalLimit = pLimit(1);
 
-export class Package {
-  json: Object;
-  parent: Package;
-  path: string;
-  directory: string;
-  _contents: string;
-  constructor(filePath: string, contents: string, parent: Package | null) {
-    this.json = is(JSON.parse(contents), is.object);
-    this._contents = contents;
-    this.path = filePath;
-    this.directory = nodePath.dirname(filePath);
-    this.parent = parent || this;
-    this._config = this.json.preconstruct || {};
-  }
-  static async create(directory: string, parent?: Package): Promise<Package> {
-    let filePath = nodePath.join(directory, "package.json");
-    let contents = await fs.readFile(filePath, "utf-8");
-    return new Package(filePath, contents, parent || null);
-  }
-  static createSync(directory: string, parent?: Package): Package {
-    let filePath = nodePath.join(directory, "package.json");
-    let contents = readFileSync(filePath, "utf-8");
-    return new Package(filePath, contents, parent || null);
-  }
+export class Package extends Item {
+  parent: Package = this;
+
   async refresh() {
     let contents: string = await fs.readFile(this.path, "utf-8");
     this.json = is(JSON.parse(contents), is.object);
@@ -98,7 +77,6 @@ export class Package {
   get peerDependencies(): null | { [key: string]: string } {
     return is(this.json.peerDependencies, is.maybe(objectOfString));
   }
-  _config: Object;
 
   global(pkg: string) {
     if (
@@ -217,7 +195,11 @@ export class Package {
       });
 
       let packages = await Promise.all(
-        filenames.map(x => Package.create(x, this))
+        filenames.map(async x => {
+          let pkg = await Package.create(x);
+          pkg.parent = this;
+          return pkg;
+        })
       );
       return packages;
     } catch (error) {
@@ -235,7 +217,11 @@ export class Package {
         absolute: true,
         expandDirectories: false
       });
-      let packages = filenames.map(x => Package.createSync(x, this));
+      let packages = filenames.map(x => {
+        let pkg = Package.createSync(x);
+        pkg.parent = this;
+        return pkg;
+      });
       return packages;
     } catch (error) {
       if (error instanceof is.AssertionError) {
@@ -248,9 +234,8 @@ export class Package {
   strict(): StrictPackage {
     validatePackage(this, false);
     if (!this._strict) {
-      this._strict = new StrictPackage(this.path, this._contents, this.parent);
-      // $FlowFixMe
-      this._strict.refresh = this.refresh.bind(this);
+      this._strict = new StrictPackage(this.path, this._contents);
+      this._strict.parent = this.parent;
     }
     return this._strict;
   }
@@ -275,5 +260,9 @@ export class StrictPackage extends Package {
   }
   set main(path: string) {
     this.json.main = path;
+  }
+  updater(json: Object) {
+    super.updater(json);
+    validatePackage(this, false);
   }
 }

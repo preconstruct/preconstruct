@@ -12,12 +12,14 @@ export let limit = pLimit(1);
 
 // there might be a simpler solution to this than using dataloader but it works so ¯\_(ツ)_/¯
 
+type ItemUnion = Package;
+
 let prefix = `🎁 ${chalk.green("?")}   `;
 
 export function createPromptConfirmLoader(
   message: string
-): (pkg: Package) => Promise<boolean> {
-  let loader = new DataLoader<Package, boolean>(pkgs =>
+): (pkg: ItemUnion) => Promise<boolean> {
+  let loader = new DataLoader<ItemUnion, boolean>(pkgs =>
     limit(
       () =>
         (async () => {
@@ -49,12 +51,12 @@ export function createPromptConfirmLoader(
     )
   );
 
-  return (pkg: Package) => loader.load(pkg);
+  return (pkg: ItemUnion) => loader.load(pkg);
 }
 
 let doPromptInput = async (
   message: string,
-  pkg: Package,
+  pkg: ItemUnion,
   defaultAnswer?: string
 ): Promise<string> => {
   let { input } = await inquirer.prompt([
@@ -71,6 +73,6 @@ let doPromptInput = async (
 
 export let promptInput = (
   message: string,
-  pkg: Package,
+  pkg: ItemUnion,
   defaultAnswer?: string
 ) => limit(() => doPromptInput(message, pkg, defaultAnswer));
