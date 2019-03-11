@@ -2,7 +2,7 @@
 import fixturez from "fixturez";
 import validate from "../validate";
 import { logMock } from "../../test-utils";
-import { Package } from "../package";
+import { Entrypoint } from "../Entrypoint";
 import { FatalError } from "../errors";
 import { errors } from "../messages";
 
@@ -69,11 +69,11 @@ Array [
 test("invalid browser", async () => {
   let tmpPath = f.copy("no-module");
 
-  let pkg = await Package.create(tmpPath);
+  let entrypoint = await Entrypoint.create(tmpPath);
 
-  pkg.browser = "invalid.js";
+  entrypoint.browser = "invalid.js";
 
-  await pkg.save();
+  await entrypoint.save();
   try {
     await validate(tmpPath);
   } catch (e) {
@@ -85,14 +85,14 @@ test("invalid browser", async () => {
 test("valid browser", async () => {
   let tmpPath = f.copy("valid-package");
 
-  let pkg = await Package.create(tmpPath);
+  let entrypoint = await Entrypoint.create(tmpPath);
 
-  pkg.browser = {
+  entrypoint.browser = {
     ["./dist/valid-package.cjs.js"]: "./dist/valid-package.browser.cjs.js",
     ["./dist/valid-package.esm.js"]: "./dist/valid-package.browser.esm.js"
   };
 
-  await pkg.save();
+  await entrypoint.save();
 
   await validate(tmpPath);
   expect(logMock.log.mock.calls).toMatchInlineSnapshot(`

@@ -4,7 +4,7 @@ import path from "path";
 import init from "../init";
 import { confirms, errors } from "../messages";
 import { logMock, getPkg } from "../../test-utils";
-import { Package } from "../package";
+import { Entrypoint } from "../entrypoint";
 
 const f = fixturez(__dirname);
 
@@ -207,11 +207,11 @@ test("fix browser", async () => {
 
   confirms.addBrowserField.mockReturnValue(true);
 
-  let pkg = await Package.create(tmpPath);
+  let entrypoint = await Entrypoint.create(tmpPath);
 
-  pkg.browser = "invalid.js";
+  entrypoint.browser = "invalid.js";
 
-  await pkg.save();
+  await entrypoint.save();
   await init(tmpPath);
 
   expect(await getPkg(tmpPath)).toMatchInlineSnapshot(`

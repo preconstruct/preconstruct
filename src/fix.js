@@ -66,17 +66,12 @@ export default async function fix(directory: string) {
 
   let didModify = (await Promise.all(
     packages.map(pkg =>
-      Promise.all(pkg.entrypoints.map(entrypoint => fixEntrypoint(entrypoint)))
+      Promise.all(
+        pkg.entrypoints.map(entrypoint => fixEntrypoint(entrypoint))
+      ).then(a => a.some(x => x))
     )
   )).some(x => x);
 
-  success(
-    packages.length > 1
-      ? didModify
-        ? "fixed packages!"
-        : "packages already valid!"
-      : didModify
-      ? "fixed package!"
-      : "package already valid!"
-  );
+  let obj = packages.length > 1 ? "packages" : "package";
+  success(didModify ? `fixed ${obj}!` : `${obj} already valid!`);
 }
