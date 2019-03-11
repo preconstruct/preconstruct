@@ -2,7 +2,7 @@
 import fixturez from "fixturez";
 import validate from "../validate";
 import { logMock } from "../../test-utils";
-import { Entrypoint } from "../Entrypoint";
+import { Entrypoint } from "../entrypoint";
 import { FatalError } from "../errors";
 import { errors } from "../messages";
 
