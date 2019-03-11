@@ -1,5 +1,6 @@
 // @flow
-import { Package, StrictPackage } from "../package";
+import { StrictPackage } from "../package";
+import { Project } from "../project";
 import { watch } from "rollup";
 import chalk from "chalk";
 import path from "path";
@@ -116,40 +117,26 @@ async function retryableWatch(
 
 export default async function build(directory: string) {
   createWorker();
-  let pkg = await Package.create(directory);
+  let { packages } = await Project.create(directory);
   // do more stuff with checking whether the repo is using yarn workspaces or bolt
 
-  let packages = await pkg.packages();
-  if (packages === null) {
-    let strictPackage = pkg.strict();
-    await retryableWatch(
-      strictPackage,
-      {},
-      async ({ start }) => {
-        await start;
-        success(successes.startedWatching);
-      },
-      0
-    );
-  } else {
-    let strictPackages = packages.map(x => x.strict());
-    let aliases = getAliases(strictPackages);
-    let startCount = 0;
-    await Promise.all(
-      strictPackages.map(pkg =>
-        retryableWatch(
-          pkg,
-          aliases,
-          async ({ start }) => {
-            await start;
-            startCount++;
-            if (startCount === strictPackages.length) {
-              success(successes.startedWatching);
-            }
-          },
-          0
-        )
+  let strictPackages = packages.map(x => x.strict());
+  let aliases = getAliases(strictPackages);
+  let startCount = 0;
+  await Promise.all(
+    strictPackages.map(pkg =>
+      retryableWatch(
+        pkg,
+        aliases,
+        async ({ start }) => {
+          await start;
+          startCount++;
+          if (startCount === strictPackages.length) {
+            success(successes.startedWatching);
+          }
+        },
+        0
       )
-    );
-  }
+    )
+  );
 }

@@ -169,7 +169,7 @@ test("monorepo single package", async () => {
 Array [
   Array [
     "🎁 success",
-    "packages already valid!",
+    "package already valid!",
   ],
 ]
 `);

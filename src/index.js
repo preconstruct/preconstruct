@@ -4,16 +4,11 @@
 // because if we allow other entrypoints in the future,
 // we can support that here and the same config that's
 // used for bundling will be used for aliasing
-import { Package } from "./package";
+import { Project } from "./project";
 
 function getPackages(cwd) {
-  let pkg = Package.createSync(cwd);
-  let pkgs = pkg.packagesSync();
-  if (pkgs === null) {
-    pkgs = [pkg];
-  }
-  pkgs = pkgs.map(x => x.strict());
-  return pkgs;
+  let project = Project.createSync(cwd);
+  return project.packages.map(x => x.strict());
 }
 
 function getAbsoluteAliases(cwd, converter = x => x) {

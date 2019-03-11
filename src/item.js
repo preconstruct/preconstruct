@@ -27,13 +27,19 @@ export class Item {
   static async create(directory: string): Promise<this> {
     let filePath = nodePath.join(directory, "package.json");
     let contents = await fs.readFile(filePath, "utf-8");
-    return new this(filePath, contents);
+    let item = new this(filePath, contents);
+    await item._init();
+    return item;
   }
   static createSync(directory: string): this {
     let filePath = nodePath.join(directory, "package.json");
     let contents = readFileSync(filePath, "utf-8");
-    return new this(filePath, contents);
+    let item = new this(filePath, contents);
+    item._initSync();
+    return item;
   }
+  _initSync() {}
+  async _init() {}
   updater(json: Object) {
     this.json = json;
   }
@@ -43,6 +49,19 @@ export class Item {
     let json = is(JSON.parse(contents), is.object);
     for (let item of itemsByPath[this.path]) {
       item.updater(json);
+    }
+  }
+  async save() {
+    if (Object.keys(this._config).length) {
+      this.json.preconstruct = this._config;
+    } else {
+      delete this.json.preconstruct;
+    }
+    await fs.writeFile(this.path, JSON.stringify(this.json, null, 2) + "\n");
+
+    this._config = this.json.preconstruct || {};
+    for (let item of itemsByPath[this.path]) {
+      item.updater(this.json);
     }
   }
 }

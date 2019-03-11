@@ -1,5 +1,6 @@
 // @flow
 import { Package } from "./package";
+import { Project } from "./project";
 import { promptInput } from "./prompt";
 import { FatalError } from "./errors";
 import { success, error, info } from "./logger";
@@ -79,16 +80,13 @@ async function doInit(pkg: Package) {
 }
 
 export default async function init(directory: string) {
-  let pkg = await Package.create(directory);
+  let project = await Project.create(directory);
   // do more stuff with checking whether the repo is using yarn workspaces or bolt
 
-  let packages = await pkg.packages();
-  if (packages === null) {
-    await doInit(pkg);
-    success("Initialised package!");
-  } else {
-    await Promise.all(packages.map(pkg => doInit(pkg)));
-
-    success("Initialised packages!");
-  }
+  await Promise.all(project.packages.map(pkg => doInit(pkg)));
+  success(
+    project.packages.length > 1
+      ? "Initialised packages!"
+      : "Initialised package!"
+  );
 }

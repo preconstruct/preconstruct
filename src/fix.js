@@ -1,5 +1,6 @@
 // @flow
 import { Package } from "./package";
+import { Project } from "./project";
 import { promptInput } from "./prompt";
 import { success } from "./logger";
 import { inputs } from "./messages";
@@ -60,18 +61,20 @@ async function fixPackage(pkg: Package) {
 }
 
 export default async function fix(directory: string) {
-  let pkg = await Package.create(directory);
+  let { packages } = await Project.create(directory);
   // do more stuff with checking whether the repo is using yarn workspaces or bolt
 
-  let packages = await pkg.packages();
-  if (packages === null) {
-    let didModify = await fixPackage(pkg);
-    success(didModify ? "fixed package!" : "package already valid!");
-  } else {
-    let didModify = (await Promise.all(
-      packages.map(pkg => fixPackage(pkg))
-    )).some(x => x);
+  let didModify = (await Promise.all(
+    packages.map(pkg => fixPackage(pkg))
+  )).some(x => x);
 
-    success(didModify ? "fixed packages!" : "packages already valid!");
-  }
+  success(
+    packages.length > 1
+      ? didModify
+        ? "fixed packages!"
+        : "packages already valid!"
+      : didModify
+      ? "fixed package!"
+      : "package already valid!"
+  );
 }

@@ -165,7 +165,7 @@ export let getRollupConfig = (
                     packages: ["@babel/runtime"],
                     cwd: pkg.directory,
                     installPeers: false,
-                    packageManager: pkg.isBolt ? "bolt" : undefined
+                    packageManager: pkg.project.isBolt ? "bolt" : undefined
                   })
                 );
                 await pkg.refresh();
