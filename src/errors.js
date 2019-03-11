@@ -1,14 +1,14 @@
 // @flow
 
 /*::
-import { Package } from './package'
+import type { ItemUnion } from './types'
 */
 
 export class FatalError extends Error {
-  package: Package;
-  constructor(message: string, pkg: Package) {
+  item: ItemUnion;
+  constructor(message: string, item: Item) {
     super(message);
-    this.package = pkg;
+    this.item = item;
   }
 }
 

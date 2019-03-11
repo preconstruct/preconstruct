@@ -59,7 +59,7 @@ class CommandNotFoundError extends Error {}
       }
     } catch (err) {
       if (err instanceof FatalError) {
-        error(err.message, err.package);
+        error(err.message, err.item);
       } else if (err instanceof CommandNotFoundError) {
         error(errors.commandNotFound);
       } else {
