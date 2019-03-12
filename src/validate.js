@@ -22,7 +22,10 @@ export function validateEntrypointSource(entrypoint: Entrypoint) {
     require.resolve(entrypoint.source);
   } catch (e) {
     if (e.code === "MODULE_NOT_FOUND") {
-      throw new FatalError(errors.noEntryPoint, entrypoint);
+      throw new FatalError(
+        errors.noSource(entrypoint.configSource),
+        entrypoint
+      );
     }
     throw e;
   }

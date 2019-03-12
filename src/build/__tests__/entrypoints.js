@@ -22,3 +22,11 @@ test("source entrypoint option flow", async () => {
 
   await snapshotDistFiles(tmpPath);
 });
+
+test("multiple entrypoints", async () => {
+  let tmpPath = f.find("multiple-entrypoints");
+
+  await build(tmpPath);
+
+  await snapshotDistFiles(tmpPath);
+});
