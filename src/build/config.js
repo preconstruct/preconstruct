@@ -239,13 +239,18 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
   // TODO: remove this and do the end result with entrypoint stuff maybe
   if (entrypointsWithReactNative.length) {
     configs.push({
-      config: getRollupConfig(pkg, entrypointsWithBrowser, aliases, "browser"),
+      config: getRollupConfig(
+        pkg,
+        entrypointsWithReactNative,
+        aliases,
+        "browser"
+      ),
       outputs: [
         {
           format: "cjs",
           entryFileNames: replaceThing(
             pkg,
-            entrypointsWithBrowser,
+            entrypointsWithReactNative,
             entrypoint => getValidCjsReactNativePath(entrypoint)
           ),
           chunkFileNames: "dist/[name]-[hash].native.cjs.js",
@@ -256,7 +261,7 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
           format: "es",
           entryFileNames: replaceThing(
             pkg,
-            entrypointsWithBrowser,
+            entrypointsWithReactNative,
             entrypoint => getValidModuleReactNativePath(entrypoint)
           ),
           chunkFileNames: "dist/[name]-[hash].native.esm.js",
