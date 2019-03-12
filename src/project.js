@@ -18,8 +18,8 @@ let unsafeRequire = require;
 let askGlobalLimit = pLimit(1);
 
 export class Project extends Item {
-  get configPackages(): Array<string> | null {
-    return is(this._config.packages, is.maybe(is.arrayOf(is.string)));
+  get configPackages(): Array<string> {
+    return is(this._config.packages, is.default(is.arrayOf(is.string), ["."]));
   }
   // probably gonna be irrelevant later but i want it for now
   get isBolt(): boolean {
@@ -49,7 +49,7 @@ export class Project extends Item {
   async _packages(): Promise<Array<Package>> {
     // suport bolt later probably
     // maybe lerna too though probably not
-    if (!this.configPackages && this.json.workspaces) {
+    if (!this._config.packages && this.json.workspaces) {
       let _workspaces;
       if (Array.isArray(this.json.workspaces)) {
         _workspaces = this.json.workspaces;
@@ -69,16 +69,9 @@ export class Project extends Item {
 
       await this.save();
     }
-    let configPackages = this.configPackages;
-
-    if (!configPackages) {
-      let pkg = await Package.create(this.directory);
-      pkg.project = this;
-      return [pkg];
-    }
 
     try {
-      let filenames = await globby(configPackages, {
+      let filenames = await globby(this.configPackages, {
         cwd: this.directory,
         onlyDirectories: true,
         absolute: true,
@@ -101,15 +94,8 @@ export class Project extends Item {
     }
   }
   _packagesSync(): Array<Package> {
-    let configPackages = this.configPackages;
-
-    if (!configPackages) {
-      let pkg = Package.createSync(this.directory);
-      pkg.project = this;
-      return [pkg];
-    }
     try {
-      let filenames = globby.sync(configPackages, {
+      let filenames = globby.sync(this.configPackages, {
         cwd: this.directory,
         onlyDirectories: true,
         absolute: true,
