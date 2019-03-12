@@ -7,6 +7,7 @@ const resolveFrom = require("resolve-from");
 const chalk = require("chalk");
 import builtInModules from "builtin-modules";
 import { Package } from "../package";
+import { StrictEntrypoint } from "../entrypoint";
 import { rollup as _rollup } from "rollup";
 import type { Aliases } from "./aliases";
 import { FatalError } from "../errors";
@@ -108,6 +109,7 @@ export type RollupConfigType =
 
 export let getRollupConfig = (
   pkg: Package,
+  entrypoints: Array<StrictEntrypoint>,
   aliases: Aliases,
   type: RollupConfigType
 ): RollupConfig => {
@@ -145,7 +147,7 @@ export let getRollupConfig = (
   });
 
   const config = {
-    input: pkg.entrypoints.map(x => x.strict())[0].source,
+    input: entrypoints.map(x => x.strict().source),
     external: makeExternalPredicate(external),
     onwarn: (warning: *) => {
       switch (warning.code) {
