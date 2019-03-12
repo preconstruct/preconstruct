@@ -96,4 +96,7 @@ export class StrictEntrypoint extends Entrypoint {
     super.updater(json);
     validateEntrypoint(this, false);
   }
+  strict() {
+    return this;
+  }
 }
