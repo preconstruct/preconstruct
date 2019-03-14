@@ -1,8 +1,8 @@
 // @flow
 
 export let errors = {
-  noEntryPoint:
-    "no entrypoint was provided, please create a file at src/index.js",
+  noSource: (source: string) =>
+    `no source file was provided, please create a file at ${source} or specify a custom source file with the preconstruct source option`,
   deniedWriteMainField:
     "changing the main field is required for preconstruct to build",
   invalidModuleField: "module field is invalid",

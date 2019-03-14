@@ -4,14 +4,9 @@ import nodePath from "path";
 import { promptInput } from "./prompt";
 import pLimit from "p-limit";
 import resolveFrom from "resolve-from";
+import globby from "globby";
 import { Item } from "./item";
 import { Package } from "./package";
-
-// move this to the flow-typed folder later
-let globby: {
-  (globs: string | Array<string>, options: Object): Promise<Array<string>>,
-  sync: (globs: string | Array<string>, options: Object) => Array<string>
-} = require("globby");
 
 let unsafeRequire = require;
 

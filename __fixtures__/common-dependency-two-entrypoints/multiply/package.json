@@ -1,0 +1,7 @@
+{
+  "main": "dist/two-entrypoints-one-module-one-not.cjs.js",
+  "module": "dist/two-entrypoints-one-module-one-not.esm.js",
+  "preconstruct": {
+    "source": "../src/multiply.js"
+  }
+}

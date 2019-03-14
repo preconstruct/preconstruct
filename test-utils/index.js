@@ -1,6 +1,7 @@
 // @flow
 import path from "path";
 import * as fs from "fs-extra";
+import globby from "globby";
 require("chalk").enabled = false;
 // $FlowFixMe
 console.error = jest.fn();
@@ -66,6 +67,23 @@ export async function snapshotDistFiles(tmpPath: string) {
       expect(
         await fs.readFile(path.join(distPath, x), "utf-8")
       ).toMatchSnapshot(x);
+    })
+  );
+}
+
+export async function snapshotDirectory(
+  tmpPath: string,
+  files: "all" | "js" = "js"
+) {
+  let paths = await globby([`**/${files === "js" ? "*.js" : "*"}`], {
+    cwd: tmpPath
+  });
+
+  await Promise.all(
+    paths.map(async x => {
+      expect(await fs.readFile(path.join(tmpPath, x), "utf-8")).toMatchSnapshot(
+        x
+      );
     })
   );
 }

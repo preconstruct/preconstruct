@@ -73,6 +73,17 @@ function getGlobals(pkg: Package, aliases) {
   }, {});
 }
 
+// this is a horrible hack but it works ¯\_(ツ)_/¯
+// what exactly is it?
+// rollup only accepts a "string" that can have bits in it that get replaced with things for entryFileNames
+// but we want to customise things more
+// so we return an object with a replace method
+// and since rollup only calls the replace method on
+// the thing it receives, it works
+// isn't js just the best 🙃
+// (of course, this isn't a great assumption to make since rollup
+// could use more methods or do validation or anything else that
+// could break it but this gets the job done for now)
 function replaceThing(
   pkg: Package,
   entrypoints: Array<StrictEntrypoint>,
@@ -87,7 +98,7 @@ function replaceThing(
   );
   return {
     replace() {
-      return outputFiles[counter];
+      return outputFiles[counter++];
     }
   };
 }
@@ -117,39 +128,46 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
         dir: pkg.directory,
         exports: "named"
       }
-      // ...(entry.module
-      //   ? [
-      //       {
-      //         format: "es",
-      //         entryFileNames: replaceThing(pkg, entrypoint =>
-      //           getDevPath(entrypoint.module)
-      //         ),
-      //         chunkFileNames: "dist/[name]-[hash].esm.js",
-      //         dir: pkg.directory
-      //       }
-      //     ]
-      //   : [])
     ]
   });
   // TODO: optimise for the case that all entrypoints have module builds(this will be 99% of cases)
   let entrypointsWithModule = pkg.entrypoints
     .map(x => x.strict())
     .filter(x => x.module);
-
   if (entrypointsWithModule.length) {
-    configs.push({
-      config: getRollupConfig(pkg, entrypointsWithModule, aliases, "node-dev"),
-      outputs: [
-        {
-          format: "es",
-          entryFileNames: replaceThing(pkg, entrypointsWithModule, entrypoint =>
-            is(entrypoint.module, is.string)
-          ),
-          chunkFileNames: "dist/[name]-[hash].esm.js",
-          dir: pkg.directory
-        }
-      ]
-    });
+    if (entrypointsWithModule.length === pkg.entrypoints.length) {
+      configs[0].outputs.push({
+        format: "es",
+        entryFileNames: replaceThing(
+          pkg,
+          pkg.entrypoints.map(x => x.strict()),
+          entrypoint => is(entrypoint.module, is.string)
+        ),
+        chunkFileNames: "dist/[name]-[hash].esm.js",
+        dir: pkg.directory
+      });
+    } else {
+      configs.push({
+        config: getRollupConfig(
+          pkg,
+          entrypointsWithModule,
+          aliases,
+          "node-dev"
+        ),
+        outputs: [
+          {
+            format: "es",
+            entryFileNames: replaceThing(
+              pkg,
+              entrypointsWithModule,
+              entrypoint => is(entrypoint.module, is.string)
+            ),
+            chunkFileNames: "dist/[name]-[hash].esm.js",
+            dir: pkg.directory
+          }
+        ]
+      });
+    }
   }
 
   configs.push({

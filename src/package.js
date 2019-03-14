@@ -1,27 +1,53 @@
 // @flow
 // based on https://github.com/jamiebuilds/std-pkg but reading fewer things, adding setters and reading the file
 import is from "sarcastic";
+import globby from "globby";
 import { Item } from "./item";
+import { Entrypoint } from "./entrypoint";
+
 /*::
 import {Project} from './project'
 */
 
-import { Entrypoint } from "./entrypoint";
-
 export class Package extends Item {
   project: Project;
   entrypoints: Array<Entrypoint>;
-
+  get configEntrypoints(): Array<string> {
+    return is(
+      this._config.entrypoints,
+      is.default(is.arrayOf(is.string), ["."])
+    );
+  }
   async _init() {
-    let entrypoint = await Entrypoint.create(this.directory);
-    entrypoint.package = this;
-    this.entrypoints = [entrypoint];
+    let filenames = await globby(this.configEntrypoints, {
+      cwd: this.directory,
+      onlyDirectories: true,
+      absolute: true,
+      expandDirectories: false
+    });
+
+    this.entrypoints = await Promise.all(
+      filenames.map(async filename => {
+        let entrypoint = await Entrypoint.create(filename);
+        entrypoint.package = this;
+        return entrypoint;
+      })
+    );
   }
 
   _initSync() {
-    let entrypoint = Entrypoint.createSync(this.directory);
-    entrypoint.package = this;
-    this.entrypoints = [entrypoint];
+    let filenames = globby.sync(this.configEntrypoints, {
+      cwd: this.directory,
+      onlyDirectories: true,
+      absolute: true,
+      expandDirectories: false
+    });
+
+    this.entrypoints = filenames.map(filename => {
+      let entrypoint = Entrypoint.createSync(filename);
+      entrypoint.package = this;
+      return entrypoint;
+    });
   }
 
   get name(): string {

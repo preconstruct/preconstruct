@@ -19,6 +19,7 @@ async function buildPackage(pkg: Package, aliases: Aliases) {
   let configs = getRollupConfigs(pkg, aliases);
   await fs.remove(path.join(pkg.directory, "dist"));
 
+  // TODO: Fix all this stuff to work with multiple entrypoints
   let hasCheckedBrowser = pkg.entrypoints[0].browser !== null;
 
   let [sampleOutput] = await Promise.all(
@@ -53,6 +54,7 @@ async function buildPackage(pkg: Package, aliases: Aliases) {
     })
   );
 
+  // TODO: fix this.
   const source = await fs.readFile(pkg.entrypoints[0].source, "utf8");
 
   let flowMode = false;
@@ -60,7 +62,11 @@ async function buildPackage(pkg: Package, aliases: Aliases) {
     flowMode = sampleOutput.exports.includes("default") ? "all" : "named";
   }
 
-  await writeOtherFiles(pkg.entrypoints[0].strict(), flowMode);
+  await Promise.all(
+    pkg.entrypoints.map(entrypoint => {
+      return writeOtherFiles(entrypoint.strict(), flowMode);
+    })
+  );
 }
 
 async function retryableBuild(pkg: Package, aliases: Aliases) {
