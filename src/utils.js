@@ -1,7 +1,5 @@
 // @flow
 import { Entrypoint } from "./entrypoint";
-import { Package } from "./package";
-import type { ItemUnion } from "./types";
 
 export function getNameForDist(name: string): string {
   return name.replace(/.*\//, "");
@@ -60,14 +58,4 @@ export function getValidReactNativeField(entrypoint: Entrypoint) {
 export function getValidUmdMainField(entrypoint: Entrypoint) {
   let nameForDist = getNameForDist(entrypoint.package.name);
   return `dist/${nameForDist}.umd.min.js`;
-}
-
-export function getItemType(item: ItemUnion): string {
-  if (item instanceof Entrypoint) {
-    return "entrypoint";
-  }
-  if (item instanceof Package) {
-    return "package";
-  }
-  return "project";
 }
