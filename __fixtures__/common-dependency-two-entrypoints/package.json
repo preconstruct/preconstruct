@@ -1,10 +1,10 @@
 {
-  "name": "two-entrypoints-one-module-one-not",
+  "name": "common-dependency-two-entrypoints",
   "version": "1.0.0",
-  "main": "dist/two-entrypoints-one-module-one-not.cjs.js",
+  "main": "dist/common-dependency-two-entrypoints.cjs.js",
   "license": "MIT",
   "private": true,
-  "module": "dist/two-entrypoints-one-module-one-not.esm.js",
+  "module": "dist/common-dependency-two-entrypoints.esm.js",
   "preconstruct": {
     "source": "src/sum",
     "entrypoints": [

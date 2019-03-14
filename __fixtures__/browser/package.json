@@ -1,8 +1,8 @@
 {
-  "name": "valid-package",
+  "name": "browser",
   "version": "1.0.0",
-  "main": "dist/valid-package.cjs.js",
+  "main": "dist/browser.cjs.js",
   "license": "MIT",
   "private": true,
-  "module": "dist/valid-package.esm.js"
+  "module": "dist/browser.esm.js"
 }

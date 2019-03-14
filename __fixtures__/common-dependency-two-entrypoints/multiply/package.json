@@ -1,6 +1,6 @@
 {
-  "main": "dist/two-entrypoints-one-module-one-not.cjs.js",
-  "module": "dist/two-entrypoints-one-module-one-not.esm.js",
+  "main": "dist/common-dependency-two-entrypoints.cjs.js",
+  "module": "dist/common-dependency-two-entrypoints.esm.js",
   "preconstruct": {
     "source": "../src/multiply.js"
   }
