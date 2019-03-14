@@ -87,7 +87,7 @@ function replaceThing(
   );
   return {
     replace() {
-      return outputFiles[counter];
+      return outputFiles[counter++];
     }
   };
 }
@@ -117,26 +117,15 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
         dir: pkg.directory,
         exports: "named"
       }
-      // ...(entry.module
-      //   ? [
-      //       {
-      //         format: "es",
-      //         entryFileNames: replaceThing(pkg, entrypoint =>
-      //           getDevPath(entrypoint.module)
-      //         ),
-      //         chunkFileNames: "dist/[name]-[hash].esm.js",
-      //         dir: pkg.directory
-      //       }
-      //     ]
-      //   : [])
     ]
   });
   // TODO: optimise for the case that all entrypoints have module builds(this will be 99% of cases)
   let entrypointsWithModule = pkg.entrypoints
     .map(x => x.strict())
     .filter(x => x.module);
-
   if (entrypointsWithModule.length) {
+    // if (entrypointsWithModule.length === pkg.entrypoints.length) {
+    // } else {
     configs.push({
       config: getRollupConfig(pkg, entrypointsWithModule, aliases, "node-dev"),
       outputs: [
@@ -150,6 +139,7 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
         }
       ]
     });
+    // }
   }
 
   configs.push({

@@ -1,5 +1,6 @@
 // @flow
 import build from "../";
+import path from "path";
 import fixturez from "fixturez";
 import { snapshotDistFiles } from "../../../test-utils";
 
@@ -24,9 +25,10 @@ test("source entrypoint option flow", async () => {
 });
 
 test("multiple entrypoints", async () => {
-  let tmpPath = f.find("multiple-entrypoints");
+  let tmpPath = f.copy("multiple-entrypoints");
 
   await build(tmpPath);
 
   await snapshotDistFiles(tmpPath);
+  await snapshotDistFiles(path.join(tmpPath, "multiply"));
 });

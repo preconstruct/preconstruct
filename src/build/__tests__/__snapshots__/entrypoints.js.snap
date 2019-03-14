@@ -1,5 +1,72 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`multiple entrypoints: multiple-entrypoints.cjs.dev.js 1`] = `
+"'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+let sum = (a, b) => a + b;
+
+exports.sum = sum;
+"
+`;
+
+exports[`multiple entrypoints: multiple-entrypoints.cjs.dev.js 2`] = `
+"'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+let multiply = (a, b) => a * b;
+
+exports.multiply = multiply;
+"
+`;
+
+exports[`multiple entrypoints: multiple-entrypoints.cjs.js 1`] = `
+"'use strict';
+
+if (process.env.NODE_ENV === \\"production\\") {
+  module.exports = require(\\"./multiple-entrypoints.cjs.prod.js\\");
+} else {
+  module.exports = require(\\"./multiple-entrypoints.cjs.dev.js\\");
+}
+"
+`;
+
+exports[`multiple entrypoints: multiple-entrypoints.cjs.prod.js 1`] = `
+"\\"use strict\\";
+Object.defineProperty(exports, \\"__esModule\\", { value: !0 });
+let sum = (a, b) => a + b;
+exports.sum = sum;
+"
+`;
+
+exports[`multiple entrypoints: multiple-entrypoints.cjs.prod.js 2`] = `
+"\\"use strict\\";
+Object.defineProperty(exports, \\"__esModule\\", { value: !0 });
+let multiply = (a, b) => a * b;
+exports.multiply = multiply;
+"
+`;
+
+exports[`multiple entrypoints: multiple-entrypoints.esm.js 1`] = `
+"let sum = (a, b) => a + b;
+
+export { sum };
+"
+`;
+
+exports[`multiple entrypoints: multiple-entrypoints.esm.js 2`] = `
+"let multiply = (a, b) => a * b;
+
+export { multiply };
+"
+`;
+
 exports[`source entrypoint option flow: source-entrypoint-option-flow.cjs.dev.js 1`] = `
 "'use strict';
 

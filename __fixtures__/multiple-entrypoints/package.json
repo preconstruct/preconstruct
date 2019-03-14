@@ -8,6 +8,7 @@
   "preconstruct": {
     "source": "src/sum",
     "entrypoints": [
+      ".",
       "multiply"
     ]
   }
