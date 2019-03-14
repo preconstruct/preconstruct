@@ -38,3 +38,11 @@ test("two entrypoints, one module, one not", async () => {
 
   await snapshotDirectory(tmpPath);
 });
+
+test("two entrypoints with common dependency", async () => {
+  let tmpPath = f.copy("common-dependency-two-entrypoints");
+
+  await build(tmpPath);
+
+  await snapshotDirectory(tmpPath);
+});

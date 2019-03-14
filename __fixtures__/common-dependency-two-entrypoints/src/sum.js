@@ -1,1 +1,3 @@
-export let sum = (a, b) => a + b;
+import { identity } from "./identity";
+
+export let sum = (a, b) => identity(a + b);

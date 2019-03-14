@@ -1,10 +1,10 @@
 {
-  "name": "multiple-entrypoints",
+  "name": "two-entrypoints-one-module-one-not",
   "version": "1.0.0",
-  "main": "dist/multiple-entrypoints.cjs.js",
+  "main": "dist/two-entrypoints-one-module-one-not.cjs.js",
   "license": "MIT",
   "private": true,
-  "module": "dist/multiple-entrypoints.esm.js",
+  "module": "dist/two-entrypoints-one-module-one-not.esm.js",
   "preconstruct": {
     "source": "src/sum",
     "entrypoints": [

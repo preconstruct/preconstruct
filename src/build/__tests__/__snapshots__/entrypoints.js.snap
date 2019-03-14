@@ -148,6 +148,136 @@ exports.something = something;
 "
 `;
 
+exports[`two entrypoints with common dependency: dist/chunk-056d83ff.esm.js 1`] = `
+"let identity = x => x;
+
+export { identity as a };
+"
+`;
+
+exports[`two entrypoints with common dependency: dist/chunk-770164e0.cjs.dev.js 1`] = `
+"'use strict';
+
+let identity = x => x;
+
+exports.identity = identity;
+"
+`;
+
+exports[`two entrypoints with common dependency: dist/chunk-770164e0.cjs.prod.js 1`] = `
+"\\"use strict\\";
+let identity = x => x;
+exports.identity = identity;
+"
+`;
+
+exports[`two entrypoints with common dependency: dist/two-entrypoints-one-module-one-not.cjs.dev.js 1`] = `
+"'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+var __chunk_1 = require('./chunk-770164e0.cjs.dev.js');
+
+let sum = (a, b) => __chunk_1.identity(a + b);
+
+exports.sum = sum;
+"
+`;
+
+exports[`two entrypoints with common dependency: dist/two-entrypoints-one-module-one-not.cjs.js 1`] = `
+"'use strict';
+
+if (process.env.NODE_ENV === \\"production\\") {
+  module.exports = require(\\"./two-entrypoints-one-module-one-not.cjs.prod.js\\");
+} else {
+  module.exports = require(\\"./two-entrypoints-one-module-one-not.cjs.dev.js\\");
+}
+"
+`;
+
+exports[`two entrypoints with common dependency: dist/two-entrypoints-one-module-one-not.cjs.prod.js 1`] = `
+"\\"use strict\\";
+Object.defineProperty(exports, \\"__esModule\\", { value: !0 });
+var __chunk_1 = require(\\"./chunk-770164e0.cjs.prod.js\\");
+let sum = (a, b) => __chunk_1.identity(a + b);
+exports.sum = sum;
+"
+`;
+
+exports[`two entrypoints with common dependency: dist/two-entrypoints-one-module-one-not.esm.js 1`] = `
+"import { a as identity } from './chunk-056d83ff.esm.js';
+
+let sum = (a, b) => identity(a + b);
+
+export { sum };
+"
+`;
+
+exports[`two entrypoints with common dependency: multiply/dist/two-entrypoints-one-module-one-not.cjs.dev.js 1`] = `
+"'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+var __chunk_1 = require('../../dist/chunk-770164e0.cjs.dev.js');
+
+let multiply = (a, b) => __chunk_1.identity(a * b);
+
+exports.multiply = multiply;
+"
+`;
+
+exports[`two entrypoints with common dependency: multiply/dist/two-entrypoints-one-module-one-not.cjs.js 1`] = `
+"'use strict';
+
+if (process.env.NODE_ENV === \\"production\\") {
+  module.exports = require(\\"./two-entrypoints-one-module-one-not.cjs.prod.js\\");
+} else {
+  module.exports = require(\\"./two-entrypoints-one-module-one-not.cjs.dev.js\\");
+}
+"
+`;
+
+exports[`two entrypoints with common dependency: multiply/dist/two-entrypoints-one-module-one-not.cjs.prod.js 1`] = `
+"\\"use strict\\";
+Object.defineProperty(exports, \\"__esModule\\", { value: !0 });
+var __chunk_1 = require(\\"../../dist/chunk-770164e0.cjs.prod.js\\");
+let multiply = (a, b) => __chunk_1.identity(a * b);
+exports.multiply = multiply;
+"
+`;
+
+exports[`two entrypoints with common dependency: multiply/dist/two-entrypoints-one-module-one-not.esm.js 1`] = `
+"import { a as identity } from '../../dist/chunk-056d83ff.esm.js';
+
+let multiply = (a, b) => identity(a * b);
+
+export { multiply };
+"
+`;
+
+exports[`two entrypoints with common dependency: src/identity.js 1`] = `
+"export let identity = x => x;
+"
+`;
+
+exports[`two entrypoints with common dependency: src/multiply.js 1`] = `
+"import { identity } from \\"./identity\\";
+
+export let multiply = (a, b) => identity(a * b);
+"
+`;
+
+exports[`two entrypoints with common dependency: src/sum.js 1`] = `
+"import { identity } from \\"./identity\\";
+
+export let sum = (a, b) => identity(a + b);
+"
+`;
+
 exports[`two entrypoints, one module, one not: dist/two-entrypoints-one-module-one-not.cjs.dev.js 1`] = `
 "'use strict';
 
