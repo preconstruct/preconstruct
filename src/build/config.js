@@ -73,6 +73,17 @@ function getGlobals(pkg: Package, aliases) {
   }, {});
 }
 
+// this is a horrible hack but it works ¯\_(ツ)_/¯
+// what exactly is it?
+// rollup only accepts a "string" that can have bits in it that get replaced with things for entryFileNames
+// but we want to customise things more
+// so we return an object with a replace method
+// and since rollup only calls the replace method on
+// the thing it receives, it works
+// isn't js just the best 🙃
+// (of course, this isn't a great assumption to make since rollup
+// could use more methods or do validation or anything else that
+// could break it but this gets the job done for now)
 function replaceThing(
   pkg: Package,
   entrypoints: Array<StrictEntrypoint>,
@@ -124,22 +135,39 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
     .map(x => x.strict())
     .filter(x => x.module);
   if (entrypointsWithModule.length) {
-    // if (entrypointsWithModule.length === pkg.entrypoints.length) {
-    // } else {
-    configs.push({
-      config: getRollupConfig(pkg, entrypointsWithModule, aliases, "node-dev"),
-      outputs: [
-        {
-          format: "es",
-          entryFileNames: replaceThing(pkg, entrypointsWithModule, entrypoint =>
-            is(entrypoint.module, is.string)
-          ),
-          chunkFileNames: "dist/[name]-[hash].esm.js",
-          dir: pkg.directory
-        }
-      ]
-    });
-    // }
+    if (entrypointsWithModule.length === pkg.entrypoints.length) {
+      configs[0].outputs.push({
+        format: "es",
+        entryFileNames: replaceThing(
+          pkg,
+          pkg.entrypoints.map(x => x.strict()),
+          entrypoint => is(entrypoint.module, is.string)
+        ),
+        chunkFileNames: "dist/[name]-[hash].esm.js",
+        dir: pkg.directory
+      });
+    } else {
+      configs.push({
+        config: getRollupConfig(
+          pkg,
+          entrypointsWithModule,
+          aliases,
+          "node-dev"
+        ),
+        outputs: [
+          {
+            format: "es",
+            entryFileNames: replaceThing(
+              pkg,
+              entrypointsWithModule,
+              entrypoint => is(entrypoint.module, is.string)
+            ),
+            chunkFileNames: "dist/[name]-[hash].esm.js",
+            dir: pkg.directory
+          }
+        ]
+      });
+    }
   }
 
   configs.push({
