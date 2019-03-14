@@ -60,7 +60,11 @@ async function buildPackage(pkg: Package, aliases: Aliases) {
     flowMode = sampleOutput.exports.includes("default") ? "all" : "named";
   }
 
-  await writeOtherFiles(pkg.entrypoints[0].strict(), flowMode);
+  await Promise.all(
+    pkg.entrypoints.map(entrypoint => {
+      return writeOtherFiles(entrypoint.strict(), flowMode);
+    })
+  );
 }
 
 async function retryableBuild(pkg: Package, aliases: Aliases) {

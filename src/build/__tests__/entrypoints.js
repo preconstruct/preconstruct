@@ -1,8 +1,7 @@
 // @flow
 import build from "../";
-import path from "path";
 import fixturez from "fixturez";
-import { snapshotDistFiles } from "../../../test-utils";
+import { snapshotDistFiles, snapshotDirectory } from "../../../test-utils";
 
 const f = fixturez(__dirname);
 
@@ -29,6 +28,13 @@ test("multiple entrypoints", async () => {
 
   await build(tmpPath);
 
-  await snapshotDistFiles(tmpPath);
-  await snapshotDistFiles(path.join(tmpPath, "multiply"));
+  await snapshotDirectory(tmpPath);
+});
+
+test("two entrypoints, one module, one not", async () => {
+  let tmpPath = f.copy("two-entrypoints-one-module-one-not");
+
+  await build(tmpPath);
+
+  await snapshotDirectory(tmpPath);
 });
