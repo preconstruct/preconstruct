@@ -12,19 +12,20 @@ import { Package } from './package'
 export class Entrypoint extends Item {
   package: Package;
 
+  constructor(filePath: string, contents: string, pkg: Package) {
+    super(filePath, contents);
+    this.package = pkg;
+  }
+
   static async create(directory: string, pkg: Package): Promise<Entrypoint> {
     let filePath = nodePath.join(directory, "package.json");
     let contents = await fs.readFile(filePath, "utf-8");
-    let item = new Entrypoint(filePath, contents);
-    item.package = pkg;
-    return item;
+    return new Entrypoint(filePath, contents, pkg);
   }
   static createSync(directory: string, pkg: Package): Entrypoint {
     let filePath = nodePath.join(directory, "package.json");
     let contents = readFileSync(filePath, "utf-8");
-    let item = new Entrypoint(filePath, contents);
-    item.package = pkg;
-    return item;
+    return new Entrypoint(filePath, contents, pkg);
   }
 
   get name(): string {
@@ -97,10 +98,13 @@ export class Entrypoint extends Item {
 
   _strict: StrictEntrypoint;
   strict(): StrictEntrypoint {
-    validateEntrypoint(this, false);
     if (!this._strict) {
-      this._strict = new StrictEntrypoint(this.path, this._contents);
-      this._strict.package = this.package;
+      validateEntrypoint(this, false);
+      this._strict = new StrictEntrypoint(
+        this.path,
+        this._contents,
+        this.package
+      );
     }
     return this._strict;
   }
