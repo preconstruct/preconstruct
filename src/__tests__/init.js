@@ -3,8 +3,7 @@ import fixturez from "fixturez";
 import path from "path";
 import init from "../init";
 import { confirms, errors } from "../messages";
-import { logMock, getPkg } from "../../test-utils";
-import { Entrypoint } from "../entrypoint";
+import { logMock, modifyPkg, getPkg } from "../../test-utils";
 
 const f = fixturez(__dirname);
 
@@ -207,11 +206,10 @@ test("fix browser", async () => {
 
   confirms.addBrowserField.mockReturnValue(true);
 
-  let entrypoint = await Entrypoint.create(tmpPath);
+  await modifyPkg(tmpPath, pkg => {
+    pkg.browser = "invalid.js";
+  });
 
-  entrypoint.browser = "invalid.js";
-
-  await entrypoint.save();
   await init(tmpPath);
 
   expect(await getPkg(tmpPath)).toMatchInlineSnapshot(`

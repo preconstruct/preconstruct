@@ -2,6 +2,9 @@
 // based on https://github.com/jamiebuilds/std-pkg but reading fewer things, adding setters and reading the file
 import is from "sarcastic";
 import globby from "globby";
+import * as fs from "fs-extra";
+import { readFileSync } from "fs";
+import nodePath from "path";
 import { Item } from "./item";
 import { Entrypoint } from "./entrypoint";
 
@@ -18,36 +21,44 @@ export class Package extends Item {
       is.default(is.arrayOf(is.string), ["."])
     );
   }
-  async _init() {
-    let filenames = await globby(this.configEntrypoints, {
-      cwd: this.directory,
+  static async create(directory: string): Promise<Package> {
+    let filePath = nodePath.join(directory, "package.json");
+
+    let contents = await fs.readFile(filePath, "utf-8");
+    let pkg = new Package(filePath, contents);
+
+    let filenames = await globby(pkg.configEntrypoints, {
+      cwd: pkg.directory,
       onlyDirectories: true,
       absolute: true,
       expandDirectories: false
     });
 
-    this.entrypoints = await Promise.all(
+    pkg.entrypoints = await Promise.all(
       filenames.map(async filename => {
-        let entrypoint = await Entrypoint.create(filename);
-        entrypoint.package = this;
+        let entrypoint = await Entrypoint.create(filename, pkg);
         return entrypoint;
       })
     );
-  }
 
-  _initSync() {
-    let filenames = globby.sync(this.configEntrypoints, {
-      cwd: this.directory,
+    return pkg;
+  }
+  static createSync(directory: string): Package {
+    let filePath = nodePath.join(directory, "package.json");
+    let contents = readFileSync(filePath, "utf-8");
+    let pkg = new Package(filePath, contents);
+    let filenames = globby.sync(pkg.configEntrypoints, {
+      cwd: pkg.directory,
       onlyDirectories: true,
       absolute: true,
       expandDirectories: false
     });
 
-    this.entrypoints = filenames.map(filename => {
-      let entrypoint = Entrypoint.createSync(filename);
-      entrypoint.package = this;
+    pkg.entrypoints = filenames.map(filename => {
+      let entrypoint = Entrypoint.createSync(filename, pkg);
       return entrypoint;
     });
+    return pkg;
   }
 
   get name(): string {

@@ -5,6 +5,8 @@ import { promptInput } from "./prompt";
 import pLimit from "p-limit";
 import resolveFrom from "resolve-from";
 import globby from "globby";
+import { readFileSync } from "fs";
+import * as fs from "fs-extra";
 import { Item } from "./item";
 import { Package } from "./package";
 
@@ -26,6 +28,22 @@ export class Project extends Item {
     let hasYarnWorkspaces = !!this.json.workspaces;
     return hasBolt && !hasYarnWorkspaces;
   }
+  static async create(directory: string): Promise<Project> {
+    let filePath = nodePath.join(directory, "package.json");
+    let contents = await fs.readFile(filePath, "utf-8");
+    let project = new Project(filePath, contents);
+    project.packages = await project._packages();
+
+    return project;
+  }
+  static createSync(directory: string): Project {
+    let filePath = nodePath.join(directory, "package.json");
+    let contents = readFileSync(filePath, "utf-8");
+    let project = new Project(filePath, contents);
+    project.packages = project._packagesSync();
+
+    return project;
+  }
 
   get name(): string {
     return is(this.json.name, is.string);
@@ -34,12 +52,6 @@ export class Project extends Item {
     this.json.name = name;
   }
   packages: Array<Package>;
-  async _init() {
-    this.packages = await this._packages();
-  }
-  _initSync() {
-    this.packages = this._packagesSync();
-  }
 
   async _packages(): Promise<Array<Package>> {
     // suport bolt later probably

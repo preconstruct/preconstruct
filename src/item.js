@@ -2,7 +2,6 @@
 import * as fs from "fs-extra";
 import nodePath from "path";
 import is from "sarcastic";
-import { readFileSync } from "fs";
 
 let itemsByPath: { [string]: Set<Item> } = {};
 
@@ -24,22 +23,6 @@ export class Item {
     itemsByPath[this.path].add(this);
   }
 
-  static async create(directory: string): Promise<this> {
-    let filePath = nodePath.join(directory, "package.json");
-    let contents = await fs.readFile(filePath, "utf-8");
-    let item = new this(filePath, contents);
-    await item._init();
-    return item;
-  }
-  static createSync(directory: string): this {
-    let filePath = nodePath.join(directory, "package.json");
-    let contents = readFileSync(filePath, "utf-8");
-    let item = new this(filePath, contents);
-    item._initSync();
-    return item;
-  }
-  _initSync() {}
-  async _init() {}
   updater(json: Object) {
     this.json = json;
   }

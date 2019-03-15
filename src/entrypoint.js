@@ -1,5 +1,7 @@
 // @flow
 import is from "sarcastic";
+import { readFileSync } from "fs";
+import * as fs from "fs-extra";
 import nodePath from "path";
 import { validateEntrypoint } from "./validate";
 import { Item } from "./item";
@@ -9,6 +11,21 @@ import { Package } from './package'
 
 export class Entrypoint extends Item {
   package: Package;
+
+  static async create(directory: string, pkg: Package): Promise<Entrypoint> {
+    let filePath = nodePath.join(directory, "package.json");
+    let contents = await fs.readFile(filePath, "utf-8");
+    let item = new Entrypoint(filePath, contents);
+    item.package = pkg;
+    return item;
+  }
+  static createSync(directory: string, pkg: Package): Entrypoint {
+    let filePath = nodePath.join(directory, "package.json");
+    let contents = readFileSync(filePath, "utf-8");
+    let item = new Entrypoint(filePath, contents);
+    item.package = pkg;
+    return item;
+  }
 
   get name(): string {
     return nodePath.join(
