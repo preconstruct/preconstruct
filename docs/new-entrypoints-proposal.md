@@ -1,7 +1,5 @@
 # Alternative entrypoints proposal
 
-> not 100% sure about the name entrypoints but it's the best name I've got so far
-
 ## What problem is this proposal addressing?
 
 You have a package, and you want people to be able to import from multiple different entry points in the package. e.g. `react-dom` and `react-dom/server`
