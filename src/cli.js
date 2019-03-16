@@ -30,45 +30,41 @@ class CommandNotFoundError extends Error {}
 
 (async () => {
   if (input.length === 1) {
-    try {
-      switch (input[0]) {
-        case "init": {
-          await init(process.cwd());
-          return;
-        }
-        case "validate": {
-          await validate(process.cwd());
-          return;
-        }
-        case "build": {
-          await build(process.cwd());
-          return;
-        }
-        case "watch": {
-          await watch(process.cwd());
-          return;
-        }
-        case "fix": {
-          await fix(process.cwd());
-          return;
-        }
-
-        default: {
-          throw new CommandNotFoundError();
-        }
+    switch (input[0]) {
+      case "init": {
+        await init(process.cwd());
+        return;
       }
-    } catch (err) {
-      if (err instanceof FatalError) {
-        error(err.message, err.item);
-      } else if (err instanceof CommandNotFoundError) {
-        error(errors.commandNotFound);
-      } else {
-        throw err;
+      case "validate": {
+        await validate(process.cwd());
+        return;
       }
-      process.exit(1);
+      case "build": {
+        await build(process.cwd());
+        return;
+      }
+      case "watch": {
+        await watch(process.cwd());
+        return;
+      }
+      case "fix": {
+        await fix(process.cwd());
+        return;
+      }
+      default: {
+        throw new CommandNotFoundError();
+      }
     }
   } else {
-    error(errors.commandNotFound);
-    process.exit(1);
+    throw new CommandNotFoundError();
   }
-})();
+})().catch(err => {
+  if (err instanceof FatalError) {
+    error(err.message, err.item);
+  } else if (err instanceof CommandNotFoundError) {
+    error(errors.commandNotFound);
+  } else {
+    console.error(err);
+  }
+  process.exit(1);
+});

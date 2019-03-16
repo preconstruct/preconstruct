@@ -5,6 +5,8 @@ import * as fs from "fs-extra";
 import nodePath from "path";
 import { validateEntrypoint } from "./validate";
 import { Item } from "./item";
+import { getNameForDist } from "./utils";
+import { confirms, errors } from "./messages";
 /*::
 import { Package } from './package'
 */
@@ -19,7 +21,32 @@ export class Entrypoint extends Item {
 
   static async create(directory: string, pkg: Package): Promise<Entrypoint> {
     let filePath = nodePath.join(directory, "package.json");
-    let contents = await fs.readFile(filePath, "utf-8");
+    let contents;
+
+    try {
+      contents = await fs.readFile(filePath, "utf-8");
+    } catch (e) {
+      if (e.code === "ENOENT" && pkg.directory !== directory) {
+        let shouldCreateEntrypointPkgJson = await confirms.createEntrypointPkgJson(
+          {
+            name: nodePath.join(
+              pkg.name,
+              nodePath.relative(pkg.directory, directory)
+            )
+          }
+        );
+        if (!shouldCreateEntrypointPkgJson) {
+          throw new Error(errors.noEntrypointPkgJson);
+        }
+        contents = JSON.stringify(
+          { main: `dist/${getNameForDist(pkg.name)}.cjs.js` },
+          null,
+          2
+        );
+        await fs.writeFile(filePath, contents);
+      }
+      throw e;
+    }
     return new Entrypoint(filePath, contents, pkg);
   }
   static createSync(directory: string, pkg: Package): Entrypoint {

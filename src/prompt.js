@@ -11,10 +11,12 @@ export let limit = pLimit(1);
 
 let prefix = `🎁 ${chalk.green("?")}   `;
 
+type NamedThing = { +name: string };
+
 export function createPromptConfirmLoader(
   message: string
-): (pkg: ItemUnion) => Promise<boolean> {
-  let loader = new DataLoader<ItemUnion, boolean>(pkgs =>
+): (pkg: NamedThing) => Promise<boolean> {
+  let loader = new DataLoader<NamedThing, boolean>(pkgs =>
     limit(
       () =>
         (async () => {
@@ -46,7 +48,7 @@ export function createPromptConfirmLoader(
     )
   );
 
-  return (pkg: ItemUnion) => loader.load(pkg);
+  return (pkg: NamedThing) => loader.load(pkg);
 }
 
 let doPromptInput = async (
