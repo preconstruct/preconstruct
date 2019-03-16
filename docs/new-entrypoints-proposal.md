@@ -16,7 +16,7 @@ Projects are the largest unit in preconstruct. In a monorepo, the options for th
 
 ### Packages
 
-Preconstruct packages map 1:1 with npm packages and are composed of a number of entrypoints. The entrypoints are defined with the `entrypoints` option in a package's preconstruct config. The option is an array of globs which lead to entrypoints. Packages are also responsible for specifying dependencies which is important for bundling UMD bundles and ensuring that packages will have all of their required dependencies when installed through npm.
+Preconstruct packages map 1:1 with npm packages and are composed of a number of entrypoints. The entrypoints are defined with the `entrypoints` option in a package's preconstruct config. The option is an array of globs which lead to entrypoints. Packages are also responsible for specifying dependencies which is important for bundling UMD bundles and ensuring that packages will have all of their required dependencies when installed through npm.(which is enforced by preconstruct)
 
 ### Entrypoints
 
