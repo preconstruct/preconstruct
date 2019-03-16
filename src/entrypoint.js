@@ -44,8 +44,9 @@ export class Entrypoint extends Item {
           2
         );
         await fs.writeFile(filePath, contents);
+      } else {
+        throw e;
       }
-      throw e;
     }
     return new Entrypoint(filePath, contents, pkg);
   }
