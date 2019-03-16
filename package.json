@@ -1,6 +1,6 @@
 {
   "name": "preconstruct",
-  "version": "0.0.44",
+  "version": "0.0.45",
   "description": "A smart bundler for libraries",
   "main": "lib/index.js",
   "files": [
