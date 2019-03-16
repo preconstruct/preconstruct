@@ -24,7 +24,7 @@ Entrypoints are the lowest level concept and represent a set of bundles for a pa
 
 ## Examples
 
-Note that all of these examples are for single package repos because the examples don't really change with monorepos, the only difference is that the root package.json specifies the preconstruct packages and that already works. The examples also don't show UMD or module builds for the simplicity of these examples but UMD and module builds will also work.
+Note that all of these examples are for single package repos because the examples don't really change with monorepos, the only difference is that the root package.json specifies the preconstruct packages and that already works. The examples also don't show UMD or module builds for the simplicity of these examples but UMD and module builds will also work. The dev and prod bundles that preconstruct creates are also removed from the examples for simplicity
 
 ### Single package repo custom source
 
