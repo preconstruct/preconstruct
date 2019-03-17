@@ -21,19 +21,6 @@ function getAbsoluteAliases(cwd, converter = x => x) {
   return aliases;
 }
 
-// inspired by https://github.com/Andarist/lerna-alias
-export let aliases = {
-  jest(cwd: string = process.cwd()) {
-    return getAbsoluteAliases(cwd, name => `^${name}$`);
-  },
-  rollup(cwd: string = process.cwd()) {
-    return getAbsoluteAliases(cwd);
-  },
-  webpack(cwd: string = process.cwd()) {
-    return getAbsoluteAliases(cwd, name => `${name}$`);
-  }
-};
-
 function getAbsoluteAbsoluteAliases(cwd, converter = x => x) {
   let project = Project.createSync(cwd);
   let aliases = {};
@@ -49,12 +36,13 @@ function getAbsoluteAbsoluteAliases(cwd, converter = x => x) {
   return aliases;
 }
 
-export let unstable_aliases = {
+// inspired by https://github.com/Andarist/lerna-alias
+export let aliases = {
   jest(cwd: string = process.cwd()) {
-    return getAbsoluteAbsoluteAliases(cwd, name => `^${name}$`);
+    return getAbsoluteAliases(cwd, name => `^${name}$`);
   },
   rollup(cwd: string = process.cwd()) {
-    return getAbsoluteAbsoluteAliases(cwd);
+    return getAbsoluteAliases(cwd);
   },
   webpack(cwd: string = process.cwd()) {
     return getAbsoluteAbsoluteAliases(cwd, name => `${name}$`);
