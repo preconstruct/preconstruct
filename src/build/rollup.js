@@ -5,6 +5,7 @@ const cjs = require("rollup-plugin-commonjs");
 const replace = require("rollup-plugin-replace");
 const resolveFrom = require("resolve-from");
 const chalk = require("chalk");
+import path from "path";
 import builtInModules from "builtin-modules";
 import { Package } from "../package";
 import { StrictEntrypoint } from "../entrypoint";
@@ -17,6 +18,7 @@ import babel from "../rollup-plugins/babel";
 import prettier from "../rollup-plugins/prettier";
 import terser from "../rollup-plugins/terser";
 import { limit } from "../prompt";
+import { getNameForDist } from "../utils";
 
 import installPackages from "install-packages";
 
@@ -146,8 +148,19 @@ export let getRollupConfig = (
     }
   });
 
+  let input = {};
+
+  entrypoints.forEach(entrypoint => {
+    input[
+      path.relative(
+        pkg.directory,
+        path.join(entrypoint.directory, "dist", getNameForDist(pkg.name))
+      )
+    ] = entrypoint.strict().source;
+  });
+
   const config = {
-    input: entrypoints.map(x => x.strict().source),
+    input,
     external: makeExternalPredicate(external),
     onwarn: (warning: *) => {
       switch (warning.code) {

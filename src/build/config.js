@@ -1,18 +1,9 @@
 // @flow
 import { Package } from "../package";
-import { StrictEntrypoint } from "../entrypoint";
-import path from "path";
 import { type RollupConfig, getRollupConfig } from "./rollup";
 import type { OutputOptions } from "./types";
 import type { Aliases } from "./aliases";
 import is from "sarcastic";
-import {
-  getValidCjsBrowserPath,
-  getValidModuleBrowserPath,
-  getValidCjsReactNativePath,
-  getValidModuleReactNativePath
-} from "../utils";
-import { getDevPath, getProdPath } from "./utils";
 import resolveFrom from "resolve-from";
 
 let unsafeRequire = require;
@@ -73,36 +64,6 @@ function getGlobals(pkg: Package, aliases) {
   }, {});
 }
 
-// this is a horrible hack but it works ¯\_(ツ)_/¯
-// what exactly is it?
-// rollup only accepts a "string" that can have bits in it that get replaced with things for entryFileNames
-// but we want to customise things more
-// so we return an object with a replace method
-// and since rollup only calls the replace method on
-// the thing it receives, it works
-// isn't js just the best 🙃
-// (of course, this isn't a great assumption to make since rollup
-// could use more methods or do validation or anything else that
-// could break it but this gets the job done for now)
-function replaceThing(
-  pkg: Package,
-  entrypoints: Array<StrictEntrypoint>,
-  getOutputPath: StrictEntrypoint => string
-) {
-  let counter = 0;
-  let outputFiles = entrypoints.map(entrypoint =>
-    path.relative(
-      pkg.directory,
-      path.join(entrypoint.directory, getOutputPath(entrypoint))
-    )
-  );
-  return {
-    replace() {
-      return outputFiles[counter++];
-    }
-  };
-}
-
 export function getRollupConfigs(pkg: Package, aliases: Aliases) {
   let configs: Array<{
     config: RollupConfig,
@@ -119,11 +80,7 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
     outputs: [
       {
         format: "cjs",
-        entryFileNames: replaceThing(
-          pkg,
-          pkg.entrypoints.map(x => x.strict()),
-          entrypoint => getDevPath(entrypoint.main)
-        ),
+        entryFileNames: "[name].cjs.dev.js",
         chunkFileNames: "dist/[name]-[hash].cjs.dev.js",
         dir: pkg.directory,
         exports: "named"
@@ -138,11 +95,7 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
     if (entrypointsWithModule.length === pkg.entrypoints.length) {
       configs[0].outputs.push({
         format: "es",
-        entryFileNames: replaceThing(
-          pkg,
-          pkg.entrypoints.map(x => x.strict()),
-          entrypoint => is(entrypoint.module, is.string)
-        ),
+        entryFileNames: "[name].esm.js",
         chunkFileNames: "dist/[name]-[hash].esm.js",
         dir: pkg.directory
       });
@@ -157,11 +110,7 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
         outputs: [
           {
             format: "es",
-            entryFileNames: replaceThing(
-              pkg,
-              entrypointsWithModule,
-              entrypoint => is(entrypoint.module, is.string)
-            ),
+            entryFileNames: "[name].esm.js",
             chunkFileNames: "dist/[name]-[hash].esm.js",
             dir: pkg.directory
           }
@@ -180,11 +129,7 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
     outputs: [
       {
         format: "cjs",
-        entryFileNames: replaceThing(
-          pkg,
-          pkg.entrypoints.map(x => x.strict()),
-          entrypoint => getProdPath(entrypoint.main)
-        ),
+        entryFileNames: "[name].cjs.prod.js",
         chunkFileNames: "dist/[name]-[hash].cjs.prod.js",
         dir: pkg.directory,
         exports: "named"
@@ -200,7 +145,7 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
     .map(x => x.strict())
     .forEach(entrypoint => {
       let umdName = is(entrypoint._config.umdName, is.string);
-      let umdMain = is(entrypoint.umdMain, is.string);
+      is(entrypoint.umdMain, is.string);
 
       configs.push({
         config: getRollupConfig(pkg, [entrypoint], aliases, "umd"),
@@ -208,8 +153,9 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
           {
             format: "umd",
             sourcemap: true,
-            file: path.join(entrypoint.directory, umdMain),
+            entryFileNames: "[name].umd.min.js",
             name: umdName,
+            dir: pkg.directory,
             globals: getGlobals(pkg, aliases)
           }
         ]
@@ -229,22 +175,14 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
       outputs: [
         {
           format: "cjs",
-          entryFileNames: replaceThing(
-            pkg,
-            entrypointsWithBrowser,
-            entrypoint => getValidCjsBrowserPath(entrypoint)
-          ),
+          entryFileNames: "[name].browser.cjs.js",
           chunkFileNames: "dist/[name]-[hash].browser.cjs.js",
           dir: pkg.directory,
           exports: "named"
         },
         {
           format: "es",
-          entryFileNames: replaceThing(
-            pkg,
-            entrypointsWithBrowser,
-            entrypoint => getValidModuleBrowserPath(entrypoint)
-          ),
+          entryFileNames: "[name].browser.esm.js",
           chunkFileNames: "dist/[name]-[hash].browser.esm.js",
           dir: pkg.directory
         }
@@ -266,22 +204,14 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
       outputs: [
         {
           format: "cjs",
-          entryFileNames: replaceThing(
-            pkg,
-            entrypointsWithReactNative,
-            entrypoint => getValidCjsReactNativePath(entrypoint)
-          ),
+          entryFileNames: "[name].native.cjs.js",
           chunkFileNames: "dist/[name]-[hash].native.cjs.js",
           dir: pkg.directory,
           exports: "named"
         },
         {
           format: "es",
-          entryFileNames: replaceThing(
-            pkg,
-            entrypointsWithReactNative,
-            entrypoint => getValidModuleReactNativePath(entrypoint)
-          ),
+          entryFileNames: "[name].native.esm.js",
           chunkFileNames: "dist/[name]-[hash].native.esm.js",
           dir: pkg.directory
         }

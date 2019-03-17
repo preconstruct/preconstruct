@@ -13,19 +13,18 @@ type GlobalsOption = { [name: string]: string } | ((name: string) => string);
 
 type OptionsPaths = { [key: string]: string } | ((id: string) => string);
 
-type ThisIsSuchAHackButItWorks = string | { replace: () => string };
-
 export type OutputOptions =
   | {
       dir: string,
-      entryFileNames: ThisIsSuchAHackButItWorks,
-      chunkFileNames: ThisIsSuchAHackButItWorks,
+      entryFileNames: string,
+      chunkFileNames: string,
       format: ModuleFormat,
       exports?: "named"
     }
   | {
       format: "umd",
-      file: string,
+      entryFileNames: string,
+      dir: string,
       sourcemap: boolean,
       name: string,
       globals: Object
