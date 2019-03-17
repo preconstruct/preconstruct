@@ -33,3 +33,30 @@ export let aliases = {
     return getAbsoluteAliases(cwd, name => `${name}$`);
   }
 };
+
+function getAbsoluteAbsoluteAliases(cwd, converter = x => x) {
+  let project = Project.createSync(cwd);
+  let aliases = {};
+
+  project.packages.forEach(pkg => {
+    pkg.entrypoints
+      .map(x => x.strict())
+      .forEach(entrypoint => {
+        aliases[converter(entrypoint.directory)] = entrypoint.source;
+      });
+  });
+
+  return aliases;
+}
+
+export let unstable_aliases = {
+  jest(cwd: string = process.cwd()) {
+    return getAbsoluteAbsoluteAliases(cwd, name => `^${name}$`);
+  },
+  rollup(cwd: string = process.cwd()) {
+    return getAbsoluteAbsoluteAliases(cwd);
+  },
+  webpack(cwd: string = process.cwd()) {
+    return getAbsoluteAbsoluteAliases(cwd, name => `${name}$`);
+  }
+};
