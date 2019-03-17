@@ -36,6 +36,8 @@ function getAbsoluteAbsoluteAliases(cwd, converter = x => x) {
   return aliases;
 }
 
+// TODO: come back to this and see if getAbsoluteAbsoluteAliases will work for everything
+
 // inspired by https://github.com/Andarist/lerna-alias
 export let aliases = {
   jest(cwd: string = process.cwd()) {
