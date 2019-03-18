@@ -47,6 +47,9 @@ export let aliases = {
     return getAbsoluteAliases(cwd);
   },
   webpack(cwd: string = process.cwd()) {
-    return getAbsoluteAbsoluteAliases(cwd, name => `${name}$`);
+    return {
+      ...getAbsoluteAliases(cwd, name => `${name}$`),
+      ...getAbsoluteAbsoluteAliases(cwd, name => `${name}$`)
+    };
   }
 };
