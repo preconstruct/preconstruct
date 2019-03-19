@@ -1,5 +1,6 @@
 // @flow
-import { Package } from "./package";
+import { Entrypoint } from "./entrypoint";
+import { Project } from "./project";
 import { promptInput } from "./prompt";
 import { success } from "./logger";
 import { inputs } from "./messages";
@@ -11,7 +12,7 @@ import {
   getValidReactNativeField
 } from "./utils";
 import {
-  validateEntrypoint,
+  validateEntrypointSource,
   isMainFieldValid,
   isModuleFieldValid,
   isUmdMainFieldValid,
@@ -20,58 +21,57 @@ import {
   isReactNativeFieldValid
 } from "./validate";
 
-async function fixPackage(pkg: Package) {
-  validateEntrypoint(pkg);
+async function fixEntrypoint(entrypoint: Entrypoint) {
+  validateEntrypointSource(entrypoint);
   let didModify = false;
-  if (!isMainFieldValid(pkg)) {
+  if (!isMainFieldValid(entrypoint)) {
     didModify = true;
-    pkg.main = getValidMainField(pkg);
+    entrypoint.main = getValidMainField(entrypoint);
   }
-  if (pkg.module !== null && !isModuleFieldValid(pkg)) {
+  if (entrypoint.module !== null && !isModuleFieldValid(entrypoint)) {
     didModify = true;
 
-    let validModuleField = getValidModuleField(pkg);
-    pkg.module = validModuleField;
+    let validModuleField = getValidModuleField(entrypoint);
+    entrypoint.module = validModuleField;
   }
-  if (pkg.umdMain !== null) {
-    if (!isUmdMainFieldValid(pkg) || !isUmdNameSpecified(pkg)) {
+  if (entrypoint.umdMain !== null) {
+    if (!isUmdMainFieldValid(entrypoint) || !isUmdNameSpecified(entrypoint)) {
       didModify = true;
 
-      pkg.umdMain = getValidUmdMainField(pkg);
-      let umdName = await promptInput(inputs.getUmdName, pkg);
-      pkg.umdName = umdName;
+      entrypoint.umdMain = getValidUmdMainField(entrypoint);
+      let umdName = await promptInput(inputs.getUmdName, entrypoint);
+      entrypoint.umdName = umdName;
     }
   }
 
-  if (pkg.browser !== null && !isBrowserFieldValid(pkg)) {
+  if (entrypoint.browser !== null && !isBrowserFieldValid(entrypoint)) {
     didModify = true;
 
-    pkg.browser = getValidBrowserField(pkg);
+    entrypoint.browser = getValidBrowserField(entrypoint);
   }
 
-  if (pkg.reactNative !== null && !isReactNativeFieldValid(pkg)) {
+  if (entrypoint.reactNative !== null && !isReactNativeFieldValid(entrypoint)) {
     didModify = true;
 
-    pkg.reactNative = getValidReactNativeField(pkg);
+    entrypoint.reactNative = getValidReactNativeField(entrypoint);
   }
 
-  await pkg.save();
+  await entrypoint.save();
   return didModify;
 }
 
 export default async function fix(directory: string) {
-  let pkg = await Package.create(directory);
+  let { packages } = await Project.create(directory);
   // do more stuff with checking whether the repo is using yarn workspaces or bolt
 
-  let packages = await pkg.packages();
-  if (packages === null) {
-    let didModify = await fixPackage(pkg);
-    success(didModify ? "fixed package!" : "package already valid!");
-  } else {
-    let didModify = (await Promise.all(
-      packages.map(pkg => fixPackage(pkg))
-    )).some(x => x);
+  let didModify = (await Promise.all(
+    packages.map(pkg =>
+      Promise.all(
+        pkg.entrypoints.map(entrypoint => fixEntrypoint(entrypoint))
+      ).then(a => a.some(x => x))
+    )
+  )).some(x => x);
 
-    success(didModify ? "fixed packages!" : "packages already valid!");
-  }
+  let obj = packages.length > 1 ? "packages" : "package";
+  success(didModify ? `fixed ${obj}!` : `${obj} already valid!`);
 }

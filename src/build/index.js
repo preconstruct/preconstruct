@@ -1,5 +1,6 @@
 // @flow
-import { Package, StrictPackage } from "../package";
+import { Package } from "../package";
+import { Project } from "../project";
 import path from "path";
 import { rollup } from "./rollup";
 import { type Aliases, getAliases } from "./aliases";
@@ -14,11 +15,12 @@ import { createWorker, destroyWorker } from "../worker-client";
 
 let browserPattern = /typeof\s+(window|document)/;
 
-async function buildPackage(pkg: StrictPackage, aliases: Aliases) {
+async function buildPackage(pkg: Package, aliases: Aliases) {
   let configs = getRollupConfigs(pkg, aliases);
   await fs.remove(path.join(pkg.directory, "dist"));
 
-  let hasCheckedBrowser = pkg.browser !== null;
+  // TODO: Fix all this stuff to work with multiple entrypoints
+  let hasCheckedBrowser = pkg.entrypoints[0].browser !== null;
 
   let [sampleOutput] = await Promise.all(
     configs.map(async ({ config, outputs }) => {
@@ -38,8 +40,10 @@ async function buildPackage(pkg: StrictPackage, aliases: Aliases) {
           throw (async () => {
             let shouldAddBrowserField = await confirms.addBrowserField(pkg);
             if (shouldAddBrowserField) {
-              pkg.browser = getValidBrowserField(pkg);
-              await pkg.save();
+              pkg.entrypoints[0].browser = getValidBrowserField(
+                pkg.entrypoints[0]
+              );
+              await pkg.entrypoints[0].save();
             } else {
               throw new FatalError(errors.deniedWriteBrowserField, pkg);
             }
@@ -50,17 +54,22 @@ async function buildPackage(pkg: StrictPackage, aliases: Aliases) {
     })
   );
 
-  const source = await fs.readFile(pkg.source, "utf8");
+  // TODO: fix this.
+  const source = await fs.readFile(pkg.entrypoints[0].source, "utf8");
 
   let flowMode = false;
   if (source.includes("@flow")) {
     flowMode = sampleOutput.exports.includes("default") ? "all" : "named";
   }
 
-  await writeOtherFiles(pkg, flowMode);
+  await Promise.all(
+    pkg.entrypoints.map(entrypoint => {
+      return writeOtherFiles(entrypoint.strict(), flowMode);
+    })
+  );
 }
 
-async function retryableBuild(pkg: StrictPackage, aliases: Aliases) {
+async function retryableBuild(pkg: Package, aliases: Aliases) {
   try {
     await buildPackage(pkg, aliases);
   } catch (err) {
@@ -74,22 +83,19 @@ async function retryableBuild(pkg: StrictPackage, aliases: Aliases) {
 }
 
 export default async function build(directory: string) {
-  createWorker();
-  let pkg = await Package.create(directory);
   // do more stuff with checking whether the repo is using yarn workspaces or bolt
   try {
-    let packages = await pkg.packages();
+    createWorker();
+
+    let project = await Project.create(directory);
+
     logger.info("building bundles!");
-    if (packages === null) {
-      let strictPackage = pkg.strict();
-      await retryableBuild(strictPackage, {});
-    } else {
-      let strictPackages = packages.map(x => x.strict());
-      let aliases = getAliases(strictPackages);
-      await Promise.all(
-        strictPackages.map(pkg => retryableBuild(pkg, aliases))
-      );
-    }
+
+    let aliases = getAliases(project);
+    await Promise.all(
+      project.packages.map(pkg => retryableBuild(pkg, aliases))
+    );
+
     logger.success("built bundles!");
   } finally {
     destroyWorker();

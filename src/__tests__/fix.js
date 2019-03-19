@@ -14,7 +14,7 @@ test("no entrypoint", async () => {
   try {
     await fix(tmpPath);
   } catch (error) {
-    expect(error.message).toBe(errors.noEntryPoint);
+    expect(error.message).toBe(errors.noSource("src/index.js"));
   }
 });
 
@@ -92,7 +92,7 @@ Object {
 `);
 });
 
-test("does modify if already valid", async () => {
+test("does not modify if already valid", async () => {
   let tmpPath = f.copy("valid-package");
   let original = await getPkg(tmpPath);
 
@@ -169,7 +169,7 @@ test("monorepo single package", async () => {
 Array [
   Array [
     "🎁 success",
-    "packages already valid!",
+    "package already valid!",
   ],
 ]
 `);

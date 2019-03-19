@@ -1,8 +1,8 @@
 // @flow
 
 export let errors = {
-  noEntryPoint:
-    "no entrypoint was provided, please create a file at src/index.js",
+  noSource: (source: string) =>
+    `no source file was provided, please create a file at ${source} or specify a custom source file with the preconstruct source option`,
   deniedWriteMainField:
     "changing the main field is required for preconstruct to build",
   invalidModuleField: "module field is invalid",
@@ -13,7 +13,8 @@ export let errors = {
   umdNameNotSpecified:
     "the umd:main field is specified but a umdName option is not specified. please add it to the preconstruct field in your package.json",
   deniedWriteBrowserField:
-    "building browser bundles for modules that include typeof window or typeof document is currently required"
+    "building browser bundles for modules that include typeof window or typeof document is currently required",
+  noEntrypointPkgJson: "There is a missing package.json for an entrypoint"
 };
 
 import { createPromptConfirmLoader } from "./prompt";
@@ -39,6 +40,9 @@ export let confirms = {
   ),
   addBrowserField: createPromptConfirmLoader(
     "typeof window or typeof document is used in this package. would you like build seperate browser builds for better browser bundle sizes?"
+  ),
+  createEntrypointPkgJson: createPromptConfirmLoader(
+    "A package.json file does not exist for this entrypoint, would you like to create one automatically?"
   )
 };
 

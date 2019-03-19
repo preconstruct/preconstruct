@@ -5,8 +5,10 @@ const cjs = require("rollup-plugin-commonjs");
 const replace = require("rollup-plugin-replace");
 const resolveFrom = require("resolve-from");
 const chalk = require("chalk");
+import path from "path";
 import builtInModules from "builtin-modules";
-import { StrictPackage } from "../package";
+import { Package } from "../package";
+import { StrictEntrypoint } from "../entrypoint";
 import { rollup as _rollup } from "rollup";
 import type { Aliases } from "./aliases";
 import { FatalError } from "../errors";
@@ -16,6 +18,7 @@ import babel from "../rollup-plugins/babel";
 import prettier from "../rollup-plugins/prettier";
 import terser from "../rollup-plugins/terser";
 import { limit } from "../prompt";
+import { getNameForDist } from "../utils";
 
 import installPackages from "install-packages";
 
@@ -43,7 +46,7 @@ function getChildPeerDeps(
   depKeys: Array<string>,
   doneDeps: Array<string>,
   aliases: Aliases,
-  pkg: StrictPackage
+  pkg: Package
 ) {
   depKeys
     .filter(x => !doneDeps.includes(x))
@@ -107,7 +110,8 @@ export type RollupConfigType =
   | "react-native";
 
 export let getRollupConfig = (
-  pkg: StrictPackage,
+  pkg: Package,
+  entrypoints: Array<StrictEntrypoint>,
   aliases: Aliases,
   type: RollupConfigType
 ): RollupConfig => {
@@ -144,8 +148,19 @@ export let getRollupConfig = (
     }
   });
 
+  let input = {};
+
+  entrypoints.forEach(entrypoint => {
+    input[
+      path.relative(
+        pkg.directory,
+        path.join(entrypoint.directory, "dist", getNameForDist(pkg.name))
+      )
+    ] = entrypoint.strict().source;
+  });
+
   const config = {
-    input: pkg.source,
+    input,
     external: makeExternalPredicate(external),
     onwarn: (warning: *) => {
       switch (warning.code) {
@@ -165,7 +180,7 @@ export let getRollupConfig = (
                     packages: ["@babel/runtime"],
                     cwd: pkg.directory,
                     installPeers: false,
-                    packageManager: pkg.isBolt ? "bolt" : undefined
+                    packageManager: pkg.project.isBolt ? "bolt" : undefined
                   })
                 );
                 await pkg.refresh();

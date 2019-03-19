@@ -1,10 +1,7 @@
 // @flow
 import inquirer from "inquirer";
 import pLimit from "p-limit";
-/*::
-// this has to be in a comment because dependency import order reasons...
-import { Package } from "./package";
-*/
+import type { ItemUnion } from "./types";
 import DataLoader from "dataloader";
 import chalk from "chalk";
 
@@ -14,10 +11,12 @@ export let limit = pLimit(1);
 
 let prefix = `🎁 ${chalk.green("?")}   `;
 
+type NamedThing = { +name: string };
+
 export function createPromptConfirmLoader(
   message: string
-): (pkg: Package) => Promise<boolean> {
-  let loader = new DataLoader<Package, boolean>(pkgs =>
+): (pkg: NamedThing) => Promise<boolean> {
+  let loader = new DataLoader<NamedThing, boolean>(pkgs =>
     limit(
       () =>
         (async () => {
@@ -49,12 +48,12 @@ export function createPromptConfirmLoader(
     )
   );
 
-  return (pkg: Package) => loader.load(pkg);
+  return (pkg: NamedThing) => loader.load(pkg);
 }
 
 let doPromptInput = async (
   message: string,
-  pkg: Package,
+  pkg: ItemUnion,
   defaultAnswer?: string
 ): Promise<string> => {
   let { input } = await inquirer.prompt([
@@ -71,6 +70,6 @@ let doPromptInput = async (
 
 export let promptInput = (
   message: string,
-  pkg: Package,
+  pkg: ItemUnion,
   defaultAnswer?: string
 ) => limit(() => doPromptInput(message, pkg, defaultAnswer));

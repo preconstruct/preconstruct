@@ -13,11 +13,22 @@ type GlobalsOption = { [name: string]: string } | ((name: string) => string);
 
 type OptionsPaths = { [key: string]: string } | ((id: string) => string);
 
-export type OutputOptions = {
-  file: string,
-  format: ModuleFormat,
-  exports?: "named"
-};
+export type OutputOptions =
+  | {
+      dir: string,
+      entryFileNames: string,
+      chunkFileNames: string,
+      format: ModuleFormat,
+      exports?: "named"
+    }
+  | {
+      format: "umd",
+      entryFileNames: string,
+      dir: string,
+      sourcemap: boolean,
+      name: string,
+      globals: Object
+    };
 
 // https://github.com/rollup/rollup/blob/7746e0fd90a58e9ffa250e92c48410f49055584c/src/rollup/types.d.ts
 // this is here for reference, i'm defining more strict types to use
