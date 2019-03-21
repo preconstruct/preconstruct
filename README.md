@@ -2,31 +2,57 @@
 
 > A smart bundler for libraries
 
+> DISCLAIMER:
+>
+> While preconstruct is pretty stable in terms of bugs and is used in big projects, a lot of things are still in flux and will change so please be aware of that. We're in 0.0.x versions for a reason.
+
 ## Why?
 
-Building libraries is difficult enough with creating the right API, writing tests, documentation and everything else that setting up a build system that generates small and performant bundles shouldn't have to be difficult. That's why preconstruct exists. Preconstruct uses [Rollup](https://rollupjs.org) under the hood to generate fast bundles for modern bundlers with ES Module builds, Node.js with CommonJS builds and the browser without a bundler via UMD builds while respecting your [Babel](https://babeljs.io/) config. Preconstruct also strictly enforces the fields in your package.json that configure where Node and bundlers look for your bundles so you don't have to worry about them. Performance and bundle size are common concerns when building libraries so preconstruct generates dev and prod CommonJS bundles so that you can have process.env.NODE_ENV checks to have helpful warnings and errors without slowing down production along with building browser specific bundles when you use `typeof window` so that you can have Node.js specific code which is dead code eliminated from browser bundles.
+Generating small, performant bundles and figuring out how to make bundlers use the right bundles shouldn't have to be difficult.
 
 ## Getting Started
 
 ```bash
 yarn add --dev preconstruct
-```
-
-```bash
 yarn preconstruct init
-```
-
-```bash
 yarn preconstruct build
 ```
 
-## I want feature X!
+## What does preconstruct do?
 
-Balancing between having minimal to no configuration and being able to support everyone's use case is very hard. Preconstruct tries to have good defaults to support lots of common use cases but it won't support everything
+preconstruct generates small bundles
 
-- works well with monorepos
-- minimal to no config
-- opinionated
+## Features
+
+### Performant Bundles
+
+Performance and bundle size are common concerns when building libraries so preconstruct generates dev and prod CommonJS bundles so that you can have process.env.NODE_ENV checks to have helpful warnings and errors without slowing down production along with building browser specific bundles when you use `typeof window` so that you can have Node.js specific code which is dead code eliminated from browser bundles.
+
+###
+
+### Strictly Enforcing Configuration
+
+preconstruct strictly enforces the relevant fields in your package.json that tell where Node and bundlers where to look for your bundles so you don't have to worry about them.
+
+### Minimal Configuration
+
+Rather than having to config
+
+### Monorepos
+
+preconstruct is built with monorepo's in mind, rather than having to manage and build packages on an individual level, preconstruct lets you manage and build all of your packages together.
+
+### Custom Entrypoints
+
+Have you ever wanted to add another entrypoint to your package but had trouble making
+
+### Lack of features
+
+Preconstruct uses [Rollup](https://rollupjs.org) under the hood to generate fast bundles for modern bundlers with ES Module builds, Node.js with CommonJS builds and the browser without a bundler via UMD builds while respecting your [Babel](https://babeljs.io/) config.
+
+Preconstruct has a minimal api that doesn't get in the way
+
+That's why preconstruct exists.
 
 ## Install
 
@@ -74,18 +100,21 @@ preconstruct fix
 
 - like init but infers as much as possible
 - made for places that already have build setups
-- e.g. if the package has a umd:main field and it's wrong, fix it and ask for a umdName but if it doesn't hava umd:main field, don't do anything
+- e.g. if the package has a umd:main field and it's wrong, fix it and ask for a umdName but if it doesn't have a umd:main field, don't do anything
 
-## Ideas
+### Configuration
 
-- [ ] good, reliable caching
-- [x] use users babel config
-- [ ] allow for other entrypoints, automatically generate folders with package.json
-- [x] opinionated dist folder structure with verification if it's wrong
+Preconstruct accepts
+
+####
+
+## I want feature X!
+
+Balancing between having minimal to no configuration and being able to support everyone's use case is a really hard problem. preconstruct tries to have good defaults to support lots of common use cases but it won't support everything. We want to make preconstruct work really well for most use cases rather than being okay for all use cases.
 
 # Thanks/Inspiration
 
 - [microbundle](https://github.com/developit/microbundle) was a huge inspiration for this! ❤️
-- [rollup](https://rollupjs.org)
+- [rollup](https://rollupjs.org) - rollup has done the really hard stuff that makes preconstruct possible!
 - [bolt](https://github.com/boltpkg/bolt) - lots of utils and things in this project were inspired by things in bolt
 - all the people who wrote all the dependencies for this project!
