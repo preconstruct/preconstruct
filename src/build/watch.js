@@ -14,7 +14,7 @@ import { successes } from "../messages";
 import { writeOtherFiles } from "./utils";
 import { createWorker } from "../worker-client";
 
-function relativePath(id) {
+function relativePath(id: string) {
   return path.relative(process.cwd(), id);
 }
 
@@ -57,10 +57,11 @@ async function watchPackage(pkg: Package, aliases: Aliases) {
               typeof event.input === "string"
                 ? relativePath(event.input)
                 : Array.isArray(event.input)
-                  ? event.input.map(relativePath).join(", ")
-                  : Object.values(event.input)
-                      .map(relativePath)
-                      .join(', ')
+                ? event.input.map(relativePath).join(", ")
+                : Object.values(event.input)
+                    // $FlowFixMe
+                    .map(relativePath)
+                    .join(", ")
             )} → ${chalk.bold(event.output.map(relativePath).join(", "))}...`
           ),
           pkg
