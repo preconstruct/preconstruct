@@ -1,0 +1,115 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`two-entrypoints-one-with-typeof-browser-one-without: dist/multiple-entrypoints.cjs.dev.js 1`] = `
+"'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+let sum = (a, b) => a + b;
+
+exports.sum = sum;
+"
+`;
+
+exports[`two-entrypoints-one-with-typeof-browser-one-without: dist/multiple-entrypoints.cjs.js 1`] = `
+"'use strict';
+
+if (process.env.NODE_ENV === \\"production\\") {
+  module.exports = require(\\"./multiple-entrypoints.cjs.prod.js\\");
+} else {
+  module.exports = require(\\"./multiple-entrypoints.cjs.dev.js\\");
+}
+"
+`;
+
+exports[`two-entrypoints-one-with-typeof-browser-one-without: dist/multiple-entrypoints.cjs.prod.js 1`] = `
+"\\"use strict\\";
+Object.defineProperty(exports, \\"__esModule\\", { value: !0 });
+let sum = (a, b) => a + b;
+exports.sum = sum;
+"
+`;
+
+exports[`two-entrypoints-one-with-typeof-browser-one-without: dist/multiple-entrypoints.esm.js 1`] = `
+"let sum = (a, b) => a + b;
+
+export { sum };
+"
+`;
+
+exports[`two-entrypoints-one-with-typeof-browser-one-without: multiply/dist/multiple-entrypoints.cjs.dev.js 1`] = `
+"'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+let multiply = typeof window === \\"undefined\\" ? (a, b) => a * b : (a, b) => a * b;
+exports.multiply = multiply;
+"
+`;
+
+exports[`two-entrypoints-one-with-typeof-browser-one-without: multiply/dist/multiple-entrypoints.cjs.js 1`] = `
+"'use strict';
+
+if (process.env.NODE_ENV === \\"production\\") {
+  module.exports = require(\\"./multiple-entrypoints.cjs.prod.js\\");
+} else {
+  module.exports = require(\\"./multiple-entrypoints.cjs.dev.js\\");
+}
+"
+`;
+
+exports[`two-entrypoints-one-with-typeof-browser-one-without: multiply/dist/multiple-entrypoints.cjs.prod.js 1`] = `
+"\\"use strict\\";
+Object.defineProperty(exports, \\"__esModule\\", { value: !0 });
+let multiply = (a, b) => a * b;
+exports.multiply = multiply;
+"
+`;
+
+exports[`two-entrypoints-one-with-typeof-browser-one-without: multiply/dist/multiple-entrypoints.esm.js 1`] = `
+"let multiply = typeof window === \\"undefined\\" ? (a, b) => a * b : (a, b) => a * b;
+
+export { multiply };
+"
+`;
+
+exports[`two-entrypoints-one-with-typeof-browser-one-without: multiply/package.json 1`] = `
+"{
+  \\"main\\": \\"dist/multiple-entrypoints.cjs.js\\",
+  \\"module\\": \\"dist/multiple-entrypoints.esm.js\\",
+  \\"preconstruct\\": {
+    \\"source\\": \\"../src/multiply.js\\"
+  }
+}
+"
+`;
+
+exports[`two-entrypoints-one-with-typeof-browser-one-without: package.json 1`] = `
+"{
+  \\"name\\": \\"multiple-entrypoints\\",
+  \\"version\\": \\"1.0.0\\",
+  \\"main\\": \\"dist/multiple-entrypoints.cjs.js\\",
+  \\"license\\": \\"MIT\\",
+  \\"private\\": true,
+  \\"module\\": \\"dist/multiple-entrypoints.esm.js\\",
+  \\"preconstruct\\": {
+    \\"source\\": \\"src/sum\\",
+    \\"entrypoints\\": [
+      \\".\\",
+      \\"multiply\\"
+    ]
+  }
+}
+"
+`;
+
+exports[`two-entrypoints-one-with-typeof-browser-one-without: src/multiply.js 1`] = `
+"export let multiply =
+  typeof window === \\"undefined\\" ? (a, b) => a * b : (a, b) => a * b;
+"
+`;
+
+exports[`two-entrypoints-one-with-typeof-browser-one-without: src/sum.js 1`] = `"export let sum = (a, b) => a + b;"`;

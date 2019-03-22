@@ -9,6 +9,7 @@ import * as fs from "fs-extra";
 import { confirms, errors } from "../messages";
 import { FatalError } from "../errors";
 import { getValidBrowserField } from "../utils";
+import { getDevPath } from "./utils";
 import { getRollupConfigs } from "./config";
 import { writeOtherFiles } from "./utils";
 import { createWorker, destroyWorker } from "../worker-client";
@@ -19,23 +20,42 @@ async function buildPackage(pkg: Package, aliases: Aliases) {
   let configs = getRollupConfigs(pkg, aliases);
   await fs.remove(path.join(pkg.directory, "dist"));
 
-  // TODO: Fix all this stuff to work with multiple entrypoints
-  let hasCheckedBrowser = pkg.entrypoints[0].browser !== null;
+  let hasCheckedBrowser = pkg.entrypoints.every(x => x.browser);
+
+  let entrypointsByCjsDevPath = {};
+  pkg.entrypoints
+    .map(x => x.strict())
+    .forEach(x => {
+      entrypointsByCjsDevPath[getDevPath(x.main)] = x;
+    });
 
   let [sampleOutput] = await Promise.all(
     configs.map(async ({ config, outputs }) => {
-      // $FlowFixMe this is not a problem with flow, i did something wrong but it's not worth fixing right now
       let bundle = await rollup(config);
       let result = await Promise.all(
-        outputs.map(outputConfig => {
-          return bundle.write(outputConfig);
+        outputs.map(async outputConfig => {
+          let ret = await bundle.write(outputConfig);
+          return ret;
         })
       );
 
-      const nodeDevOutput = result[0].output[0];
+      let nodeDevOutput = result[0].output;
 
       if (!hasCheckedBrowser) {
         hasCheckedBrowser = true;
+
+        let entries = [];
+        let chunks = [];
+        nodeDevOutput.forEach(x => {
+          if (x.isEntry) {
+            entries.push(x);
+          } else {
+            chunks.push(x);
+          }
+        });
+
+        let entrypointsThatNeedABrowserBuild = [];
+
         if (browserPattern.test(nodeDevOutput.code)) {
           throw (async () => {
             let shouldAddBrowserField = await confirms.addBrowserField(pkg);
