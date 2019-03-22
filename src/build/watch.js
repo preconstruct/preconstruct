@@ -56,7 +56,11 @@ async function watchPackage(pkg: Package, aliases: Aliases) {
             `bundles ${chalk.bold(
               typeof event.input === "string"
                 ? relativePath(event.input)
-                : event.input.map(relativePath).join(", ")
+                : Array.isArray(event.input)
+                  ? event.input.map(relativePath).join(", ")
+                  : Object.values(event.input)
+                      .map(relativePath)
+                      .join(', ')
             )} → ${chalk.bold(event.output.map(relativePath).join(", "))}...`
           ),
           pkg
