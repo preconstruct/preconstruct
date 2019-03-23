@@ -128,6 +128,7 @@ export class Entrypoint extends Item {
   _strict: StrictEntrypoint;
   strict(): StrictEntrypoint {
     if (!this._strict) {
+      validatePackage(this.package);
       validateEntrypoint(this, false);
       this._strict = new StrictEntrypoint(
         this.path,

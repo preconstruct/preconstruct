@@ -37,9 +37,11 @@ test("multiple entrypoints", async () => {
 test("two entrypoints, one module, one not", async () => {
   let tmpPath = f.copy("two-entrypoints-one-module-one-not");
 
-  await build(tmpPath);
+  let err = await build(tmpPath).catch(x => x);
 
-  await snapshotDirectory(tmpPath);
+  expect(err).toMatchInlineSnapshot(
+    `[Error: two-entrypoints-one-module-one-not/multiply has a module build but two-entrypoints-one-module-one-not does not have a module build. Entrypoints in a package must either all have a particular build type or all not have a particular build type.]`
+  );
 });
 
 test("two entrypoints with a common dependency", async () => {
