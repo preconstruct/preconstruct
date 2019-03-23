@@ -1,6 +1,7 @@
 // @flow
 import { Package } from "../package";
 import { Project } from "../project";
+import { StrictEntrypoint } from "../entrypoint";
 import path from "path";
 import { rollup } from "./rollup";
 import { type Aliases, getAliases } from "./aliases";
@@ -10,7 +11,7 @@ import { confirms, errors } from "../messages";
 import { FatalError } from "../errors";
 import { getValidBrowserField } from "../utils";
 import { getRollupConfigs } from "./config";
-import { writeOtherFiles } from "./utils";
+import { writeOtherFiles, getDevPath } from "./utils";
 import { createWorker, destroyWorker } from "../worker-client";
 
 let browserPattern = /typeof\s+(window|document)/;
@@ -22,7 +23,7 @@ async function buildPackage(pkg: Package, aliases: Aliases) {
   // TODO: Fix all this stuff to work with multiple entrypoints
   let hasCheckedBrowser = pkg.entrypoints[0].browser !== null;
 
-  let [sampleOutput] = await Promise.all(
+  let [outputThings] = await Promise.all(
     configs.map(async ({ config, outputs }) => {
       // $FlowFixMe this is not a problem with flow, i did something wrong but it's not worth fixing right now
       let bundle = await rollup(config);
@@ -32,18 +33,19 @@ async function buildPackage(pkg: Package, aliases: Aliases) {
         })
       );
 
-      const nodeDevOutput = result[0].output[0];
+      const nodeDevOutput = result[0].output;
 
       if (!hasCheckedBrowser) {
+        let allCode = nodeDevOutput.map(({ code }) => code).join("\n");
         hasCheckedBrowser = true;
-        if (browserPattern.test(nodeDevOutput.code)) {
+        if (browserPattern.test(allCode)) {
           throw (async () => {
             let shouldAddBrowserField = await confirms.addBrowserField(pkg);
             if (shouldAddBrowserField) {
-              pkg.entrypoints[0].browser = getValidBrowserField(
-                pkg.entrypoints[0]
+              await pkg.setFieldOnEntrypoints(
+                "browser",
+                getValidBrowserField(pkg.entrypoints[0])
               );
-              await pkg.entrypoints[0].save();
             } else {
               throw new FatalError(errors.deniedWriteBrowserField, pkg);
             }
@@ -54,16 +56,30 @@ async function buildPackage(pkg: Package, aliases: Aliases) {
     })
   );
 
-  // TODO: fix this.
-  const source = await fs.readFile(pkg.entrypoints[0].source, "utf8");
+  let outputByCjsDevPath = {};
+  outputThings.forEach(x => {
+    outputByCjsDevPath[x.fileName] = x;
+  });
 
-  let flowMode = false;
-  if (source.includes("@flow")) {
-    flowMode = sampleOutput.exports.includes("default") ? "all" : "named";
-  }
+  let outputsByEntrypoint: Array<[StrictEntrypoint, Object]> = [];
+
+  pkg.entrypoints
+    .map(x => x.strict())
+    .forEach(entrypoint => {
+      outputsByEntrypoint.push([
+        entrypoint,
+        outputByCjsDevPath[getDevPath(entrypoint.main)]
+      ]);
+    });
 
   await Promise.all(
-    pkg.entrypoints.map(entrypoint => {
+    outputsByEntrypoint.map(async ([entrypoint, thing]) => {
+      const source = await fs.readFile(pkg.entrypoints[0].source, "utf8");
+
+      let flowMode = false;
+      if (source.includes("@flow")) {
+        flowMode = thing.exports.includes("default") ? "all" : "named";
+      }
       return writeOtherFiles(entrypoint.strict(), flowMode);
     })
   );
