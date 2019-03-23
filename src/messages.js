@@ -56,10 +56,11 @@ export let infos = {
   validUmdMainField: "umd:main field is valid",
   validEntrypoint: "a valid entry point exists.",
   validBrowserField: "browser field is valid",
-  validReactNativeField: "react-native field is valid"
+  validReactNativeField: "react-native field is valid",
+  validPackageEntrypoints: "package entrypoints are valid"
 };
 
 export let successes = {
-  validPackage: "package is valid!",
+  validProject: "project is valid!",
   startedWatching: "started watching!"
 };

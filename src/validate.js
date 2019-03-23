@@ -12,6 +12,7 @@ import {
 } from "./utils";
 import * as logger from "./logger";
 import equal from "fast-deep-equal";
+import { validatePackage } from "./validate-package";
 
 // this doesn't offer to fix anything
 // just does validation
@@ -117,7 +118,9 @@ export default async function validate(directory: string) {
     for (let entrypoint of pkg.entrypoints) {
       validateEntrypoint(entrypoint, true);
     }
+    validatePackage(pkg);
+    logger.info(infos.validPackageEntrypoints, pkg);
   }
 
-  logger.success(successes.validPackage);
+  logger.success(successes.validProject);
 }

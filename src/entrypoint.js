@@ -7,6 +7,7 @@ import { validateEntrypoint } from "./validate";
 import { Item } from "./item";
 import { getNameForDist } from "./utils";
 import { confirms, errors } from "./messages";
+import { validatePackage } from "./validate-package";
 /*::
 import { Package } from './package'
 */
@@ -147,6 +148,7 @@ export class StrictEntrypoint extends Entrypoint {
   }
   updater(json: Object) {
     super.updater(json);
+    validatePackage(this.package);
     validateEntrypoint(this, false);
   }
   strict() {

@@ -61,6 +61,19 @@ export class Package extends Item {
     return pkg;
   }
 
+  async setFieldOnEntrypoints(
+    field: "main" | "browser" | "module",
+    val: Object | string
+  ) {
+    await Promise.all(
+      this.entrypoints.map(async entrypoint => {
+        // $FlowFixMe
+        entrypoint[field] = val;
+        await entrypoint.save();
+      })
+    );
+  }
+
   get name(): string {
     return is(this.json.name, is.string);
   }
