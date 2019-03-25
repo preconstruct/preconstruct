@@ -55,8 +55,9 @@ async function fixEntrypoint(entrypoint: Entrypoint) {
 
     entrypoint.reactNative = getValidReactNativeField(entrypoint);
   }
-
-  await entrypoint.save();
+  if (didModify) {
+    await entrypoint.save();
+  }
   return didModify;
 }
 
