@@ -9,7 +9,6 @@ import * as logger from "../logger";
 import * as fs from "fs-extra";
 import { confirms, errors } from "../messages";
 import { FatalError } from "../errors";
-import { getValidBrowserField } from "../utils";
 import { getRollupConfigs } from "./config";
 import { writeOtherFiles, getDevPath } from "./utils";
 import { createWorker, destroyWorker } from "../worker-client";
