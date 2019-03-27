@@ -14,7 +14,9 @@ export let errors = {
     "the umd:main field is specified but a umdName option is not specified. please add it to the preconstruct field in your package.json",
   deniedWriteBrowserField:
     "building browser bundles for modules that include typeof window or typeof document is currently required",
-  noEntrypointPkgJson: "There is a missing package.json for an entrypoint"
+  noEntrypointPkgJson: "There is a missing package.json for an entrypoint",
+  noEntrypoints:
+    "packages must have at least one entrypoint, this package has no entrypoints"
 };
 
 import { createPromptConfirmLoader } from "./prompt";

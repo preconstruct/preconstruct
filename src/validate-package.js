@@ -1,5 +1,6 @@
 // @flow
 import { FatalError } from "./errors";
+import { errors } from "./messages";
 /*:: 
 import { Package } from "./package";
 */
@@ -14,10 +15,7 @@ let camelToPkgJsonField = {
 
 export function validatePackage(pkg: Package) {
   if (pkg.entrypoints.length === 0) {
-    throw new FatalError(
-      "packages must have at least one entrypoint, this package has no entrypoints",
-      pkg
-    );
+    throw new FatalError(errors.noEntrypoints, pkg);
   }
   let fields = {
     main: true,
