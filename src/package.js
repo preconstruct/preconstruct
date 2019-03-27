@@ -7,6 +7,13 @@ import { readFileSync } from "fs";
 import nodePath from "path";
 import { Item } from "./item";
 import { Entrypoint } from "./entrypoint";
+import {
+  getValidMainField,
+  getValidModuleField,
+  getValidBrowserField,
+  getValidUmdMainField,
+  getValidReactNativeField
+} from "./utils";
 
 /*::
 import {Project} from './project'
@@ -61,17 +68,33 @@ export class Package extends Item {
     return pkg;
   }
 
-  async setFieldOnEntrypoints(
-    field: "main" | "browser" | "module",
-    val: Object | string
+  setFieldOnEntrypoints(
+    field: "main" | "browser" | "module" | "umdMain" | "reactNative"
   ) {
-    await Promise.all(
-      this.entrypoints.map(async entrypoint => {
-        // $FlowFixMe
-        entrypoint[field] = val;
-        await entrypoint.save();
-      })
-    );
+    this.entrypoints.forEach(entrypoint => {
+      switch (field) {
+        case "main": {
+          entrypoint.main = getValidMainField(entrypoint);
+          break;
+        }
+        case "module": {
+          entrypoint.module = getValidModuleField(entrypoint);
+          break;
+        }
+        case "browser": {
+          entrypoint.browser = getValidBrowserField(entrypoint);
+          break;
+        }
+        case "umdMain": {
+          entrypoint.umdMain = getValidUmdMainField(entrypoint);
+          break;
+        }
+        case "reactNative": {
+          entrypoint.reactNative = getValidReactNativeField(entrypoint);
+          break;
+        }
+      }
+    });
   }
 
   get name(): string {

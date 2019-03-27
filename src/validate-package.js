@@ -1,5 +1,5 @@
 // @flow
-import { FatalError } from "./errors";
+import { FatalError, FixableError } from "./errors";
 import { errors } from "./messages";
 /*:: 
 import { Package } from "./package";
@@ -12,6 +12,26 @@ let camelToPkgJsonField = {
   browser: "browser",
   reactNative: "react-native"
 };
+
+export async function fixPackage(pkg: Package) {
+  if (pkg.entrypoints.length === 0) {
+    throw new FatalError(errors.noEntrypoints, pkg);
+  }
+  let fields = {
+    main: true,
+    module: pkg.entrypoints.some(x => x.module),
+    umdMain: pkg.entrypoints.some(x => x.umdMain),
+    browser: pkg.entrypoints.some(x => x.browser),
+    reactNative: pkg.entrypoints.some(x => x.reactNative)
+  };
+
+  Object.keys(fields)
+    .filter(x => fields[x])
+    .forEach(field => {
+      pkg.setFieldOnEntrypoints(field);
+    });
+  await Promise.all(pkg.entrypoints.map(x => x.save()));
+}
 
 export function validatePackage(pkg: Package) {
   if (pkg.entrypoints.length === 0) {
@@ -32,7 +52,7 @@ export function validatePackage(pkg: Package) {
         entrypoint[field] &&
         !fields[field]
       ) {
-        throw new FatalError(
+        throw new FixableError(
           `${pkg.entrypoints[0].name} has a ${
             camelToPkgJsonField[field]
           } build but ${entrypoint.name} does not have a ${
@@ -46,7 +66,7 @@ export function validatePackage(pkg: Package) {
         !entrypoint[field] &&
         fields[field]
       ) {
-        throw new FatalError(
+        throw new FixableError(
           `${entrypoint.name} has a ${camelToPkgJsonField[field]} build but ${
             pkg.entrypoints[0].name
           } does not have a ${
