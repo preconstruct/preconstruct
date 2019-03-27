@@ -8,6 +8,8 @@ import fix from "./fix";
 import { error } from "./logger";
 import { FatalError } from "./errors";
 
+process.env.NODE_ENV = "production";
+
 let { input } = meow(
   `
 Usage
