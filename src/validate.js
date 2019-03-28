@@ -83,7 +83,7 @@ export function validateEntrypoint(entrypoint: Entrypoint, log: boolean) {
           logger.info(infos.validUmdMainField, entrypoint);
         }
       } else {
-        throw new FatalError(errors.umdNameNotSpecified, entrypoint);
+        throw new FixableError(errors.umdNameNotSpecified, entrypoint);
       }
     } else {
       throw new FixableError(errors.invalidUmdMainField, entrypoint);

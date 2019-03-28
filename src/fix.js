@@ -45,22 +45,22 @@ async function fixEntrypoint(entrypoint: Entrypoint) {
   if (entrypoint.reactNative !== null && !isReactNativeFieldValid(entrypoint)) {
     entrypoint.reactNative = getValidReactNativeField(entrypoint);
   }
-  await entrypoint.save();
+  return entrypoint.save();
 }
 
 export default async function fix(directory: string) {
   let { packages } = await Project.create(directory);
   // do more stuff with checking whether the repo is using yarn workspaces or bolt
 
-  await Promise.all(
+  let didModify = (await Promise.all(
     packages.map(async pkg => {
-      await fixPackage(pkg);
+      let didModify = await fixPackage(pkg);
       return Promise.all(
         pkg.entrypoints.map(entrypoint => fixEntrypoint(entrypoint))
-      ).then(a => a.some(x => x));
+      ).then(a => a.some(x => x) || didModify);
     })
-  );
+  )).some(x => x);
 
   let obj = packages.length > 1 ? "packages" : "package";
-  success(`fixed ${obj}!`);
+  success(didModify ? `fixed ${obj}!` : `${obj} already valid!`);
 }

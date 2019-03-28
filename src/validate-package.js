@@ -30,7 +30,7 @@ export async function fixPackage(pkg: Package) {
     .forEach(field => {
       pkg.setFieldOnEntrypoints(field);
     });
-  await Promise.all(pkg.entrypoints.map(x => x.save()));
+  return (await Promise.all(pkg.entrypoints.map(x => x.save()))).some(x => x);
 }
 
 export function validatePackage(pkg: Package) {

@@ -51,6 +51,8 @@ export class Item {
         item.updater(this.json);
       }
       this._stringifiedSavedJson = stringified;
+      return true;
     }
+    return false;
   }
 }
