@@ -43,6 +43,9 @@ export let confirms = {
   addBrowserField: createPromptConfirmLoader(
     "typeof window or typeof document is used in this package. would you like build seperate browser builds for better browser bundle sizes?"
   ),
+  fixBrowserField: createPromptConfirmLoader(
+    "would you like to fix the browser build?"
+  ),
   createEntrypointPkgJson: createPromptConfirmLoader(
     "A package.json file does not exist for this entrypoint, would you like to create one automatically?"
   )

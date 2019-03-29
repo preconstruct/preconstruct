@@ -67,36 +67,25 @@ export let createPackageCheckTestCreator = (
     await Promise.all(
       things.map(async entrypointPath => {
         let content = entrypoints[entrypointPath];
-        try {
-          let filepath = path.join(tmpPath, entrypointPath, "package.json");
-          await fs.ensureFile(filepath);
-          await fs.writeFile(filepath, JSON.stringify(content, null, 2));
-        } catch (e) {
-          throw new Error(e.stack);
-        }
+        let filepath = path.join(tmpPath, entrypointPath, "package.json");
+        await fs.ensureFile(filepath);
+        await fs.writeFile(filepath, JSON.stringify(content, null, 2));
       })
     );
 
     await cb(async () => {
-      try {
-        await doResult(tmpPath);
-      } catch (e) {
-        throw new Error("here");
-      }
+      await doResult(tmpPath);
+
       let newThings = {};
 
       await Promise.all(
         things.map(async entrypointPath => {
-          try {
-            newThings[entrypointPath] = JSON.parse(
-              await fs.readFile(
-                path.join(tmpPath, entrypointPath, "package.json"),
-                "utf8"
-              )
-            );
-          } catch (e) {
-            throw new Error("here");
-          }
+          newThings[entrypointPath] = JSON.parse(
+            await fs.readFile(
+              path.join(tmpPath, entrypointPath, "package.json"),
+              "utf8"
+            )
+          );
         })
       );
       return newThings;

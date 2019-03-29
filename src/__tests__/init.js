@@ -211,7 +211,7 @@ Object {
 test("fix browser", async () => {
   let tmpPath = f.copy("valid-package");
 
-  confirms.addBrowserField.mockReturnValue(true);
+  confirms.fixBrowserField.mockReturnValue(true);
 
   await modifyPkg(tmpPath, pkg => {
     pkg.browser = "invalid.js";
@@ -329,6 +329,55 @@ Object {
   "two": Object {
     "main": "dist/something.cjs.js",
     "module": "dist/something.esm.js",
+    "preconstruct": Object {
+      "source": "../src",
+    },
+  },
+}
+`);
+  }
+);
+
+testInit(
+  "three entrypoints, no main, add main and fix browser",
+  {
+    ...basicThreeEntrypoints,
+    "": { ...basicThreeEntrypoints[""], browser: "" }
+  },
+  async run => {
+    confirms.writeMainField.mockReturnValue(true);
+    confirms.writeModuleField.mockReturnValue(false);
+    confirms.writeUmdBuilds.mockReturnValue(false);
+    confirms.fixBrowserField.mockReturnValue(true);
+
+    let result = await run();
+
+    expect(result).toMatchInlineSnapshot(`
+Object {
+  "": Object {
+    "browser": Object {
+      "./dist/something.cjs.js": "./dist/something.browser.cjs.js",
+    },
+    "main": "dist/something.cjs.js",
+    "name": "something",
+    "preconstruct": Object {
+      "entrypoints": Array [
+        ".",
+        "two",
+        "three",
+      ],
+    },
+  },
+  "one": Object {
+    "preconstruct": Object {
+      "source": "../src",
+    },
+  },
+  "two": Object {
+    "browser": Object {
+      "./dist/something.cjs.js": "./dist/something.browser.cjs.js",
+    },
+    "main": "dist/something.cjs.js",
     "preconstruct": Object {
       "source": "../src",
     },

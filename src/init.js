@@ -50,10 +50,10 @@ async function doInit(pkg: Package) {
   let someEntrypointsHaveAMaybeInvalidUmdBuild = pkg.entrypoints.some(
     entrypoint => entrypoint.umdMain !== null
   );
-  let someUmdMainFieldsAreInvalid = pkg.entrypoints.every(
+  let someUmdMainFieldsAreInvalid = pkg.entrypoints.some(
     entrypoint => !isUmdMainFieldValid(entrypoint)
   );
-  let someUmdNamesAreNotSpecified = pkg.entrypoints.every(
+  let someUmdNamesAreNotSpecified = pkg.entrypoints.some(
     entrypoint => !isUmdNameSpecified(entrypoint)
   );
   if (
@@ -76,7 +76,7 @@ async function doInit(pkg: Package) {
     }
   }
 
-  let allEntrypointsHaveABrowserField = pkg.entrypoints.every(
+  let someEntrypointsHaveABrowserField = pkg.entrypoints.some(
     entrypoint => entrypoint.browser !== null
   );
 
@@ -84,10 +84,10 @@ async function doInit(pkg: Package) {
     entrypoint => !isBrowserFieldValid(entrypoint)
   );
   if (
-    allEntrypointsHaveABrowserField &&
+    someEntrypointsHaveABrowserField &&
     someEntrypointsHaveAnInvalidBrowserField
   ) {
-    let shouldFixBrowserField = await confirms.addBrowserField(pkg);
+    let shouldFixBrowserField = await confirms.fixBrowserField(pkg);
     if (shouldFixBrowserField) {
       pkg.setFieldOnEntrypoints("browser");
     } else {
