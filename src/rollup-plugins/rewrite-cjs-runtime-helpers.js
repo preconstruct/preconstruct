@@ -15,7 +15,8 @@ export default function rewriteCjsRuntimeHelpers() {
             babelrc: false,
             configFile: false,
             plugins: [
-              require.resolve("../babel-plugins/rewrite-cjs-runtime-helpers")
+              require.resolve("../babel-plugins/rewrite-cjs-runtime-helpers"),
+              require.resolve("../babel-plugins/ks-field-types-render-chunk")
             ]
           })
         )

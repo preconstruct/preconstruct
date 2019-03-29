@@ -218,7 +218,8 @@ export let getRollupConfig = (
           [
             require.resolve("@babel/plugin-transform-runtime"),
             { useESModules: true }
-          ]
+          ],
+          require.resolve("../babel-plugins/ks-field-types-in-babel")
         ]
       }),
       cjs(),

@@ -1,0 +1,7 @@
+{
+  "name": "field-types",
+  "version": "1.0.0",
+  "main": "dist/field-types.cjs.js",
+  "license": "MIT",
+  "private": true
+}

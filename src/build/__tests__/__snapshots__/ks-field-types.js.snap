@@ -1,0 +1,73 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`field types: dist/chunk-c4d933aa.cjs.dev.js 1`] = `
+"'use strict';
+
+var Field = () => {
+  return \\"some cool react component stuff\\";
+};
+
+exports.default = Field;
+"
+`;
+
+exports[`field types: dist/chunk-c4d933aa.cjs.prod.js 1`] = `
+"\\"use strict\\";
+var Field = () => \\"some cool react component stuff\\";
+exports.default = Field;
+"
+`;
+
+exports[`field types: dist/field-types.cjs.dev.js 1`] = `
+"'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+let Text = { ...otherFieldTypeStuff,
+  views: {
+    Field: require.resolve('./chunk-c4d933aa.cjs.dev.js')
+  }
+};
+exports.Text = Text;
+"
+`;
+
+exports[`field types: dist/field-types.cjs.js 1`] = `
+"'use strict';
+
+if (process.env.NODE_ENV === \\"production\\") {
+  module.exports = require(\\"./field-types.cjs.prod.js\\");
+} else {
+  module.exports = require(\\"./field-types.cjs.dev.js\\");
+}
+"
+`;
+
+exports[`field types: dist/field-types.cjs.prod.js 1`] = `
+"\\"use strict\\";
+Object.defineProperty(exports, \\"__esModule\\", { value: !0 });
+let Text = {
+  ...otherFieldTypeStuff,
+  views: { Field: require.resolve(\\"./chunk-c4d933aa.cjs.prod.js\\") }
+};
+exports.Text = Text;
+"
+`;
+
+exports[`field types: src/index.js 1`] = `
+"export let Text = {
+  ...otherFieldTypeStuff,
+  views: {
+    Field: importView(\\"./views/Field\\")
+  }
+};
+"
+`;
+
+exports[`field types: src/views/Field.js 1`] = `
+"export default () => {
+  return \\"some cool react component stuff\\";
+};
+"
+`;
