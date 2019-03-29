@@ -174,7 +174,7 @@ Array [
   ],
   Array [
     "🎁 success",
-    "Initialised package!",
+    "initialised package!",
   ],
 ]
 `);
