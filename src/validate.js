@@ -53,7 +53,7 @@ export function isReactNativeFieldValid(entrypoint: Entrypoint): boolean {
 }
 
 export function isUmdNameSpecified(entrypoint: Entrypoint) {
-  return entrypoint._config.umdName !== null;
+  return typeof entrypoint._config.umdName === "string";
 }
 
 export function validateEntrypoint(entrypoint: Entrypoint, log: boolean) {

@@ -56,41 +56,47 @@ export async function modifyPkg(tmpPath: string, cb: Object => mixed) {
 
 export let createPackageCheckTestCreator = (
   doResult: string => Promise<void>
-) => async (
-  testName: string,
-  entrypoints: { [key: string]: Object },
-  cb: (doThing: () => Promise<{ [key: string]: Object }>) => Promise<void>
 ) => {
-  test(testName, async () => {
-    let tmpPath = f.copy("template-simple-package");
-    let things = Object.keys(entrypoints);
-    await Promise.all(
-      things.map(async entrypointPath => {
-        let content = entrypoints[entrypointPath];
-        let filepath = path.join(tmpPath, entrypointPath, "package.json");
-        await fs.ensureFile(filepath);
-        await fs.writeFile(filepath, JSON.stringify(content, null, 2));
-      })
-    );
-
-    await cb(async () => {
-      await doResult(tmpPath);
-
-      let newThings = {};
-
+  let createTestCreator = testFn => async (
+    testName: string,
+    entrypoints: { [key: string]: Object },
+    cb: (doThing: () => Promise<{ [key: string]: Object }>) => Promise<void>
+  ) => {
+    testFn(testName, async () => {
+      let tmpPath = f.copy("template-simple-package");
+      let things = Object.keys(entrypoints);
       await Promise.all(
         things.map(async entrypointPath => {
-          newThings[entrypointPath] = JSON.parse(
-            await fs.readFile(
-              path.join(tmpPath, entrypointPath, "package.json"),
-              "utf8"
-            )
-          );
+          let content = entrypoints[entrypointPath];
+          let filepath = path.join(tmpPath, entrypointPath, "package.json");
+          await fs.ensureFile(filepath);
+          await fs.writeFile(filepath, JSON.stringify(content, null, 2));
         })
       );
-      return newThings;
+
+      await cb(async () => {
+        await doResult(tmpPath);
+
+        let newThings = {};
+
+        await Promise.all(
+          things.map(async entrypointPath => {
+            newThings[entrypointPath] = JSON.parse(
+              await fs.readFile(
+                path.join(tmpPath, entrypointPath, "package.json"),
+                "utf8"
+              )
+            );
+          })
+        );
+        return newThings;
+      });
     });
-  });
+  };
+  let testFn = createTestCreator(test);
+  testFn.only = createTestCreator(test.only);
+  testFn.skip = createTestCreator(test.skip);
+  return testFn;
 };
 
 export async function snapshotDistFiles(tmpPath: string) {

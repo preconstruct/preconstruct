@@ -9,11 +9,15 @@ import { fixPackage } from "./validate-package";
 
 async function fixEntrypoint(entrypoint: Entrypoint) {
   validateEntrypointSource(entrypoint);
+
   if (entrypoint.umdMain !== null && !isUmdNameSpecified(entrypoint)) {
     let umdName = await promptInput(inputs.getUmdName, entrypoint);
     entrypoint.umdName = umdName;
+    await entrypoint.save();
+
+    return true;
   }
-  return entrypoint.save();
+  return false;
 }
 
 export default async function fix(directory: string) {
@@ -22,11 +26,11 @@ export default async function fix(directory: string) {
 
   let didModify = (await Promise.all(
     packages.map(async pkg => {
-      let didModify = await fixPackage(pkg);
-      return (
-        didModify ||
-        (await Promise.all(pkg.entrypoints.map(fixEntrypoint))).some(x => x)
-      );
+      let didModifyInPkgFix = await fixPackage(pkg);
+      let didModifyInEntrypointsFix = (await Promise.all(
+        pkg.entrypoints.map(fixEntrypoint)
+      )).some(x => x);
+      return didModifyInPkgFix || didModifyInEntrypointsFix;
     })
   )).some(x => x);
 
