@@ -109,7 +109,7 @@ interface SerializedTimings {
   [label: string]: [number, number, number];
 }
 
-interface OutputChunk extends RenderedChunk {
+export interface OutputChunk extends RenderedChunk {
   code: string;
   map?: SourceMap;
 }
@@ -126,22 +126,30 @@ interface SourceMap {
   toUrl(): string;
 }
 
+interface RenderedModule {
+  originalLength: number;
+  removedExports: string[];
+  renderedExports: string[];
+  renderedLength: number;
+}
+
 export interface RenderedChunk {
-  fileName: string;
-  isEntry: boolean;
-  imports: string[];
+  dynamicImports: string[];
   exports: string[];
+  facadeModuleId: string | null;
+  fileName: string;
+  imports: string[];
+  isDynamicEntry: boolean;
+  isEntry: boolean;
   modules: {
     [id: string]: RenderedModule
   };
+  name: string;
 }
 
-interface RenderedModule {
-  renderedExports: string[];
-  removedExports: string[];
-  renderedLength: number;
-  originalLength: number;
-}
+type RollupOutput = {
+  output: Array<OutputChunk>
+};
 
 export interface RollupSingleFileBuild {
   // TODO: consider deprecating to match code splitting
@@ -151,6 +159,6 @@ export interface RollupSingleFileBuild {
   watchFiles: string[];
 
   generate: (outputOptions: OutputOptions) => Promise<OutputChunk>;
-  write: (options: OutputOptions) => Promise<OutputChunk>;
+  write: (options: OutputOptions) => Promise<RollupOutput>;
   getTimings?: () => SerializedTimings;
 }

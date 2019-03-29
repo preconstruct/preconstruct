@@ -70,16 +70,15 @@ async function watchPackage(pkg: Package, aliases: Aliases) {
       }
 
       case "BUNDLE_END": {
-        pkg.entrypoints.forEach(entrypoint => {
-          writeOtherFiles(
-            entrypoint.strict(),
-            event.result.modules[0].originalCode.includes("@flow")
-              ? Object.keys(event.result.exports).includes("default")
-                ? "all"
-                : "named"
-              : false
-          );
-        });
+        event.result
+          .generate({ format: "esm" })
+          .then(({ output }) => {
+            console.log("yay", thing);
+          })
+          .catch(reject);
+        console.log();
+
+        pkg.entrypoints.forEach(entrypoint => {});
 
         info(
           chalk.green(
