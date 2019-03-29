@@ -105,7 +105,7 @@ export default async function init(directory: string) {
 
   success(
     project.packages.length > 1
-      ? "Initialised packages!"
-      : "Initialised package!"
+      ? "initialised packages!"
+      : "initialised package!"
   );
 }
