@@ -8,6 +8,7 @@ import { Item } from "./item";
 import { getNameForDist } from "./utils";
 import { confirms, errors } from "./messages";
 import { validatePackage } from "./validate-package";
+
 /*::
 import { Package } from './package'
 */

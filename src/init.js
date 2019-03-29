@@ -18,7 +18,6 @@ async function doInit(pkg: Package) {
   pkg.entrypoints.forEach(entrypoint => {
     validateEntrypointSource(entrypoint);
   });
-
   if (pkg.entrypoints.every(entrypoint => isMainFieldValid(entrypoint))) {
     info(infos.validMainField, pkg);
   } else {
@@ -80,6 +79,7 @@ async function doInit(pkg: Package) {
   let allEntrypointsHaveABrowserField = pkg.entrypoints.every(
     entrypoint => entrypoint.browser !== null
   );
+
   let someEntrypointsHaveAnInvalidBrowserField = pkg.entrypoints.some(
     entrypoint => !isBrowserFieldValid(entrypoint)
   );

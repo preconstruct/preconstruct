@@ -2,6 +2,10 @@
 import path from "path";
 import * as fs from "fs-extra";
 import globby from "globby";
+import fixturez from "fixturez";
+
+let f = fixturez(__dirname);
+
 require("chalk").enabled = false;
 // $FlowFixMe
 console.error = jest.fn();
@@ -49,6 +53,56 @@ export async function modifyPkg(tmpPath: string, cb: Object => mixed) {
   let pkgPath = getPkgPath(tmpPath);
   await fs.writeFile(pkgPath, JSON.stringify(json, null, 2));
 }
+
+export let createPackageCheckTestCreator = (
+  doResult: string => Promise<void>
+) => async (
+  testName: string,
+  entrypoints: { [key: string]: Object },
+  cb: (doThing: () => Promise<{ [key: string]: Object }>) => Promise<void>
+) => {
+  test(testName, async () => {
+    let tmpPath = f.copy("template-simple-package");
+    let things = Object.keys(entrypoints);
+    await Promise.all(
+      things.map(async entrypointPath => {
+        let content = entrypoints[entrypointPath];
+        try {
+          let filepath = path.join(tmpPath, entrypointPath, "package.json");
+          await fs.ensureFile(filepath);
+          await fs.writeFile(filepath, JSON.stringify(content, null, 2));
+        } catch (e) {
+          throw new Error(e.stack);
+        }
+      })
+    );
+
+    await cb(async () => {
+      try {
+        await doResult(tmpPath);
+      } catch (e) {
+        throw new Error("here");
+      }
+      let newThings = {};
+
+      await Promise.all(
+        things.map(async entrypointPath => {
+          try {
+            newThings[entrypointPath] = JSON.parse(
+              await fs.readFile(
+                path.join(tmpPath, entrypointPath, "package.json"),
+                "utf8"
+              )
+            );
+          } catch (e) {
+            throw new Error("here");
+          }
+        })
+      );
+      return newThings;
+    });
+  });
+};
 
 export async function snapshotDistFiles(tmpPath: string) {
   let distPath = path.join(tmpPath, "dist");

@@ -41,7 +41,8 @@ async function buildPackage(pkg: Package, aliases: Aliases) {
           throw (async () => {
             let shouldAddBrowserField = await confirms.addBrowserField(pkg);
             if (shouldAddBrowserField) {
-              await pkg.setFieldOnEntrypoints("browser");
+              pkg.setFieldOnEntrypoints("browser");
+              await Promise.all(pkg.entrypoints.map(x => x.save()));
             } else {
               throw new FatalError(errors.deniedWriteBrowserField, pkg);
             }

@@ -6,6 +6,8 @@ import { snapshotDistFiles, snapshotDirectory } from "../../../test-utils";
 
 const f = fixturez(__dirname);
 
+jest.setTimeout(10000);
+
 let unsafeRequire = require;
 
 jest.mock("../../prompt");
@@ -36,12 +38,15 @@ test("multiple entrypoints", async () => {
 
 test("two entrypoints, one module, one not", async () => {
   let tmpPath = f.copy("two-entrypoints-one-module-one-not");
-
-  let err = await build(tmpPath).catch(x => x);
-
-  expect(err).toMatchInlineSnapshot(
-    `[Error: two-entrypoints-one-module-one-not/multiply has a module build but two-entrypoints-one-module-one-not does not have a module build. Entrypoints in a package must either all have a particular build type or all not have a particular build type.]`
-  );
+  try {
+    await build(tmpPath);
+  } catch (err) {
+    expect(err).toMatchInlineSnapshot(
+      `[Error: two-entrypoints-one-module-one-not/multiply has a module build but two-entrypoints-one-module-one-not does not have a module build. Entrypoints in a package must either all have a particular build type or all not have a particular build type.]`
+    );
+    return;
+  }
+  expect(true).toBe(false);
 });
 
 test("two entrypoints with a common dependency", async () => {

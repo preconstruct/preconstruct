@@ -107,16 +107,6 @@ test("prod checks", async () => {
 // TODO: make it faster so this isn't required
 jest.setTimeout(20000);
 
-test("browser", async () => {
-  let tmpPath = f.copy("browser");
-
-  confirms.addBrowserField.mockReturnValue(Promise.resolve(true));
-
-  await build(tmpPath);
-
-  await snapshotDistFiles(tmpPath);
-});
-
 test("umd with dep on other module", async () => {
   let tmpPath = f.copy("umd-with-dep");
 
