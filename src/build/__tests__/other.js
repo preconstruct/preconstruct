@@ -1,7 +1,8 @@
 // @flow
 import build from "../";
 import fixturez from "fixturez";
-import { snapshotDistFiles } from "../../../test-utils";
+import { snapshotDistFiles, snapshotDirectory } from "../../../test-utils";
+import { confirms } from "../../messages";
 
 const f = fixturez(__dirname);
 
@@ -13,4 +14,14 @@ test("react native", async () => {
   await build(tmpPath);
 
   await snapshotDistFiles(tmpPath);
+});
+
+test("browser", async () => {
+  let tmpPath = f.copy("browser");
+
+  confirms.addBrowserField.mockReturnValue(Promise.resolve(true));
+
+  await build(tmpPath);
+  expect(confirms.addBrowserField).toBeCalledTimes(1);
+  await snapshotDirectory(tmpPath, "all");
 });

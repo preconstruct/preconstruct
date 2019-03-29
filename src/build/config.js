@@ -70,13 +70,10 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
     outputs: Array<OutputOptions>
   }> = [];
 
+  let strictEntrypoints = pkg.entrypoints.map(x => x.strict());
+
   configs.push({
-    config: getRollupConfig(
-      pkg,
-      pkg.entrypoints.map(x => x.strict()),
-      aliases,
-      "node-dev"
-    ),
+    config: getRollupConfig(pkg, strictEntrypoints, aliases, "node-dev"),
     outputs: [
       {
         format: "cjs",
@@ -87,45 +84,18 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
       }
     ]
   });
-  // TODO: optimise for the case that all entrypoints have module builds(this will be 99% of cases)
-  let entrypointsWithModule = pkg.entrypoints
-    .map(x => x.strict())
-    .filter(x => x.module);
-  if (entrypointsWithModule.length) {
-    if (entrypointsWithModule.length === pkg.entrypoints.length) {
-      configs[0].outputs.push({
-        format: "es",
-        entryFileNames: "[name].esm.js",
-        chunkFileNames: "dist/[name]-[hash].esm.js",
-        dir: pkg.directory
-      });
-    } else {
-      configs.push({
-        config: getRollupConfig(
-          pkg,
-          entrypointsWithModule,
-          aliases,
-          "node-dev"
-        ),
-        outputs: [
-          {
-            format: "es",
-            entryFileNames: "[name].esm.js",
-            chunkFileNames: "dist/[name]-[hash].esm.js",
-            dir: pkg.directory
-          }
-        ]
-      });
-    }
+  let hasModuleField = strictEntrypoints[0].module !== null;
+  if (hasModuleField) {
+    configs[0].outputs.push({
+      format: "es",
+      entryFileNames: "[name].esm.js",
+      chunkFileNames: "dist/[name]-[hash].esm.js",
+      dir: pkg.directory
+    });
   }
 
   configs.push({
-    config: getRollupConfig(
-      pkg,
-      pkg.entrypoints.map(x => x.strict()),
-      aliases,
-      "node-prod"
-    ),
+    config: getRollupConfig(pkg, strictEntrypoints, aliases, "node-prod"),
     outputs: [
       {
         format: "cjs",
@@ -140,38 +110,37 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
   // umd builds are a bit special
   // we don't guarantee that shared modules are shared across umd builds
   // this is just like dependencies, they're bundled into the umd build
-  pkg.entrypoints
-    .filter(x => x.umdMain)
-    .map(x => x.strict())
-    .forEach(entrypoint => {
-      let umdName = is(entrypoint._config.umdName, is.string);
-      is(entrypoint.umdMain, is.string);
+  if (strictEntrypoints[0].umdMain !== null)
+    pkg.entrypoints
+      .map(x => x.strict())
+      .forEach(entrypoint => {
+        let umdName = is(entrypoint._config.umdName, is.string);
+        is(entrypoint.umdMain, is.string);
 
-      configs.push({
-        config: getRollupConfig(pkg, [entrypoint], aliases, "umd"),
-        outputs: [
-          {
-            format: "umd",
-            sourcemap: true,
-            entryFileNames: "[name].umd.min.js",
-            name: umdName,
-            dir: pkg.directory,
-            globals: getGlobals(pkg, aliases)
-          }
-        ]
+        configs.push({
+          config: getRollupConfig(pkg, [entrypoint], aliases, "umd"),
+          outputs: [
+            {
+              format: "umd",
+              sourcemap: true,
+              entryFileNames: "[name].umd.min.js",
+              name: umdName,
+              dir: pkg.directory,
+              globals: getGlobals(pkg, aliases)
+            }
+          ]
+        });
       });
-    });
-  let entrypointsWithBrowser = pkg.entrypoints
-    .map(x => x.strict())
-    .filter(x => x.browser);
 
-  if (entrypointsWithBrowser.length) {
+  let hasBrowserField = strictEntrypoints[0].browser !== null;
+
+  if (hasBrowserField) {
     // i just realised that we're making the assumption that if you have a browser build
     // you also have a module build. I feel like this is probably a safe assumption
     // but might want to think about more.
 
     configs.push({
-      config: getRollupConfig(pkg, entrypointsWithBrowser, aliases, "browser"),
+      config: getRollupConfig(pkg, strictEntrypoints, aliases, "browser"),
       outputs: [
         {
           format: "cjs",
@@ -189,18 +158,10 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
       ]
     });
   }
-  let entrypointsWithReactNative = pkg.entrypoints
-    .map(x => x.strict())
-    .filter(x => x.reactNative);
-  // TODO: remove this and do the end result with entrypoint stuff maybe
-  if (entrypointsWithReactNative.length) {
+
+  if (strictEntrypoints[0].reactNative !== null) {
     configs.push({
-      config: getRollupConfig(
-        pkg,
-        entrypointsWithReactNative,
-        aliases,
-        "browser"
-      ),
+      config: getRollupConfig(pkg, strictEntrypoints, aliases, "react-native"),
       outputs: [
         {
           format: "cjs",

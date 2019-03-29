@@ -5,8 +5,8 @@ import validate from "./validate";
 import build from "./build";
 import watch from "./build/watch";
 import fix from "./fix";
-import { error } from "./logger";
-import { FatalError } from "./errors";
+import { error, info } from "./logger";
+import { FatalError, FixableError } from "./errors";
 
 process.env.NODE_ENV = "production";
 
@@ -61,7 +61,13 @@ class CommandNotFoundError extends Error {}
     throw new CommandNotFoundError();
   }
 })().catch(err => {
-  if (err instanceof FatalError) {
+  if (err instanceof FixableError) {
+    error(err.message, err.item);
+    info(
+      "The above error can be fixed automatically by running preconstruct fix",
+      err.item
+    );
+  } else if (err instanceof FatalError) {
     error(err.message, err.item);
   } else if (err instanceof CommandNotFoundError) {
     error(errors.commandNotFound);
