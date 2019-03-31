@@ -38,7 +38,9 @@ export function validatePackage(pkg: Package) {
     throw new FatalError(errors.noEntrypoints, pkg);
   }
   let fields = {
-    main: true,
+    // main is intentionally not here, since it's always required
+    // it will be validated in validateEntrypoint and the case
+    // which this function validates will never happen
     module: !!pkg.entrypoints[0].module,
     umdMain: !!pkg.entrypoints[0].umdMain,
     browser: !!pkg.entrypoints[0].browser,

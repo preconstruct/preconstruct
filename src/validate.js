@@ -115,10 +115,10 @@ export default async function validate(directory: string) {
   let project = await Project.create(directory);
 
   for (let pkg of project.packages) {
+    validatePackage(pkg);
     for (let entrypoint of pkg.entrypoints) {
       validateEntrypoint(entrypoint, true);
     }
-    validatePackage(pkg);
     logger.info(infos.validPackageEntrypoints, pkg);
   }
 

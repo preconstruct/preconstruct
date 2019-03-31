@@ -47,6 +47,19 @@ Array [
 `);
 });
 
+test("no main field", async () => {
+  let tmpPath = f.find("no-main-field");
+
+  try {
+    await validate(tmpPath);
+  } catch (e) {
+    expect(e).toMatchInlineSnapshot(`[Error: main field is invalid]`);
+    return;
+  }
+
+  expect(true).toBe(false);
+});
+
 test("no module", async () => {
   let tmpPath = f.find("no-module");
 
