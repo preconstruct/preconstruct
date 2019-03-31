@@ -1,3 +1,5 @@
+import { importView } from "preconstruct";
+
 export let Text = {
   ...otherFieldTypeStuff,
   views: {

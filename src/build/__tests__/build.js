@@ -2,8 +2,12 @@
 import build from "../";
 import fixturez from "fixturez";
 import path from "path";
-import spawn from "spawndamnit";
-import { initBasic, getPkg, snapshotDistFiles } from "../../../test-utils";
+import {
+  initBasic,
+  getPkg,
+  snapshotDistFiles,
+  install
+} from "../../../test-utils";
 import { confirms } from "../../messages";
 import { FatalError } from "../../errors";
 import { promptInput } from "../../prompt";
@@ -13,10 +17,6 @@ const f = fixturez(__dirname);
 jest.mock("../../prompt");
 
 let unsafePromptInput: any = promptInput;
-
-async function install(tmpPath) {
-  await spawn("yarn", ["install"], { cwd: tmpPath });
-}
 
 jest.mock("install-packages");
 

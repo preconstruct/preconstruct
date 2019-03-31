@@ -5,7 +5,10 @@ module.exports = function(babel) {
     visitor: {
       CallExpression(path) {
         // TODO: do this via import stuff
-        if (path.get("callee").node.name !== "importView") {
+        if (
+          path.get("callee").node.name !==
+          "___KS_BUILD_SYSTEM_INTERNAL___importView"
+        ) {
           return;
         }
         let promiseResolveCall = path.get("arguments")[0];

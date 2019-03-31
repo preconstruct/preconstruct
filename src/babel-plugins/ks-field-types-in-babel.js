@@ -1,18 +1,20 @@
-module.exports = function(babel) {
-  const { types: t } = babel;
-  return {
-    visitor: {
-      CallExpression(path) {
-        // TODO: do this via import stuff
-        if (path.get("callee").node.name !== "importView") {
-          return;
-        }
-        // TODO: validate that it's a string literal and throw a nice error when it's not explaining why it has to be a string literal
-        let stringLiteral = path.get("arguments.0");
+let createPlugin = require("./macros-thing");
+
+module.exports = createPlugin({
+  preconstruct: function({ babel, references }) {
+    const { types: t } = babel;
+    if (references.importView) {
+      references.importView.forEach(reference => {
+        // TODO: check that parentPath is a call expression
+        let stringLiteral = reference.parentPath.get("arguments.0");
+        // TODO: check that stringLiteral is actually a string literal
         stringLiteral.replaceWith(
           t.callExpression(t.import(), [stringLiteral.node])
         );
-      }
+        reference.replaceWith(
+          t.identifier("___KS_BUILD_SYSTEM_INTERNAL___importView")
+        );
+      });
     }
-  };
-};
+  }
+});

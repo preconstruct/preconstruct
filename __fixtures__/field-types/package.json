@@ -3,5 +3,8 @@
   "version": "1.0.0",
   "main": "dist/field-types.cjs.js",
   "license": "MIT",
-  "private": true
+  "private": true,
+  "dependencies": {
+    "preconstruct": "0.0.52"
+  }
 }

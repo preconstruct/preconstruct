@@ -3,6 +3,7 @@ import path from "path";
 import * as fs from "fs-extra";
 import globby from "globby";
 import fixturez from "fixturez";
+import spawn from "spawndamnit";
 
 let f = fixturez(__dirname);
 
@@ -135,4 +136,8 @@ export async function snapshotDirectory(
       );
     })
   );
+}
+
+export async function install(tmpPath: string) {
+  await spawn("yarn", ["install"], { cwd: tmpPath });
 }
