@@ -8,6 +8,10 @@ const f = fixturez(__dirname);
 
 jest.mock("../../prompt");
 
+afterEach(() => {
+  jest.resetAllMocks();
+});
+
 test("react native", async () => {
   let tmpPath = f.copy("with-react-native-field");
 
@@ -18,6 +22,16 @@ test("react native", async () => {
 
 test("browser", async () => {
   let tmpPath = f.copy("browser");
+
+  confirms.addBrowserField.mockReturnValue(Promise.resolve(true));
+
+  await build(tmpPath);
+  expect(confirms.addBrowserField).toBeCalledTimes(1);
+  await snapshotDirectory(tmpPath, "all");
+});
+
+test("browser no module", async () => {
+  let tmpPath = f.copy("browser-no-module");
 
   confirms.addBrowserField.mockReturnValue(Promise.resolve(true));
 

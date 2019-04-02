@@ -72,6 +72,8 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
 
   let strictEntrypoints = pkg.entrypoints.map(x => x.strict());
 
+  let hasModuleField = strictEntrypoints[0].module !== null;
+
   configs.push({
     config: getRollupConfig(pkg, strictEntrypoints, aliases, "node-dev"),
     outputs: [
@@ -81,18 +83,19 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
         chunkFileNames: "dist/[name]-[hash].cjs.dev.js",
         dir: pkg.directory,
         exports: "named"
-      }
+      },
+      ...(hasModuleField
+        ? [
+            {
+              format: "es",
+              entryFileNames: "[name].esm.js",
+              chunkFileNames: "dist/[name]-[hash].esm.js",
+              dir: pkg.directory
+            }
+          ]
+        : [])
     ]
   });
-  let hasModuleField = strictEntrypoints[0].module !== null;
-  if (hasModuleField) {
-    configs[0].outputs.push({
-      format: "es",
-      entryFileNames: "[name].esm.js",
-      chunkFileNames: "dist/[name]-[hash].esm.js",
-      dir: pkg.directory
-    });
-  }
 
   configs.push({
     config: getRollupConfig(pkg, strictEntrypoints, aliases, "node-prod"),
@@ -149,12 +152,16 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
           dir: pkg.directory,
           exports: "named"
         },
-        {
-          format: "es",
-          entryFileNames: "[name].browser.esm.js",
-          chunkFileNames: "dist/[name]-[hash].browser.esm.js",
-          dir: pkg.directory
-        }
+        ...(hasModuleField
+          ? [
+              {
+                format: "es",
+                entryFileNames: "[name].browser.esm.js",
+                chunkFileNames: "dist/[name]-[hash].browser.esm.js",
+                dir: pkg.directory
+              }
+            ]
+          : [])
       ]
     });
   }
@@ -170,12 +177,16 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
           dir: pkg.directory,
           exports: "named"
         },
-        {
-          format: "es",
-          entryFileNames: "[name].native.esm.js",
-          chunkFileNames: "dist/[name]-[hash].native.esm.js",
-          dir: pkg.directory
-        }
+        ...(hasModuleField
+          ? [
+              {
+                format: "es",
+                entryFileNames: "[name].native.esm.js",
+                chunkFileNames: "dist/[name]-[hash].native.esm.js",
+                dir: pkg.directory
+              }
+            ]
+          : [])
       ]
     });
   }
