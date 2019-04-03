@@ -5,10 +5,9 @@ import { promptInput } from "./prompt";
 import pLimit from "p-limit";
 import resolveFrom from "resolve-from";
 import globby from "globby";
-import { readFileSync } from "fs";
-import * as fs from "fs-extra";
 import { Item } from "./item";
 import { Package } from "./package";
+import { resync, desyncs, desync } from "./resync";
 
 let unsafeRequire = require;
 
@@ -28,21 +27,23 @@ export class Project extends Item {
     let hasYarnWorkspaces = !!this.json.workspaces;
     return hasBolt && !hasYarnWorkspaces;
   }
-  static async create(directory: string): Promise<Project> {
+  static creator = desync(function*(directory: string) {
     let filePath = nodePath.join(directory, "package.json");
-    let contents = await fs.readFile(filePath, "utf-8");
+    let contents = yield* desyncs.readFile(filePath, "utf-8");
     let project = new Project(filePath, contents);
-    project.packages = await project._packages();
+    project.packages = yield* resync({
+      async: () => project._packages(),
+      sync: () => project._packagesSync()
+    });
 
     return project;
+  });
+
+  static async create(directory: string): Promise<Project> {
+    return Project.creator(directory).async();
   }
   static createSync(directory: string): Project {
-    let filePath = nodePath.join(directory, "package.json");
-    let contents = readFileSync(filePath, "utf-8");
-    let project = new Project(filePath, contents);
-    project.packages = project._packagesSync();
-
-    return project;
+    return Project.creator(directory).sync();
   }
 
   get name(): string {
@@ -52,33 +53,38 @@ export class Project extends Item {
     this.json.name = name;
   }
   packages: Array<Package>;
-
-  async _packages(): Promise<Array<Package>> {
+  *_packages() {
     // suport bolt later probably
     // maybe lerna too though probably not
-    if (!this._config.packages && this.json.workspaces) {
-      let _workspaces;
-      if (Array.isArray(this.json.workspaces)) {
-        _workspaces = this.json.workspaces;
-      } else if (Array.isArray(this.json.workspaces.packages)) {
-        _workspaces = this.json.workspaces.packages;
-      }
-
-      let workspaces = is(_workspaces, is.arrayOf(is.string));
-
-      let packages = await promptInput(
-        "what packages should preconstruct build?",
-        this,
-        workspaces.join(",")
-      );
-
-      this._config.packages = packages.split(",");
-
-      await this.save();
+    yield {
+      async: async () => {
+        if (!this._config.packages && this.json.workspaces) {
+          let _workspaces;
+          if (Array.isArray(this.json.workspaces)) {
+            _workspaces = this.json.workspaces;
+          } else if (Array.isArray(this.json.workspaces.packages)) {
+            _workspaces = this.json.workspaces.packages;
+          }
+    
+          let workspaces = is(_workspaces, is.arrayOf(is.string));
+    
+          let packages = await promptInput(
+            "what packages should preconstruct build?",
+            this,
+            workspaces.join(",")
+          );
+    
+          this._config.packages = packages.split(",");
+    
+          await this.save();
+        }
+      },
+      sync: () => {}
     }
+ 
 
     try {
-      let filenames = await globby(this.configPackages, {
+      let filenames = yield* desyncs.globby(this.configPackages, {
         cwd: this.directory,
         onlyDirectories: true,
         absolute: true,
@@ -99,6 +105,9 @@ export class Project extends Item {
       }
       throw error;
     }
+
+  }
+  async _packages(): Promise<Array<Package>> {
   }
   _packagesSync(): Array<Package> {
     try {

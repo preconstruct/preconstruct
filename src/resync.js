@@ -1,28 +1,38 @@
 // @flow
 import { readFileSync } from "fs";
 import * as fs from "fs-extra";
+import _globby from "globby";
 
-type Desync<Return> = {
+type Resync<Return> = {
   sync: () => Return,
   async: () => Promise<Return>
 };
 
-function run<Return>(resync: Desync<Return>): Generator<any, Return, any> {
+export function resync<Return>(
+  resync: Resync<Return>
+): Generator<any, Return, any> {
   return (function*() {
     let val = yield resync;
     return val;
   })();
 }
 
-export let readFile = (filename: string) =>
-  run({
-    sync: () => readFileSync(filename, "utf8"),
-    async: () => fs.readFile(filename, "utf8")
-  });
+export let desyncs = {
+  readFile: (filename: string, encoding: string) =>
+    resync({
+      sync: () => readFileSync(filename, encoding),
+      async: () => fs.readFile(filename, encoding)
+    }),
+  globby: (globs: string | Array<string>, options: Object) =>
+    resync({
+      sync: () => _globby.sync(globs, options),
+      async: () => _globby(globs, options)
+    })
+};
 
-export function resync<Args: $ReadOnlyArray<mixed>, Return>(
+export function desync<Args: $ReadOnlyArray<mixed>, Return>(
   fn: (...Args) => Generator<any, Return, any>
-): (...Args) => Desync<Return> {
+): (...Args) => Resync<Return> {
   return (...args) => ({
     sync: () => {
       let gen = fn(...args);
