@@ -325,7 +325,7 @@ exports[`typescript: package.json 1`] = `
 `;
 
 exports[`typescript: src/index.ts 1`] = `
-"let thing = \\"something\\";
+"let thing: string = \\"something\\";
 
 export default thing;
 "
