@@ -238,13 +238,6 @@ if (process.env.NODE_ENV === \\"production\\") {
 "
 `;
 
-exports[`react native: with-react-native-field.cjs.js.flow 1`] = `
-"// @flow
-export * from \\"../src/index.js\\";
-export { default } from \\"../src/index.js\\";
-"
-`;
-
 exports[`react native: with-react-native-field.cjs.prod.js 1`] = `
 "\\"use strict\\";
 Object.defineProperty(exports, \\"__esModule\\", { value: !0 });
