@@ -205,6 +205,7 @@ export let getRollupConfig = (
     },
     plugins: [
       babel({
+        cwd: pkg.project.directory,
         plugins: [
           require.resolve("@babel/plugin-transform-flow-strip-types"),
           require.resolve(

@@ -3,6 +3,7 @@ import path from "path";
 import * as fs from "fs-extra";
 import globby from "globby";
 import fixturez from "fixturez";
+import spawn from "spawndamnit";
 
 let f = fixturez(__dirname);
 
@@ -124,9 +125,14 @@ export async function snapshotDirectory(
   tmpPath: string,
   files: "all" | "js" = "js"
 ) {
-  let paths = await globby([`**/${files === "js" ? "*.js" : "*"}`], {
-    cwd: tmpPath
-  });
+  let paths = await globby(
+    [`**/${files === "js" ? "*.js" : "*"}`, "!node_modules/**"],
+    {
+      cwd: tmpPath
+    }
+  );
+
+  console.log(paths);
 
   await Promise.all(
     paths.map(async x => {
@@ -135,4 +141,8 @@ export async function snapshotDirectory(
       );
     })
   );
+}
+
+export async function install(tmpPath: string) {
+  await spawn("yarn", ["install"], { cwd: tmpPath });
 }

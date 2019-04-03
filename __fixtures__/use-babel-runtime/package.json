@@ -5,5 +5,8 @@
   "module": "dist/use-babel-runtime.esm.js",
   "license": "MIT",
   "private": true,
-  "dependencies": {}
+  "dependencies": {
+    "@babel/core": "^7.4.3",
+    "@babel/preset-env": "^7.4.3"
+  }
 }

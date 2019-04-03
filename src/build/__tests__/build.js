@@ -2,10 +2,12 @@
 import build from "../";
 import fixturez from "fixturez";
 import path from "path";
-import spawn from "spawndamnit";
-import { initBasic, getPkg, snapshotDistFiles } from "../../../test-utils";
-import { confirms } from "../../messages";
-import { FatalError } from "../../errors";
+import {
+  initBasic,
+  getPkg,
+  snapshotDistFiles,
+  install
+} from "../../../test-utils";
 import { promptInput } from "../../prompt";
 
 const f = fixturez(__dirname);
@@ -13,10 +15,6 @@ const f = fixturez(__dirname);
 jest.mock("../../prompt");
 
 let unsafePromptInput: any = promptInput;
-
-async function install(tmpPath) {
-  await spawn("yarn", ["install"], { cwd: tmpPath });
-}
 
 jest.mock("install-packages");
 
@@ -56,20 +54,6 @@ test("no module", async () => {
   expect(unsafeRequire(tmpPath).default).toBe(
     "this does not have a module build"
   );
-});
-
-test.skip("uses obj spread", async () => {
-  let tmpPath = f.copy("use-obj-spread");
-  confirms.shouldInstallObjectAssign.mockReturnValue(Promise.resolve(false));
-
-  try {
-    await build(tmpPath);
-  } catch (err) {
-    expect(err).toBeInstanceOf(FatalError);
-    expect(err.message).toBe(
-      "object-assign should be in dependencies of use-object-spread"
-    );
-  }
 });
 
 test("clears dist folder", async () => {
@@ -229,21 +213,6 @@ Object {
   ],
 }
 `);
-});
-
-test.skip("uses @babel/runtime", async () => {
-  let tmpPath = f.copy("use-babel-runtime");
-
-  confirms.shouldInstallBabelRuntime.mockReturnValue(Promise.resolve(false));
-
-  try {
-    await build(tmpPath);
-  } catch (err) {
-    expect(err).toBeInstanceOf(FatalError);
-    expect(err.message).toMatchInlineSnapshot(
-      `"@babel/runtime should be in dependencies of use-babel-runtime"`
-    );
-  }
 });
 
 test("@babel/runtime installed", async () => {
