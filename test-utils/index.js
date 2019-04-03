@@ -126,7 +126,7 @@ export async function snapshotDirectory(
   files: "all" | "js" = "js"
 ) {
   let paths = await globby(
-    [`**/${files === "js" ? "*.js" : "*"}`, "!node_modules/**"],
+    [`**/${files === "js" ? "*.js" : "*"}`, "!node_modules/**", "!yarn.lock"],
     {
       cwd: tmpPath
     }

@@ -9,6 +9,8 @@ import {
   install
 } from "../../../test-utils";
 import { promptInput } from "../../prompt";
+import { confirms } from "../../messages";
+import { FatalError } from "../../errors";
 
 const f = fixturez(__dirname);
 
@@ -225,16 +227,6 @@ test("@babel/runtime installed", async () => {
   await snapshotDistFiles(tmpPath);
 });
 
-test.skip("@babel/runtime", async () => {
-  let tmpPath = f.copy("babel-runtime-custom-babel");
-
-  await install(tmpPath);
-
-  await build(tmpPath);
-
-  await snapshotDistFiles(tmpPath);
-});
-
 test("monorepo single package", async () => {
   let tmpPath = f.copy("monorepo-single-package");
   await initBasic(tmpPath);
@@ -245,4 +237,23 @@ test("monorepo single package", async () => {
   await snapshotDistFiles(pkgPath);
 
   expect(unsafeRequire(pkgPath).default).toBe(2);
+});
+
+test("needs @babel/runtime disallow install", async () => {
+  let tmpPath = f.copy("use-babel-runtime");
+  await install(tmpPath);
+  confirms.shouldInstallBabelRuntime.mockReturnValue(Promise.resolve(false));
+
+  try {
+    await build(tmpPath);
+  } catch (err) {
+    expect(err).toBeInstanceOf(FatalError);
+    expect(err.message).toMatchInlineSnapshot(
+      `"@babel/runtime should be in dependencies of use-babel-runtime"`
+    );
+    // TODO: investigate why this is called more than one time
+    expect(confirms.shouldInstallBabelRuntime).toBeCalled();
+    return;
+  }
+  expect(true).toBe(false);
 });

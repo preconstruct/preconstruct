@@ -2,8 +2,7 @@
 import build from "../";
 import fixturez from "fixturez";
 import { confirms } from "../../messages";
-import { FatalError } from "../../errors";
-import { install } from "../../../test-utils";
+import { install, snapshotDirectory } from "../../../test-utils";
 
 const f = fixturez(__dirname);
 
@@ -11,19 +10,19 @@ jest.setTimeout(20000);
 
 jest.mock("../../prompt");
 
-test("needs @babel/runtime disallow install", async () => {
+beforeEach(() => {
+  jest.resetAllMocks();
+});
+
+test("needs @babel/runtime allow install", async () => {
   let tmpPath = f.copy("use-babel-runtime");
   await install(tmpPath);
-  confirms.shouldInstallBabelRuntime.mockReturnValue(Promise.resolve(false));
+  confirms.shouldInstallBabelRuntime.mockReturnValue(Promise.resolve(true));
 
-  try {
-    await build(tmpPath);
-  } catch (err) {
-    expect(err).toBeInstanceOf(FatalError);
-    expect(err.message).toMatchInlineSnapshot(
-      `"@babel/runtime should be in dependencies of use-babel-runtime"`
-    );
-    return;
-  }
-  expect(true).toBe(false);
+  await build(tmpPath);
+
+  // TODO: investigate why this is called more than one time
+  expect(confirms.shouldInstallBabelRuntime).toBeCalled();
+
+  await snapshotDirectory(tmpPath, "all");
 });
