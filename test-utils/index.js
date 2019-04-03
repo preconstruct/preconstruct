@@ -25,7 +25,6 @@ afterEach(() => {
 
 import init from "../src/init";
 import { confirms } from "../src/messages";
-import spawn from "spawndamnit";
 
 export async function initBasic(directory: string) {
   confirms.writeMainField.mockReturnValue(true);
