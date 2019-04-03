@@ -221,7 +221,8 @@ export let getRollupConfig = (
             require.resolve("@babel/plugin-transform-runtime"),
             { useESModules: true }
           ]
-        ]
+        ],
+        extensions: EXTENSIONS
       }),
       cjs(),
       (type === "browser" || type === "umd") &&
