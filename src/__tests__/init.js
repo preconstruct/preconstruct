@@ -25,7 +25,7 @@ test("no entrypoint", async () => {
   try {
     await init(tmpPath);
   } catch (error) {
-    expect(error.message).toBe(errors.noSource("src/index.js"));
+    expect(error.message).toBe(errors.noSource("src/index"));
   }
 });
 

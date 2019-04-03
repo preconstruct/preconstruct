@@ -5,9 +5,10 @@ import * as fs from "fs-extra";
 import nodePath from "path";
 import { validateEntrypoint } from "./validate";
 import { Item } from "./item";
-import { getNameForDist } from "./utils";
+import { getNameForDist, EXTENSIONS } from "./utils";
 import { confirms, errors } from "./messages";
 import { validatePackage } from "./validate-package";
+import resolve from "resolve";
 
 /*::
 import { Package } from './package'
@@ -104,11 +105,13 @@ export class Entrypoint extends Item {
   }
 
   get configSource(): string {
-    return is(this._config.source, is.default(is.string, "src/index.js"));
+    return is(this._config.source, is.default(is.string, "src/index"));
   }
 
   get source(): string {
-    return require.resolve(nodePath.join(this.directory, this.configSource));
+    return resolve.sync(nodePath.join(this.directory, this.configSource), {
+      extensions: EXTENSIONS
+    });
   }
   get umdName(): null | string {
     return is(this._config.umdName, is.maybe(is.string));

@@ -19,6 +19,7 @@ import prettier from "../rollup-plugins/prettier";
 import terser from "../rollup-plugins/terser";
 import { limit } from "../prompt";
 import { getNameForDist } from "../utils";
+import { EXTENSIONS } from "../utils";
 
 import installPackages from "install-packages";
 
@@ -216,6 +217,7 @@ export let getRollupConfig = (
       babel({
         cwd: pkg.project.directory,
         plugins: [
+          // TODO: revisit these plugins
           require.resolve(
             "../babel-plugins/add-basic-constructor-to-react-component"
           ),
@@ -228,7 +230,8 @@ export let getRollupConfig = (
             require.resolve("@babel/plugin-transform-runtime"),
             { useESModules: true }
           ]
-        ]
+        ],
+        extensions: EXTENSIONS
       }),
       cjs(),
       (type === "browser" || type === "umd") &&
@@ -238,7 +241,12 @@ export let getRollupConfig = (
         }),
       rewriteCjsRuntimeHelpers(),
       type === "umd" && alias(rollupAliases),
-      type === "umd" && resolve(),
+      resolve({
+        extensions: EXTENSIONS,
+        customResolveOptions: {
+          moduleDirectory: type === "umd" ? "node_modules" : []
+        }
+      }),
       (type === "umd" || type === "node-prod") &&
         replace({
           "process.env.NODE_ENV": '"production"'

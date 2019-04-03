@@ -45,6 +45,15 @@ test("browser no module", async () => {
   await snapshotDirectory(tmpPath, "all");
 });
 
+test("typescript", async () => {
+  let tmpPath = f.copy("typescript");
+
+  await install(tmpPath);
+  await build(tmpPath);
+
+  await snapshotDirectory(tmpPath, "all");
+});
+
 test("package resolvable but not in deps", async () => {
   let tmpPath = f.copy("package-resolvable-but-not-in-deps");
   await install(tmpPath);
