@@ -14,6 +14,10 @@ export default function flowEntry(): Plugin {
         if (file.isAsset || !file.isEntry || file.facadeModuleId == null) {
           continue;
         }
+        let flowMode = false;
+        if (source.includes("@flow")) {
+          flowMode = thing.exports.includes("default") ? "all" : "named";
+        }
 
         let relativeToSource = path.relative(opts.dir, file.facadeModuleId);
         `// @flow

@@ -22,16 +22,6 @@ jest.mock("install-packages");
 
 let unsafeRequire = require;
 
-test("basic", async () => {
-  let tmpPath = f.copy("valid-package");
-
-  await build(tmpPath);
-
-  await snapshotDistFiles(tmpPath);
-
-  expect(unsafeRequire(tmpPath).default).toBe("something");
-});
-
 test("monorepo", async () => {
   let tmpPath = f.copy("monorepo");
   await initBasic(tmpPath);
