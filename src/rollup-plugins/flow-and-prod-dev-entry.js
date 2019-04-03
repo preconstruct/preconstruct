@@ -26,7 +26,10 @@ export default function flowAndNodeDevProdEntry(): Plugin {
         let mainFieldPath = file.fileName.replace(/\.prod\.js$/, ".js");
 
         if (flowMode !== false) {
-          let relativeToSource = path.relative(opts.dir, facadeModuleId);
+          let relativeToSource = path.relative(
+            path.parse(path.join(opts.dir, file.fileName)).dir,
+            facadeModuleId
+          );
           let flowFileSource = `// @flow
 export * from "${relativeToSource}";${
             flowMode === "all"
