@@ -11,7 +11,6 @@ import { type Aliases, getAliases } from "./aliases";
 import { toUnsafeRollupConfig } from "./rollup";
 import { success, info } from "../logger";
 import { successes } from "../messages";
-import { writeOtherFiles } from "./utils";
 import { createWorker } from "../worker-client";
 
 function relativePath(id: string) {
@@ -70,17 +69,6 @@ async function watchPackage(pkg: Package, aliases: Aliases) {
       }
 
       case "BUNDLE_END": {
-        pkg.entrypoints.forEach(entrypoint => {
-          writeOtherFiles(
-            entrypoint.strict(),
-            event.result.modules[0].originalCode.includes("@flow")
-              ? Object.keys(event.result.exports).includes("default")
-                ? "all"
-                : "named"
-              : false
-          );
-        });
-
         info(
           chalk.green(
             `created ${chalk.bold(
