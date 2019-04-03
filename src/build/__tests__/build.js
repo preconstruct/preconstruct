@@ -69,6 +69,8 @@ test("clears dist folder", async () => {
 test("flow", async () => {
   let tmpPath = f.copy("flow");
 
+  await install(tmpPath);
+
   await build(tmpPath);
 
   await snapshotDistFiles(tmpPath);
@@ -76,6 +78,8 @@ test("flow", async () => {
 
 test("flow", async () => {
   let tmpPath = f.copy("flow-export-default");
+
+  await install(tmpPath);
 
   await build(tmpPath);
 
