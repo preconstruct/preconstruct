@@ -192,6 +192,15 @@ export let getRollupConfig = (
               }
             })();
           }
+          if (!warning.source.startsWith(".")) {
+            throw new FatalError(
+              `"${warning.source}" is imported by "${path.relative(
+                pkg.directory,
+                warning.importer
+              )}" but it is not specified in dependencies or peerDependencies`,
+              pkg
+            );
+          }
         }
         default: {
           throw new FatalError(
