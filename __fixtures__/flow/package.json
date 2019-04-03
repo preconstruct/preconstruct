@@ -4,5 +4,9 @@
   "main": "dist/flow.cjs.js",
   "license": "MIT",
   "private": true,
-  "module": "dist/flow.esm.js"
+  "module": "dist/flow.esm.js",
+  "dependencies": {
+    "@babel/core": "^7.4.3",
+    "@babel/preset-flow": "^7.0.0"
+  }
 }
