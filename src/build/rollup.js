@@ -169,7 +169,6 @@ export let getRollupConfig = (
           break;
         }
         case "UNRESOLVED_IMPORT": {
-          // TODO: same for tslib
           if (/^@babel\/runtime\/helpers\//.test(warning.source)) {
             throw (async () => {
               let shouldInstallBabelRuntime = await confirms.shouldInstallBabelRuntime(
