@@ -242,7 +242,12 @@ export let getRollupConfig = (
         }),
       rewriteCjsRuntimeHelpers(),
       type === "umd" && alias(rollupAliases),
-      resolve({ extensions: EXTENSIONS }),
+      resolve({
+        extensions: EXTENSIONS,
+        customResolveOptions: {
+          moduleDirectory: type === "umd" ? "node_modules" : []
+        }
+      }),
       (type === "umd" || type === "node-prod") &&
         replace({
           "process.env.NODE_ENV": '"production"'
