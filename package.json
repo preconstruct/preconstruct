@@ -1,6 +1,6 @@
 {
   "name": "preconstruct",
-  "version": "0.0.52",
+  "version": "0.0.0-typescript.0",
   "description": "A smart bundler for libraries",
   "main": "lib/index.js",
   "files": [
