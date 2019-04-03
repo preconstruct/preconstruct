@@ -1,5 +1,95 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`browser no module: dist/browser-no-module.browser.cjs.js 1`] = `
+"'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+let thing = \\"wow\\";
+{
+  thing = \\"something\\";
+}
+{
+  thing += \\"other\\";
+}
+var thing$1 = thing;
+exports.default = thing$1;
+"
+`;
+
+exports[`browser no module: dist/browser-no-module.cjs.dev.js 1`] = `
+"'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+let thing = \\"wow\\";
+
+if (typeof window !== \\"undefined\\") {
+  thing = \\"something\\";
+}
+
+if (typeof document !== undefined) {
+  thing += \\"other\\";
+}
+
+var thing$1 = thing;
+exports.default = thing$1;
+"
+`;
+
+exports[`browser no module: dist/browser-no-module.cjs.js 1`] = `
+"'use strict';
+
+if (process.env.NODE_ENV === \\"production\\") {
+  module.exports = require(\\"./browser-no-module.cjs.prod.js\\");
+} else {
+  module.exports = require(\\"./browser-no-module.cjs.dev.js\\");
+}
+"
+`;
+
+exports[`browser no module: dist/browser-no-module.cjs.prod.js 1`] = `
+"\\"use strict\\";
+Object.defineProperty(exports, \\"__esModule\\", { value: !0 });
+let thing = \\"wow\\";
+\\"undefined\\" != typeof window && (thing = \\"something\\"),
+  void 0 !== typeof document && (thing += \\"other\\");
+var thing$1 = thing;
+exports.default = thing$1;
+"
+`;
+
+exports[`browser no module: package.json 1`] = `
+"{
+  \\"name\\": \\"browser-no-module\\",
+  \\"version\\": \\"1.0.0\\",
+  \\"main\\": \\"dist/browser-no-module.cjs.js\\",
+  \\"license\\": \\"MIT\\",
+  \\"private\\": true,
+  \\"browser\\": {
+    \\"./dist/browser-no-module.cjs.js\\": \\"./dist/browser-no-module.browser.cjs.js\\"
+  }
+}
+"
+`;
+
+exports[`browser no module: src/index.js 1`] = `
+"let thing = \\"wow\\";
+
+if (typeof window !== \\"undefined\\") {
+  thing = \\"something\\";
+}
+
+if (typeof document !== undefined) {
+  thing += \\"other\\";
+}
+
+export default thing;
+"
+`;
+
 exports[`browser: dist/browser.browser.cjs.js 1`] = `
 "'use strict';
 
