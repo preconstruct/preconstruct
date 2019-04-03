@@ -32,7 +32,7 @@ export interface OutputOptions {
   chunkFileNames?: string;
   compact?: boolean;
   // only required for bundle.write
-  dir?: string;
+  dir: string;
   dynamicImportFunction?: string;
   entryFileNames?: string;
   esModule?: boolean;
@@ -278,12 +278,12 @@ export interface SourceMap {
   toUrl(): string;
 }
 
-export interface OutputAsset {
-  code?: void;
-  fileName: string;
-  isAsset: true;
-  source: string | Buffer;
-}
+export type OutputAsset = {
+  code?: void,
+  fileName: string,
+  isAsset: true,
+  source: string | Buffer
+};
 
 export interface OutputChunk extends RenderedChunk {
   code: string;
