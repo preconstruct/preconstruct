@@ -19,6 +19,7 @@ import prettier from "../rollup-plugins/prettier";
 import terser from "../rollup-plugins/terser";
 import { limit } from "../prompt";
 import { getNameForDist } from "../utils";
+import { EXTENSIONS } from "../utils";
 
 import installPackages from "install-packages";
 
@@ -168,6 +169,7 @@ export let getRollupConfig = (
           break;
         }
         case "UNRESOLVED_IMPORT": {
+          // TODO: same for tslib
           if (/^@babel\/runtime\/helpers\//.test(warning.source)) {
             throw (async () => {
               let shouldInstallBabelRuntime = await confirms.shouldInstallBabelRuntime(
@@ -206,7 +208,7 @@ export let getRollupConfig = (
     plugins: [
       babel({
         plugins: [
-          require.resolve("@babel/plugin-transform-flow-strip-types"),
+          // TODO: revisit these plugins
           require.resolve(
             "../babel-plugins/add-basic-constructor-to-react-component"
           ),
@@ -229,7 +231,7 @@ export let getRollupConfig = (
         }),
       rewriteCjsRuntimeHelpers(),
       type === "umd" && alias(rollupAliases),
-      type === "umd" && resolve(),
+      resolve({ extensions: EXTENSIONS }),
       (type === "umd" || type === "node-prod") &&
         replace({
           "process.env.NODE_ENV": '"production"'

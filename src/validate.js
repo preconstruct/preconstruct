@@ -8,11 +8,13 @@ import {
   getValidMainField,
   getValidUmdMainField,
   getValidBrowserField,
-  getValidReactNativeField
+  getValidReactNativeField,
+  EXTENSIONS
 } from "./utils";
 import * as logger from "./logger";
 import equal from "fast-deep-equal";
 import { validatePackage } from "./validate-package";
+import resolve from "resolve";
 
 // this doesn't offer to fix anything
 // just does validation
@@ -20,7 +22,7 @@ import { validatePackage } from "./validate-package";
 
 export function validateEntrypointSource(entrypoint: Entrypoint) {
   try {
-    require.resolve(entrypoint.source);
+    resolve.sync(entrypoint.source, { extensions: EXTENSIONS });
   } catch (e) {
     if (e.code === "MODULE_NOT_FOUND") {
       throw new FatalError(

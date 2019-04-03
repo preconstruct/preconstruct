@@ -1,7 +1,11 @@
 // @flow
 import build from "../";
 import fixturez from "fixturez";
-import { snapshotDistFiles, snapshotDirectory } from "../../../test-utils";
+import {
+  snapshotDistFiles,
+  snapshotDirectory,
+  install
+} from "../../../test-utils";
 import { confirms } from "../../messages";
 
 const f = fixturez(__dirname);
@@ -37,5 +41,14 @@ test("browser no module", async () => {
 
   await build(tmpPath);
   expect(confirms.addBrowserField).toBeCalledTimes(1);
+  await snapshotDirectory(tmpPath, "all");
+});
+
+test("typescript", async () => {
+  let tmpPath = f.copy("typescript");
+
+  await install(tmpPath);
+  await build(tmpPath);
+
   await snapshotDirectory(tmpPath, "all");
 });
