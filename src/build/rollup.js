@@ -207,6 +207,7 @@ export let getRollupConfig = (
     },
     plugins: [
       babel({
+        cwd: pkg.project.directory,
         plugins: [
           // TODO: revisit these plugins
           require.resolve(
