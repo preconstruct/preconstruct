@@ -1,6 +1,4 @@
 // @flow
-
-// @flow
 import build from "../";
 import fixturez from "fixturez";
 import { snapshotDistFiles } from "../../../test-utils";
