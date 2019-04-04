@@ -8,9 +8,7 @@ import * as logger from "../logger";
 import * as fs from "fs-extra";
 import { confirms, errors } from "../messages";
 import { FatalError } from "../errors";
-import { getValidBrowserField } from "../utils";
 import { getRollupConfigs } from "./config";
-import { writeOtherFiles } from "./utils";
 import { createWorker, destroyWorker } from "../worker-client";
 
 let browserPattern = /typeof\s+(window|document)/;
@@ -22,7 +20,7 @@ async function buildPackage(pkg: Package, aliases: Aliases) {
   // TODO: Fix all this stuff to work with multiple entrypoints
   let hasCheckedBrowser = pkg.entrypoints[0].browser !== null;
 
-  let [sampleOutput] = await Promise.all(
+  await Promise.all(
     configs.map(async ({ config, outputs }) => {
       // $FlowFixMe this is not a problem with flow, i did something wrong but it's not worth fixing right now
       let bundle = await rollup(config);
@@ -32,39 +30,23 @@ async function buildPackage(pkg: Package, aliases: Aliases) {
         })
       );
 
-      const nodeDevOutput = result[0].output[0];
+      const nodeDevOutput = result[0].output;
 
       if (!hasCheckedBrowser) {
+        let allCode = nodeDevOutput.map(({ code }) => code).join("\n");
         hasCheckedBrowser = true;
-        if (browserPattern.test(nodeDevOutput.code)) {
+        if (browserPattern.test(allCode)) {
           throw (async () => {
             let shouldAddBrowserField = await confirms.addBrowserField(pkg);
             if (shouldAddBrowserField) {
-              pkg.entrypoints[0].browser = getValidBrowserField(
-                pkg.entrypoints[0]
-              );
-              await pkg.entrypoints[0].save();
+              pkg.setFieldOnEntrypoints("browser");
+              await Promise.all(pkg.entrypoints.map(x => x.save()));
             } else {
               throw new FatalError(errors.deniedWriteBrowserField, pkg);
             }
           })();
         }
       }
-      return nodeDevOutput;
-    })
-  );
-
-  // TODO: fix this.
-  const source = await fs.readFile(pkg.entrypoints[0].source, "utf8");
-
-  let flowMode = false;
-  if (source.includes("@flow")) {
-    flowMode = sampleOutput.exports.includes("default") ? "all" : "named";
-  }
-
-  await Promise.all(
-    pkg.entrypoints.map(entrypoint => {
-      return writeOtherFiles(entrypoint.strict(), flowMode);
     })
   );
 }

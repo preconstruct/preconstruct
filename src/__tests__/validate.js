@@ -36,11 +36,28 @@ Array [
     "umd:main field is valid",
   ],
   Array [
+    "🎁 info valid-package",
+    "package entrypoints are valid",
+  ],
+  Array [
     "🎁 success",
-    "package is valid!",
+    "project is valid!",
   ],
 ]
 `);
+});
+
+test("no main field", async () => {
+  let tmpPath = f.find("no-main-field");
+
+  try {
+    await validate(tmpPath);
+  } catch (e) {
+    expect(e).toMatchInlineSnapshot(`[Error: main field is invalid]`);
+    return;
+  }
+
+  expect(true).toBe(false);
 });
 
 test("no module", async () => {
@@ -58,8 +75,12 @@ Array [
     "main field is valid",
   ],
   Array [
+    "🎁 info no-module",
+    "package entrypoints are valid",
+  ],
+  Array [
     "🎁 success",
-    "package is valid!",
+    "project is valid!",
   ],
 ]
 `);
@@ -114,8 +135,12 @@ Array [
     "browser field is valid",
   ],
   Array [
+    "🎁 info valid-package",
+    "package entrypoints are valid",
+  ],
+  Array [
     "🎁 success",
-    "package is valid!",
+    "project is valid!",
   ],
 ]
 `);
@@ -144,8 +169,12 @@ Array [
     "react-native field is valid",
   ],
   Array [
+    "🎁 info with-react-native-field",
+    "package entrypoints are valid",
+  ],
+  Array [
     "🎁 success",
-    "package is valid!",
+    "project is valid!",
   ],
 ]
 `);
@@ -166,9 +195,24 @@ Array [
     "main field is valid",
   ],
   Array [
+    "🎁 info @some-scope/package-two-single-package",
+    "package entrypoints are valid",
+  ],
+  Array [
     "🎁 success",
-    "package is valid!",
+    "project is valid!",
   ],
 ]
 `);
+});
+
+test("one-entrypoint-with-browser-field-one-without", async () => {
+  let tmpPath = f.copy("one-entrypoint-with-browser-field-one-without");
+  try {
+    await validate(tmpPath);
+  } catch (e) {
+    expect(e).toMatchInlineSnapshot(
+      `[Error: one-entrypoint-with-browser-field-one-without has a browser build but one-entrypoint-with-browser-field-one-without/multiply does not have a browser build. Entrypoints in a package must either all have a particular build type or all not have a particular build type.]`
+    );
+  }
 });

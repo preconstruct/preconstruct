@@ -9,7 +9,7 @@ export let limit = pLimit(1);
 
 // there might be a simpler solution to this than using dataloader but it works so ¯\_(ツ)_/¯
 
-let prefix = `🎁 ${chalk.green("?")}   `;
+let prefix = `🎁 ${chalk.green("?")}`;
 
 type NamedThing = { +name: string };
 

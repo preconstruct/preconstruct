@@ -4,60 +4,20 @@ import { Project } from "./project";
 import { promptInput } from "./prompt";
 import { success } from "./logger";
 import { inputs } from "./messages";
-import {
-  getValidModuleField,
-  getValidMainField,
-  getValidUmdMainField,
-  getValidBrowserField,
-  getValidReactNativeField
-} from "./utils";
-import {
-  validateEntrypointSource,
-  isMainFieldValid,
-  isModuleFieldValid,
-  isUmdMainFieldValid,
-  isUmdNameSpecified,
-  isBrowserFieldValid,
-  isReactNativeFieldValid
-} from "./validate";
+import { validateEntrypointSource, isUmdNameSpecified } from "./validate";
+import { fixPackage } from "./validate-package";
 
 async function fixEntrypoint(entrypoint: Entrypoint) {
   validateEntrypointSource(entrypoint);
-  let didModify = false;
-  if (!isMainFieldValid(entrypoint)) {
-    didModify = true;
-    entrypoint.main = getValidMainField(entrypoint);
+
+  if (entrypoint.umdMain !== null && !isUmdNameSpecified(entrypoint)) {
+    let umdName = await promptInput(inputs.getUmdName, entrypoint);
+    entrypoint.umdName = umdName;
+    await entrypoint.save();
+
+    return true;
   }
-  if (entrypoint.module !== null && !isModuleFieldValid(entrypoint)) {
-    didModify = true;
-
-    let validModuleField = getValidModuleField(entrypoint);
-    entrypoint.module = validModuleField;
-  }
-  if (entrypoint.umdMain !== null) {
-    if (!isUmdMainFieldValid(entrypoint) || !isUmdNameSpecified(entrypoint)) {
-      didModify = true;
-
-      entrypoint.umdMain = getValidUmdMainField(entrypoint);
-      let umdName = await promptInput(inputs.getUmdName, entrypoint);
-      entrypoint.umdName = umdName;
-    }
-  }
-
-  if (entrypoint.browser !== null && !isBrowserFieldValid(entrypoint)) {
-    didModify = true;
-
-    entrypoint.browser = getValidBrowserField(entrypoint);
-  }
-
-  if (entrypoint.reactNative !== null && !isReactNativeFieldValid(entrypoint)) {
-    didModify = true;
-
-    entrypoint.reactNative = getValidReactNativeField(entrypoint);
-  }
-
-  await entrypoint.save();
-  return didModify;
+  return false;
 }
 
 export default async function fix(directory: string) {
@@ -65,11 +25,13 @@ export default async function fix(directory: string) {
   // do more stuff with checking whether the repo is using yarn workspaces or bolt
 
   let didModify = (await Promise.all(
-    packages.map(pkg =>
-      Promise.all(
-        pkg.entrypoints.map(entrypoint => fixEntrypoint(entrypoint))
-      ).then(a => a.some(x => x))
-    )
+    packages.map(async pkg => {
+      let didModifyInPkgFix = await fixPackage(pkg);
+      let didModifyInEntrypointsFix = (await Promise.all(
+        pkg.entrypoints.map(fixEntrypoint)
+      )).some(x => x);
+      return didModifyInPkgFix || didModifyInEntrypointsFix;
+    })
   )).some(x => x);
 
   let obj = packages.length > 1 ? "packages" : "package";

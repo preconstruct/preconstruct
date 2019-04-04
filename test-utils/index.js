@@ -2,6 +2,11 @@
 import path from "path";
 import * as fs from "fs-extra";
 import globby from "globby";
+import fixturez from "fixturez";
+import spawn from "spawndamnit";
+
+let f = fixturez(__dirname);
+
 require("chalk").enabled = false;
 // $FlowFixMe
 console.error = jest.fn();
@@ -50,6 +55,51 @@ export async function modifyPkg(tmpPath: string, cb: Object => mixed) {
   await fs.writeFile(pkgPath, JSON.stringify(json, null, 2));
 }
 
+export let createPackageCheckTestCreator = (
+  doResult: string => Promise<void>
+) => {
+  let createTestCreator = testFn => async (
+    testName: string,
+    entrypoints: { [key: string]: Object },
+    cb: (doThing: () => Promise<{ [key: string]: Object }>) => Promise<void>
+  ) => {
+    testFn(testName, async () => {
+      let tmpPath = f.copy("template-simple-package");
+      let things = Object.keys(entrypoints);
+      await Promise.all(
+        things.map(async entrypointPath => {
+          let content = entrypoints[entrypointPath];
+          let filepath = path.join(tmpPath, entrypointPath, "package.json");
+          await fs.ensureFile(filepath);
+          await fs.writeFile(filepath, JSON.stringify(content, null, 2));
+        })
+      );
+
+      await cb(async () => {
+        await doResult(tmpPath);
+
+        let newThings = {};
+
+        await Promise.all(
+          things.map(async entrypointPath => {
+            newThings[entrypointPath] = JSON.parse(
+              await fs.readFile(
+                path.join(tmpPath, entrypointPath, "package.json"),
+                "utf8"
+              )
+            );
+          })
+        );
+        return newThings;
+      });
+    });
+  };
+  let testFn = createTestCreator(test);
+  testFn.only = createTestCreator(test.only);
+  testFn.skip = createTestCreator(test.skip);
+  return testFn;
+};
+
 export async function snapshotDistFiles(tmpPath: string) {
   let distPath = path.join(tmpPath, "dist");
   let distFiles;
@@ -75,9 +125,14 @@ export async function snapshotDirectory(
   tmpPath: string,
   files: "all" | "js" = "js"
 ) {
-  let paths = await globby([`**/${files === "js" ? "*.js" : "*"}`], {
-    cwd: tmpPath
-  });
+  let paths = await globby(
+    [`**/${files === "js" ? "*.js" : "*"}`, "!node_modules/**", "!yarn.lock"],
+    {
+      cwd: tmpPath
+    }
+  );
+
+  console.log(paths);
 
   await Promise.all(
     paths.map(async x => {
@@ -86,4 +141,8 @@ export async function snapshotDirectory(
       );
     })
   );
+}
+
+export async function install(tmpPath: string) {
+  await spawn("yarn", ["install"], { cwd: tmpPath });
 }

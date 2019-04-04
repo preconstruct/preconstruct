@@ -7,6 +7,10 @@ import { validateEntrypoint } from "./validate";
 import { Item } from "./item";
 import { getNameForDist } from "./utils";
 import { confirms, errors } from "./messages";
+import { validatePackage } from "./validate-package";
+import resolve from "resolve";
+import { EXTENSIONS } from "./constants";
+
 /*::
 import { Package } from './package'
 */
@@ -102,31 +106,29 @@ export class Entrypoint extends Item {
   }
 
   get configSource(): string {
-    return is(this._config.source, is.default(is.string, "src/index.js"));
+    return is(this._config.source, is.default(is.string, "src/index"));
   }
 
   get source(): string {
-    return require.resolve(nodePath.join(this.directory, this.configSource));
+    return resolve.sync(nodePath.join(this.directory, this.configSource), {
+      extensions: EXTENSIONS
+    });
   }
   get umdName(): null | string {
     return is(this._config.umdName, is.maybe(is.string));
   }
   set umdName(umdName: null | string) {
     if (umdName === null) {
-      delete this.json.preconstruct.umdName;
-      if (Object.keys(this.json.preconstruct).length === 0) {
-        delete this.json.preconstruct;
-      }
+      delete this._config.umdName;
+    } else {
+      this._config.umdName = umdName;
     }
-    if (!this.json.preconstruct) {
-      this.json.preconstruct = {};
-    }
-    this.json.preconstruct.umdName = umdName;
   }
 
   _strict: StrictEntrypoint;
   strict(): StrictEntrypoint {
     if (!this._strict) {
+      validatePackage(this.package);
       validateEntrypoint(this, false);
       this._strict = new StrictEntrypoint(
         this.path,
@@ -147,6 +149,7 @@ export class StrictEntrypoint extends Entrypoint {
   }
   updater(json: Object) {
     super.updater(json);
+    validatePackage(this.package);
     validateEntrypoint(this, false);
   }
   strict() {

@@ -15,3 +15,5 @@ export class FatalError extends Error {
 export class ValidationError extends Error {}
 
 export class MissingDependency extends Error {}
+
+export class FixableError extends FatalError {}

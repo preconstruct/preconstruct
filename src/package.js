@@ -6,7 +6,14 @@ import * as fs from "fs-extra";
 import { readFileSync } from "fs";
 import nodePath from "path";
 import { Item } from "./item";
-import { Entrypoint } from "./entrypoint";
+import { Entrypoint, StrictEntrypoint } from "./entrypoint";
+import {
+  getValidMainField,
+  getValidModuleField,
+  getValidBrowserField,
+  getValidUmdMainField,
+  getValidReactNativeField
+} from "./utils";
 
 /*::
 import {Project} from './project'
@@ -61,6 +68,35 @@ export class Package extends Item {
     return pkg;
   }
 
+  setFieldOnEntrypoints(
+    field: "main" | "browser" | "module" | "umdMain" | "reactNative"
+  ) {
+    this.entrypoints.forEach(entrypoint => {
+      switch (field) {
+        case "main": {
+          entrypoint.main = getValidMainField(entrypoint);
+          break;
+        }
+        case "module": {
+          entrypoint.module = getValidModuleField(entrypoint);
+          break;
+        }
+        case "browser": {
+          entrypoint.browser = getValidBrowserField(entrypoint);
+          break;
+        }
+        case "umdMain": {
+          entrypoint.umdMain = getValidUmdMainField(entrypoint);
+          break;
+        }
+        case "reactNative": {
+          entrypoint.reactNative = getValidReactNativeField(entrypoint);
+          break;
+        }
+      }
+    });
+  }
+
   get name(): string {
     return is(this.json.name, is.string);
   }
@@ -74,4 +110,8 @@ export class Package extends Item {
   get peerDependencies(): null | { [key: string]: string } {
     return is(this.json.peerDependencies, is.maybe(is.objectOf(is.string)));
   }
+}
+
+export class StrictPackage extends Package {
+  strictEntrypoints: Array<StrictEntrypoint>;
 }

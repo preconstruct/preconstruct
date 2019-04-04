@@ -2,7 +2,7 @@
 import { Project } from "./project";
 import { Entrypoint } from "./entrypoint";
 import { errors, successes, infos } from "./messages";
-import { FatalError } from "./errors";
+import { FatalError, FixableError } from "./errors";
 import {
   getValidModuleField,
   getValidMainField,
@@ -10,8 +10,11 @@ import {
   getValidBrowserField,
   getValidReactNativeField
 } from "./utils";
+import { EXTENSIONS } from "./constants";
 import * as logger from "./logger";
 import equal from "fast-deep-equal";
+import { validatePackage } from "./validate-package";
+import resolve from "resolve";
 
 // this doesn't offer to fix anything
 // just does validation
@@ -19,7 +22,7 @@ import equal from "fast-deep-equal";
 
 export function validateEntrypointSource(entrypoint: Entrypoint) {
   try {
-    require.resolve(entrypoint.source);
+    resolve.sync(entrypoint.source, { extensions: EXTENSIONS });
   } catch (e) {
     if (e.code === "MODULE_NOT_FOUND") {
       throw new FatalError(
@@ -52,7 +55,7 @@ export function isReactNativeFieldValid(entrypoint: Entrypoint): boolean {
 }
 
 export function isUmdNameSpecified(entrypoint: Entrypoint) {
-  return entrypoint._config.umdName !== null;
+  return typeof entrypoint._config.umdName === "string";
 }
 
 export function validateEntrypoint(entrypoint: Entrypoint, log: boolean) {
@@ -61,7 +64,7 @@ export function validateEntrypoint(entrypoint: Entrypoint, log: boolean) {
     logger.info(infos.validEntrypoint, entrypoint);
   }
   if (!isMainFieldValid(entrypoint)) {
-    throw new FatalError(errors.invalidMainField, entrypoint);
+    throw new FixableError(errors.invalidMainField, entrypoint);
   }
   if (log) {
     logger.info(infos.validMainField, entrypoint);
@@ -72,7 +75,7 @@ export function validateEntrypoint(entrypoint: Entrypoint, log: boolean) {
         logger.info(infos.validModuleField, entrypoint);
       }
     } else {
-      throw new FatalError(errors.invalidMainField, entrypoint);
+      throw new FixableError(errors.invalidModuleField, entrypoint);
     }
   }
   if (entrypoint.umdMain !== null) {
@@ -82,10 +85,10 @@ export function validateEntrypoint(entrypoint: Entrypoint, log: boolean) {
           logger.info(infos.validUmdMainField, entrypoint);
         }
       } else {
-        throw new FatalError(errors.umdNameNotSpecified, entrypoint);
+        throw new FixableError(errors.umdNameNotSpecified, entrypoint);
       }
     } else {
-      throw new FatalError(errors.invalidUmdMainField, entrypoint);
+      throw new FixableError(errors.invalidUmdMainField, entrypoint);
     }
   }
   if (entrypoint.browser !== null) {
@@ -93,7 +96,7 @@ export function validateEntrypoint(entrypoint: Entrypoint, log: boolean) {
       typeof entrypoint.browser === "string" ||
       !isBrowserFieldValid(entrypoint)
     ) {
-      throw new FatalError(errors.invalidBrowserField, entrypoint);
+      throw new FixableError(errors.invalidBrowserField, entrypoint);
     } else if (log) {
       logger.info(infos.validBrowserField, entrypoint);
     }
@@ -103,7 +106,7 @@ export function validateEntrypoint(entrypoint: Entrypoint, log: boolean) {
       typeof entrypoint.reactNative === "string" ||
       !isReactNativeFieldValid(entrypoint)
     ) {
-      throw new FatalError(errors.invalidReactNativeField, entrypoint);
+      throw new FixableError(errors.invalidReactNativeField, entrypoint);
     } else if (log) {
       logger.info(infos.validReactNativeField, entrypoint);
     }
@@ -114,10 +117,12 @@ export default async function validate(directory: string) {
   let project = await Project.create(directory);
 
   for (let pkg of project.packages) {
+    validatePackage(pkg);
     for (let entrypoint of pkg.entrypoints) {
       validateEntrypoint(entrypoint, true);
     }
+    logger.info(infos.validPackageEntrypoints, pkg);
   }
 
-  logger.success(successes.validPackage);
+  logger.success(successes.validProject);
 }

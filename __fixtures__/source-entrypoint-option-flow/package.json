@@ -6,5 +6,9 @@
   "private": true,
   "preconstruct": {
     "source": "modules"
+  },
+  "dependencies": {
+    "@babel/core": "^7.4.3",
+    "@babel/preset-flow": "^7.0.0"
   }
 }

@@ -2,21 +2,24 @@
 import * as fs from "fs-extra";
 import nodePath from "path";
 import is from "sarcastic";
+import { PKG_JSON_CONFIG_FIELD } from "./constants";
 
 let itemsByPath: { [string]: Set<Item> } = {};
 
 export class Item {
   _contents: string;
+  _stringifiedSavedJson: string;
   path: string;
   directory: string;
   json: Object;
   _config: Object;
   constructor(filePath: string, contents: string) {
     this.json = is(JSON.parse(contents), is.object);
+    this._stringifiedSavedJson = JSON.stringify(this.json, null, 2);
     this._contents = contents;
     this.path = filePath;
     this.directory = nodePath.dirname(filePath);
-    this._config = this.json.preconstruct || {};
+    this._config = this.json[PKG_JSON_CONFIG_FIELD] || {};
     if (itemsByPath[this.path] === undefined) {
       itemsByPath[this.path] = new Set();
     }
@@ -36,15 +39,21 @@ export class Item {
   }
   async save() {
     if (Object.keys(this._config).length) {
-      this.json.preconstruct = this._config;
+      this.json[PKG_JSON_CONFIG_FIELD] = this._config;
     } else {
-      delete this.json.preconstruct;
+      delete this.json[PKG_JSON_CONFIG_FIELD];
     }
-    await fs.writeFile(this.path, JSON.stringify(this.json, null, 2) + "\n");
+    let stringified = JSON.stringify(this.json, null, 2);
+    if (stringified !== this._stringifiedSavedJson) {
+      await fs.writeFile(this.path, JSON.stringify(this.json, null, 2) + "\n");
 
-    this._config = this.json.preconstruct || {};
-    for (let item of itemsByPath[this.path]) {
-      item.updater(this.json);
+      this._config = this.json[PKG_JSON_CONFIG_FIELD] || {};
+      for (let item of itemsByPath[this.path]) {
+        item.updater(this.json);
+      }
+      this._stringifiedSavedJson = stringified;
+      return true;
     }
+    return false;
   }
 }

@@ -2,11 +2,15 @@
 import build from "../";
 import fixturez from "fixturez";
 import path from "path";
-import spawn from "spawndamnit";
-import { initBasic, getPkg, snapshotDistFiles } from "../../../test-utils";
+import {
+  initBasic,
+  getPkg,
+  snapshotDistFiles,
+  install
+} from "../../../test-utils";
+import { promptInput } from "../../prompt";
 import { confirms } from "../../messages";
 import { FatalError } from "../../errors";
-import { promptInput } from "../../prompt";
 
 const f = fixturez(__dirname);
 
@@ -14,23 +18,9 @@ jest.mock("../../prompt");
 
 let unsafePromptInput: any = promptInput;
 
-async function install(tmpPath) {
-  await spawn("yarn", ["install"], { cwd: tmpPath });
-}
-
 jest.mock("install-packages");
 
 let unsafeRequire = require;
-
-test("basic", async () => {
-  let tmpPath = f.copy("valid-package");
-
-  await build(tmpPath);
-
-  await snapshotDistFiles(tmpPath);
-
-  expect(unsafeRequire(tmpPath).default).toBe("something");
-});
 
 test("monorepo", async () => {
   let tmpPath = f.copy("monorepo");
@@ -58,20 +48,6 @@ test("no module", async () => {
   );
 });
 
-test.skip("uses obj spread", async () => {
-  let tmpPath = f.copy("use-obj-spread");
-  confirms.shouldInstallObjectAssign.mockReturnValue(Promise.resolve(false));
-
-  try {
-    await build(tmpPath);
-  } catch (err) {
-    expect(err).toBeInstanceOf(FatalError);
-    expect(err.message).toBe(
-      "object-assign should be in dependencies of use-object-spread"
-    );
-  }
-});
-
 test("clears dist folder", async () => {
   let tmpPath = f.copy("already-has-things-in-dist");
 
@@ -83,6 +59,8 @@ test("clears dist folder", async () => {
 test("flow", async () => {
   let tmpPath = f.copy("flow");
 
+  await install(tmpPath);
+
   await build(tmpPath);
 
   await snapshotDistFiles(tmpPath);
@@ -90,6 +68,8 @@ test("flow", async () => {
 
 test("flow", async () => {
   let tmpPath = f.copy("flow-export-default");
+
+  await install(tmpPath);
 
   await build(tmpPath);
 
@@ -106,16 +86,6 @@ test("prod checks", async () => {
 
 // TODO: make it faster so this isn't required
 jest.setTimeout(20000);
-
-test("browser", async () => {
-  let tmpPath = f.copy("browser");
-
-  confirms.addBrowserField.mockReturnValue(Promise.resolve(true));
-
-  await build(tmpPath);
-
-  await snapshotDistFiles(tmpPath);
-});
 
 test("umd with dep on other module", async () => {
   let tmpPath = f.copy("umd-with-dep");
@@ -241,33 +211,8 @@ Object {
 `);
 });
 
-test.skip("uses @babel/runtime", async () => {
-  let tmpPath = f.copy("use-babel-runtime");
-
-  confirms.shouldInstallBabelRuntime.mockReturnValue(Promise.resolve(false));
-
-  try {
-    await build(tmpPath);
-  } catch (err) {
-    expect(err).toBeInstanceOf(FatalError);
-    expect(err.message).toMatchInlineSnapshot(
-      `"@babel/runtime should be in dependencies of use-babel-runtime"`
-    );
-  }
-});
-
 test("@babel/runtime installed", async () => {
   let tmpPath = f.copy("babel-runtime-installed");
-
-  await install(tmpPath);
-
-  await build(tmpPath);
-
-  await snapshotDistFiles(tmpPath);
-});
-
-test.skip("@babel/runtime", async () => {
-  let tmpPath = f.copy("babel-runtime-custom-babel");
 
   await install(tmpPath);
 
@@ -286,4 +231,23 @@ test("monorepo single package", async () => {
   await snapshotDistFiles(pkgPath);
 
   expect(unsafeRequire(pkgPath).default).toBe(2);
+});
+
+test("needs @babel/runtime disallow install", async () => {
+  let tmpPath = f.copy("use-babel-runtime");
+  await install(tmpPath);
+  confirms.shouldInstallBabelRuntime.mockReturnValue(Promise.resolve(false));
+
+  try {
+    await build(tmpPath);
+  } catch (err) {
+    expect(err).toBeInstanceOf(FatalError);
+    expect(err.message).toMatchInlineSnapshot(
+      `"@babel/runtime should be in dependencies of use-babel-runtime"`
+    );
+    // TODO: investigate why this is called more than one time
+    expect(confirms.shouldInstallBabelRuntime).toBeCalled();
+    return;
+  }
+  expect(true).toBe(false);
 });
