@@ -86,6 +86,16 @@ preconstruct watch
 preconstruct fix
 ```
 
+TODO
+
+#### `validate`
+
+```bash
+preconstruct validate
+```
+
+TODO
+
 ### preconstruct Configuration
 
 Preconstruct accepts configuration at three different configuration points; Projects, Packages and Entrypoints. These configuration points can be represented by one package.json or by 20 package.jsons, it depends on the requirements of a specific project. For example, in a single package repo with one entrypoint, it would be represented by a single package.json.
