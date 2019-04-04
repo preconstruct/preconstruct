@@ -2,7 +2,7 @@
 import * as fs from "fs-extra";
 import nodePath from "path";
 import is from "sarcastic";
-import { pkgJsonConfigField } from "./utils";
+import { PKG_JSON_CONFIG_FIELD } from "./constants";
 
 let itemsByPath: { [string]: Set<Item> } = {};
 
@@ -19,7 +19,7 @@ export class Item {
     this._contents = contents;
     this.path = filePath;
     this.directory = nodePath.dirname(filePath);
-    this._config = this.json[pkgJsonConfigField] || {};
+    this._config = this.json[PKG_JSON_CONFIG_FIELD] || {};
     if (itemsByPath[this.path] === undefined) {
       itemsByPath[this.path] = new Set();
     }
@@ -39,15 +39,15 @@ export class Item {
   }
   async save() {
     if (Object.keys(this._config).length) {
-      this.json[pkgJsonConfigField] = this._config;
+      this.json[PKG_JSON_CONFIG_FIELD] = this._config;
     } else {
-      delete this.json[pkgJsonConfigField];
+      delete this.json[PKG_JSON_CONFIG_FIELD];
     }
     let stringified = JSON.stringify(this.json, null, 2);
     if (stringified !== this._stringifiedSavedJson) {
       await fs.writeFile(this.path, JSON.stringify(this.json, null, 2) + "\n");
 
-      this._config = this.json[pkgJsonConfigField] || {};
+      this._config = this.json[PKG_JSON_CONFIG_FIELD] || {};
       for (let item of itemsByPath[this.path]) {
         item.updater(this.json);
       }

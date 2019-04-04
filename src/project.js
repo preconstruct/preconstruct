@@ -9,7 +9,7 @@ import { readFileSync } from "fs";
 import * as fs from "fs-extra";
 import { Item } from "./item";
 import { Package } from "./package";
-import { pkgJsonConfigField } from "./utils";
+import { PKG_JSON_CONFIG_FIELD } from "./constants";
 
 let unsafeRequire = require;
 
@@ -133,10 +133,10 @@ export class Project extends Item {
         );
         if (
           pkgJson &&
-          pkgJson[pkgJsonConfigField] &&
-          pkgJson[pkgJsonConfigField].umdName
+          pkgJson[PKG_JSON_CONFIG_FIELD] &&
+          pkgJson[PKG_JSON_CONFIG_FIELD].umdName
         ) {
-          return pkgJson[pkgJsonConfigField].umdName;
+          return pkgJson[PKG_JSON_CONFIG_FIELD].umdName;
         }
       } catch (err) {
         if (err.code !== "MODULE_NOT_FOUND") {

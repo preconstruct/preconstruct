@@ -5,10 +5,11 @@ import * as fs from "fs-extra";
 import nodePath from "path";
 import { validateEntrypoint } from "./validate";
 import { Item } from "./item";
-import { getNameForDist, EXTENSIONS } from "./utils";
+import { getNameForDist } from "./utils";
 import { confirms, errors } from "./messages";
 import { validatePackage } from "./validate-package";
 import resolve from "resolve";
+import { EXTENSIONS } from "./constants";
 
 /*::
 import { Package } from './package'

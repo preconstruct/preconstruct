@@ -8,9 +8,9 @@ import {
   getValidMainField,
   getValidUmdMainField,
   getValidBrowserField,
-  getValidReactNativeField,
-  EXTENSIONS
+  getValidReactNativeField
 } from "./utils";
+import { EXTENSIONS } from "./constants";
 import * as logger from "./logger";
 import equal from "fast-deep-equal";
 import { validatePackage } from "./validate-package";
