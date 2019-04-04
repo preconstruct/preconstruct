@@ -61,3 +61,5 @@ export function getValidUmdMainField(entrypoint: Entrypoint) {
 }
 
 export let EXTENSIONS = [".js", ".jsx", ".ts", ".tsx"];
+
+export let pkgJsonConfigField = "preconstruct";

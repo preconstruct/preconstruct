@@ -9,6 +9,7 @@ import { readFileSync } from "fs";
 import * as fs from "fs-extra";
 import { Item } from "./item";
 import { Package } from "./package";
+import { pkgJsonConfigField } from "./utils";
 
 let unsafeRequire = require;
 
@@ -130,8 +131,12 @@ export class Project extends Item {
         let pkgJson = unsafeRequire(
           resolveFrom(this.directory, nodePath.join(pkg, "package.json"))
         );
-        if (pkgJson && pkgJson.preconstruct && pkgJson.preconstruct.umdName) {
-          return pkgJson.preconstruct.umdName;
+        if (
+          pkgJson &&
+          pkgJson[pkgJsonConfigField] &&
+          pkgJson[pkgJsonConfigField].umdName
+        ) {
+          return pkgJson[pkgJsonConfigField].umdName;
         }
       } catch (err) {
         if (err.code !== "MODULE_NOT_FOUND") {

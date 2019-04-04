@@ -118,15 +118,10 @@ export class Entrypoint extends Item {
   }
   set umdName(umdName: null | string) {
     if (umdName === null) {
-      delete this.json.preconstruct.umdName;
-      if (Object.keys(this.json.preconstruct).length === 0) {
-        delete this.json.preconstruct;
-      }
+      delete this._config.umdName;
+    } else {
+      this._config.umdName = umdName;
     }
-    if (!this.json.preconstruct) {
-      this.json.preconstruct = {};
-    }
-    this.json.preconstruct.umdName = umdName;
   }
 
   _strict: StrictEntrypoint;
