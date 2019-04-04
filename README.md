@@ -4,7 +4,7 @@
 
 > DISCLAIMER:
 >
-> While preconstruct is pretty stable in terms of bugs and is used in big projects but a lot of things are still in flux and will change so please be aware of that. We're in 0.0.x versions for a reason.
+> While preconstruct is pretty stable in terms of bugs and is used in big projects, a lot of things are still in flux and will change so please be aware of that. We're in 0.0.x versions for a reason.
 
 ## Why?
 
