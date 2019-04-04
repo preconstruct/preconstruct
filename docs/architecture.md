@@ -21,3 +21,7 @@ In two words, common dependencies.
 Let's say we have module A, B and C. Module A and B are entrypoints and they both depend on C. You don't want module C to be duplicated in both A and B. Module C should be in it's own bundle which should be imported by modules A and B. Because of this, we need both packages and entrypoints so that preconstruct can know where package boundaries are and thus where to bundle.
 
 > Note: This guarantee about modules not getting duplicated between entrypoints is not guaranteed for UMD builds.
+
+### Why are the filenames of the dist files so strictly enforced?
+
+Strictly enforcing the filenames allows preconstruct to automatically validate and fix any filenames to ensure that consumer bundlers will be able to consume the package.

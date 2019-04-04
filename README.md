@@ -8,7 +8,7 @@
 
 ## Why?
 
-Generating small, performant bundles and figuring out how to make bundlers use the right bundles shouldn't have to be difficult.
+Generating small, performant bundles and making consumer bundlers use the right bundles shouldn't have to be difficult.
 
 ## Getting Started
 
@@ -19,6 +19,8 @@ yarn preconstruct build
 ```
 
 ## What does preconstruct do?
+
+preconstruct generates bundles for NPM packages with different module formats and enforces that consumer bundlers like webpack and Node can import those packages.
 
 ### Performant Bundles
 
@@ -38,7 +40,11 @@ preconstruct is built with monorepo's in mind, rather than having to manage and 
 
 ### Custom Entrypoints
 
-preconstruct lets you create custom entrypoints
+preconstruct lets you create entrypoints beyond the standard entrypoint of `package-name` so a single package can have other entrypoints like `package-name/some-cool-thing` and `my-package/another-cool-thing`. These entrypoints still have bundles in multiple module formats so consumer bundlers still get a great bundle for them.
+
+## Aliases
+
+TODO
 
 ## Install
 
@@ -56,11 +62,7 @@ yarn add --dev preconstruct
 preconstruct init
 ```
 
-`preconstruct init` asks questions about your project and how it should be build.
-
-- Setup package.json with `"main"` and `"module"`
-- Setup packages if in monorepo
-- probably ask other things
+`preconstruct init` asks questions about your project and how it should be built.
 
 #### `build`
 
@@ -110,42 +112,6 @@ Projects roughly map 1:1 with a version control repository. They specify global 
 }
 ```
 
-##### `globals`
-
-`{ [packageName: string]: (umdName: string) }`
-
-`globals` specify the names of `peerDependencies`
-
-###### Default
-
-> Note: this is the default value, if it's what you want, you don't need to specify it.
-
-```json
-{
-  "preconstruct": {
-    "packages": ["."]
-  }
-}
-```
-
-##### `packages`
-
-`Array<string>`
-
-`packages` is an array of globs which specify which packages should be built with preconstruct.
-
-###### Default
-
-> Note: this is the default value, if it's what you want, you don't need to specify it.
-
-```json
-{
-  "preconstruct": {
-    "packages": ["."]
-  }
-}
-```
-
 ###### Example
 
 ```json
@@ -156,9 +122,46 @@ Projects roughly map 1:1 with a version control repository. They specify global 
 }
 ```
 
+##### `globals`
+
+`{ [packageName: string]: (umdName: string) }`
+
+`globals` specify the UMD names of `peerDependencies` since `peerDependencies` aren't bundled in UMD builds. You don't need to specify this option manually, preconstruct will prompt you for the UMD name when it's necessary.
+
+###### Default
+
+> Note: this is the default value, if it's what you want, you don't need to specify it.
+
+```json
+{
+  "preconstruct": {
+    "globals": {}
+  }
+}
+```
+
+###### Example
+
+```json
+{
+  "preconstruct": {
+    "globals": {
+      "react": "React",
+      "react-dom": "ReactDOM"
+    }
+  }
+}
+```
+
 #### Package
 
+TODO
+
 #### Entrypoint
+
+TODO
+
+### preconstruct
 
 ## I want feature X!
 
