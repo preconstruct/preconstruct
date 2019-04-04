@@ -17,7 +17,7 @@ export function resync<Return>(
   })();
 }
 
-export let desyncs = {
+export let resyncs = {
   readFile: (filename: string, encoding: string) =>
     resync({
       sync: () => readFileSync(filename, encoding),
@@ -29,6 +29,21 @@ export let desyncs = {
       async: () => _globby(globs, options)
     })
 };
+
+type Extract = <Value>(resync: Resync<Value>) => Value;
+
+export function all<Resyncs: $ReadOnlyArray<Resync<mixed>>>(
+  resyncs: Resyncs
+): Generator<any, $TupleMap<Resyncs, Extract>, any> {
+  return resync({
+    sync: () => {
+      return resyncs.map(resync => resync.sync());
+    },
+    async: () => {
+      return Promise.all(resyncs.map(resync => resync.async()));
+    }
+  });
+}
 
 export function desync<Args: $ReadOnlyArray<mixed>, Return>(
   fn: (...Args) => Generator<any, Return, any>

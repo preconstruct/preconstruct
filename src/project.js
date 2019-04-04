@@ -7,7 +7,7 @@ import resolveFrom from "resolve-from";
 import globby from "globby";
 import { Item } from "./item";
 import { Package } from "./package";
-import { resync, desyncs, desync } from "./resync";
+import { resync, resyncs, desync } from "./resync";
 
 let unsafeRequire = require;
 
@@ -29,7 +29,7 @@ export class Project extends Item {
   }
   static creator = desync(function*(directory: string) {
     let filePath = nodePath.join(directory, "package.json");
-    let contents = yield* desyncs.readFile(filePath, "utf-8");
+    let contents = yield* resyncs.readFile(filePath, "utf-8");
     let project = new Project(filePath, contents);
     project.packages = yield* resync({
       async: () => project._packages(),
@@ -53,10 +53,10 @@ export class Project extends Item {
     this.json.name = name;
   }
   packages: Array<Package>;
-  *_packages() {
+  *_packagesGen() {
     // suport bolt later probably
     // maybe lerna too though probably not
-    yield {
+    yield resync({
       async: async () => {
         if (!this._config.packages && this.json.workspaces) {
           let _workspaces;
@@ -65,34 +65,34 @@ export class Project extends Item {
           } else if (Array.isArray(this.json.workspaces.packages)) {
             _workspaces = this.json.workspaces.packages;
           }
-    
+
           let workspaces = is(_workspaces, is.arrayOf(is.string));
-    
+
           let packages = await promptInput(
             "what packages should preconstruct build?",
             this,
             workspaces.join(",")
           );
-    
+
           this._config.packages = packages.split(",");
-    
+
           await this.save();
         }
       },
       sync: () => {}
-    }
- 
+    });
 
     try {
-      let filenames = yield* desyncs.globby(this.configPackages, {
+      let filenames = yield* resyncs.globby(this.configPackages, {
         cwd: this.directory,
         onlyDirectories: true,
         absolute: true,
         expandDirectories: false
       });
 
-      let packages = await Promise.all(
-        filenames.map(async x => {
+      let packages = all(
+        filenames.map(x => {
+          return desync();
           let pkg = await Package.create(x);
           pkg.project = this;
           return pkg;
@@ -105,10 +105,8 @@ export class Project extends Item {
       }
       throw error;
     }
-
   }
-  async _packages(): Promise<Array<Package>> {
-  }
+  async _packages(): Promise<Array<Package>> {}
   _packagesSync(): Array<Package> {
     try {
       let filenames = globby.sync(this.configPackages, {
