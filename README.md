@@ -4,7 +4,7 @@
 
 > DISCLAIMER:
 >
-> While preconstruct is pretty stable in terms of bugs and is used in big projects, a lot of things are still in flux and will change so please be aware of that. We're in 0.0.x versions for a reason.
+> While preconstruct is pretty stable in terms of bugs and is used in big projects but a lot of things are still in flux and will change so please be aware of that. We're in 0.0.x versions for a reason.
 
 ## Why?
 
@@ -20,39 +20,25 @@ yarn preconstruct build
 
 ## What does preconstruct do?
 
-preconstruct generates small bundles
-
-## Features
-
 ### Performant Bundles
 
 Performance and bundle size are common concerns when building libraries so preconstruct generates dev and prod CommonJS bundles so that you can have process.env.NODE_ENV checks to have helpful warnings and errors without slowing down production along with building browser specific bundles when you use `typeof window` so that you can have Node.js specific code which is dead code eliminated from browser bundles.
 
-###
+### package.json Validation & Autofixing
 
-### Strictly Enforcing Configuration
-
-preconstruct strictly enforces the relevant fields in your package.json that tell where Node and bundlers where to look for your bundles so you don't have to worry about them.
+preconstruct strictly enforces that the relevant fields in your package.json that tell where Node and bundlers where to look for your bundles are correct so you don't have to worry about them. This means you'll always be publishing working versions of your packages. preconstruct can also fix most invalid
 
 ### Minimal Configuration
 
-Rather than having to config
+Rather than having to configure everything, preconstruct infers how your project should be built. For example, if you have a `module` field in your package.json, preconstruct will create an ESM bundle but if you don't have a `module` field in your package.json, preconstruct won't create an ESM bundle.
 
 ### Monorepos
 
-preconstruct is built with monorepo's in mind, rather than having to manage and build packages on an individual level, preconstruct lets you manage and build all of your packages together.
+preconstruct is built with monorepo's in mind, rather than having to manage and build packages on an individual level, preconstruct lets you manage and build all of your packages together as a single project.
 
 ### Custom Entrypoints
 
-Have you ever wanted to add another entrypoint to your package but had trouble making
-
-### Lack of features
-
-Preconstruct uses [Rollup](https://rollupjs.org) under the hood to generate fast bundles for modern bundlers with ES Module builds, Node.js with CommonJS builds and the browser without a bundler via UMD builds while respecting your [Babel](https://babeljs.io/) config.
-
-Preconstruct has a minimal api that doesn't get in the way
-
-That's why preconstruct exists.
+preconstruct lets you create custom entrypoints
 
 ## Install
 
@@ -64,49 +50,115 @@ yarn add --dev preconstruct
 
 ### Commands
 
-#### init
+#### `init`
 
 ```bash
 preconstruct init
 ```
 
+`preconstruct init` asks questions about your project and how it should be build.
+
 - Setup package.json with `"main"` and `"module"`
 - Setup packages if in monorepo
 - probably ask other things
 
-#### build
+#### `build`
 
 ```bash
 preconstruct build
 ```
 
-- verifies things
-  - if `typeof document` or `typeof window` is used, prompt to add browser field
-- does the build
+`preconstruct build` creates the bundles for your project.
 
-#### watch
+#### `watch`
 
 ```bash
 preconstruct watch
 ```
 
-- same as build but watches
+`preconstruct watch` is similar to `preconstruct build` except instead of doing a single build, it will start a watcher and rebuild the project whenever there are changes.
 
-#### fix
+#### `fix`
 
 ```bash
 preconstruct fix
 ```
 
-- like init but infers as much as possible
-- made for places that already have build setups
-- e.g. if the package has a umd:main field and it's wrong, fix it and ask for a umdName but if it doesn't have a umd:main field, don't do anything
+### preconstruct Configuration
 
-### Configuration
+Preconstruct accepts configuration at three different configuration points; Projects, Packages and Entrypoints. These configuration points can be represented by one package.json or by 20 package.jsons, it depends on the requirements of a specific project. For example, in a single package repo with one entrypoint, it would be represented by a single package.json.
 
-Preconstruct accepts
+#### Projects
 
-####
+Projects roughly map 1:1 with a version control repository. They specify global configuration that applies to all builds.
+
+##### `packages`
+
+`Array<string>`
+
+`packages` is an array of globs which specify which packages should be built with preconstruct.
+
+###### Default
+
+> Note: this is the default value, if it's what you want, you don't need to specify it.
+
+```json
+{
+  "preconstruct": {
+    "packages": ["."]
+  }
+}
+```
+
+##### `globals`
+
+`{ [packageName: string]: (umdName: string) }`
+
+`globals` specify the names of `peerDependencies`
+
+###### Default
+
+> Note: this is the default value, if it's what you want, you don't need to specify it.
+
+```json
+{
+  "preconstruct": {
+    "packages": ["."]
+  }
+}
+```
+
+##### `packages`
+
+`Array<string>`
+
+`packages` is an array of globs which specify which packages should be built with preconstruct.
+
+###### Default
+
+> Note: this is the default value, if it's what you want, you don't need to specify it.
+
+```json
+{
+  "preconstruct": {
+    "packages": ["."]
+  }
+}
+```
+
+###### Example
+
+```json
+{
+  "preconstruct": {
+    "packages": ["packages/*"]
+  }
+}
+```
+
+#### Package
+
+#### Entrypoint
 
 ## I want feature X!
 
