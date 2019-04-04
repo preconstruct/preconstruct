@@ -20,7 +20,7 @@ import prettier from "../rollup-plugins/prettier";
 import terser from "../rollup-plugins/terser";
 import { limit } from "../prompt";
 import { getNameForDist } from "../utils";
-import { EXTENSIONS } from "../utils";
+import { EXTENSIONS } from "../constants";
 
 import installPackages from "install-packages";
 

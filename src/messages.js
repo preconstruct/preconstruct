@@ -1,17 +1,17 @@
 // @flow
 
+import { PKG_JSON_CONFIG_FIELD } from "./constants";
+
 export let errors = {
   noSource: (source: string) =>
-    `no source file was provided, please create a file at ${source} or specify a custom source file with the preconstruct source option`,
-  deniedWriteMainField:
-    "changing the main field is required for preconstruct to build",
+    `no source file was provided, please create a file at ${source} or specify a custom source file with the ${PKG_JSON_CONFIG_FIELD} source option`,
+  deniedWriteMainField: "changing the main field is required to build",
   invalidModuleField: "module field is invalid",
   invalidMainField: "main field is invalid",
   invalidUmdMainField: "umd:main field is invalid",
   invalidBrowserField: "browser field is invalid",
   invalidReactNativeField: "react-native field is invalid",
-  umdNameNotSpecified:
-    "the umd:main field is specified but a umdName option is not specified. please add it to the preconstruct field in your package.json",
+  umdNameNotSpecified: `the umd:main field is specified but a umdName option is not specified. please add it to the ${PKG_JSON_CONFIG_FIELD} field in your package.json`,
   deniedWriteBrowserField:
     "building browser bundles for modules that include typeof window or typeof document is currently required",
   noEntrypointPkgJson: "There is a missing package.json for an entrypoint",
