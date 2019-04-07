@@ -234,7 +234,8 @@ export let getRollupConfig = (
         ],
         extensions: EXTENSIONS
       }),
-      cjs(),
+      type === "umd" &&
+        cjs({ include: ["**/node_modules/**", "node_modules/**"] }),
       (type === "browser" || type === "umd") &&
         replace({
           "typeof document": JSON.stringify("object"),
