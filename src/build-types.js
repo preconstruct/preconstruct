@@ -1,8 +1,8 @@
 // @flow
 
-type BuildType = "required" | "prompted" | "optional";
+export type BuildType = "required" | "prompted" | "optional";
 
-type FieldType = "single" | "mapping";
+export type FieldType = "single" | "mapping";
 
 type SingleField = {
   name: string,
@@ -20,7 +20,7 @@ type Field =
     };
 
 type BaseBuild = {
-  Field: string,
+  field: Field,
   getValid: (pkgName: string) => { [key: string]: string } | string
 };
 
