@@ -24,8 +24,13 @@ if (process.env.NODE_ENV === \\"production\\") {
 
 exports[`basic: valid-package.cjs.prod.js 1`] = `
 "\\"use strict\\";
-Object.defineProperty(exports, \\"__esModule\\", { value: !0 });
+
+Object.defineProperty(exports, \\"__esModule\\", {
+  value: !0
+});
+
 var index = \\"something\\";
+
 exports.default = index;
 "
 `;

@@ -54,35 +54,24 @@ if (process.env.NODE_ENV === \\"production\\") {
 
 exports[`needs @babel/runtime allow install: dist/use-babel-runtime.cjs.prod.js 1`] = `
 "\\"use strict\\";
+
 function _interopDefault(ex) {
   return ex && \\"object\\" == typeof ex && \\"default\\" in ex ? ex.default : ex;
 }
-Object.defineProperty(exports, \\"__esModule\\", { value: !0 });
-var _possibleConstructorReturn = _interopDefault(
-    require(\\"@babel/runtime/helpers/possibleConstructorReturn\\")
-  ),
-  _getPrototypeOf = _interopDefault(
-    require(\\"@babel/runtime/helpers/getPrototypeOf\\")
-  ),
-  _inherits = _interopDefault(require(\\"@babel/runtime/helpers/inherits\\")),
-  _classCallCheck = _interopDefault(
-    require(\\"@babel/runtime/helpers/classCallCheck\\")
-  ),
-  Bar = function Bar() {
-    _classCallCheck(this, Bar);
-  },
-  Foo = (function(_Bar) {
-    function Foo() {
-      return (
-        _classCallCheck(this, Foo),
-        _possibleConstructorReturn(
-          this,
-          _getPrototypeOf(Foo).apply(this, arguments)
-        )
-      );
-    }
-    return _inherits(Foo, Bar), Foo;
-  })();
+
+Object.defineProperty(exports, \\"__esModule\\", {
+  value: !0
+});
+
+var _possibleConstructorReturn = _interopDefault(require(\\"@babel/runtime/helpers/possibleConstructorReturn\\")), _getPrototypeOf = _interopDefault(require(\\"@babel/runtime/helpers/getPrototypeOf\\")), _inherits = _interopDefault(require(\\"@babel/runtime/helpers/inherits\\")), _classCallCheck = _interopDefault(require(\\"@babel/runtime/helpers/classCallCheck\\")), Bar = function Bar() {
+  _classCallCheck(this, Bar);
+}, Foo = function(_Bar) {
+  function Foo() {
+    return _classCallCheck(this, Foo), _possibleConstructorReturn(this, _getPrototypeOf(Foo).apply(this, arguments));
+  }
+  return _inherits(Foo, Bar), Foo;
+}();
+
 exports.Foo = Foo;
 "
 `;

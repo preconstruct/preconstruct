@@ -42,7 +42,6 @@
     "meow": "^5.0.0",
     "ms": "^2.1.1",
     "p-limit": "^2.0.0",
-    "prettier": "^1.15.3",
     "resolve": "^1.10.0",
     "resolve-from": "^4.0.0",
     "rollup": "^1.0.0",
@@ -55,6 +54,7 @@
     "terser": "^3.14.1"
   },
   "devDependencies": {
+    "prettier": "^1.15.3",
     "@babel/cli": "^7.1.2",
     "@babel/plugin-proposal-object-rest-spread": "^7.2.0",
     "@babel/preset-env": "^7.1.0",
