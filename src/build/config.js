@@ -66,7 +66,7 @@ function getGlobals(pkg: Package, aliases) {
 
 export function getRollupConfigs(pkg: Package, aliases: Aliases) {
   let configs: Array<{
-    config: RollupConfig,
+    config: Promise<RollupConfig>,
     outputs: Array<OutputOptions>
   }> = [];
 

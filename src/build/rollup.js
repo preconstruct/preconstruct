@@ -3,7 +3,6 @@ const resolve = require("rollup-plugin-node-resolve");
 const alias = require("rollup-plugin-alias");
 const cjs = require("rollup-plugin-commonjs");
 const replace = require("rollup-plugin-replace");
-const resolveFrom = require("resolve-from");
 const chalk = require("chalk");
 import path from "path";
 import builtInModules from "builtin-modules";
@@ -21,8 +20,12 @@ import terser from "../rollup-plugins/terser";
 import { limit } from "../prompt";
 import { getNameForDist } from "../utils";
 import { EXTENSIONS } from "../constants";
+import _nodeResolve from "resolve";
+import { promisify } from "util";
 
 import installPackages from "install-packages";
+
+let nodeResolve = promisify(_nodeResolve);
 
 // this makes sure nested imports of external packages are external
 const makeExternalPredicate = externalArr => {
@@ -42,7 +45,7 @@ let pkgJsonsAllowedToFail = [
   "nopt"
 ];
 
-function getChildPeerDeps(
+async function getChildPeerDeps(
   finalPeerDeps: Array<string>,
   isUMD: boolean,
   depKeys: Array<string>,
@@ -50,48 +53,56 @@ function getChildPeerDeps(
   aliases: Aliases,
   pkg: Package
 ) {
-  depKeys
-    .filter(x => !doneDeps.includes(x))
-    .forEach(key => {
-      let pkgJson;
-      try {
-        pkgJson = unsafeRequire(
-          resolveFrom(pkg.directory, key + "/package.json")
-        );
-      } catch (err) {
-        if (
-          err.code === "MODULE_NOT_FOUND" &&
-          pkgJsonsAllowedToFail.includes(key)
-        ) {
-          return;
+  return Promise.all(
+    depKeys
+      .filter(x => !doneDeps.includes(x))
+      .map(async key => {
+        let pkgJson;
+        try {
+          pkgJson = unsafeRequire(
+            await nodeResolve(key + "/package.json", { basedir: pkg.directory })
+          );
+        } catch (err) {
+          if (
+            err.code === "MODULE_NOT_FOUND" &&
+            pkgJsonsAllowedToFail.includes(key)
+          ) {
+            return;
+          }
+          throw err;
         }
-        throw err;
-      }
-      if (pkgJson.peerDependencies) {
-        finalPeerDeps.push(...Object.keys(pkgJson.peerDependencies));
-        getChildPeerDeps(
-          finalPeerDeps,
-          isUMD,
-          Object.keys(pkgJson.peerDependencies),
-          doneDeps,
-          aliases,
-          pkg
-        );
-      }
-      // when we're building a UMD bundle, we're also bundling the dependencies so we need
-      // to get the peerDependencies of dependencies
-      if (pkgJson.dependencies && isUMD) {
-        doneDeps.push(...Object.keys(pkgJson.dependencies));
-        getChildPeerDeps(
-          finalPeerDeps,
-          isUMD,
-          Object.keys(pkgJson.dependencies),
-          doneDeps,
-          aliases,
-          pkg
-        );
-      }
-    });
+        let promises = [];
+        if (pkgJson.peerDependencies) {
+          finalPeerDeps.push(...Object.keys(pkgJson.peerDependencies));
+          promises.push(
+            getChildPeerDeps(
+              finalPeerDeps,
+              isUMD,
+              Object.keys(pkgJson.peerDependencies),
+              doneDeps,
+              aliases,
+              pkg
+            )
+          );
+        }
+        // when we're building a UMD bundle, we're also bundling the dependencies so we need
+        // to get the peerDependencies of dependencies
+        if (pkgJson.dependencies && isUMD) {
+          doneDeps.push(...Object.keys(pkgJson.dependencies));
+          promises.push(
+            getChildPeerDeps(
+              finalPeerDeps,
+              isUMD,
+              Object.keys(pkgJson.dependencies),
+              doneDeps,
+              aliases,
+              pkg
+            )
+          );
+        }
+        await Promise.all(promises);
+      })
+  );
 }
 
 import type { RollupSingleFileBuild } from "./types";
@@ -111,12 +122,12 @@ export type RollupConfigType =
   | "node-prod"
   | "react-native";
 
-export let getRollupConfig = (
+export let getRollupConfig = async (
   pkg: Package,
   entrypoints: Array<StrictEntrypoint>,
   aliases: Aliases,
   type: RollupConfigType
-): RollupConfig => {
+): Promise<RollupConfig> => {
   let external = [];
   if (pkg.peerDependencies) {
     external.push(...Object.keys(pkg.peerDependencies));
@@ -124,7 +135,7 @@ export let getRollupConfig = (
   if (pkg.dependencies && type !== "umd") {
     external.push(...Object.keys(pkg.dependencies));
   }
-  getChildPeerDeps(
+  await getChildPeerDeps(
     external,
     type === "umd",
     external.concat(
@@ -140,15 +151,19 @@ export let getRollupConfig = (
 
   let rollupAliases = {};
 
-  Object.keys(aliases).forEach(key => {
-    try {
-      rollupAliases[key] = resolveFrom(pkg.directory, aliases[key]);
-    } catch (err) {
-      if (err.code !== "MODULE_NOT_FOUND") {
-        throw err;
+  await Promise.all(
+    Object.keys(aliases).map(async key => {
+      try {
+        rollupAliases[key] = await nodeResolve(aliases[key], {
+          basedir: pkg.directory
+        });
+      } catch (err) {
+        if (err.code !== "MODULE_NOT_FOUND") {
+          throw err;
+        }
       }
-    }
-  });
+    })
+  );
 
   let input = {};
 

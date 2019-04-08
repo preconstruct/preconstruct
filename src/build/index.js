@@ -23,7 +23,7 @@ async function buildPackage(pkg: Package, aliases: Aliases) {
   await Promise.all(
     configs.map(async ({ config, outputs }) => {
       // $FlowFixMe this is not a problem with flow, i did something wrong but it's not worth fixing right now
-      let bundle = await rollup(config);
+      let bundle = await rollup(await config);
       let result = await Promise.all(
         outputs.map(outputConfig => {
           return bundle.write(outputConfig);

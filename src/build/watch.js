@@ -20,9 +20,14 @@ function relativePath(id: string) {
 async function watchPackage(pkg: Package, aliases: Aliases) {
   const _configs = getRollupConfigs(pkg, aliases);
   await fs.remove(path.join(pkg.directory, "dist"));
-  let configs = _configs.map(config => {
-    return { ...toUnsafeRollupConfig(config.config), output: config.outputs };
-  });
+  let configs = await Promise.all(
+    _configs.map(async config => {
+      return {
+        ...toUnsafeRollupConfig(await config.config),
+        output: config.outputs
+      };
+    })
+  );
   const watcher = watch(configs);
   let reject;
   let errPromise = new Promise((resolve, _reject) => {
