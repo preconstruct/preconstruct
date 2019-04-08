@@ -42,6 +42,7 @@
     "meow": "^5.0.0",
     "ms": "^2.1.1",
     "p-limit": "^2.0.0",
+    "quick-lru": "^4.0.0",
     "resolve": "^1.10.0",
     "resolve-from": "^4.0.0",
     "rollup": "^1.0.0",
@@ -51,10 +52,10 @@
     "rollup-plugin-replace": "^2.0.0",
     "rollup-pluginutils": "^2.6.0",
     "sarcastic": "^1.5.0",
-    "terser": "^3.14.1"
+    "terser": "^3.14.1",
+    "xxhash-wasm": "^0.3.1"
   },
   "devDependencies": {
-    "prettier": "^1.15.3",
     "@babel/cli": "^7.1.2",
     "@babel/plugin-proposal-object-rest-spread": "^7.2.0",
     "@babel/preset-env": "^7.1.0",
@@ -72,6 +73,7 @@
     "jest-in-case": "^1.0.2",
     "jest-junit": "^6.1.0",
     "object-assign": "^4.1.1",
+    "prettier": "^1.15.3",
     "react": "^16.6.3",
     "rimraf": "^2.6.2",
     "spawndamnit": "^2.0.0"
