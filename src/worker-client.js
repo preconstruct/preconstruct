@@ -1,14 +1,18 @@
 // @flow
 import Worker from "jest-worker";
 
+let shouldUseWorker = process.env.DISABLE_PRECONSTRUCT_WORKER !== "true";
+
 let worker;
 
 export function createWorker() {
-  worker = new Worker(require.resolve("./worker"));
+  if (shouldUseWorker) {
+    worker = new Worker(require.resolve("./worker"));
+  }
 }
 
 export function destroyWorker() {
-  if (worker !== undefined) {
+  if (worker !== undefined && shouldUseWorker) {
     worker.end();
     worker = undefined;
   }
