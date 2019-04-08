@@ -8,6 +8,8 @@ let worker;
 export function createWorker() {
   if (shouldUseWorker) {
     worker = new Worker(require.resolve("./worker"));
+  } else {
+    worker = require("./worker");
   }
 }
 
