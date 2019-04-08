@@ -10,7 +10,6 @@ export function createWorker() {
 export function destroyWorker() {
   if (worker !== undefined) {
     worker.end();
-
     worker = undefined;
   }
 }

@@ -16,7 +16,6 @@ import { confirms } from "../messages";
 import rewriteCjsRuntimeHelpers from "../rollup-plugins/rewrite-cjs-runtime-helpers";
 import flowAndNodeDevProdEntry from "../rollup-plugins/flow-and-prod-dev-entry";
 import babel from "../rollup-plugins/babel";
-import prettier from "../rollup-plugins/prettier";
 import terser from "../rollup-plugins/terser";
 import { limit } from "../prompt";
 import { getNameForDist } from "../utils";
@@ -256,9 +255,12 @@ export let getRollupConfig = (
       type === "umd" && terser(),
       type === "node-prod" &&
         terser({
-          mangle: false
+          mangle: false,
+          output: {
+            beautify: true,
+            indent_level: 2
+          }
         }),
-      type === "node-prod" && prettier(),
       type === "node-prod" && flowAndNodeDevProdEntry()
     ].filter(Boolean)
   };
