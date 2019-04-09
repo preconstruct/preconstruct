@@ -35,7 +35,7 @@ const lru = new QuickLRU({ maxSize: 1000 });
 
 let hasher;
 
-initHasher().then(({ h64 }) => {
+export let hasherPromise = initHasher().then(({ h64 }) => {
   hasher = h64;
 });
 
@@ -54,13 +54,16 @@ let rollupPluginBabel = (pluginOptions: *) => {
     name: "babel",
     transform(code: string, filename: string) {
       if (!filter(filename)) return Promise.resolve(null);
-      let hash = hasher(code + filename);
+      let hash = hasher(filename);
       if (lru.has(hash)) {
-        return lru.get(hash);
+        let cachedResult = lru.get(hash);
+        if (code === cachedResult.code) {
+          return cachedResult.promise;
+        }
       }
       let options = JSON.stringify({ ...babelOptions, filename });
       let promise = getWorker().transformBabel(code, options);
-      lru.set(hash, promise);
+      lru.set(hash, { code, promise });
       return promise;
     }
   };
