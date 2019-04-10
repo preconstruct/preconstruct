@@ -25,3 +25,7 @@ Let's say we have module A, B and C. Module A and B are entrypoints and they bot
 ### Why are the filenames of the dist files so strictly enforced?
 
 Strictly enforcing the filenames allows preconstruct to automatically validate and fix any filenames to ensure that consumer bundlers will be able to consume the package.
+
+### Why do all entrypoints in a package have to have the same build types?
+
+This is necessary to guarantee that common dependencies between entrypoints in a package are not duplicated between entrypoints.
