@@ -201,17 +201,45 @@ Entrypoints are the lowest level configuration point and describe a set of bundl
 
 ##### Build types
 
-Build types specify what types of bundles preconstruct should build. They are specified via the package.json fields which . It's important to note that **all** of the entrypoints in a package.
+Build types specify what types of bundles preconstruct should build. They are specified via the package.json fields which Node and bundlers like webpack look at to find bundles. It's important to note that **all** of the entrypoints in a package must have the same build types, this is necessary to ensure that common dependencies between entrypoints aren't duplicated.
 
 ###### `main`
 
-The `main` field specifies a CommonJS build. It is the only build type which is **required**.
+The `main` field specifies a CommonJS build. It is the only build type which is **required**. This bundle will work in Node and can work in bundlers like webpack but a ES Module build is recommended for bundlers like webpack.
+
+Example:
+
+```jsx
+{
+  "main": "dist/my-package.cjs.js"
+}
+```
 
 ###### `module`
 
+The `module` field specifies an ES Module build. This bundle is what bundlers like webpack will use.
+
+Example:
+
+```jsx
+{
+  "module": "dist/my-package.esm.js"
+}
+```
+
 ###### `umd:main`
 
-###### `browser`
+The `umd:main` field specifies a UMD build. This bundle can be used directly in a browser with a `<script>` tag.
+
+Example:
+
+```jsx
+{
+  "umd:main": "dist/my-package.umd.min.js"
+}
+```
+
+<!-- TODO: maybe talk about browser builds, not 100% sure though. -->
 
 <!-- i'm explicitly not mentioning the react-native thing because i doubt it will stay in preconstruct  -->
 
