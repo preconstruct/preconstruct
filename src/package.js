@@ -28,11 +28,17 @@ export class Package extends Item {
       is.default(is.arrayOf(is.string), ["."])
     );
   }
-  static async create(directory: string): Promise<Package> {
+
+  constructor(filePath: string, contents: string, project: Project) {
+    super(filePath, contents);
+
+    this.project = project;
+  }
+  static async create(directory: string, project: Project): Promise<Package> {
     let filePath = nodePath.join(directory, "package.json");
 
     let contents = await fs.readFile(filePath, "utf-8");
-    let pkg = new Package(filePath, contents);
+    let pkg = new Package(filePath, contents, project);
 
     let filenames = await globby(pkg.configEntrypoints, {
       cwd: pkg.directory,
@@ -50,10 +56,10 @@ export class Package extends Item {
 
     return pkg;
   }
-  static createSync(directory: string): Package {
+  static createSync(directory: string, project: Project): Package {
     let filePath = nodePath.join(directory, "package.json");
     let contents = readFileSync(filePath, "utf-8");
-    let pkg = new Package(filePath, contents);
+    let pkg = new Package(filePath, contents, project);
     let filenames = globby.sync(pkg.configEntrypoints, {
       cwd: pkg.directory,
       onlyDirectories: true,

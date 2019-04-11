@@ -1,9 +1,9 @@
-// @flow
+// @flow strict
 import { readFileSync } from "fs";
 import * as fs from "fs-extra";
 import _globby from "globby";
 
-type Resync<Return> = {
+export type Resync<Return> = {
   sync: () => Return,
   async: () => Promise<Return>
 };
@@ -45,27 +45,25 @@ export function all<Resyncs: $ReadOnlyArray<Resync<mixed>>>(
   });
 }
 
-export function desync<Args: $ReadOnlyArray<mixed>, Return>(
-  fn: (...Args) => Generator<any, Return, any>
-): (...Args) => Resync<Return> {
-  return (...args) => ({
-    sync: () => {
-      let gen = fn(...args);
+export function desync<Return>(
+  fn: () => Generator<any, Return, any>
+): Resync<Return> {
+  return {
+    sync: (): Return => {
+      let gen = fn();
       let current = gen.next();
       while (!current.done) {
         current = gen.next(current.value.sync());
       }
-      // $FlowFixMe
-      return current.value;
+      return ((current.value: any): Return);
     },
-    async: async () => {
-      let gen = fn(...args);
+    async: async (): Promise<Return> => {
+      let gen = fn();
       let current = gen.next();
       while (!current.done) {
         current = gen.next(await current.value.async());
       }
-      // $FlowFixMe
-      return current.value;
+      return ((current.value: any): Return);
     }
-  });
+  };
 }

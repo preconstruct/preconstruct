@@ -7,7 +7,7 @@ import resolveFrom from "resolve-from";
 import globby from "globby";
 import { Item } from "./item";
 import { Package } from "./package";
-import { resync, resyncs, desync } from "./resync";
+import { resync, resyncs, desync, all, type Resync } from "./resync";
 import { PKG_JSON_CONFIG_FIELD } from "./constants";
 
 let unsafeRequire = require;
@@ -28,17 +28,14 @@ export class Project extends Item {
     let hasYarnWorkspaces = !!this.json.workspaces;
     return hasBolt && !hasYarnWorkspaces;
   }
-  static creator = desync(function*(directory: string) {
-    let filePath = nodePath.join(directory, "package.json");
-    let contents = yield* resyncs.readFile(filePath, "utf-8");
-    let project = new Project(filePath, contents);
-    project.packages = yield* resync({
-      async: () => project._packages(),
-      sync: () => project._packagesSync()
+  static creator = (directory: string): Resync<Project> =>
+    desync(function*() {
+      let filePath = nodePath.join(directory, "package.json");
+      let contents = yield* resyncs.readFile(filePath, "utf-8");
+      let project = new Project(filePath, contents);
+      project.packages = yield* project._packages();
+      return project;
     });
-
-    return project;
-  });
 
   static async create(directory: string): Promise<Project> {
     return Project.creator(directory).async();
@@ -54,7 +51,7 @@ export class Project extends Item {
     this.json.name = name;
   }
   packages: Array<Package>;
-  *_packagesGen() {
+  *_packages() {
     // suport bolt later probably
     // maybe lerna too though probably not
     yield resync({
@@ -91,36 +88,14 @@ export class Project extends Item {
         expandDirectories: false
       });
 
-      let packages = all(
+      let packages = yield* all(
         filenames.map(x => {
-          return desync();
-          let pkg = await Package.create(x);
-          pkg.project = this;
-          return pkg;
+          return {
+            async: () => Package.create(x, this),
+            sync: () => Package.createSync(x, this)
+          };
         })
       );
-      return packages;
-    } catch (error) {
-      if (error instanceof is.AssertionError) {
-        return [];
-      }
-      throw error;
-    }
-  }
-  async _packages(): Promise<Array<Package>> {}
-  _packagesSync(): Array<Package> {
-    try {
-      let filenames = globby.sync(this.configPackages, {
-        cwd: this.directory,
-        onlyDirectories: true,
-        absolute: true,
-        expandDirectories: false
-      });
-      let packages = filenames.map(x => {
-        let pkg = Package.createSync(x);
-        pkg.project = this;
-        return pkg;
-      });
       return packages;
     } catch (error) {
       if (error instanceof is.AssertionError) {
