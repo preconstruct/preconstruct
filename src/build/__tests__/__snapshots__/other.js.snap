@@ -52,11 +52,17 @@ if (process.env.NODE_ENV === \\"production\\") {
 
 exports[`browser no module: dist/browser-no-module.cjs.prod.js 1`] = `
 "\\"use strict\\";
-Object.defineProperty(exports, \\"__esModule\\", { value: !0 });
+
+Object.defineProperty(exports, \\"__esModule\\", {
+  value: !0
+});
+
 let thing = \\"wow\\";
-\\"undefined\\" != typeof window && (thing = \\"something\\"),
-  void 0 !== typeof document && (thing += \\"other\\");
+
+\\"undefined\\" != typeof window && (thing = \\"something\\"), void 0 !== typeof document && (thing += \\"other\\");
+
 var thing$1 = thing;
+
 exports.default = thing$1;
 "
 `;
@@ -159,11 +165,17 @@ if (process.env.NODE_ENV === \\"production\\") {
 
 exports[`browser: dist/browser.cjs.prod.js 1`] = `
 "\\"use strict\\";
-Object.defineProperty(exports, \\"__esModule\\", { value: !0 });
+
+Object.defineProperty(exports, \\"__esModule\\", {
+  value: !0
+});
+
 let thing = \\"wow\\";
-\\"undefined\\" != typeof window && (thing = \\"something\\"),
-  void 0 !== typeof document && (thing += \\"other\\");
+
+\\"undefined\\" != typeof window && (thing = \\"something\\"), void 0 !== typeof document && (thing += \\"other\\");
+
 var thing$1 = thing;
+
 exports.default = thing$1;
 "
 `;
@@ -240,8 +252,13 @@ if (process.env.NODE_ENV === \\"production\\") {
 
 exports[`react native: with-react-native-field.cjs.prod.js 1`] = `
 "\\"use strict\\";
-Object.defineProperty(exports, \\"__esModule\\", { value: !0 });
+
+Object.defineProperty(exports, \\"__esModule\\", {
+  value: !0
+});
+
 var index = \\"react native\\";
+
 exports.default = index;
 "
 `;
@@ -295,8 +312,13 @@ if (process.env.NODE_ENV === \\"production\\") {
 
 exports[`typescript: dist/typescript.cjs.prod.js 1`] = `
 "\\"use strict\\";
-Object.defineProperty(exports, \\"__esModule\\", { value: !0 });
+
+Object.defineProperty(exports, \\"__esModule\\", {
+  value: !0
+});
+
 let thing = \\"something\\";
+
 exports.default = thing;
 "
 `;

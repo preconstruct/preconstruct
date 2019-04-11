@@ -8,6 +8,7 @@ import globby from "globby";
 import { Item } from "./item";
 import { Package } from "./package";
 import { resync, resyncs, desync } from "./resync";
+import { PKG_JSON_CONFIG_FIELD } from "./constants";
 
 let unsafeRequire = require;
 
@@ -137,8 +138,12 @@ export class Project extends Item {
         let pkgJson = unsafeRequire(
           resolveFrom(this.directory, nodePath.join(pkg, "package.json"))
         );
-        if (pkgJson && pkgJson.preconstruct && pkgJson.preconstruct.umdName) {
-          return pkgJson.preconstruct.umdName;
+        if (
+          pkgJson &&
+          pkgJson[PKG_JSON_CONFIG_FIELD] &&
+          pkgJson[PKG_JSON_CONFIG_FIELD].umdName
+        ) {
+          return pkgJson[PKG_JSON_CONFIG_FIELD].umdName;
         }
       } catch (err) {
         if (err.code !== "MODULE_NOT_FOUND") {

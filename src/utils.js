@@ -59,5 +59,3 @@ export function getValidUmdMainField(entrypoint: Entrypoint) {
   let nameForDist = getNameForDist(entrypoint.package.name);
   return `dist/${nameForDist}.umd.min.js`;
 }
-
-export let EXTENSIONS = [".ts", ".tsx", ".js", ".jsx"];

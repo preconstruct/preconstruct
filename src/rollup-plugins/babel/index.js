@@ -2,6 +2,8 @@
 import * as babel from "@babel/core";
 import { createFilter } from "rollup-pluginutils";
 import { getWorker } from "../../worker-client";
+import initHasher from "xxhash-wasm";
+import QuickLRU from "quick-lru";
 
 const regExpCharactersRegExp = /[\\^$.*+?()[\]{}|]/g;
 const escapeRegExpCharacters = (str: string) =>
@@ -29,6 +31,14 @@ const unpackOptions = ({
   }
 });
 
+const lru = new QuickLRU({ maxSize: 1000 });
+
+let hasher;
+
+export let hasherPromise = initHasher().then(({ h64 }) => {
+  hasher = h64;
+});
+
 let rollupPluginBabel = (pluginOptions: *) => {
   const { exclude, extensions, include, ...babelOptions } = unpackOptions(
     pluginOptions
@@ -44,9 +54,17 @@ let rollupPluginBabel = (pluginOptions: *) => {
     name: "babel",
     transform(code: string, filename: string) {
       if (!filter(filename)) return Promise.resolve(null);
+      let hash = hasher(filename);
+      if (lru.has(hash)) {
+        let cachedResult = lru.get(hash);
+        if (code === cachedResult.code) {
+          return cachedResult.promise;
+        }
+      }
       let options = JSON.stringify({ ...babelOptions, filename });
-
-      return getWorker().transformBabel(code, options);
+      let promise = getWorker().transformBabel(code, options);
+      lru.set(hash, { code, promise });
+      return promise;
     }
   };
 };

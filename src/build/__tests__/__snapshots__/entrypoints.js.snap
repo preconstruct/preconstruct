@@ -26,8 +26,13 @@ if (process.env.NODE_ENV === \\"production\\") {
 
 exports[`multiple entrypoints: dist/multiple-entrypoints.cjs.prod.js 1`] = `
 "\\"use strict\\";
-Object.defineProperty(exports, \\"__esModule\\", { value: !0 });
+
+Object.defineProperty(exports, \\"__esModule\\", {
+  value: !0
+});
+
 let sum = (a, b) => a + b;
+
 exports.sum = sum;
 "
 `;
@@ -65,8 +70,13 @@ if (process.env.NODE_ENV === \\"production\\") {
 
 exports[`multiple entrypoints: multiply/dist/multiple-entrypoints.cjs.prod.js 1`] = `
 "\\"use strict\\";
-Object.defineProperty(exports, \\"__esModule\\", { value: !0 });
+
+Object.defineProperty(exports, \\"__esModule\\", {
+  value: !0
+});
+
 let multiply = (a, b) => a * b;
+
 exports.multiply = multiply;
 "
 `;
@@ -112,8 +122,13 @@ export * from \\"../modules/index.js\\";
 
 exports[`source entrypoint option flow: source-entrypoint-option-flow.cjs.prod.js 1`] = `
 "\\"use strict\\";
-Object.defineProperty(exports, \\"__esModule\\", { value: !0 });
+
+Object.defineProperty(exports, \\"__esModule\\", {
+  value: !0
+});
+
 let something = \\"\\";
+
 exports.something = something;
 "
 `;
@@ -142,8 +157,13 @@ if (process.env.NODE_ENV === \\"production\\") {
 
 exports[`source entrypoint option: source-entrypoint-option.cjs.prod.js 1`] = `
 "\\"use strict\\";
-Object.defineProperty(exports, \\"__esModule\\", { value: !0 });
+
+Object.defineProperty(exports, \\"__esModule\\", {
+  value: !0
+});
+
 let something = \\"\\";
+
 exports.something = something;
 "
 `;
@@ -174,8 +194,13 @@ if (process.env.NODE_ENV === \\"production\\") {
 
 exports[`two entrypoints where one requires the other entrypoint: dist/common-dependency-two-entrypoints.cjs.prod.js 1`] = `
 "\\"use strict\\";
-Object.defineProperty(exports, \\"__esModule\\", { value: !0 });
+
+Object.defineProperty(exports, \\"__esModule\\", {
+  value: !0
+});
+
 let identity = x => x;
+
 exports.identity = identity;
 "
 `;
@@ -208,9 +233,15 @@ if (process.env.NODE_ENV === \\"production\\") {
 
 exports[`two entrypoints where one requires the other entrypoint: multiply/dist/common-dependency-two-entrypoints.cjs.prod.js 1`] = `
 "\\"use strict\\";
-Object.defineProperty(exports, \\"__esModule\\", { value: !0 });
+
+Object.defineProperty(exports, \\"__esModule\\", {
+  value: !0
+});
+
 var commonDependencyTwoEntrypoints = require(\\"../../dist/common-dependency-two-entrypoints.cjs.prod.js\\");
+
 let multiply = (a, b) => commonDependencyTwoEntrypoints.identity(a * b);
+
 exports.multiply = multiply;
 "
 `;
@@ -245,7 +276,9 @@ exports.identity = identity;
 
 exports[`two entrypoints with a common dependency: dist/chunk-770164e0.cjs.prod.js 1`] = `
 "\\"use strict\\";
+
 let identity = x => x;
+
 exports.identity = identity;
 "
 `;
@@ -278,9 +311,15 @@ if (process.env.NODE_ENV === \\"production\\") {
 
 exports[`two entrypoints with a common dependency: dist/common-dependency-two-entrypoints.cjs.prod.js 1`] = `
 "\\"use strict\\";
-Object.defineProperty(exports, \\"__esModule\\", { value: !0 });
+
+Object.defineProperty(exports, \\"__esModule\\", {
+  value: !0
+});
+
 var __chunk_1 = require(\\"./chunk-770164e0.cjs.prod.js\\");
+
 let sum = (a, b) => __chunk_1.identity(a + b);
+
 exports.sum = sum;
 "
 `;
@@ -322,9 +361,15 @@ if (process.env.NODE_ENV === \\"production\\") {
 
 exports[`two entrypoints with a common dependency: multiply/dist/common-dependency-two-entrypoints.cjs.prod.js 1`] = `
 "\\"use strict\\";
-Object.defineProperty(exports, \\"__esModule\\", { value: !0 });
+
+Object.defineProperty(exports, \\"__esModule\\", {
+  value: !0
+});
+
 var __chunk_1 = require(\\"../../dist/chunk-770164e0.cjs.prod.js\\");
+
 let multiply = (a, b) => __chunk_1.identity(a * b);
+
 exports.multiply = multiply;
 "
 `;

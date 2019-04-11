@@ -16,11 +16,10 @@ import { confirms } from "../messages";
 import rewriteCjsRuntimeHelpers from "../rollup-plugins/rewrite-cjs-runtime-helpers";
 import flowAndNodeDevProdEntry from "../rollup-plugins/flow-and-prod-dev-entry";
 import babel from "../rollup-plugins/babel";
-import prettier from "../rollup-plugins/prettier";
 import terser from "../rollup-plugins/terser";
 import { limit } from "../prompt";
 import { getNameForDist } from "../utils";
-import { EXTENSIONS } from "../utils";
+import { EXTENSIONS } from "../constants";
 
 import installPackages from "install-packages";
 
@@ -218,15 +217,6 @@ export let getRollupConfig = (
       babel({
         cwd: pkg.project.directory,
         plugins: [
-          // TODO: revisit these plugins
-          require.resolve(
-            "../babel-plugins/add-basic-constructor-to-react-component"
-          ),
-          [
-            require.resolve("@babel/plugin-proposal-class-properties"),
-            { loose: true }
-          ],
-          require.resolve("../babel-plugins/fix-dce-for-classes-with-statics"),
           [
             require.resolve("@babel/plugin-transform-runtime"),
             { useESModules: true }
@@ -234,7 +224,8 @@ export let getRollupConfig = (
         ],
         extensions: EXTENSIONS
       }),
-      cjs(),
+      type === "umd" &&
+        cjs({ include: ["**/node_modules/**", "node_modules/**"] }),
       (type === "browser" || type === "umd") &&
         replace({
           "typeof document": JSON.stringify("object"),
@@ -255,9 +246,12 @@ export let getRollupConfig = (
       type === "umd" && terser(),
       type === "node-prod" &&
         terser({
-          mangle: false
+          mangle: false,
+          output: {
+            beautify: true,
+            indent_level: 2
+          }
         }),
-      type === "node-prod" && prettier(),
       type === "node-prod" && flowAndNodeDevProdEntry()
     ].filter(Boolean)
   };
