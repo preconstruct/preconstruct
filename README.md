@@ -1,6 +1,6 @@
 # 🎁 preconstruct
 
-> A smart bundler for libraries
+> A smart build tool for libraries
 
 > DISCLAIMER:
 >
