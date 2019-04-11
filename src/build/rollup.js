@@ -217,15 +217,6 @@ export let getRollupConfig = (
       babel({
         cwd: pkg.project.directory,
         plugins: [
-          // TODO: revisit these plugins
-          require.resolve(
-            "../babel-plugins/add-basic-constructor-to-react-component"
-          ),
-          [
-            require.resolve("@babel/plugin-proposal-class-properties"),
-            { loose: true }
-          ],
-          require.resolve("../babel-plugins/fix-dce-for-classes-with-statics"),
           [
             require.resolve("@babel/plugin-transform-runtime"),
             { useESModules: true }
