@@ -4,7 +4,6 @@
   "description": "A smart bundler for libraries",
   "main": "lib/index.js",
   "files": [
-    "src",
     "bin.js",
     "lib"
   ],
