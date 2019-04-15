@@ -1,5 +1,5 @@
 {
-  "main": "dist/common-dependency-two-entrypoints.cjs.js",
+  "main": "dist/importing-another-entrypoint.cjs.js",
   "preconstruct": {
     "source": "../src/multiply.js"
   }
