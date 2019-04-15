@@ -99,4 +99,26 @@ unregister();
   }
 });
 
-// TODO: add a test for the source map stuff
+test("source maps work", async () => {
+  let tmpPath = f.copy("uses-babel-and-throws-error");
+
+  await install(tmpPath);
+
+  await dev(tmpPath);
+
+  // i would require it but i don't want jest to do magical things
+  let { code, stdout, stderr } = await spawn("node", [tmpPath]);
+
+  expect(code).toBe(1);
+  expect(stdout.toString()).toBe("");
+  expect(
+    // this is just easier than using a stack trace parser
+    stderr
+      .toString()
+      .trim()
+      .split("\n")[0]
+  ).toEqual(
+    // the important thing we're checking is that it's mapping to line 5
+    expect.stringMatching(/uses-babel-and-throws-error\/src\/index\.js:5$/)
+  );
+});
