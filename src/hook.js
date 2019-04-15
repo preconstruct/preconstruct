@@ -1,15 +1,15 @@
 // @flow
-import { EXTENSIONS } from "./constants";
-import { addHook } from "pirates";
-import * as babel from "@babel/core";
-import sourceMapSupport from "source-map-support";
+let { EXTENSIONS } = require("./constants");
+let { addHook } = require("pirates");
+let babel = require("@babel/core");
+let sourceMapSupport = require("source-map-support");
 
 let babelPlugins = [
   require.resolve("@babel/plugin-transform-runtime"),
   require.resolve("@babel/plugin-transform-modules-commonjs")
 ];
 
-export let ___internalHook = () => {
+exports.___internalHook = () => {
   let compiling = false;
 
   function compileHook(code, filename) {
