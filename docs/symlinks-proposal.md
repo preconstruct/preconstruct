@@ -19,6 +19,7 @@ This would solve the problem since tools can just resolve the module like they w
   - This could be mostly alleviated by putting it in a postinstall script though that wouldn't solve the case when you change what packages and entrypoints preconstruct should build
 - This makes aliases all or nothing because you couldn't import a dist file in one tool(e.g. Node) and use the aliases to import a source file in another tool(e.g. webpack)
   - This could arguably be a good thing though since it would force us to come up with an solution to this that works everywhere
+  - This means we'd have to be 100% confident in require hooks and I'm not sure if that's a good trade off to make
 
 ## Alternatives
 
@@ -29,7 +30,10 @@ let unregister = require("preconstruct").___babelRequireHook(__dirname);
 
 module.exports = require("../path/to/source");
 
+// we don't want to modify anything that isn't from preconstruct
 unregister();
 ```
+
+This would solve the problem of people having to handle Babel compilation themselves/having to add a require hook themselves. That could be worse for using preconstruct with jest since jest would compile stuff along with preconstruct compiling things.
 
 ## Unresolved questions
