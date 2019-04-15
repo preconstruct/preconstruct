@@ -97,6 +97,6 @@ unregister();
   for (let filename of shouldBeSymlinkedToEsm) {
     expect(await fs.readlink(path.join(distPath, filename))).toBe(esmDistPath);
   }
-
-  //   fs.stat();
 });
+
+// TODO: add a test for the source map stuff
