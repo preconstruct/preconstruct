@@ -12,31 +12,67 @@ export default async function dev(projectDir: string) {
   info("project is valid!");
 
   let promises = [];
-  for (let pkg of project.packages) {
-    let strictEntrypoints = pkg.entrypoints.map(x => x.strict());
-    for (let entrypoint of strictEntrypoints) {
-      let filesNeeded: Array<string> = [entrypoint.main];
+  await Promise.all(
+    project.packages.map(pkg => {
+      return Promise.all(
+        pkg.entrypoints.map(async _entrypoint => {
+          let entrypoint = _entrypoint.strict();
+          await fs.remove(path.join(entrypoint.directory, "dist"));
 
-      if (entrypoint.module) {
-        filesNeeded.push(entrypoint.module);
-      }
+          await fs.ensureDir(path.join(entrypoint.directory, "dist"));
+          let promises = [
+            fs.writeFile(
+              path.join(entrypoint.directory, entrypoint.main),
+              `${
+                (await fs.readFile(entrypoint.source, "utf-8")).includes(
+                  "@flow"
+                )
+                  ? "// @flow\n"
+                  : ""
+              }'use strict';
 
-      let browserField = entrypoint.browser;
-      if (browserField) {
-        filesNeeded.push(
-          ...Object.keys(browserField).map(x => browserField[x])
-        );
-      }
-      filesNeeded.forEach(filepath => {
-        promises.push(
-          fs.ensureSymlink(
-            entrypoint.source,
-            path.join(entrypoint.directory, filepath)
-          )
-        );
-      });
-    }
-  }
+let unregister = require('${require.resolve("./hook")}').___internalHook();
+
+module.exports = require('${entrypoint.source}');
+
+unregister();
+`
+            )
+          ];
+          if (entrypoint.module) {
+            promises.push(
+              fs.symlink(
+                entrypoint.source,
+                path.join(entrypoint.directory, entrypoint.module)
+              )
+            );
+          }
+          if (entrypoint.browser) {
+            for (let key of Object.keys(entrypoint.browser)) {
+              promises.push(
+                fs.symlink(
+                  path.join(entrypoint.directory, entrypoint.browser[key]),
+                  path.join(entrypoint.directory, key)
+                )
+              );
+            }
+          }
+          if (entrypoint.reactNative) {
+            for (let key of Object.keys(entrypoint.reactNative)) {
+              promises.push(
+                fs.symlink(
+                  path.join(entrypoint.directory, entrypoint.reactNative[key]),
+                  path.join(entrypoint.directory, key)
+                )
+              );
+            }
+          }
+          return Promise.all(promises);
+        })
+      );
+    })
+  );
+
   await Promise.all(promises);
 
   success("created symlinks!");

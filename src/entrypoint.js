@@ -94,7 +94,7 @@ export class Entrypoint extends Item {
       is.maybe(is.either(is.string, is.objectOf(is.string)))
     );
   }
-  set reactNative(option: string | { [key: string]: string }) {
+  set reactNative(option: { [key: string]: string }) {
     this.json["react-native"] = option;
   }
 
@@ -153,6 +153,13 @@ export class StrictEntrypoint extends Entrypoint {
   set browser(option: { [key: string]: string }) {
     this.json.browser = option;
   }
+  get reactNative(): null | { [key: string]: string } {
+    return is(this.json["react-native"], is.maybe(is.objectOf(is.string)));
+  }
+  set reactNative(option: { [key: string]: string }) {
+    this.json["react-native"] = option;
+  }
+
   updater(json: Object) {
     super.updater(json);
     validatePackage(this.package);
