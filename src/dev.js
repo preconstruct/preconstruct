@@ -47,22 +47,24 @@ unregister();
               )
             );
           }
-          if (entrypoint.browser) {
-            for (let key of Object.keys(entrypoint.browser)) {
+          let browserField = entrypoint.browser;
+          if (browserField) {
+            for (let key of Object.keys(browserField)) {
               promises.push(
                 fs.symlink(
-                  path.join(entrypoint.directory, entrypoint.browser[key]),
-                  path.join(entrypoint.directory, key)
+                  path.join(entrypoint.directory, key),
+                  path.join(entrypoint.directory, browserField[key])
                 )
               );
             }
           }
-          if (entrypoint.reactNative) {
-            for (let key of Object.keys(entrypoint.reactNative)) {
+          let rnField = entrypoint.reactNative;
+          if (rnField) {
+            for (let key of Object.keys(rnField)) {
               promises.push(
                 fs.symlink(
-                  path.join(entrypoint.directory, entrypoint.reactNative[key]),
-                  path.join(entrypoint.directory, key)
+                  path.join(entrypoint.directory, key),
+                  path.join(entrypoint.directory, rnField[key])
                 )
               );
             }
