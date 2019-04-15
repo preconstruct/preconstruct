@@ -86,19 +86,23 @@ unregister();
     "all-the-build-types.native.cjs.js"
   ];
 
-  // i'm too lazy to use Promise.all and this is fast enough
-  for (let filename of shouldBeSymlinkedToCjs) {
-    expect(await fs.readlink(path.join(distPath, filename))).toBe(cjsDistPath);
-  }
-
   let shouldBeSymlinkedToEsm = [
     "all-the-build-types.browser.esm.js",
     "all-the-build-types.native.esm.js"
   ];
 
-  for (let filename of shouldBeSymlinkedToEsm) {
-    expect(await fs.readlink(path.join(distPath, filename))).toBe(esmDistPath);
-  }
+  await Promise.all([
+    ...shouldBeSymlinkedToCjs.map(async filename => {
+      expect(await fs.readlink(path.join(distPath, filename))).toBe(
+        cjsDistPath
+      );
+    }),
+    ...shouldBeSymlinkedToEsm.map(async filename => {
+      expect(await fs.readlink(path.join(distPath, filename))).toBe(
+        esmDistPath
+      );
+    })
+  ]);
 });
 
 test("source maps work", async () => {
