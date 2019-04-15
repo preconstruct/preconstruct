@@ -80,6 +80,12 @@ preconstruct watch
 
 `preconstruct watch` is similar to `preconstruct build` except instead of doing a single build, it starts a watcher and rebuilds the project whenever there are changes.
 
+#### `dev`
+
+`preconstruct dev` creates files and symlinks in the dist folders of entrypoints so that they can be imported from Node and in bundlers.
+
+TODO: explain how it works specifically
+
 #### `fix`
 
 ```bash
