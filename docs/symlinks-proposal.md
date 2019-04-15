@@ -37,3 +37,6 @@ unregister();
 This would solve the problem of people having to handle Babel compilation themselves/having to add a require hook themselves. That could be worse for using preconstruct with jest since jest would compile stuff along with preconstruct compiling things.
 
 ## Unresolved questions
+
+- Is this overcomplicating things when it mostly works right now?
+- Is having to have something that has to be run on postinstall and whenever changes are made to preconstruct config worth it?
