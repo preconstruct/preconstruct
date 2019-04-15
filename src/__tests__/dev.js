@@ -2,6 +2,7 @@
 import fixturez from "fixturez";
 import spawn from "spawndamnit";
 import path from "path";
+import * as fs from "fs-extra";
 import { install } from "../../test-utils";
 import dev from "../dev";
 
@@ -36,5 +37,66 @@ message from package two but logged by package one
   expect(stderr.toString()).toBe("");
 });
 
-// TODO: test for ESM one
-// maybe run parcel inside of jest because why not
+test("all the build types", async () => {
+  // TODO: maybe actually require them
+
+  let tmpPath = f.copy("all-the-build-types");
+
+  await install(tmpPath);
+
+  await dev(tmpPath);
+
+  let sourceFile = path.join(tmpPath, "src", "index.js");
+
+  let distPath = path.join(tmpPath, "dist");
+  expect(await fs.readdir(distPath)).toEqual([
+    "all-the-build-types.browser.cjs.js",
+    "all-the-build-types.browser.esm.js",
+    "all-the-build-types.cjs.js",
+    "all-the-build-types.esm.js",
+    "all-the-build-types.native.cjs.js",
+    "all-the-build-types.native.esm.js"
+  ]);
+
+  let cjsDistPath = path.join(distPath, "all-the-build-types.cjs.js");
+  let esmDistPath = path.join(distPath, "all-the-build-types.esm.js");
+
+  expect(
+    (await fs.readFile(cjsDistPath, "utf-8")).replace(
+      /require\('[^']+'\)/g,
+      "thisWasARequireCall()"
+    )
+  ).toMatchInlineSnapshot(`
+"'use strict';
+
+let unregister = thisWasARequireCall().___internalHook();
+
+module.exports = thisWasARequireCall();
+
+unregister();
+"
+`);
+
+  expect(await fs.readlink(esmDistPath)).toBe(sourceFile);
+
+  let shouldBeSymlinkedToCjs = [
+    "all-the-build-types.browser.cjs.js",
+    "all-the-build-types.native.cjs.js"
+  ];
+
+  // i'm too lazy to use Promise.all and this is fast enough
+  for (let filename of shouldBeSymlinkedToCjs) {
+    expect(await fs.readlink(path.join(distPath, filename))).toBe(cjsDistPath);
+  }
+
+  let shouldBeSymlinkedToEsm = [
+    "all-the-build-types.browser.esm.js",
+    "all-the-build-types.native.esm.js"
+  ];
+
+  for (let filename of shouldBeSymlinkedToEsm) {
+    expect(await fs.readlink(path.join(distPath, filename))).toBe(esmDistPath);
+  }
+
+  //   fs.stat();
+});
