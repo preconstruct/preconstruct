@@ -21,15 +21,11 @@ test("dev command works in node", async () => {
     path.join(tmpPath, "packages", "package-one")
   ]);
   expect(code).toBe(0);
-  expect(
-    stdout
-      .toString()
-      .trim()
-      .split("\n")
-  ).toEqual([
+  expect(stdout.toString().split("\n")).toEqual([
     "message from package two",
     "message from package one",
-    "message from package two but logged by package one"
+    "message from package two but logged by package one",
+    ""
   ]);
   expect(stdout.toString()).toMatchInlineSnapshot(`
 "message from package two
