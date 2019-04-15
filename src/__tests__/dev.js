@@ -114,7 +114,7 @@ test("source maps work", async () => {
   expect(code).toBe(1);
   expect(stdout.toString()).toBe("");
   expect(
-    // this is just easier than using a stack trace parser
+    // this is easier than using a stack trace parser
     stderr
       .toString()
       .trim()
