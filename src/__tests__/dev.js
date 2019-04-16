@@ -10,7 +10,8 @@ const f = fixturez(__dirname);
 
 jest.mock("../prompt");
 
-jest.setTimeout(10000);
+// TODO: make it so we don't have to do this
+jest.setTimeout(20000);
 
 test("dev command works in node", async () => {
   let tmpPath = f.copy("valid-monorepo-that-logs-stuff");
