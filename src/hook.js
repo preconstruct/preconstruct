@@ -30,7 +30,6 @@ exports.___internalHook = () => {
   }
   sourceMapSupport.install({
     environment: "node",
-    handleUncaughtExceptions: false,
     retrieveSourceMap(source) {
       let map = sourceMaps[source];
       if (map !== undefined) {
