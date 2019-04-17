@@ -2,6 +2,8 @@
 import path from "path";
 import type { Plugin } from "./types";
 import { getDevPath, getProdPath } from "../build/utils";
+import { flowTemplate } from "../utils";
+
 import * as fs from "fs-extra";
 
 export default function flowAndNodeDevProdEntry(): Plugin {
@@ -27,15 +29,14 @@ export default function flowAndNodeDevProdEntry(): Plugin {
 
         if (flowMode !== false) {
           let relativeToSource = path.relative(
-            path.parse(path.join(opts.dir, file.fileName)).dir,
+            path.dirname(path.join(opts.dir, file.fileName)),
             facadeModuleId
           );
-          let flowFileSource = `// @flow
-export * from "${relativeToSource}";${
-            flowMode === "all"
-              ? `\nexport { default } from "${relativeToSource}";`
-              : ""
-          }\n`;
+
+          let flowFileSource = flowTemplate(
+            flowMode === "all",
+            relativeToSource
+          );
           let flowFileName = mainFieldPath + ".flow";
           bundle[flowFileName] = {
             fileName: flowFileName,

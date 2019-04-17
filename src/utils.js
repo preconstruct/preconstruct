@@ -59,3 +59,10 @@ export function getValidUmdMainField(entrypoint: Entrypoint) {
   let nameForDist = getNameForDist(entrypoint.package.name);
   return `dist/${nameForDist}.umd.min.js`;
 }
+
+export function flowTemplate(hasDefaultExport: boolean, relativePath: string) {
+  return `// @flow
+export * from "${relativePath}";${
+    hasDefaultExport ? `\nexport { default } from "${relativePath}";` : ""
+  }\n`;
+}

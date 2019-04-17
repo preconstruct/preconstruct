@@ -129,3 +129,52 @@ test("source maps work", async () => {
     expect.stringMatching(/uses-babel-and-throws-error\/src\/index\.js:5$/)
   );
 });
+
+test("flow", async () => {
+  let tmpPath = f.copy("flow-dev");
+
+  await install(tmpPath);
+
+  await dev(tmpPath);
+
+  // should not have export default
+
+  expect(
+    await fs.readFile(
+      path.join(tmpPath, "dist", "flow-dev.cjs.js.flow"),
+      "utf8"
+    )
+  ).toMatchInlineSnapshot(`
+"// @flow
+export * from \\"../src/index.js\\";
+"
+`);
+
+  // should have export default
+
+  expect(
+    await fs.readFile(
+      path.join(tmpPath, "a", "dist", "flow-dev.cjs.js.flow"),
+      "utf8"
+    )
+  ).toMatchInlineSnapshot(`
+"// @flow
+export * from \\"../src/index.js\\";
+export { default } from \\"../src/index.js\\";
+"
+`);
+
+  // should have export default
+
+  expect(
+    await fs.readFile(
+      path.join(tmpPath, "b", "dist", "flow-dev.cjs.js.flow"),
+      "utf8"
+    )
+  ).toMatchInlineSnapshot(`
+"// @flow
+export * from \\"../src/index.js\\";
+export { default } from \\"../src/index.js\\";
+"
+`);
+});

@@ -2,7 +2,45 @@
 import { Project } from "./project";
 import { success, info } from "./logger";
 import * as fs from "fs-extra";
+import * as babel from "@babel/core";
+import { flowTemplate } from "./utils";
 import path from "path";
+
+async function writeFlowFile(contentPromise, entrypoint) {
+  let content = await contentPromise;
+  if (!content.includes("@flow")) {
+    return;
+  }
+  let ast = await babel.parseAsync(content, {
+    filename: entrypoint.source,
+    sourceType: "module"
+  });
+
+  let hasDefaultExport = false;
+
+  for (let statement of ast.program.body) {
+    if (
+      statement.type === "ExportDefaultDeclaration" ||
+      (statement.type === "ExportNamedDeclaration" &&
+        statement.specifiers.some(
+          specifier =>
+            specifier.type === "ExportSpecifier" &&
+            specifier.exported.name === "default"
+        ))
+    ) {
+      hasDefaultExport = true;
+      break;
+    }
+  }
+
+  let cjsDistPath = path.join(entrypoint.directory, entrypoint.main);
+  let relativePath = path.relative(
+    path.dirname(cjsDistPath),
+    entrypoint.source
+  );
+  let contents = flowTemplate(hasDefaultExport, relativePath);
+  await fs.writeFile(cjsDistPath + ".flow", contents);
+}
 
 export default async function dev(projectDir: string) {
   let project: Project = await Project.create(projectDir);
@@ -17,19 +55,15 @@ export default async function dev(projectDir: string) {
       return Promise.all(
         pkg.entrypoints.map(async _entrypoint => {
           let entrypoint = _entrypoint.strict();
+          let contentPromise = fs.readFile(entrypoint.source, "utf8");
           await fs.remove(path.join(entrypoint.directory, "dist"));
-
           await fs.ensureDir(path.join(entrypoint.directory, "dist"));
+
           let promises = [
+            writeFlowFile(contentPromise, entrypoint),
             fs.writeFile(
               path.join(entrypoint.directory, entrypoint.main),
-              `${
-                (await fs.readFile(entrypoint.source, "utf-8")).includes(
-                  "@flow"
-                )
-                  ? "// @flow\n"
-                  : ""
-              }'use strict';
+              `'use strict';
 
 let unregister = require('${require.resolve("./hook")}').___internalHook();
 
