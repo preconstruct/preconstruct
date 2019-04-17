@@ -12,7 +12,7 @@
   },
   "scripts": {
     "build": "rimraf lib && babel src --out-dir lib --ignore '**/__tests__/**/*','**/__mocks__/**/*'",
-    "release": "yarn build && npm publish --tag=symlink && git push && git push --tags",
+    "release": "yarn build && npm publish && git push && git push --tags",
     "test": "jest"
   },
   "repository": "https://github.com/preconstruct/preconstruct",
