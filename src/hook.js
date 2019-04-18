@@ -20,7 +20,8 @@ exports.___internalHook = () => {
       let output = babel.transformSync(code, {
         plugins: babelPlugins,
         filename,
-        sourceMaps: "both"
+        sourceMaps: "both",
+        rootMode: "upward-optional"
       });
       sourceMaps[filename] = output.map;
       return output.code;

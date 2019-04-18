@@ -222,7 +222,8 @@ export let getRollupConfig = (
             { useESModules: true }
           ]
         ],
-        extensions: EXTENSIONS
+        extensions: EXTENSIONS,
+        rootMode: "upward-optional"
       }),
       type === "umd" &&
         cjs({ include: ["**/node_modules/**", "node_modules/**"] }),
