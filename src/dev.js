@@ -65,7 +65,9 @@ export default async function dev(projectDir: string) {
               path.join(entrypoint.directory, entrypoint.main),
               `'use strict';
 
-let unregister = require('${require.resolve("./hook")}').___internalHook();
+let unregister = require('${require.resolve("./hook")}').___internalHook('${
+                project.directory
+              }');
 
 module.exports = require('${entrypoint.source}');
 
