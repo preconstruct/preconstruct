@@ -67,11 +67,11 @@ test("all the build types", async () => {
   expect(
     (await fs.readFile(cjsDistPath, "utf-8"))
       .replace(/require\('[^']+'\)/g, "thisWasARequireCall()")
-      .replace(/\/private\/var\/.*all-the-build-types/, "/project/directory")
+      .replace(/___internalHook\('[^']+'\)/, "thisWasA___internalHookCall()")
   ).toMatchInlineSnapshot(`
 "'use strict';
 
-let unregister = thisWasARequireCall().___internalHook('/project/directory');
+let unregister = thisWasARequireCall().thisWasA___internalHookCall();
 
 module.exports = thisWasARequireCall();
 
