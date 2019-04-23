@@ -13,7 +13,8 @@ async function writeFlowFile(contentPromise, entrypoint) {
   }
   let ast = await babel.parseAsync(content, {
     filename: entrypoint.source,
-    sourceType: "module"
+    sourceType: "module",
+    cwd: entrypoint.package.project.directory
   });
 
   let hasDefaultExport = false;
