@@ -13,7 +13,8 @@ async function writeFlowFile(contentPromise, entrypoint) {
   }
   let ast = await babel.parseAsync(content, {
     filename: entrypoint.source,
-    sourceType: "module"
+    sourceType: "module",
+    cwd: entrypoint.package.project.directory
   });
 
   let hasDefaultExport = false;
@@ -65,7 +66,9 @@ export default async function dev(projectDir: string) {
               path.join(entrypoint.directory, entrypoint.main),
               `'use strict';
 
-let unregister = require('${require.resolve("./hook")}').___internalHook();
+let unregister = require('${require.resolve("./hook")}').___internalHook('${
+                project.directory
+              }');
 
 module.exports = require('${entrypoint.source}');
 

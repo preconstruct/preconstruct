@@ -65,14 +65,13 @@ test("all the build types", async () => {
   let esmDistPath = path.join(distPath, "all-the-build-types.esm.js");
 
   expect(
-    (await fs.readFile(cjsDistPath, "utf-8")).replace(
-      /require\('[^']+'\)/g,
-      "thisWasARequireCall()"
-    )
+    (await fs.readFile(cjsDistPath, "utf-8"))
+      .replace(/require\('[^']+'\)/g, "thisWasARequireCall()")
+      .replace(/___internalHook\('[^']+'\)/, "thisWasA___internalHookCall()")
   ).toMatchInlineSnapshot(`
 "'use strict';
 
-let unregister = thisWasARequireCall().___internalHook();
+let unregister = thisWasARequireCall().thisWasA___internalHookCall();
 
 module.exports = thisWasARequireCall();
 

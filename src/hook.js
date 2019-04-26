@@ -9,7 +9,7 @@ let babelPlugins = [
   require.resolve("@babel/plugin-transform-modules-commonjs")
 ];
 
-exports.___internalHook = () => {
+exports.___internalHook = (cwd /*:string*/) => {
   let compiling = false;
   let sourceMaps = {};
   function compileHook(code, filename) {
@@ -21,7 +21,7 @@ exports.___internalHook = () => {
         plugins: babelPlugins,
         filename,
         sourceMaps: "both",
-        rootMode: "upward-optional"
+        cwd
       });
       sourceMaps[filename] = output.map;
       return output.code;
