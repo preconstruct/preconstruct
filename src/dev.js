@@ -89,7 +89,7 @@ unregister();
             for (let key of Object.keys(browserField)) {
               promises.push(
                 fs.symlink(
-                  path.join(entrypoint.directory, key),
+                  entrypoint.source,
                   path.join(entrypoint.directory, browserField[key])
                 )
               );
@@ -100,7 +100,7 @@ unregister();
             for (let key of Object.keys(rnField)) {
               promises.push(
                 fs.symlink(
-                  path.join(entrypoint.directory, key),
+                  entrypoint.source,
                   path.join(entrypoint.directory, rnField[key])
                 )
               );

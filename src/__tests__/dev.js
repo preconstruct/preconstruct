@@ -81,28 +81,18 @@ unregister();
 
   expect(await fs.readlink(esmDistPath)).toBe(sourceFile);
 
-  let shouldBeSymlinkedToCjs = [
+  let shouldBeSymlinkedToSource = [
     "all-the-build-types.browser.cjs.js",
-    "all-the-build-types.native.cjs.js"
-  ];
-
-  let shouldBeSymlinkedToEsm = [
+    "all-the-build-types.native.cjs.js",
     "all-the-build-types.browser.esm.js",
     "all-the-build-types.native.esm.js"
   ];
 
-  await Promise.all([
-    ...shouldBeSymlinkedToCjs.map(async filename => {
-      expect(await fs.readlink(path.join(distPath, filename))).toBe(
-        cjsDistPath
-      );
-    }),
-    ...shouldBeSymlinkedToEsm.map(async filename => {
-      expect(await fs.readlink(path.join(distPath, filename))).toBe(
-        esmDistPath
-      );
+  await Promise.all(
+    shouldBeSymlinkedToSource.map(async filename => {
+      expect(await fs.readlink(path.join(distPath, filename))).toBe(sourceFile);
     })
-  ]);
+  );
 });
 
 test("source maps work", async () => {
