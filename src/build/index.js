@@ -16,7 +16,12 @@ let browserPattern = /typeof\s+(window|document)/;
 
 async function buildPackage(pkg: Package, aliases: Aliases) {
   let configs = getRollupConfigs(pkg, aliases);
-  await fs.remove(path.join(pkg.directory, "dist"));
+  await Promise.all([
+    fs.remove(path.join(pkg.directory, "dist")),
+    ...pkg.entrypoints.map(entrypoint => {
+      return fs.remove(path.join(entrypoint.directory, "dist"));
+    })
+  ]);
 
   // TODO: Fix all this stuff to work with multiple entrypoints
   let hasCheckedBrowser = pkg.entrypoints[0].browser !== null;
