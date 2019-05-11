@@ -44,9 +44,6 @@ async function doInit(pkg: Package) {
   } else {
     info(infos.validModuleField, pkg);
   }
-  let allEntrypointsAreMissingAUmdMainField = pkg.entrypoints.every(
-    entrypoint => entrypoint.umdMain === null
-  );
   let someEntrypointsHaveAMaybeInvalidUmdBuild = pkg.entrypoints.some(
     entrypoint => entrypoint.umdMain !== null
   );
@@ -56,12 +53,8 @@ async function doInit(pkg: Package) {
   let someUmdNamesAreNotSpecified = pkg.entrypoints.some(
     entrypoint => !isUmdNameSpecified(entrypoint)
   );
-  if (
-    allEntrypointsAreMissingAUmdMainField ||
-    someUmdMainFieldsAreInvalid ||
-    someUmdNamesAreNotSpecified
-  ) {
-    let shouldWriteUMDBuilds = await confirms.writeUmdBuilds(pkg);
+  if (someUmdMainFieldsAreInvalid || someUmdNamesAreNotSpecified) {
+    let shouldWriteUMDBuilds = await confirms.fixUmdBuild(pkg);
     if (shouldWriteUMDBuilds) {
       pkg.setFieldOnEntrypoints("umdMain");
       for (let entrypoint of pkg.entrypoints) {
@@ -103,9 +96,24 @@ export default async function init(directory: string) {
 
   await Promise.all(project.packages.map(doInit));
 
-  success(
-    project.packages.length > 1
-      ? "initialised packages!"
-      : "initialised package!"
-  );
+  if (project.json.scripts && project.json.scripts.postinstall) {
+    if (!project.json.scripts.postinstall.includes("preconstruct dev")) {
+      info(
+        "your project already has a postinstall script. you should add `preconstruct dev` to it manually"
+      );
+    }
+  } else {
+    let shouldAddPreconstructDevToPostinstall = await confirms.addPreconstructDevToPostinstall(
+      project
+    );
+    if (shouldAddPreconstructDevToPostinstall) {
+      if (!project.json.scripts) {
+        project.json.scripts = {};
+      }
+      project.json.scripts.postinstall = "preconstruct dev";
+      await project.save();
+    }
+  }
+
+  success("initialised project!");
 }

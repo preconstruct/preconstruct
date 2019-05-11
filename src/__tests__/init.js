@@ -47,12 +47,12 @@ test("set only main field", async () => {
 
   confirms.writeMainField.mockReturnValue(true);
   confirms.writeModuleField.mockReturnValue(false);
-  confirms.writeUmdBuilds.mockReturnValue(false);
+  confirms.addPreconstructDevToPostinstall.mockReturnValue(false);
 
   await init(tmpPath);
   expect(confirms.writeMainField).toBeCalledTimes(1);
   expect(confirms.writeModuleField).toBeCalledTimes(1);
-  expect(confirms.writeUmdBuilds).toBeCalledTimes(1);
+  expect(confirms.addPreconstructDevToPostinstall).toBeCalledTimes(1);
 
   let pkg = await getPkg(tmpPath);
   expect(pkg).toMatchInlineSnapshot(`
@@ -71,12 +71,12 @@ test("set main and module field", async () => {
 
   confirms.writeMainField.mockReturnValue(true);
   confirms.writeModuleField.mockReturnValue(true);
-  confirms.writeUmdBuilds.mockReturnValue(false);
+  confirms.addPreconstructDevToPostinstall.mockReturnValue(false);
 
   await init(tmpPath);
   expect(confirms.writeMainField).toBeCalledTimes(1);
   expect(confirms.writeModuleField).toBeCalledTimes(1);
-  expect(confirms.writeUmdBuilds).toBeCalledTimes(1);
+  expect(confirms.addPreconstructDevToPostinstall).toBeCalledTimes(1);
 
   let pkg = await getPkg(tmpPath);
 
@@ -97,12 +97,12 @@ test("scoped package", async () => {
 
   confirms.writeMainField.mockReturnValue(true);
   confirms.writeModuleField.mockReturnValue(true);
-  confirms.writeUmdBuilds.mockReturnValue(false);
+  confirms.addPreconstructDevToPostinstall.mockReturnValue(false);
 
   await init(tmpPath);
   expect(confirms.writeMainField).toBeCalledTimes(1);
   expect(confirms.writeModuleField).toBeCalledTimes(1);
-  expect(confirms.writeUmdBuilds).toBeCalledTimes(1);
+  expect(confirms.addPreconstructDevToPostinstall).toBeCalledTimes(1);
   let pkg = await getPkg(tmpPath);
 
   expect(pkg).toMatchInlineSnapshot(`
@@ -122,12 +122,12 @@ test("monorepo", async () => {
 
   confirms.writeMainField.mockReturnValue(true);
   confirms.writeModuleField.mockReturnValue(true);
-  confirms.writeUmdBuilds.mockReturnValue(false);
+  confirms.addPreconstructDevToPostinstall.mockReturnValue(false);
 
   await init(tmpPath);
   expect(confirms.writeMainField).toBeCalledTimes(2);
   expect(confirms.writeModuleField).toBeCalledTimes(2);
-  expect(confirms.writeUmdBuilds).toBeCalledTimes(2);
+  expect(confirms.addPreconstructDevToPostinstall).toBeCalledTimes(1);
 
   let pkg1 = await getPkg(path.join(tmpPath, "packages", "package-one"));
   let pkg2 = await getPkg(path.join(tmpPath, "packages", "package-two"));
@@ -174,7 +174,7 @@ Array [
   ],
   Array [
     "🎁 success",
-    "initialised package!",
+    "initialised project!",
   ],
 ]
 `);
@@ -185,13 +185,13 @@ test("invalid fields", async () => {
 
   confirms.writeMainField.mockReturnValue(true);
   confirms.writeModuleField.mockReturnValue(true);
-  confirms.writeUmdBuilds.mockReturnValue(false);
+  confirms.addPreconstructDevToPostinstall.mockReturnValue(false);
 
   await init(tmpPath);
 
   expect(confirms.writeMainField).toBeCalledTimes(1);
   expect(confirms.writeModuleField).toBeCalledTimes(1);
-  expect(confirms.writeUmdBuilds).toBeCalledTimes(1);
+  expect(confirms.addPreconstructDevToPostinstall).toBeCalledTimes(1);
 
   let pkg = await getPkg(tmpPath);
 
@@ -258,13 +258,19 @@ let basicThreeEntrypoints = {
   }
 };
 
+let basicSingleEntrypoint = {
+  "": {
+    name: "something"
+  }
+};
+
 testInit(
   "three entrypoints, no main, only add main",
   basicThreeEntrypoints,
   async run => {
     confirms.writeMainField.mockReturnValue(true);
     confirms.writeModuleField.mockReturnValue(false);
-    confirms.writeUmdBuilds.mockReturnValue(false);
+    confirms.addPreconstructDevToPostinstall.mockReturnValue(false);
 
     let result = await run();
 
@@ -303,7 +309,7 @@ testInit(
   async run => {
     confirms.writeMainField.mockReturnValue(true);
     confirms.writeModuleField.mockReturnValue(true);
-    confirms.writeUmdBuilds.mockReturnValue(false);
+    confirms.addPreconstructDevToPostinstall.mockReturnValue(false);
 
     let result = await run();
 
@@ -347,7 +353,7 @@ testInit(
   async run => {
     confirms.writeMainField.mockReturnValue(true);
     confirms.writeModuleField.mockReturnValue(false);
-    confirms.writeUmdBuilds.mockReturnValue(false);
+    confirms.addPreconstructDevToPostinstall.mockReturnValue(false);
     confirms.fixBrowserField.mockReturnValue(true);
 
     let result = await run();
@@ -381,6 +387,59 @@ Object {
     "preconstruct": Object {
       "source": "../src",
     },
+  },
+}
+`);
+  }
+);
+
+testInit("add preconstruct dev", basicSingleEntrypoint, async run => {
+  confirms.writeMainField.mockReturnValue(true);
+  confirms.writeModuleField.mockReturnValue(false);
+  confirms.addPreconstructDevToPostinstall.mockReturnValue(true);
+
+  let result = await run();
+
+  expect(confirms.addPreconstructDevToPostinstall).toBeCalledTimes(1);
+
+  expect(result).toMatchInlineSnapshot(`
+Object {
+  "": Object {
+    "main": "dist/something.cjs.js",
+    "name": "something",
+    "scripts": Object {
+      "postinstall": "preconstruct dev",
+    },
+  },
+}
+`);
+});
+
+testInit(
+  "fix umd",
+  {
+    "": {
+      name: "something",
+      "umd:main": "something"
+    }
+  },
+  async run => {
+    confirms.writeMainField.mockReturnValue(true);
+    confirms.writeModuleField.mockReturnValue(false);
+    confirms.fixUmdBuild.mockReturnValue(true);
+    confirms.addPreconstructDevToPostinstall.mockReturnValue(true);
+
+    let result = await run();
+
+    expect(result).toMatchInlineSnapshot(`
+Object {
+  "": Object {
+    "main": "dist/something.cjs.js",
+    "name": "something",
+    "scripts": Object {
+      "postinstall": "preconstruct dev",
+    },
+    "umd:main": "dist/something.umd.min.js",
   },
 }
 `);
