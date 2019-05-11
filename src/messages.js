@@ -31,8 +31,8 @@ export let confirms = {
   fixModuleField: createPromptConfirmLoader(
     "would you like to fix the module field?"
   ),
-  writeUmdBuilds: createPromptConfirmLoader(
-    "would you like to generate UMD builds?"
+  fixUmdBuild: createPromptConfirmLoader(
+    "would you like to fix the umd field?"
   ),
   shouldInstallObjectAssign: createPromptConfirmLoader(
     "Object.assign is polyfilled with object-assign to reduce bundle size when used with react. would you like to install object-assign automatically?"
@@ -48,6 +48,9 @@ export let confirms = {
   ),
   createEntrypointPkgJson: createPromptConfirmLoader(
     "A package.json file does not exist for this entrypoint, would you like to create one automatically?"
+  ),
+  addPreconstructDevToPostinstall: createPromptConfirmLoader(
+    "would you like preconstruct to automatically add `preconstruct dev` in a postinstall hook so that importing entrypoints during development will import the source"
   )
 };
 
