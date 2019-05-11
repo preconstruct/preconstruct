@@ -414,3 +414,34 @@ Object {
 }
 `);
 });
+
+testInit(
+  "fix umd",
+  {
+    "": {
+      name: "something",
+      "umd:main": "something"
+    }
+  },
+  async run => {
+    confirms.writeMainField.mockReturnValue(true);
+    confirms.writeModuleField.mockReturnValue(false);
+    confirms.fixUmdBuild.mockReturnValue(true);
+    confirms.addPreconstructDevToPostinstall.mockReturnValue(true);
+
+    let result = await run();
+
+    expect(result).toMatchInlineSnapshot(`
+Object {
+  "": Object {
+    "main": "dist/something.cjs.js",
+    "name": "something",
+    "scripts": Object {
+      "postinstall": "preconstruct dev",
+    },
+    "umd:main": "dist/something.umd.min.js",
+  },
+}
+`);
+  }
+);
