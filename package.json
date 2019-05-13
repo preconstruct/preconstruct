@@ -8,7 +8,8 @@
     "changeset": "changeset",
     "version-packages": "changeset bump",
     "release": "yarn build && changeset release",
-    "start:site": "cd site && yarn start"
+    "start:site": "cd site && yarn start",
+    "build:site": "cd site && yarn build"
   },
   "repository": "https://github.com/preconstruct/preconstruct",
   "license": "MIT",
