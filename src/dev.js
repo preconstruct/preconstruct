@@ -114,5 +114,5 @@ unregister();
 
   await Promise.all(promises);
 
-  success("created symlinks!");
+  success("created links!");
 }
