@@ -9,15 +9,20 @@
   },
   "repository": "https://github.com/preconstruct/preconstruct",
   "license": "MIT",
-  "devDependencies": {
-    "@babel/core": "^7.1.2",
+  "workspaces": [
+    "packages/*"
+  ],
+  "private": true,
+  "dependencies": {
     "@babel/cli": "^7.1.2",
+    "@babel/core": "^7.1.2",
     "@babel/plugin-proposal-class-properties": "^7.3.4",
     "@babel/plugin-proposal-object-rest-spread": "^7.2.0",
     "@babel/plugin-transform-flow-strip-types": "^7.4.0",
     "@babel/preset-env": "^7.1.0",
     "@babel/preset-flow": "^7.0.0",
     "@babel/runtime": "^7.2.0",
+    "@changesets/cli": "^1.1.1",
     "babel-core": "^7.0.0-bridge.0",
     "babel-eslint": "^10.0.1",
     "babel-jest": "^24.0.0",
