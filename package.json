@@ -7,12 +7,14 @@
     "test": "jest",
     "changeset": "changeset",
     "version-packages": "changeset bump",
-    "release": "yarn build && changeset release"
+    "release": "yarn build && changeset release",
+    "start:site": "cd site && yarn start"
   },
   "repository": "https://github.com/preconstruct/preconstruct",
   "license": "MIT",
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "site"
   ],
   "private": true,
   "dependencies": {
@@ -32,6 +34,7 @@
     "dotenv": "^8.0.0",
     "eslint": "^5.8.0",
     "eslint-plugin-prettier": "^3.0.0",
+    "eslint-plugin-react": "^7.13.0",
     "fixturez": "^1.1.0",
     "flow-bin": "^0.94.0",
     "jest": "^24.0.0",
@@ -41,7 +44,8 @@
     "prettier": "^1.15.3",
     "react": "^16.6.3",
     "rimraf": "^2.6.2",
-    "spawndamnit": "^2.0.0"
+    "spawndamnit": "^2.0.0",
+    "@emotion/core": "^10.0.10"
   },
   "jest": {
     "reporters": [

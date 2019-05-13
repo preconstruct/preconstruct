@@ -4,3 +4,5 @@ lib/
 junit.xml
 coverage/
 .env
+.cache/
+public/
