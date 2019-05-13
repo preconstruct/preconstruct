@@ -4,8 +4,10 @@
   "description": "A smart build tool for libraries",
   "scripts": {
     "build": "cd packages/preconstruct && yarn build",
-    "release": "yarn build",
-    "test": "jest"
+    "test": "jest",
+    "changeset": "changeset",
+    "version-packages": "changeset bump",
+    "release": "yarn build && changeset release"
   },
   "repository": "https://github.com/preconstruct/preconstruct",
   "license": "MIT",
