@@ -42,10 +42,6 @@ preconstruct is built with monorepo's in mind, rather than having to manage and 
 
 preconstruct lets you create entrypoints beyond the standard entrypoint of `package-name` so a single package can have other entrypoints like `package-name/some-cool-thing` and `my-package/another-cool-thing`. These entrypoints still have bundles in multiple module formats, so Node and consumer bundlers can still get the right module format for them.
 
-### Aliases
-
-preconstruct exports aliases which you can use with tools like Jest and webpack so you can import from entrypoints like consumers do but rather than importing a dist file, you'll be importing the source file.
-
 ## Install
 
 ```bash

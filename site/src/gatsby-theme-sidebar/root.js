@@ -181,7 +181,10 @@ export default ({
               display: "flex",
               justifyContent: "center",
               alignItems: "center"
-            })
+            }),
+            "h1 code, h2 code, h3 code, h4 code, h5 code, h6 code": {
+              fontSize: "inherit"
+            }
           }}
         >
           {props.children}
