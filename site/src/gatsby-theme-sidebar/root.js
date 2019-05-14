@@ -5,7 +5,6 @@ import colors from "../colors";
 
 const NavLink = props => (
   <Link
-    {...props}
     activeClassName="active"
     css={{
       display: "block",
@@ -22,6 +21,7 @@ const NavLink = props => (
         color: colors.active
       }
     }}
+    {...props}
   />
 );
 
@@ -77,7 +77,6 @@ export default ({
   ...props
 }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  console.log(props);
   return (
     <Layout
       css={{
@@ -90,52 +89,89 @@ export default ({
           backgroundColor: colors.base
         }}
       >
-        <div
+        <NavLink
+          activeClassName=""
           css={{
-            fontSize: 24,
-            marginRight: 8
+            display: "inline-flex",
+            justifyContent: "center",
+            alignItems: "center"
           }}
+          to="/"
         >
-          🎁
-        </div>
-        <Title>preconstruct</Title>
-        <Spacer />
-        <MobileOnly>
-          <MenuButton
-            title="toggleMenu"
-            onClick={() => {
-              setSidebarOpen(!sidebarOpen);
+          <div
+            css={{
+              fontSize: 24,
+              marginRight: 8
             }}
           >
-            {hamburger}
-          </MenuButton>
-        </MobileOnly>
-      </Header>
-      <Main>
-        <Sidebar
-          width={320}
-          open={sidebarOpen}
-          onClick={() => {
-            setSidebarOpen(false);
-          }}
-          onDismiss={() => {
-            setSidebarOpen(false);
-          }}
+            🎁
+          </div>
+          <Title>preconstruct</Title>
+        </NavLink>
+        <Spacer />
+        <div
           css={{
-            paddingTop: 32,
-            paddingBottom: 32,
-            backgroundColor: colors.pink,
-            width: 320
+            display: "inline-flex",
+            justifyContent: "center",
+            alignItems: "center"
           }}
         >
-          <NavLink to="/">Home</NavLink>
-          <NavLink to="/getting-started">Getting Started</NavLink>
-        </Sidebar>
+          <NavLink activeClassName="" to="/getting-started">
+            Docs
+          </NavLink>
+          {props["*"] !== "" && (
+            <MobileOnly>
+              <MenuButton
+                css={{ display: "inline-flex" }}
+                title="toggleMenu"
+                onClick={() => {
+                  setSidebarOpen(!sidebarOpen);
+                }}
+              >
+                {hamburger}
+              </MenuButton>
+            </MobileOnly>
+          )}
+        </div>
+      </Header>
+      <Main>
+        {props["*"] !== "" && (
+          <Sidebar
+            width={320}
+            open={sidebarOpen}
+            onClick={() => {
+              setSidebarOpen(false);
+            }}
+            onDismiss={() => {
+              setSidebarOpen(false);
+            }}
+            css={{
+              paddingTop: 32,
+              paddingBottom: 32,
+              backgroundColor: colors.pink
+            }}
+          >
+            <NavLink to="/getting-started">Getting Started</NavLink>
+            <NavLink to="/concepts">Concepts</NavLink>
+            <NavLink to="/config">Configuration</NavLink>
+            <div css={{ marginLeft: 16 }}>
+              <NavLink to="/config/projects">Projects</NavLink>
+              <NavLink to="/config/packages">Packages</NavLink>
+              <NavLink to="/config/entrypoints">Entrypoints</NavLink>
+            </div>
+            <NavLink to="/decisions">Architecture and Design Decisions</NavLink>
+          </Sidebar>
+        )}
 
         <Content
           css={{
             paddingTop: 32,
-            paddingBottom: 32
+            paddingBottom: 32,
+            ...(props["*"] === "" && {
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center"
+            })
           }}
         >
           {props.children}
