@@ -153,12 +153,22 @@ export default ({
           >
             <NavLink to="/getting-started">Getting Started</NavLink>
             <NavLink to="/concepts">Concepts</NavLink>
+            <NavLink to="/commands">Commands</NavLink>
+            <div css={{ marginLeft: 16 }}>
+              <NavLink to="/commands/init">init</NavLink>
+              <NavLink to="/commands/build">build</NavLink>
+              <NavLink to="/commands/dev">dev</NavLink>
+              <NavLink to="/commands/fix">fix</NavLink>
+              <NavLink to="/commands/validate">validate</NavLink>
+              <NavLink to="/commands/watch">watch</NavLink>
+            </div>
             <NavLink to="/config">Configuration</NavLink>
             <div css={{ marginLeft: 16 }}>
               <NavLink to="/config/projects">Projects</NavLink>
               <NavLink to="/config/packages">Packages</NavLink>
               <NavLink to="/config/entrypoints">Entrypoints</NavLink>
             </div>
+
             <NavLink to="/decisions">Architecture and Design Decisions</NavLink>
           </Sidebar>
         )}
