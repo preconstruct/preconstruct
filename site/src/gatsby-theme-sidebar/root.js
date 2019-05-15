@@ -1,7 +1,10 @@
 import React, { useState } from "react";
 import { Link } from "gatsby";
 import { Spacer } from "gatsby-theme-sidebar";
+import { MDXProvider } from "@mdx-js/react";
+import Highlight, { defaultProps } from "prism-react-renderer";
 import colors from "../colors";
+import { theme as codeTheme } from "../code-theme";
 
 const NavLink = props => (
   <Link
@@ -65,6 +68,47 @@ const hamburger = (
     <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z" />
   </svg>
 );
+
+let components = {
+  pre: ({ children: { props } }) => {
+    console.log(props);
+    // props is for MDXTag, props.props is for code element
+    const lang = props.className && props.className.split("-")[1];
+    return (
+      <div
+        css={{
+          width: "100% !important",
+          marginBottom: "1.5rem",
+          overflowX: "auto",
+          "& pre": {
+            overflowX: "auto",
+            width: "100%",
+            padding: 16
+          }
+        }}
+      >
+        <Highlight
+          {...defaultProps}
+          theme={codeTheme}
+          code={props.children.trim()}
+          language={lang}
+        >
+          {({ className, style, tokens, getLineProps, getTokenProps }) => (
+            <pre className={className} style={style}>
+              {tokens.map((line, i) => (
+                <div {...getLineProps({ line, key: i })}>
+                  {line.map((token, key) => (
+                    <span {...getTokenProps({ token, key })} />
+                  ))}
+                </div>
+              ))}
+            </pre>
+          )}
+        </Highlight>
+      </div>
+    );
+  }
+};
 
 export default ({
   Layout,
@@ -187,7 +231,7 @@ export default ({
             }
           }}
         >
-          {props.children}
+          <MDXProvider components={components}>{props.children}</MDXProvider>
         </Content>
       </Main>
     </Layout>
