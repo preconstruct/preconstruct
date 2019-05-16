@@ -1,5 +1,10 @@
 # preconstruct
 
+## 0.0.68
+### Patch Changes
+
+- [9022265](https://github.com/preconstruct/preconstruct/commit/9022265) - Set fields in a better order
+
 ## 0.0.67
 ### Patch Changes
 
