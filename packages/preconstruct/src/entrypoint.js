@@ -7,6 +7,49 @@ import { validatePackage } from "./validate-package";
 import resolve from "resolve";
 import { EXTENSIONS } from "./constants";
 
+let fields = [
+  "version",
+  "description",
+  "main",
+  "module",
+  "umd:main",
+  "browser",
+  "react-native"
+];
+
+function setFieldInOrder(
+  obj,
+  field: "main" | "module" | "umd:main" | "browser" | "react-native",
+  value
+) {
+  if (field in obj) {
+    return { ...obj, [field]: value };
+  }
+  let fieldIndex = fields.indexOf(field);
+  let idealField = fields
+    .slice(0, fieldIndex)
+    .reverse()
+    .find(key => {
+      return key in obj;
+    });
+
+  if (idealField === undefined) {
+    return { ...obj, [field]: value };
+  }
+
+  let newObj = {};
+
+  for (let key in obj) {
+    newObj[key] = obj[key];
+
+    if (key === idealField) {
+      newObj[field] = value;
+    }
+  }
+
+  return newObj;
+}
+
 /*::
 import { Package } from './package'
 */
@@ -30,13 +73,13 @@ export class Entrypoint extends Item {
     return is(this.json.main, is.maybe(is.string));
   }
   set main(path: string) {
-    this.json.main = path;
+    this.json = setFieldInOrder(this.json, "main", path);
   }
   get module(): string | null {
     return is(this.json.module, is.maybe(is.string));
   }
   set module(path: string) {
-    this.json.module = path;
+    this.json = setFieldInOrder(this.json, "module", path);
   }
   get browser(): null | string | { [key: string]: string } {
     return is(
@@ -45,7 +88,7 @@ export class Entrypoint extends Item {
     );
   }
   set browser(option: { [key: string]: string }) {
-    this.json.browser = option;
+    this.json = setFieldInOrder(this.json, "browser", option);
   }
   get reactNative(): null | string | { [key: string]: string } {
     return is(
@@ -54,14 +97,14 @@ export class Entrypoint extends Item {
     );
   }
   set reactNative(option: { [key: string]: string }) {
-    this.json["react-native"] = option;
+    this.json = setFieldInOrder(this.json, "react-native", option);
   }
 
   get umdMain(): string | null {
     return is(this.json["umd:main"], is.maybe(is.string));
   }
   set umdMain(path: string) {
-    this.json["umd:main"] = path;
+    this.json = setFieldInOrder(this.json, "umd:main", path);
   }
 
   get configSource(): string {
@@ -104,21 +147,20 @@ export class StrictEntrypoint extends Entrypoint {
     return is(this.json.main, is.string);
   }
   set main(path: string) {
-    this.json.main = path;
+    this.json = setFieldInOrder(this.json, "main", path);
   }
   get browser(): null | { [key: string]: string } {
     return is(this.json.browser, is.maybe(is.objectOf(is.string)));
   }
   set browser(option: { [key: string]: string }) {
-    this.json.browser = option;
+    this.json = setFieldInOrder(this.json, "browser", option);
   }
   get reactNative(): null | { [key: string]: string } {
     return is(this.json["react-native"], is.maybe(is.objectOf(is.string)));
   }
   set reactNative(option: { [key: string]: string }) {
-    this.json["react-native"] = option;
+    this.json = setFieldInOrder(this.json, "react-native", option);
   }
-
   updater(json: Object) {
     super.updater(json);
     validatePackage(this.package);

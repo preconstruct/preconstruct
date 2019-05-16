@@ -132,6 +132,17 @@ test("monorepo", async () => {
   let pkg1 = await getPkg(path.join(tmpPath, "packages", "package-one"));
   let pkg2 = await getPkg(path.join(tmpPath, "packages", "package-two"));
 
+  expect(Object.keys(pkg1)).toMatchInlineSnapshot(`
+Array [
+  "name",
+  "version",
+  "main",
+  "module",
+  "license",
+  "private",
+]
+`);
+
   expect(pkg1).toMatchInlineSnapshot(`
 Object {
   "license": "MIT",
