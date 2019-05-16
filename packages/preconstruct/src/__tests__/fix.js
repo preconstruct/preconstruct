@@ -111,7 +111,7 @@ test("does not modify if already valid", async () => {
 Array [
   Array [
     "🎁 success",
-    "package already valid!",
+    "project already valid!",
   ],
 ]
 `);
@@ -177,7 +177,7 @@ test("monorepo single package", async () => {
 Array [
   Array [
     "🎁 success",
-    "package already valid!",
+    "project already valid!",
   ],
 ]
 `);

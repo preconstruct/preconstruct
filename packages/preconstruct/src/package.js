@@ -13,6 +13,8 @@ import {
   getValidUmdMainField,
   getValidReactNativeField
 } from "./utils";
+import { errors, confirms } from "./messages";
+import { getNameForDist } from "./utils";
 
 /*::
 import {Project} from './project'
@@ -33,7 +35,7 @@ export class Package extends Item {
     let contents = await fs.readFile(filePath, "utf-8");
     let pkg = new Package(filePath, contents);
 
-    let filenames = await globby(pkg.configEntrypoints, {
+    let entrypointDirectories = await globby(pkg.configEntrypoints, {
       cwd: pkg.directory,
       onlyDirectories: true,
       absolute: true,
@@ -41,10 +43,47 @@ export class Package extends Item {
     });
 
     pkg.entrypoints = await Promise.all(
-      filenames.map(async filename => {
-        let entrypoint = await Entrypoint.create(filename, pkg);
-        return entrypoint;
+      entrypointDirectories.map(async directory => {
+        let filename = nodePath.join(directory, "package.json");
+
+        let contents = null;
+
+        try {
+          contents = await fs.readFile(filename, "utf-8");
+        } catch (e) {
+          if (e.code !== "ENOENT") {
+            throw e;
+          }
+        }
+
+        return { filename, contents };
       })
+    ).then(descriptors =>
+      Promise.all(
+        descriptors.map(async ({ filename, contents }) => {
+          if (contents === null) {
+            let shouldCreateEntrypointPkgJson = await confirms.createEntrypointPkgJson(
+              {
+                name: nodePath.join(
+                  pkg.name,
+                  nodePath.relative(pkg.directory, directory)
+                )
+              }
+            );
+            if (!shouldCreateEntrypointPkgJson) {
+              throw new Error(errors.noEntrypointPkgJson);
+            }
+            // TODO: check if other entrypoints have module or etc. and add it here
+            contents = JSON.stringify(
+              { main: `dist/${getNameForDist(pkg.name)}.cjs.js` },
+              null,
+              2
+            );
+            await fs.writeFile(filename, contents);
+          }
+          return new Entrypoint(filename, contents, pkg);
+        })
+      )
     );
 
     return pkg;
