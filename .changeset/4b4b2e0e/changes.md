@@ -1,0 +1,1 @@
+Fix init command prompting incorrectly for UMD builds

@@ -44,6 +44,7 @@ async function doInit(pkg: Package) {
   } else {
     info(infos.validModuleField, pkg);
   }
+
   let someEntrypointsHaveAMaybeInvalidUmdBuild = pkg.entrypoints.some(
     entrypoint => entrypoint.umdMain !== null
   );
@@ -53,7 +54,10 @@ async function doInit(pkg: Package) {
   let someUmdNamesAreNotSpecified = pkg.entrypoints.some(
     entrypoint => !isUmdNameSpecified(entrypoint)
   );
-  if (someUmdMainFieldsAreInvalid || someUmdNamesAreNotSpecified) {
+  if (
+    someEntrypointsHaveAMaybeInvalidUmdBuild &&
+    (someUmdMainFieldsAreInvalid || someUmdNamesAreNotSpecified)
+  ) {
     let shouldWriteUMDBuilds = await confirms.fixUmdBuild(pkg);
     if (shouldWriteUMDBuilds) {
       pkg.setFieldOnEntrypoints("umdMain");
@@ -61,10 +65,7 @@ async function doInit(pkg: Package) {
         let umdName = await promptInput(inputs.getUmdName, entrypoint);
         entrypoint.umdName = umdName;
       }
-    } else if (
-      someEntrypointsHaveAMaybeInvalidUmdBuild &&
-      (someUmdMainFieldsAreInvalid || someUmdNamesAreNotSpecified)
-    ) {
+    } else {
       throw new FixableError(errors.invalidUmdMainField, pkg);
     }
   }
