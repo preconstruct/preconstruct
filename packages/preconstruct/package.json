@@ -11,7 +11,7 @@
     "preconstruct": "./bin.js"
   },
   "scripts": {
-    "build": "rimraf lib && babel src --out-dir lib --ignore '**/__tests__/**/*','**/__mocks__/**/*'"
+    "build": "rimraf lib && babel src --out-dir lib --root-mode upward --ignore '**/__tests__/**/*','**/__mocks__/**/*'"
   },
   "repository": "https://github.com/preconstruct/preconstruct",
   "license": "MIT",
