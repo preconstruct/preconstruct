@@ -1,6 +1,5 @@
 // @flow
 import is from "sarcastic";
-import { readFileSync } from "fs";
 import * as fs from "fs-extra";
 import nodePath from "path";
 import { validateEntrypoint } from "./validate";
@@ -52,11 +51,6 @@ export class Entrypoint extends Item {
         throw e;
       }
     }
-    return new Entrypoint(filePath, contents, pkg);
-  }
-  static createSync(directory: string, pkg: Package): Entrypoint {
-    let filePath = nodePath.join(directory, "package.json");
-    let contents = readFileSync(filePath, "utf-8");
     return new Entrypoint(filePath, contents, pkg);
   }
 

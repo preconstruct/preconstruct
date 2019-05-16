@@ -3,7 +3,6 @@
 import is from "sarcastic";
 import globby from "globby";
 import * as fs from "fs-extra";
-import { readFileSync } from "fs";
 import nodePath from "path";
 import { Item } from "./item";
 import { Entrypoint, StrictEntrypoint } from "./entrypoint";
@@ -48,23 +47,6 @@ export class Package extends Item {
       })
     );
 
-    return pkg;
-  }
-  static createSync(directory: string): Package {
-    let filePath = nodePath.join(directory, "package.json");
-    let contents = readFileSync(filePath, "utf-8");
-    let pkg = new Package(filePath, contents);
-    let filenames = globby.sync(pkg.configEntrypoints, {
-      cwd: pkg.directory,
-      onlyDirectories: true,
-      absolute: true,
-      expandDirectories: false
-    });
-
-    pkg.entrypoints = filenames.map(filename => {
-      let entrypoint = Entrypoint.createSync(filename, pkg);
-      return entrypoint;
-    });
     return pkg;
   }
 

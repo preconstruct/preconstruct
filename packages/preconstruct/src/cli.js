@@ -16,11 +16,13 @@ let { input } = meow(
 Usage
   $ preconstruct [command]
 Commands
-  init         initialise preconstruct
-  build        build the package(s)
-  watch        start a watch process to build the package(s)
-  validate     validate the package(s)
-  fix          infer as much information as possible and fix package(s)
+  init         initialise a project
+  build        build the project
+  watch        start a watch process to build the project
+  validate     validate the project
+  fix          infer as much information as possible and fix the project
+  dev          infer as much information as possible and fix the project
+
 `,
   {}
 );

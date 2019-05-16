@@ -22,7 +22,6 @@ async function fixEntrypoint(entrypoint: Entrypoint) {
 
 export default async function fix(directory: string) {
   let { packages } = await Project.create(directory);
-  // do more stuff with checking whether the repo is using yarn workspaces or bolt
 
   let didModify = (await Promise.all(
     packages.map(async pkg => {
@@ -34,6 +33,5 @@ export default async function fix(directory: string) {
     })
   )).some(x => x);
 
-  let obj = packages.length > 1 ? "packages" : "package";
-  success(didModify ? `fixed ${obj}!` : `${obj} already valid!`);
+  success(didModify ? "fixed project!" : "project already valid!");
 }
