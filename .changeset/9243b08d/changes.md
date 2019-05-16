@@ -1,1 +1,0 @@
-Remove aliases export, this is now replaced with the dev command
