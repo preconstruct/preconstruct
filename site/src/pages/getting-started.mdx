@@ -1,6 +1,30 @@
 # Getting Started
 
-Firstly, we need to install preconstruct
+Before we can use preconstruct, we need a package to build. We're going to build a package that export a random number.
+
+The first thing we're going to do is create a directory and run `yarn init` in it which will create a package.json for us.
+
+```bash
+$ yarn init
+yarn init v1.15.2
+question name (a-random-number):
+question version (1.0.0):
+question description:
+question entry point (index.js):
+question repository url:
+question author:
+question license (MIT):
+question private:
+success Saved package.json
+```
+
+Now we're going to create our source file. By default, preconstruct looks at the src directory to find the source file so we're going to create a file at `src/index.js` that looks like this.
+
+```jsx
+export let random = Math.random();
+```
+
+Now we can install preconstruct
 
 ```bash
 yarn add --dev preconstruct
@@ -13,3 +37,5 @@ yarn preconstruct init
 ```
 
 ## What have we got now?
+
+Depending on
