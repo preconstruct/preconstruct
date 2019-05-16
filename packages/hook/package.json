@@ -14,5 +14,8 @@
     "@babel/plugin-transform-modules-commonjs": "^7.4.4",
     "pirates": "^4.0.1",
     "source-map-support": "^0.5.12"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
