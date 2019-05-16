@@ -1,8 +1,9 @@
 // @flow
-let { EXTENSIONS } = require("./constants");
 let { addHook } = require("pirates");
 let babel = require("@babel/core");
 let sourceMapSupport = require("source-map-support");
+
+let EXTENSIONS = [".js", ".jsx", ".ts", ".tsx"];
 
 let babelPlugins = [
   require.resolve("@babel/plugin-transform-runtime"),
