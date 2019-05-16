@@ -48,7 +48,7 @@ jobs:
           command: yarn install --pure-lockfile
       - run:
           name: "Flow"
-          command: yarn flow
+          command: yarn flow:check
 
   lint:
     docker:
