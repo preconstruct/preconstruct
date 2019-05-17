@@ -70,6 +70,12 @@ const hamburger = (
 );
 
 let components = {
+  a: ({ href, ...props }) => {
+    if (href.startsWith("http")) {
+      return <a href={href} {...props} />;
+    }
+    return <Link to={href} {...props} />;
+  },
   pre: ({ children: { props } }) => {
     console.log(props);
     // props is for MDXTag, props.props is for code element
@@ -218,6 +224,10 @@ export default ({
               <NavLink to="/config/projects">Projects</NavLink>
               <NavLink to="/config/packages">Packages</NavLink>
               <NavLink to="/config/entrypoints">Entrypoints</NavLink>
+            </div>
+            <NavLink to="/errors">Errors</NavLink>
+            <div css={{ marginLeft: 16 }}>
+              {/* <NavLink to="/errors/something">Monorepos</NavLink> */}
             </div>
 
             <NavLink to="/decisions">Architecture and Design Decisions</NavLink>

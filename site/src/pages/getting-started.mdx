@@ -123,6 +123,22 @@ export { random };
 
 Now it's using `var` and it'll work everywhere 🎉
 
-## Preparing for publishing
+## Publishing
+
+Now that our package is ready for people to use for all their random number needs we can publish it to npm.
+
+We're going to add some package scripts to make it easier and make sure that we don't publish our package without building it first.
+
+```json
+"scripts": {
+  "postinstall": "preconstruct dev",
+  "build": "preconstruct build",
+  "release": "yarn build && npm publish"
+}
+```
+
+So now we can run `npm version patch` and then `yarn release` to do a release.
 
 ## Going further
+
+preconstruct can do a lot more than building a simple package like this. You can learn more about what preconstruct can do by going through [preconstruct's guides](/guides)
