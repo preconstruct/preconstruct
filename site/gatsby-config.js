@@ -8,6 +8,12 @@ module.exports = {
         pathToConfigModule: "src/typography"
       }
     },
-    "gatsby-plugin-emotion"
+    "gatsby-plugin-emotion",
+    {
+      resolve: "gatsby-plugin-google-analytics",
+      options: {
+        trackingId: "UA-140394521-1"
+      }
+    }
   ]
 };
