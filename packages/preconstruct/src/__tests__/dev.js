@@ -126,8 +126,9 @@ test("flow", async () => {
 
   await dev(tmpPath);
 
-  // should not have export default
-
+  expect(
+    await fs.readlink(path.join(tmpPath, "dist", "flow-dev.cjs.js.flow"))
+  ).toBe(path.join(tmpPath, "src", "index.js"));
   expect(
     await fs.readFile(
       path.join(tmpPath, "dist", "flow-dev.cjs.js.flow"),
@@ -135,11 +136,10 @@ test("flow", async () => {
     )
   ).toMatchInlineSnapshot(`
 "// @flow
-export * from \\"../src/index.js\\";
+
+export let something = true;
 "
 `);
-
-  // should have export default
 
   expect(
     await fs.readFile(
@@ -148,12 +148,10 @@ export * from \\"../src/index.js\\";
     )
   ).toMatchInlineSnapshot(`
 "// @flow
-export * from \\"../src/index.js\\";
-export { default } from \\"../src/index.js\\";
+
+export default \\"something\\";
 "
 `);
-
-  // should have export default
 
   expect(
     await fs.readFile(
@@ -162,8 +160,10 @@ export { default } from \\"../src/index.js\\";
     )
   ).toMatchInlineSnapshot(`
 "// @flow
-export * from \\"../src/index.js\\";
-export { default } from \\"../src/index.js\\";
+
+let something = true;
+
+export { something as default };
 "
 `);
 });
