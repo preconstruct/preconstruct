@@ -76,6 +76,21 @@ let components = {
     }
     return <Link to={href} {...props} />;
   },
+  blockquote: props => {
+    return (
+      <blockquote
+        css={{
+          borderLeft: `8px solid ${colors.base}`,
+          paddingLeft: 16,
+          marginLeft: 0,
+          backgroundColor: colors.pink,
+          paddingTop: 16,
+          paddingBottom: 16
+        }}
+        {...props}
+      />
+    );
+  },
   pre: ({ children: { props } }) => {
     console.log(props);
     // props is for MDXTag, props.props is for code element
