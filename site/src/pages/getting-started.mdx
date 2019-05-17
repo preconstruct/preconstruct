@@ -33,9 +33,96 @@ yarn add --dev preconstruct
 We can initialise preconstruct with `preconstruct init`.
 
 ```bash
-yarn preconstruct init
+$ yarn preconstruct init
+🎁 ? a-random-number preconstruct is going to change the main field in your package.json, are you okay with that? Yes
+🎁 ? a-random-number would you like to generate module builds? this will write to the module field in your package.json Yes
+🎁 ? a-random-number would you like preconstruct to automatically add `preconstruct dev` in a postinstall hook so that importing entrypoints during development will import the s
+ource Yes
+🎁 success initialised project!
 ```
 
-## What have we got now?
+## What did we just do?
 
-Depending on
+`preconstruct init` added some things to your package.json so it'll probably look something like this.
+
+```json
+{
+  "name": "a-random-number",
+  "version": "1.0.0",
+  "main": "dist/a-random-number.cjs.js",
+  "module": "dist/a-random-number.esm.js",
+  "license": "MIT",
+  "devDependencies": {
+    "preconstruct": "^0.0.68"
+  },
+  "scripts": {
+    "postinstall": "preconstruct dev"
+  }
+}
+```
+
+<details>
+
+<summary>What does all this mean?</summary>
+
+```json
+"main": "dist/a-random-number.cjs.js",
+```
+
+The `main` field specifies what file Node and older bundlers should look at when someone uses your package. preconstruct has automatically set it to `dist/a-random-number.cjs.js` which is based on the package name `a-random-number`.
+
+```json
+"module": "dist/a-random-number.esm.js",
+```
+
+The `module` field specifies what file newer bundlers like webpack should look at when someone uses your package.
+
+```json
+"scripts": {
+  "postinstall": "preconstruct dev"
+}
+```
+
+preconstruct has also added a script called `postinstall` which will be automatically run by package managers like Yarn and npm. `preconstruct dev` will create links from the dist files specified above to your sour ce file so that your can import the directory that the package.json is in and you'll get the source files. While this is primarily useful in monorepos, it's also useful in monorepos because it allows you to run tests against your dist files but still run them against your source files in development for faster feedback loop.
+
+</details>
+
+## We need to compile our code with Babel
+
+If we run `yarn preconstruct build` now, we'll get a couple files but let's look at the ESM one.
+
+```jsx
+let random = Math.random();
+
+export { random };
+```
+
+This looks good but this file is using `let` which means that it'll break if people use the package with some toolchains.
+
+To fix this, we're going to use Babel. preconstruct uses Babel under the hood so if we add a Babel config, preconstruct will use it.
+
+We're going to install `@babel/preset-env` and add it to a `.babelrc`.
+
+```bash
+yarn add --dev @babel/preset-env
+```
+
+```json
+{
+  "presets": ["@babel/preset-env"]
+}
+```
+
+If we run `yarn preconstruct build` now, our code will be compiled with `@babel/preset-env` so our ESM file looks like this.
+
+```jsx
+var random = Math.random();
+
+export { random };
+```
+
+Now it's using `var` and it'll work everywhere 🎉
+
+## Preparing for publishing
+
+## Going further

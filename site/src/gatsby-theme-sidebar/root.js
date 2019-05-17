@@ -197,6 +197,13 @@ export default ({
           >
             <NavLink to="/getting-started">Getting Started</NavLink>
             <NavLink to="/concepts">Concepts</NavLink>
+            <NavLink to="/guides">Guides</NavLink>
+            <div css={{ marginLeft: 16 }}>
+              <NavLink to="/guides/monorepos">Monorepos</NavLink>
+              <NavLink to="/guides/multiple-entrypoints">
+                Multiple Entrypoints
+              </NavLink>
+            </div>
             <NavLink to="/commands">Commands</NavLink>
             <div css={{ marginLeft: 16 }}>
               <NavLink to="/commands/init">init</NavLink>
