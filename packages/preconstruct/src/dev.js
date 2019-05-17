@@ -2,8 +2,6 @@
 import { Project } from "./project";
 import { success, info } from "./logger";
 import * as fs from "fs-extra";
-import * as babel from "@babel/core";
-import { flowTemplate } from "./utils";
 import path from "path";
 
 async function writeFlowFile(contentPromise, entrypoint) {
@@ -11,36 +9,9 @@ async function writeFlowFile(contentPromise, entrypoint) {
   if (!content.includes("@flow")) {
     return;
   }
-  let ast = await babel.parseAsync(content, {
-    filename: entrypoint.source,
-    sourceType: "module",
-    cwd: entrypoint.package.project.directory
-  });
-
-  let hasDefaultExport = false;
-
-  for (let statement of ast.program.body) {
-    if (
-      statement.type === "ExportDefaultDeclaration" ||
-      (statement.type === "ExportNamedDeclaration" &&
-        statement.specifiers.some(
-          specifier =>
-            specifier.type === "ExportSpecifier" &&
-            specifier.exported.name === "default"
-        ))
-    ) {
-      hasDefaultExport = true;
-      break;
-    }
-  }
-
   let cjsDistPath = path.join(entrypoint.directory, entrypoint.main);
-  let relativePath = path.relative(
-    path.dirname(cjsDistPath),
-    entrypoint.source
-  );
-  let contents = flowTemplate(hasDefaultExport, relativePath);
-  await fs.writeFile(cjsDistPath + ".flow", contents);
+
+  await fs.symlink(entrypoint.source, cjsDistPath + ".flow");
 }
 
 export default async function dev(projectDir: string) {
