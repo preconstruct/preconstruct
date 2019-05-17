@@ -258,6 +258,15 @@ export default ({
             }),
             "h1 code, h2 code, h3 code, h4 code, h5 code, h6 code": {
               fontSize: "inherit"
+            },
+            details: {
+              borderLeft: `8px solid ${colors.base}`,
+              backgroundColor: colors.pink,
+              padding: 16,
+              marginBottom: 16
+            },
+            "details[open] summary": {
+              marginBottom: 16
             }
           }}
         >
