@@ -4,14 +4,33 @@ import { success, info } from "./logger";
 import * as fs from "fs-extra";
 import path from "path";
 
-async function writeFlowFile(contentPromise, entrypoint) {
-  let content = await contentPromise;
-  if (!content.includes("@flow")) {
-    return;
-  }
-  let cjsDistPath = path.join(entrypoint.directory, entrypoint.main);
+let tsExtensionPattern = /tsx?$/;
 
-  await fs.symlink(entrypoint.source, cjsDistPath + ".flow");
+async function getTypeSystem(
+  entrypoint
+): Promise<null | "flow" | "typescript"> {
+  if (tsExtensionPattern.test(entrypoint.source)) {
+    return "typescript";
+  }
+  // TODO: maybe we should write the flow symlink even if there isn't an @flow
+  // comment so that if someone adds an @flow comment they don't have to run preconstruct dev again
+  let content = await fs.readFile(entrypoint.source, "utf8");
+  if (content.includes("@flow")) {
+    return "flow";
+  }
+  return null;
+}
+
+async function writeFlowFile(typeSystemPromise, entrypoint) {
+  let typeSystem = await typeSystemPromise;
+  if (typeSystem !== null) {
+    let cjsDistPath = path.join(entrypoint.directory, entrypoint.main);
+
+    await fs.symlink(
+      entrypoint.source,
+      cjsDistPath + (typeSystem === "flow" ? ".flow" : ".d.ts")
+    );
+  }
 }
 
 export default async function dev(projectDir: string) {
@@ -27,12 +46,13 @@ export default async function dev(projectDir: string) {
       return Promise.all(
         pkg.entrypoints.map(async _entrypoint => {
           let entrypoint = _entrypoint.strict();
-          let contentPromise = fs.readFile(entrypoint.source, "utf8");
+          let typeSystemPromise = getTypeSystem(entrypoint);
+
           await fs.remove(path.join(entrypoint.directory, "dist"));
           await fs.ensureDir(path.join(entrypoint.directory, "dist"));
 
           let promises = [
-            writeFlowFile(contentPromise, entrypoint),
+            writeFlowFile(typeSystemPromise, entrypoint),
             fs.writeFile(
               path.join(entrypoint.directory, entrypoint.main),
               `'use strict';
