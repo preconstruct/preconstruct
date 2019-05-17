@@ -92,8 +92,6 @@ let components = {
     );
   },
   pre: ({ children: { props } }) => {
-    console.log(props);
-    // props is for MDXTag, props.props is for code element
     const lang = props.className && props.className.split("-")[1];
     return (
       <div
