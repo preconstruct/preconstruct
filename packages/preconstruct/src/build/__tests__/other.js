@@ -32,7 +32,7 @@ test("browser", async () => {
 
   await build(tmpPath);
   expect(confirms.addBrowserField).toBeCalledTimes(1);
-  await snapshotDirectory(tmpPath, "all");
+  await snapshotDirectory(tmpPath, { files: "all" });
 });
 
 test("browser no module", async () => {
@@ -42,7 +42,7 @@ test("browser no module", async () => {
 
   await build(tmpPath);
   expect(confirms.addBrowserField).toBeCalledTimes(1);
-  await snapshotDirectory(tmpPath, "all");
+  await snapshotDirectory(tmpPath, { files: "all" });
 });
 
 test("typescript", async () => {
@@ -51,7 +51,7 @@ test("typescript", async () => {
   await install(tmpPath);
   await build(tmpPath);
 
-  await snapshotDirectory(tmpPath, "all");
+  await snapshotDirectory(tmpPath, { files: "all" });
 });
 
 test("package resolvable but not in deps", async () => {

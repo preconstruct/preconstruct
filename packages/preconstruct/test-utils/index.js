@@ -121,9 +121,34 @@ export async function snapshotDistFiles(tmpPath: string) {
   );
 }
 
+export let stripHashes = () => {
+  let i = 0;
+  let cache = {};
+  let transformer = (pathname: string) => {
+    return pathname.replace(/chunk-[^\.]+/g, content => {
+      if (!cache[content]) {
+        cache[content] = `chunk-hash-${i++}`;
+      }
+      return cache[content];
+    });
+  };
+  return {
+    transformPath: transformer,
+    transformContent: transformer
+  };
+};
+
 export async function snapshotDirectory(
   tmpPath: string,
-  files: "all" | "js" = "js"
+  {
+    files = "js",
+    transformPath = x => x,
+    transformContent = x => x
+  }: {
+    files?: "all" | "js",
+    transformPath?: string => string,
+    transformContent?: string => string
+  } = {}
 ) {
   let paths = await globby(
     [`**/${files === "js" ? "*.js" : "*"}`, "!node_modules/**", "!yarn.lock"],
@@ -136,9 +161,9 @@ export async function snapshotDirectory(
 
   await Promise.all(
     paths.map(async x => {
-      expect(await fs.readFile(path.join(tmpPath, x), "utf-8")).toMatchSnapshot(
-        x
-      );
+      expect(
+        transformContent(await fs.readFile(path.join(tmpPath, x), "utf-8"))
+      ).toMatchSnapshot(transformPath(x));
     })
   );
 }

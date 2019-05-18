@@ -5,7 +5,8 @@ import path from "path";
 import {
   snapshotDistFiles,
   snapshotDirectory,
-  install
+  install,
+  stripHashes
 } from "../../../test-utils";
 
 const f = fixturez(__dirname);
@@ -60,7 +61,7 @@ test("two entrypoints with a common dependency", async () => {
 
   await build(tmpPath);
 
-  await snapshotDirectory(tmpPath);
+  await snapshotDirectory(tmpPath, stripHashes());
 });
 
 test("two entrypoints where one requires the other entrypoint", async () => {
