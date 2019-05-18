@@ -1,1 +1,0 @@
-Add support for TypeScript resolving types with dev command
