@@ -4,6 +4,7 @@ import * as fs from "fs-extra";
 import globby from "globby";
 import fixturez from "fixturez";
 import spawn from "spawndamnit";
+import initHasher from "xxhash-wasm";
 
 let f = fixturez(__dirname);
 
@@ -121,20 +122,21 @@ export async function snapshotDistFiles(tmpPath: string) {
   );
 }
 
-export let stripHashes = () => {
-  let i = 0;
-  let cache = {};
-  let transformer = (pathname: string) => {
-    return pathname.replace(/chunk-[^\.]+/g, content => {
-      if (!cache[content]) {
-        cache[content] = `chunk-hash-${i++}`;
-      }
-      return cache[content];
+export let stripHashes = async () => {
+  let { h64 } = await initHasher();
+
+  let transformer = (pathname: string, content: string) => {
+    return pathname.replace(/chunk-[^\.]+/g, () => {
+      return `chunk-this-is-not-the-real-hash-${h64(content)}`;
     });
   };
   return {
     transformPath: transformer,
-    transformContent: transformer
+    transformContent: (content: string) => {
+      return content.replace(/chunk-[^\.]+/g, () => {
+        return "chunk-some-hash";
+      });
+    }
   };
 };
 
@@ -146,7 +148,7 @@ export async function snapshotDirectory(
     transformContent = x => x
   }: {
     files?: "all" | "js",
-    transformPath?: string => string,
+    transformPath?: (path: string, contents: string) => string,
     transformContent?: string => string
   } = {}
 ) {
@@ -161,9 +163,10 @@ export async function snapshotDirectory(
 
   await Promise.all(
     paths.map(async x => {
-      expect(
-        transformContent(await fs.readFile(path.join(tmpPath, x), "utf-8"))
-      ).toMatchSnapshot(transformPath(x));
+      let content = transformContent(
+        await fs.readFile(path.join(tmpPath, x), "utf-8")
+      );
+      expect(content).toMatchSnapshot(transformPath(x, content));
     })
   );
 }
