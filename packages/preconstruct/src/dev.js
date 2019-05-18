@@ -28,7 +28,7 @@ async function writeFlowFile(typeSystemPromise, entrypoint) {
 
     await fs.symlink(
       entrypoint.source,
-      cjsDistPath + (typeSystem === "flow" ? ".flow" : ".d.ts")
+      cjsDistPath + (typeSystem === "flow" ? ".flow" : ".ts")
     );
   }
 }

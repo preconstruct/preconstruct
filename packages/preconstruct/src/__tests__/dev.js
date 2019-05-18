@@ -176,11 +176,11 @@ test("typescript", async () => {
   await dev(tmpPath);
 
   expect(
-    await fs.readlink(path.join(tmpPath, "dist", "typescript.cjs.js.d.ts"))
+    await fs.readlink(path.join(tmpPath, "dist", "typescript.cjs.js.ts"))
   ).toBe(path.join(tmpPath, "src", "index.ts"));
   expect(
     await fs.readFile(
-      path.join(tmpPath, "dist", "typescript.cjs.js.d.ts"),
+      path.join(tmpPath, "dist", "typescript.cjs.js.ts"),
       "utf8"
     )
   ).toMatchInlineSnapshot(`
