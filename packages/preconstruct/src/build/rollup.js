@@ -214,6 +214,7 @@ export let getRollupConfig = (
       }
     },
     plugins: [
+      type === "node-prod" && flowAndNodeDevProdEntry(pkg),
       babel({
         cwd: pkg.project.directory,
         plugins: [
@@ -251,8 +252,7 @@ export let getRollupConfig = (
             beautify: true,
             indent_level: 2
           }
-        }),
-      type === "node-prod" && flowAndNodeDevProdEntry()
+        })
     ].filter(Boolean)
   };
 
