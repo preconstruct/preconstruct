@@ -159,8 +159,8 @@ function doSomething(arg) {
 }
 
 var index = \\"wow\\";
-exports.doSomething = doSomething;
 exports.default = index;
+exports.doSomething = doSomething;
 "
 `;
 
@@ -195,7 +195,7 @@ Object.defineProperty(exports, \\"__esModule\\", {
 
 var index = \\"wow\\";
 
-exports.doSomething = doSomething, exports.default = index;
+exports.default = index, exports.doSomething = doSomething;
 "
 `;
 

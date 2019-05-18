@@ -24,5 +24,5 @@ test("needs @babel/runtime allow install", async () => {
   // TODO: investigate why this is called more than one time
   expect(confirms.shouldInstallBabelRuntime).toBeCalled();
 
-  await snapshotDirectory(tmpPath, "all");
+  await snapshotDirectory(tmpPath, { files: "all" });
 });

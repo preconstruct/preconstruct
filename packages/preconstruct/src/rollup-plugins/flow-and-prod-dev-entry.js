@@ -3,12 +3,31 @@ import path from "path";
 import type { Plugin } from "./types";
 import { getDevPath, getProdPath } from "../build/utils";
 import { flowTemplate } from "../utils";
+import { Package } from "../package";
+import { FatalError } from "../errors";
 
 import * as fs from "fs-extra";
 
-export default function flowAndNodeDevProdEntry(): Plugin {
+export default function flowAndNodeDevProdEntry(pkg: Package): Plugin {
   return {
     name: "flow-and-prod-dev-entry",
+    async resolveId(source: string, importer: string) {
+      let resolved = await this.resolve(source, importer, { skipSelf: true });
+
+      if (
+        resolved.id.startsWith("\0") ||
+        resolved.id.startsWith(pkg.directory)
+      ) {
+        return resolved;
+      }
+      throw new FatalError(
+        `all relative imports in a package should only import modules inside of their package directory but "${path.relative(
+          pkg.directory,
+          importer
+        )}" is importing "${source}"`,
+        pkg
+      );
+    },
     // eslint-disable-next-line no-unused-vars
     async generateBundle(opts, bundle, something) {
       for (const n in bundle) {

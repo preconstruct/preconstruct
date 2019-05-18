@@ -1,0 +1,8 @@
+{
+  "name": "entrypoint-outside-pkg-dir",
+  "preconstruct": {
+    "packages": [
+      "pkg-a"
+    ]
+  }
+}

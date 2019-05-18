@@ -32,7 +32,7 @@ test("browser", async () => {
 
   await build(tmpPath);
   expect(confirms.addBrowserField).toBeCalledTimes(1);
-  await snapshotDirectory(tmpPath, "all");
+  await snapshotDirectory(tmpPath, { files: "all" });
 });
 
 test("browser no module", async () => {
@@ -42,7 +42,7 @@ test("browser no module", async () => {
 
   await build(tmpPath);
   expect(confirms.addBrowserField).toBeCalledTimes(1);
-  await snapshotDirectory(tmpPath, "all");
+  await snapshotDirectory(tmpPath, { files: "all" });
 });
 
 test("typescript", async () => {
@@ -51,7 +51,7 @@ test("typescript", async () => {
   await install(tmpPath);
   await build(tmpPath);
 
-  await snapshotDirectory(tmpPath, "all");
+  await snapshotDirectory(tmpPath, { files: "all" });
 });
 
 test("package resolvable but not in deps", async () => {
@@ -63,6 +63,36 @@ test("package resolvable but not in deps", async () => {
     expect(err).toBeInstanceOf(FatalError);
     expect(err.message).toMatchInlineSnapshot(
       `"\\"react\\" is imported by \\"src/index.js\\" but it is not specified in dependencies or peerDependencies"`
+    );
+    return;
+  }
+  expect(true).toBe(false);
+});
+
+test("entrypoint outside package directory", async () => {
+  let tmpPath = f.copy("entrypoint-outside-pkg-dir");
+  await install(tmpPath);
+  try {
+    await build(tmpPath);
+  } catch (err) {
+    expect(err).toBeInstanceOf(FatalError);
+    expect(err.message).toMatchInlineSnapshot(
+      `"entrypoint source files must be inside their respective package directory but this entrypoint has specified its source file as ../some-file"`
+    );
+    return;
+  }
+  expect(true).toBe(false);
+});
+
+test("module imported outside package directory", async () => {
+  let tmpPath = f.copy("imports-outside-pkg-dir");
+  await install(tmpPath);
+  try {
+    await build(tmpPath);
+  } catch (err) {
+    expect(err).toBeInstanceOf(FatalError);
+    expect(err.message).toMatchInlineSnapshot(
+      `"all relative imports in a package should only import modules inside of their package directory but \\"src/index.js\\" is importing \\"../../some-file\\""`
     );
     return;
   }

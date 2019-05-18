@@ -10,11 +10,9 @@ import {
   getValidBrowserField,
   getValidReactNativeField
 } from "./utils";
-import { EXTENSIONS } from "./constants";
 import * as logger from "./logger";
 import equal from "fast-deep-equal";
 import { validatePackage } from "./validate-package";
-import resolve from "resolve";
 
 // this doesn't offer to fix anything
 // just does validation
@@ -22,7 +20,14 @@ import resolve from "resolve";
 
 export function validateEntrypointSource(entrypoint: Entrypoint) {
   try {
-    resolve.sync(entrypoint.source, { extensions: EXTENSIONS });
+    if (!entrypoint.source.startsWith(entrypoint.package.directory)) {
+      throw new FatalError(
+        `entrypoint source files must be inside their respective package directory but this entrypoint has specified its source file as ${
+          entrypoint.configSource
+        }`,
+        entrypoint
+      );
+    }
   } catch (e) {
     if (e.code === "MODULE_NOT_FOUND") {
       throw new FatalError(

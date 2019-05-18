@@ -1,0 +1,7 @@
+{
+  "name": "@entrypoint-outside-pkg-dir/pkg-a",
+  "main": "dist/pkg-a.cjs.js",
+  "preconstruct": {
+    "source": "../some-file"
+  }
+}
