@@ -1,0 +1,1 @@
+Add checks that modules imported in a package are inside of the package's directory
