@@ -1,15 +1,14 @@
 // @flow
 import { Project } from "./project";
 import { success, info } from "./logger";
+import { isTsPath } from "./utils";
 import * as fs from "fs-extra";
 import path from "path";
-
-let tsExtensionPattern = /tsx?$/;
 
 async function getTypeSystem(
   entrypoint
 ): Promise<null | "flow" | "typescript"> {
-  if (tsExtensionPattern.test(entrypoint.source)) {
+  if (isTsPath(entrypoint.source)) {
     return "typescript";
   }
   // TODO: maybe we should write the flow symlink even if there isn't an @flow
@@ -28,7 +27,7 @@ async function writeFlowFile(typeSystemPromise, entrypoint) {
 
     await fs.symlink(
       entrypoint.source,
-      cjsDistPath + (typeSystem === "flow" ? ".flow" : ".d.ts")
+      cjsDistPath + (typeSystem === "flow" ? ".flow" : ".ts")
     );
   }
 }

@@ -4,20 +4,26 @@ import { Project } from "./project";
 import { promptInput } from "./prompt";
 import { success } from "./logger";
 import { inputs } from "./messages";
-import { validateEntrypointSource, isUmdNameSpecified } from "./validate";
+import {
+  validateEntrypointSource,
+  isUmdNameSpecified,
+  isTypesFieldValid
+} from "./validate";
+import { getValidTypesField, isTsPath } from "./utils";
 import { fixPackage } from "./validate-package";
 
 async function fixEntrypoint(entrypoint: Entrypoint) {
   validateEntrypointSource(entrypoint);
 
+  if (isTsPath(entrypoint.source) && !isTypesFieldValid(entrypoint)) {
+    entrypoint.tsTypes = getValidTypesField(entrypoint);
+  }
+
   if (entrypoint.umdMain !== null && !isUmdNameSpecified(entrypoint)) {
     let umdName = await promptInput(inputs.getUmdName, entrypoint);
     entrypoint.umdName = umdName;
-    await entrypoint.save();
-
-    return true;
   }
-  return false;
+  return entrypoint.save();
 }
 
 export default async function fix(directory: string) {

@@ -1,8 +1,9 @@
 {
-  "name": "typescript",
+  "name": "valid-typescript",
   "version": "1.0.0",
-  "main": "dist/typescript.cjs.js",
-  "module": "dist/typescript.esm.js",
+  "main": "dist/valid-typescript.cjs.js",
+  "module": "dist/valid-typescript.esm.js",
+  "types": "dist/valid-typescript.types",
   "license": "MIT",
   "private": true,
   "dependencies": {

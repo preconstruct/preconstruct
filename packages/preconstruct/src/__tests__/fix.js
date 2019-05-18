@@ -63,6 +63,30 @@ Object {
 `);
 });
 
+test("set typescript", async () => {
+  let tmpPath = f.copy("typescript");
+
+  await fix(tmpPath);
+
+  let pkg = await getPkg(tmpPath);
+
+  expect(pkg).toMatchInlineSnapshot(`
+Object {
+  "dependencies": Object {
+    "@babel/core": "^7.4.3",
+    "@babel/preset-typescript": "^7.3.3",
+  },
+  "license": "MIT",
+  "main": "dist/typescript.cjs.js",
+  "module": "dist/typescript.esm.js",
+  "name": "typescript",
+  "private": true,
+  "types": "dist/typescript.types",
+  "version": "1.0.0",
+}
+`);
+});
+
 test("monorepo", async () => {
   let tmpPath = f.copy("monorepo");
 

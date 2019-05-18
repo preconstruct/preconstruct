@@ -5,6 +5,7 @@ import { promptInput } from "./prompt";
 import { FatalError, FixableError } from "./errors";
 import { success, info } from "./logger";
 import { infos, confirms, errors, inputs } from "./messages";
+import { isTsPath, getValidTypesField } from "./utils";
 import {
   validateEntrypointSource,
   isMainFieldValid,
@@ -27,6 +28,19 @@ async function doInit(pkg: Package) {
     }
     pkg.setFieldOnEntrypoints("main");
   }
+
+  // TODO: think about making ts entrypoints all or nothing per package like other fields
+  await Promise.all(
+    pkg.entrypoints.map(async entrypoint => {
+      if (isTsPath(entrypoint.source)) {
+        let canWriteTypesField = await confirms.writeTypesField(pkg);
+        if (!canWriteTypesField) {
+          throw new FatalError(errors.deniedWriteTypesField, pkg);
+        }
+        entrypoint.tsTypes = getValidTypesField(entrypoint);
+      }
+    })
+  );
 
   let allEntrypointsAreMissingAModuleField = pkg.entrypoints.every(
     entrypoint => entrypoint.module === null

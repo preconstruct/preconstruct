@@ -6,11 +6,15 @@ export let errors = {
   noSource: (source: string) =>
     `no source file was provided, please create a file at ${source} or specify a custom source file with the ${PKG_JSON_CONFIG_FIELD} source option`,
   deniedWriteMainField: "changing the main field is required to build",
+  deniedWriteTypesField:
+    "changing the types field is required if your source is typescript",
   invalidModuleField: "module field is invalid",
   invalidMainField: "main field is invalid",
   invalidUmdMainField: "umd:main field is invalid",
   invalidBrowserField: "browser field is invalid",
   invalidReactNativeField: "react-native field is invalid",
+  invalidTypesField:
+    "the source file of this entrypoint is using typescript but the types field is not valid",
   umdNameNotSpecified: `the umd:main field is specified but a umdName option is not specified. please add it to the ${PKG_JSON_CONFIG_FIELD} field in your package.json`,
   deniedWriteBrowserField:
     "building browser bundles for modules that include typeof window or typeof document is currently required",
@@ -24,6 +28,9 @@ import { createPromptConfirmLoader } from "./prompt";
 export let confirms = {
   writeMainField: createPromptConfirmLoader(
     "preconstruct is going to change the main field in your package.json, are you okay with that?"
+  ),
+  writeTypesField: createPromptConfirmLoader(
+    "preconstruct generates declaration files from typescript source files so preconstruct is going to change the types field in your package.json, are you okay with that?"
   ),
   writeModuleField: createPromptConfirmLoader(
     "would you like to generate module builds? this will write to the module field in your package.json"

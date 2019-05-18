@@ -191,6 +191,36 @@ Array [
 `);
 });
 
+test("typescript", async () => {
+  let tmpPath = f.copy("typescript");
+
+  confirms.writeTypesField.mockReturnValue(true);
+  confirms.addPreconstructDevToPostinstall.mockReturnValue(false);
+
+  await init(tmpPath);
+
+  expect(confirms.writeTypesField).toBeCalledTimes(1);
+  expect(confirms.addPreconstructDevToPostinstall).toBeCalledTimes(1);
+
+  let pkg = await getPkg(tmpPath);
+
+  expect(pkg).toMatchInlineSnapshot(`
+Object {
+  "dependencies": Object {
+    "@babel/core": "^7.4.3",
+    "@babel/preset-typescript": "^7.3.3",
+  },
+  "license": "MIT",
+  "main": "dist/typescript.cjs.js",
+  "module": "dist/typescript.esm.js",
+  "name": "typescript",
+  "private": true,
+  "types": "dist/typescript.types",
+  "version": "1.0.0",
+}
+`);
+});
+
 test("invalid fields", async () => {
   let tmpPath = f.copy("invalid-fields");
 

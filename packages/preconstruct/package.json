@@ -1,6 +1,6 @@
 {
   "name": "preconstruct",
-  "version": "0.0.68",
+  "version": "0.0.0-ts-dev-symlink",
   "description": "A smart build tool for libraries",
   "files": [
     "bin.js",

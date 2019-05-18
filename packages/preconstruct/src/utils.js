@@ -60,6 +60,17 @@ export function getValidUmdMainField(entrypoint: Entrypoint) {
   return `dist/${nameForDist}.umd.min.js`;
 }
 
+export function getValidTypesField(entrypoint: Entrypoint) {
+  let nameForDist = getNameForDist(entrypoint.package.name);
+  return `dist/${nameForDist}.types`;
+}
+
+let tsExtensionPattern = /tsx?$/;
+
+export function isTsPath(path: string) {
+  return tsExtensionPattern.test(path);
+}
+
 export function flowTemplate(hasDefaultExport: boolean, relativePath: string) {
   return `// @flow
 export * from "${relativePath}";${

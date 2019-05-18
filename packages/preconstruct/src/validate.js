@@ -8,7 +8,9 @@ import {
   getValidMainField,
   getValidUmdMainField,
   getValidBrowserField,
-  getValidReactNativeField
+  getValidReactNativeField,
+  getValidTypesField,
+  isTsPath
 } from "./utils";
 import { EXTENSIONS } from "./constants";
 import * as logger from "./logger";
@@ -54,6 +56,10 @@ export function isReactNativeFieldValid(entrypoint: Entrypoint): boolean {
   return equal(entrypoint.reactNative, getValidReactNativeField(entrypoint));
 }
 
+export function isTypesFieldValid(entrypoint: Entrypoint): boolean {
+  return entrypoint.tsTypes === getValidTypesField(entrypoint);
+}
+
 export function isUmdNameSpecified(entrypoint: Entrypoint) {
   return typeof entrypoint._config.umdName === "string";
 }
@@ -68,6 +74,9 @@ export function validateEntrypoint(entrypoint: Entrypoint, log: boolean) {
   }
   if (log) {
     logger.info(infos.validMainField, entrypoint);
+  }
+  if (isTsPath(entrypoint.source) && !isTypesFieldValid(entrypoint)) {
+    throw new FixableError(errors.invalidTypesField, entrypoint);
   }
   if (entrypoint.module !== null) {
     if (isModuleFieldValid(entrypoint)) {

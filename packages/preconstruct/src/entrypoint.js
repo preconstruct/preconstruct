@@ -10,16 +10,18 @@ import { EXTENSIONS } from "./constants";
 let fields = [
   "version",
   "description",
+  "license",
   "main",
   "module",
   "umd:main",
   "browser",
-  "react-native"
+  "react-native",
+  "types"
 ];
-
+// TODO: fix this, i'm pretty sure it's slightly broken
 function setFieldInOrder(
   obj,
-  field: "main" | "module" | "umd:main" | "browser" | "react-native",
+  field: "main" | "module" | "umd:main" | "browser" | "react-native" | "types",
   value
 ) {
   if (field in obj) {
@@ -105,6 +107,13 @@ export class Entrypoint extends Item {
   }
   set umdMain(path: string) {
     this.json = setFieldInOrder(this.json, "umd:main", path);
+  }
+
+  get tsTypes(): string | null {
+    return is(this.json["types"], is.maybe(is.string));
+  }
+  set tsTypes(path: string) {
+    this.json = setFieldInOrder(this.json, "types", path);
   }
 
   get configSource(): string {
