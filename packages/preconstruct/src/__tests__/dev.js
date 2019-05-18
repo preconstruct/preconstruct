@@ -167,3 +167,26 @@ export { something as default };
 "
 `);
 });
+
+test("typescript", async () => {
+  let tmpPath = f.copy("typescript");
+
+  await install(tmpPath);
+
+  await dev(tmpPath);
+
+  expect(
+    await fs.readlink(path.join(tmpPath, "dist", "typescript.cjs.js.ts"))
+  ).toBe(path.join(tmpPath, "src", "index.ts"));
+  expect(
+    await fs.readFile(
+      path.join(tmpPath, "dist", "typescript.cjs.js.ts"),
+      "utf8"
+    )
+  ).toMatchInlineSnapshot(`
+"let thing: string = \\"something\\";
+
+export default thing;
+"
+`);
+});
