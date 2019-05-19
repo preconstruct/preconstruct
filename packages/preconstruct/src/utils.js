@@ -66,3 +66,9 @@ export * from "${relativePath}";${
     hasDefaultExport ? `\nexport { default } from "${relativePath}";` : ""
   }\n`;
 }
+
+export function tsTemplate(hasDefaultExport: boolean, relativePath: string) {
+  return `export * from "${relativePath}";${
+    hasDefaultExport ? `\nexport { default } from "${relativePath}";` : ""
+  }\n`;
+}

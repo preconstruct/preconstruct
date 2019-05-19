@@ -310,6 +310,12 @@ if (process.env.NODE_ENV === \\"production\\") {
 "
 `;
 
+exports[`typescript: dist/typescript.cjs.js.d.ts 1`] = `
+"export * from \\"../src/index.ts\\";
+export { default } from \\"../src/index.ts\\";
+"
+`;
+
 exports[`typescript: dist/typescript.cjs.prod.js 1`] = `
 "\\"use strict\\";
 

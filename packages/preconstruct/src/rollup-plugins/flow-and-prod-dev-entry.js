@@ -2,7 +2,7 @@
 import path from "path";
 import type { Plugin } from "./types";
 import { getDevPath, getProdPath } from "../build/utils";
-import { flowTemplate } from "../utils";
+import { flowTemplate, tsTemplate } from "../utils";
 import { Package } from "../package";
 import { FatalError } from "../errors";
 
@@ -38,30 +38,45 @@ export default function flowAndNodeDevProdEntry(pkg: Package): Plugin {
           continue;
         }
 
-        let flowMode = false;
-
-        let source = await fs.readFile(facadeModuleId, "utf8");
-        if (source.includes("@flow")) {
-          flowMode = file.exports.includes("default") ? "all" : "named";
-        }
         let mainFieldPath = file.fileName.replace(/\.prod\.js$/, ".js");
+        let relativeToSource = path.relative(
+          path.dirname(path.join(opts.dir, file.fileName)),
+          facadeModuleId
+        );
 
-        if (flowMode !== false) {
-          let relativeToSource = path.relative(
-            path.dirname(path.join(opts.dir, file.fileName)),
-            facadeModuleId
-          );
+        let isEntrySourceTypeScript = /\.tsx?/.test(facadeModuleId);
 
-          let flowFileSource = flowTemplate(
-            flowMode === "all",
+        if (isEntrySourceTypeScript) {
+          let tsFileSource = tsTemplate(
+            file.exports.includes("default"),
             relativeToSource
           );
-          let flowFileName = mainFieldPath + ".flow";
-          bundle[flowFileName] = {
-            fileName: flowFileName,
+          let tsFileName = mainFieldPath + ".d.ts";
+          bundle[tsFileName] = {
+            fileName: tsFileName,
             isAsset: true,
-            source: flowFileSource
+            source: tsFileSource
           };
+        } else {
+          let flowMode = false;
+
+          let source = await fs.readFile(facadeModuleId, "utf8");
+          if (source.includes("@flow")) {
+            flowMode = file.exports.includes("default") ? "all" : "named";
+          }
+
+          if (flowMode !== false) {
+            let flowFileSource = flowTemplate(
+              flowMode === "all",
+              relativeToSource
+            );
+            let flowFileName = mainFieldPath + ".flow";
+            bundle[flowFileName] = {
+              fileName: flowFileName,
+              isAsset: true,
+              source: flowFileSource
+            };
+          }
         }
 
         let mainEntrySource = `'use strict';
