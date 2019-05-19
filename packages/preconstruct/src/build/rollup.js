@@ -159,7 +159,7 @@ export let getRollupConfig = (
       )
     ] = entrypoint.strict().source;
   });
-
+  throw pkg.json.sideEffects === undefined ? true : pkg.json.sideEffects;
   const config = {
     input,
     external: makeExternalPredicate(external),
@@ -212,6 +212,10 @@ export let getRollupConfig = (
           );
         }
       }
+    },
+    treeshake: {
+      moduleSideEffects:
+        pkg.json.sideEffects === undefined ? true : pkg.json.sideEffects
     },
     plugins: [
       type === "node-prod" && flowAndNodeDevProdEntry(pkg),

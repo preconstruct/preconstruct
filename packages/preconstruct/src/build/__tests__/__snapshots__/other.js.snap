@@ -288,6 +288,175 @@ export default index;
 "
 `;
 
+exports[`sideEffects: false: dist/chunk-0623f7e5.cjs.dev.js 1`] = `
+"'use strict';
+
+let sum = (a, b) => a + b;
+
+let two = sum(1, 1);
+exports.sum = sum;
+exports.two = two;
+"
+`;
+
+exports[`sideEffects: false: dist/chunk-0623f7e5.cjs.prod.js 1`] = `
+"\\"use strict\\";
+
+let sum = (a, b) => a + b, two = sum(1, 1);
+
+exports.sum = sum, exports.two = two;
+"
+`;
+
+exports[`sideEffects: false: dist/chunk-6500acd4.esm.js 1`] = `
+"let sum = (a, b) => a + b;
+let two = sum(1, 1);
+
+export { sum as a, two as b };
+"
+`;
+
+exports[`sideEffects: false: dist/chunk-3414781c.esm.js 1`] = `
+"let sum = (a, b) => a + b;
+let two = sum(1, 1);
+
+export { sum as a, two as b };
+"
+`;
+
+exports[`sideEffects: false: dist/chunk-a86b7f83.cjs.dev.js 1`] = `
+"'use strict';
+
+let sum = (a, b) => a + b;
+
+let two = sum(1, 1);
+exports.sum = sum;
+exports.two = two;
+"
+`;
+
+exports[`sideEffects: false: dist/chunk-a86b7f83.cjs.prod.js 1`] = `
+"\\"use strict\\";
+
+let sum = (a, b) => a + b, two = sum(1, 1);
+
+exports.sum = sum, exports.two = two;
+"
+`;
+
+exports[`sideEffects: false: dist/multiple-entrypoints.cjs.dev.js 1`] = `
+"'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+let sum = (a, b) => a + b;
+
+let two = sum(1, 1);
+exports.sum = sum;
+exports.two = two;
+"
+`;
+
+exports[`sideEffects: false: dist/multiple-entrypoints.cjs.js 1`] = `
+"'use strict';
+
+if (process.env.NODE_ENV === \\"production\\") {
+  module.exports = require(\\"./multiple-entrypoints.cjs.prod.js\\");
+} else {
+  module.exports = require(\\"./multiple-entrypoints.cjs.dev.js\\");
+}
+"
+`;
+
+exports[`sideEffects: false: dist/multiple-entrypoints.cjs.prod.js 1`] = `
+"\\"use strict\\";
+
+Object.defineProperty(exports, \\"__esModule\\", {
+  value: !0
+});
+
+let sum = (a, b) => a + b, two = sum(1, 1);
+
+exports.sum = sum, exports.two = two;
+"
+`;
+
+exports[`sideEffects: false: dist/multiple-entrypoints.esm.js 1`] = `
+"let sum = (a, b) => a + b;
+let two = sum(1, 1);
+
+export { sum, two };
+"
+`;
+
+exports[`sideEffects: false: multiply/dist/multiple-entrypoints.cjs.dev.js 1`] = `
+"'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+var multipleEntrypoints = require('../../dist/multiple-entrypoints.cjs.dev.js');
+
+let multiply = (a, b) => multipleEntrypoints.sum(a * b, 0);
+
+exports.multiply = multiply;
+"
+`;
+
+exports[`sideEffects: false: multiply/dist/multiple-entrypoints.cjs.js 1`] = `
+"'use strict';
+
+if (process.env.NODE_ENV === \\"production\\") {
+  module.exports = require(\\"./multiple-entrypoints.cjs.prod.js\\");
+} else {
+  module.exports = require(\\"./multiple-entrypoints.cjs.dev.js\\");
+}
+"
+`;
+
+exports[`sideEffects: false: multiply/dist/multiple-entrypoints.cjs.prod.js 1`] = `
+"\\"use strict\\";
+
+Object.defineProperty(exports, \\"__esModule\\", {
+  value: !0
+});
+
+var multipleEntrypoints = require(\\"../../dist/multiple-entrypoints.cjs.prod.js\\");
+
+let multiply = (a, b) => multipleEntrypoints.sum(a * b, 0);
+
+exports.multiply = multiply;
+"
+`;
+
+exports[`sideEffects: false: multiply/dist/multiple-entrypoints.esm.js 1`] = `
+"import { sum } from '../../dist/multiple-entrypoints.esm.js';
+
+let multiply = (a, b) => sum(a * b, 0);
+
+export { multiply };
+"
+`;
+
+exports[`sideEffects: false: src/multiply.js 1`] = `
+"import { sum } from \\"./sum\\";
+
+export let multiply = (a, b) => sum(a * b, 0);
+"
+`;
+
+exports[`sideEffects: false: src/sum.js 1`] = `
+"export let sum = (a, b) => a + b;
+
+export let two = sum(1, 1);
+"
+`;
+
+exports[`sideEffects: false: src/sum-impl.js 1`] = `""`;
+
 exports[`typescript: dist/typescript.cjs.dev.js 1`] = `
 "'use strict';
 

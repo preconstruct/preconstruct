@@ -98,3 +98,13 @@ test("module imported outside package directory", async () => {
   }
   expect(true).toBe(false);
 });
+
+test.only("sideEffects: false", async () => {
+  let tmpPath = f.copy("side-effects-false");
+
+  await install(tmpPath);
+
+  await build(tmpPath);
+
+  await snapshotDirectory(tmpPath);
+});
