@@ -1,1 +1,17 @@
 # Multiple Entrypoints
+
+> **Note:** this guide builds upon knowledge in [the Getting Started guide](/getting-started) so if you haven't gone through it, you should do that first.
+
+We're going to add another entrypoint to our `a-random-number` package called `create` so that people can import `a-random-number/create` to create their own random numbers.
+
+The first thing we're going to do is create our entrypoint directory
+
+```json
+"preconstruct": {
+  "entrypoints": [".", "create"]
+}
+```
+
+```jsx
+export let createRandomNumber = () => Math.random();
+```
