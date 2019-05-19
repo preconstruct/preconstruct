@@ -68,6 +68,7 @@ export * from "${relativePath}";${
 }
 
 export function tsTemplate(hasDefaultExport: boolean, relativePath: string) {
+  relativePath = relativePath.replace(/\.tsx?$/, "");
   return `export * from "${relativePath}";${
     hasDefaultExport ? `\nexport { default } from "${relativePath}";` : ""
   }\n`;

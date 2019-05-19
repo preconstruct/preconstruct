@@ -44,7 +44,7 @@ export default function flowAndNodeDevProdEntry(pkg: Package): Plugin {
           facadeModuleId
         );
 
-        let isEntrySourceTypeScript = /\.tsx?/.test(facadeModuleId);
+        let isEntrySourceTypeScript = /\.tsx?$/.test(facadeModuleId);
 
         if (isEntrySourceTypeScript) {
           let tsFileSource = tsTemplate(
