@@ -5,16 +5,13 @@ import globby from "globby";
 import * as fs from "fs-extra";
 import nodePath from "path";
 import { Item } from "./item";
+import { FatalError } from "./errors";
 import { Entrypoint, StrictEntrypoint } from "./entrypoint";
 import {
-  getValidMainField,
-  getValidModuleField,
-  getValidBrowserField,
-  getValidUmdMainField,
-  getValidReactNativeField
+  getValidObjectFieldContentForBuildType,
+  getValidStringFieldContentForBuildType
 } from "./utils";
 import { errors, confirms } from "./messages";
-import { getNameForDist } from "./utils";
 
 /*::
 import {Project} from './project'
@@ -58,8 +55,40 @@ export class Package extends Item {
 
         return { filename, contents };
       })
-    ).then(descriptors =>
-      Promise.all(
+    ).then(descriptors => {
+      let getPlainEntrypointContent = () => {
+        let plainEntrypointObj: Object = {
+          main: getValidStringFieldContentForBuildType("main", pkg.name)
+        };
+        for (let descriptor of descriptors) {
+          if (descriptor.contents !== null) {
+            let parsed = JSON.parse(descriptor.contents);
+            for (let field of ["module", "umd:main"]) {
+              if (parsed[field] !== undefined) {
+                plainEntrypointObj[
+                  field
+                ] = getValidStringFieldContentForBuildType(field, pkg.name);
+              }
+            }
+            for (let field of ["browser", "react-native"]) {
+              if (parsed[field] !== undefined) {
+                plainEntrypointObj[
+                  field
+                ] = getValidObjectFieldContentForBuildType(
+                  field,
+                  pkg.name,
+                  plainEntrypointObj.module !== undefined
+                );
+              }
+            }
+          }
+        }
+        let plainEntrypointContents = JSON.stringify(plainEntrypointObj);
+        getPlainEntrypointContent = () => plainEntrypointContents;
+        return plainEntrypointContents;
+      };
+
+      return Promise.all(
         descriptors.map(async ({ filename, contents }) => {
           if (contents === null) {
             let shouldCreateEntrypointPkgJson = await confirms.createEntrypointPkgJson(
@@ -71,20 +100,20 @@ export class Package extends Item {
               }
             );
             if (!shouldCreateEntrypointPkgJson) {
-              throw new Error(errors.noEntrypointPkgJson);
+              throw new FatalError(errors.noEntrypointPkgJson, {
+                name: nodePath.join(
+                  pkg.name,
+                  nodePath.relative(pkg.directory, directory)
+                )
+              });
             }
-            // TODO: check if other entrypoints have module or etc. and add it here
-            contents = JSON.stringify(
-              { main: `dist/${getNameForDist(pkg.name)}.cjs.js` },
-              null,
-              2
-            );
+            contents = getPlainEntrypointContent();
             await fs.writeFile(filename, contents);
           }
           return new Entrypoint(filename, contents, pkg);
         })
-      )
-    );
+      );
+    });
 
     return pkg;
   }
@@ -95,23 +124,40 @@ export class Package extends Item {
     this.entrypoints.forEach(entrypoint => {
       switch (field) {
         case "main": {
-          entrypoint.main = getValidMainField(entrypoint);
+          entrypoint.main = getValidStringFieldContentForBuildType(
+            "main",
+            this.name
+          );
           break;
         }
         case "module": {
-          entrypoint.module = getValidModuleField(entrypoint);
+          entrypoint.module = getValidStringFieldContentForBuildType(
+            "module",
+            this.name
+          );
           break;
         }
         case "browser": {
-          entrypoint.browser = getValidBrowserField(entrypoint);
+          entrypoint.browser = getValidObjectFieldContentForBuildType(
+            "browser",
+            this.name,
+            entrypoint.module !== null
+          );
           break;
         }
         case "umdMain": {
-          entrypoint.umdMain = getValidUmdMainField(entrypoint);
+          entrypoint.umdMain = getValidStringFieldContentForBuildType(
+            "umd:main",
+            this.name
+          );
           break;
         }
         case "reactNative": {
-          entrypoint.reactNative = getValidReactNativeField(entrypoint);
+          entrypoint.reactNative = getValidObjectFieldContentForBuildType(
+            "react-native",
+            this.name,
+            entrypoint.module !== null
+          );
           break;
         }
       }

@@ -1,63 +1,59 @@
 // @flow
-import { Entrypoint } from "./entrypoint";
 
 export function getNameForDist(name: string): string {
   return name.replace(/.*\//, "");
 }
 
-export function getValidMainField(entrypoint: Entrypoint) {
-  let nameForDist = getNameForDist(entrypoint.package.name);
-  return `dist/${nameForDist}.cjs.js`;
-}
-
-export function getValidModuleField(entrypoint: Entrypoint) {
-  let nameForDist = getNameForDist(entrypoint.package.name);
-  return `dist/${nameForDist}.esm.js`;
-}
-
-export function getValidCjsBrowserPath(entrypoint: Entrypoint) {
-  return getValidMainField(entrypoint).replace("cjs", "browser.cjs");
-}
-
-export function getValidModuleBrowserPath(entrypoint: Entrypoint) {
-  return getValidModuleField(entrypoint).replace("esm", "browser.esm");
-}
-
-export function getValidCjsReactNativePath(entrypoint: Entrypoint) {
-  return getValidMainField(entrypoint).replace("cjs", "native.cjs");
-}
-
-export function getValidModuleReactNativePath(entrypoint: Entrypoint) {
-  return getValidModuleField(entrypoint).replace("esm", "native.esm");
-}
-
-export function getValidBrowserField(entrypoint: Entrypoint) {
-  let obj = {
-    [`./${getValidMainField(entrypoint)}`]:
-      "./" + getValidCjsBrowserPath(entrypoint)
-  };
-  if (entrypoint.module !== null) {
-    obj[`./${getValidModuleField(entrypoint)}`] =
-      "./" + getValidModuleBrowserPath(entrypoint);
+export function getValidStringFieldContentForBuildType(
+  type: "main" | "module" | "umd:main",
+  pkgName: string
+) {
+  let safeName = getNameForDist(pkgName);
+  switch (type) {
+    case "main": {
+      return `dist/${safeName}.cjs.js`;
+    }
+    case "module": {
+      return `dist/${safeName}.esm.js`;
+    }
+    case "umd:main": {
+      return `dist/${safeName}.umd.min.js`;
+    }
   }
-  return obj;
+  throw new Error(
+    `unknown string build type: ${type}. this is likely a bug in preconstruct.`
+  );
 }
 
-export function getValidReactNativeField(entrypoint: Entrypoint) {
-  let obj = {
-    [`./${getValidMainField(entrypoint)}`]:
-      "./" + getValidCjsReactNativePath(entrypoint)
-  };
-  if (entrypoint.module !== null) {
-    obj[`./${getValidModuleField(entrypoint)}`] =
-      "./" + getValidModuleReactNativePath(entrypoint);
+export function getValidObjectFieldContentForBuildType(
+  type: "browser" | "react-native",
+  pkgName: string,
+  hasModuleBuild: boolean
+) {
+  let safeName = getNameForDist(pkgName);
+  switch (type) {
+    case "browser": {
+      let obj = {
+        [`./dist/${safeName}.cjs.js`]: `./dist/${safeName}.browser.cjs.js`
+      };
+      if (hasModuleBuild) {
+        obj[`./dist/${safeName}.esm.js`] = `./dist/${safeName}.browser.esm.js`;
+      }
+      return obj;
+    }
+    case "react-native": {
+      let obj = {
+        [`./dist/${safeName}.cjs.js`]: `./dist/${safeName}.native.cjs.js`
+      };
+      if (hasModuleBuild) {
+        obj[`./dist/${safeName}.esm.js`] = `./dist/${safeName}.native.esm.js`;
+      }
+      return obj;
+    }
   }
-  return obj;
-}
-
-export function getValidUmdMainField(entrypoint: Entrypoint) {
-  let nameForDist = getNameForDist(entrypoint.package.name);
-  return `dist/${nameForDist}.umd.min.js`;
+  throw new Error(
+    `unknown object build type: ${type}. this is likely a bug in preconstruct.`
+  );
 }
 
 export function flowTemplate(hasDefaultExport: boolean, relativePath: string) {

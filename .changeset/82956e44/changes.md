@@ -1,0 +1,1 @@
+Fix entrypoints package.json creation
