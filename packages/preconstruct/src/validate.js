@@ -4,11 +4,8 @@ import { Entrypoint } from "./entrypoint";
 import { errors, successes, infos } from "./messages";
 import { FatalError, FixableError } from "./errors";
 import {
-  getValidModuleField,
-  getValidMainField,
-  getValidUmdMainField,
-  getValidBrowserField,
-  getValidReactNativeField
+  getValidObjectFieldContentForBuildType,
+  getValidStringFieldContentForBuildType
 } from "./utils";
 import * as logger from "./logger";
 import equal from "fast-deep-equal";
@@ -40,23 +37,46 @@ export function validateEntrypointSource(entrypoint: Entrypoint) {
 }
 
 export function isMainFieldValid(entrypoint: Entrypoint) {
-  return entrypoint.main === getValidMainField(entrypoint);
+  return (
+    entrypoint.main ===
+    getValidStringFieldContentForBuildType("main", entrypoint.package.name)
+  );
 }
 
 export function isModuleFieldValid(entrypoint: Entrypoint) {
-  return entrypoint.module === getValidModuleField(entrypoint);
+  return (
+    entrypoint.module ===
+    getValidStringFieldContentForBuildType("module", entrypoint.package.name)
+  );
 }
 
 export function isUmdMainFieldValid(entrypoint: Entrypoint) {
-  return entrypoint.umdMain === getValidUmdMainField(entrypoint);
+  return (
+    entrypoint.umdMain ===
+    getValidStringFieldContentForBuildType("umd:main", entrypoint.package.name)
+  );
 }
 
 export function isBrowserFieldValid(entrypoint: Entrypoint): boolean {
-  return equal(entrypoint.browser, getValidBrowserField(entrypoint));
+  return equal(
+    entrypoint.browser,
+    getValidObjectFieldContentForBuildType(
+      "browser",
+      entrypoint.package.name,
+      entrypoint.module !== null
+    )
+  );
 }
 
 export function isReactNativeFieldValid(entrypoint: Entrypoint): boolean {
-  return equal(entrypoint.reactNative, getValidReactNativeField(entrypoint));
+  return equal(
+    entrypoint.reactNative,
+    getValidObjectFieldContentForBuildType(
+      "react-native",
+      entrypoint.package.name,
+      entrypoint.module !== null
+    )
+  );
 }
 
 export function isUmdNameSpecified(entrypoint: Entrypoint) {

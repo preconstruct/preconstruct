@@ -62,7 +62,10 @@ export let createPackageCheckTestCreator = (
   let createTestCreator = testFn => async (
     testName: string,
     entrypoints: { [key: string]: Object },
-    cb: (doThing: () => Promise<{ [key: string]: Object }>) => Promise<void>
+    cb: (
+      doThing: () => Promise<{ [key: string]: Object }>,
+      stuff: { dir: string }
+    ) => Promise<void>
   ) => {
     testFn(testName, async () => {
       let tmpPath = f.copy("template-simple-package");
@@ -76,23 +79,26 @@ export let createPackageCheckTestCreator = (
         })
       );
 
-      await cb(async () => {
-        await doResult(tmpPath);
+      await cb(
+        async () => {
+          await doResult(tmpPath);
 
-        let newThings = {};
+          let newThings = {};
 
-        await Promise.all(
-          things.map(async entrypointPath => {
-            newThings[entrypointPath] = JSON.parse(
-              await fs.readFile(
-                path.join(tmpPath, entrypointPath, "package.json"),
-                "utf8"
-              )
-            );
-          })
-        );
-        return newThings;
-      });
+          await Promise.all(
+            things.map(async entrypointPath => {
+              newThings[entrypointPath] = JSON.parse(
+                await fs.readFile(
+                  path.join(tmpPath, entrypointPath, "package.json"),
+                  "utf8"
+                )
+              );
+            })
+          );
+          return newThings;
+        },
+        { dir: tmpPath }
+      );
     });
   };
   let testFn = createTestCreator(test);

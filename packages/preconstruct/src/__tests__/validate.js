@@ -1,9 +1,10 @@
 // @flow
 import fixturez from "fixturez";
+import path from "path";
 import validate from "../validate";
-import { logMock, modifyPkg } from "../../test-utils";
+import { logMock, modifyPkg, getPkg } from "../../test-utils";
 import { FatalError } from "../errors";
-import { errors } from "../messages";
+import { errors, confirms } from "../messages";
 
 const f = fixturez(__dirname);
 
@@ -215,4 +216,21 @@ test("one-entrypoint-with-browser-field-one-without", async () => {
       `[Error: one-entrypoint-with-browser-field-one-without has a browser build but one-entrypoint-with-browser-field-one-without/multiply does not have a browser build. Entrypoints in a package must either all have a particular build type or all not have a particular build type.]`
     );
   }
+});
+
+test("create package.json for an entrypoint", async () => {
+  let tmpPath = f.copy("entrypoint-pkg-json-missing");
+
+  confirms.createEntrypointPkgJson.mockReturnValue(true);
+
+  await validate(tmpPath);
+
+  expect(confirms.createEntrypointPkgJson).toBeCalledTimes(1);
+
+  expect(await getPkg(path.join(tmpPath, "other"))).toMatchInlineSnapshot(`
+Object {
+  "main": "dist/entrypoint-pkg-json-missing.cjs.js",
+  "module": "dist/entrypoint-pkg-json-missing.esm.js",
+}
+`);
 });
