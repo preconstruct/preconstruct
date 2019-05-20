@@ -1,17 +1,66 @@
 # Multiple Entrypoints
 
-> **Note:** this guide builds upon knowledge in [the Getting Started guide](/getting-started) so if you haven't gone through it, you should do that first.
+> **Note:** this guide builds upon [the Getting Started guide](/getting-started) so if you haven't gone through it, you should do that first.
 
-We're going to add another entrypoint to our `a-random-number` package called `create` so that people can import `a-random-number/create` to create their own random numbers.
+> A repository with the end result of this guide is available at https://github.com/preconstruct/a-random-number-with-create
 
-The first thing we're going to do is create our entrypoint directory
+We're going to create another package from `a-random-number` called `a-random-number-with-create` and add another entrypoint called `create` so that people can import `a-random-number-with-create/create` to create their own random numbers and still import `a-random-number-with-create` to get a random number.
+
+The first thing we're going to do is create our entrypoint directory.
+
+```bash
+mkdir create
+```
+
+Then we can set what the entrypoints for our package should be.
 
 ```json
 "preconstruct": {
-  "entrypoints": [".", "create"]
+  "entrypoints": [
+    ".",
+    "create"
+  ]
 }
 ```
 
-```jsx
-export let createRandomNumber = () => Math.random();
+<details>
+  <summary>What does `"."` mean here?</summary>
+
+`"."` is referring to the current directory so in this context it means that the current directory should be an entrypoint. So consumers should be able to import `a-random-number` (`"."`) and `a-random-number/create`
+
+</details>
+
+If we run `yarn preconstruct fix` now, it'll ask us a question and fix any problems with our project.
+
+```bash
+🎁 ? a-random-number-with-create A package.json file does not exist for this entrypoint, would you like to create one automatically? Yes
+🎁 error a-random-number-with-create/create no source file was provided, please create a file at src/index or specify a custom source file with the preconstruct source option
 ```
+
+Now preconstruct is complaining that there isn't a source file so we need to create one. We're going to create one at `src/create.js`
+
+```jsx
+export let createRandom = () => Math.random();
+```
+
+We're also going to change `src/index.js` to use our new `createRandom` function
+
+```jsx
+import { createRandom } from "./create";
+
+export let random = createRandom();
+```
+
+Since the source file for our `source` entrypoint isn't at the default of `src/index.js` relative to the entrypoint, we need to use the `source` option in the `package.json` in the `source` directory.
+
+```json
+{
+  "main": "dist/a-random-number-with-create.cjs.js",
+  "module": "dist/a-random-number-with-create.esm.js",
+  "preconstruct": {
+    "source": "../src/random"
+  }
+}
+```
+
+Now if we run `yarn preconstruct build`, everything will work 🎉
