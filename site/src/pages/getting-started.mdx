@@ -1,146 +1,18 @@
 # Getting Started
 
-> A repository with the end result of this guide is available at https://github.com/preconstruct/a-random-number
+> **Note:** If you're new to building packages, you should go through [preconstruct's tutorials](/tutorials)
 
-Before we can use preconstruct, we need a package to build. We're going to build a package that export a random number.
+preconstruct is a build tool that aims to simplify a lot of the complexity in building packages.
 
-The first thing we're going to do is create a directory and run `yarn init` in it which will create a package.json for us.
+- Minimal configuration
 
-```bash
-$ yarn init
-yarn init v1.15.2
-question name (a-random-number):
-question version (1.0.0):
-question description:
-question entry point (index.js):
-question repository url:
-question author:
-question license (MIT):
-question private:
-success Saved package.json
-```
-
-Now we're going to create our source file. By default, preconstruct looks at the src directory to find the source file so we're going to create a file at `src/index.js` that looks like this.
-
-```jsx
-export let random = Math.random();
-```
-
-Now we can install preconstruct
+Assuming you've already got a package and your source file is at `src/index.js`(or `src/index.ts` if you're using TypeScript), you can install preconstruct and run `preconstruct init` to setup preconstruct.
 
 ```bash
 yarn add --dev preconstruct
+yarn preconstruct init
 ```
 
-We can initialise preconstruct with `preconstruct init`.
+preconstruct will ask some questions about your project and then update your package.json.
 
-```bash
-$ yarn preconstruct init
-🎁 ? a-random-number preconstruct is going to change the main field in your package.json, are you okay with that? Yes
-🎁 ? a-random-number would you like to generate module builds? this will write to the module field in your package.json Yes
-🎁 ? a-random-number would you like preconstruct to automatically add `preconstruct dev` in a postinstall hook so that importing entrypoints during development will import the s
-ource Yes
-🎁 success initialised project!
-```
-
-## What did we just do?
-
-`preconstruct init` added some things to your package.json so it'll probably look something like this.
-
-```json
-{
-  "name": "a-random-number",
-  "version": "1.0.0",
-  "main": "dist/a-random-number.cjs.js",
-  "module": "dist/a-random-number.esm.js",
-  "license": "MIT",
-  "devDependencies": {
-    "preconstruct": "^0.0.68"
-  },
-  "scripts": {
-    "postinstall": "preconstruct dev"
-  }
-}
-```
-
-<details>
-
-<summary>What does all this mean?</summary>
-
-```json
-"main": "dist/a-random-number.cjs.js",
-```
-
-The `main` field specifies what file Node and older bundlers should look at when someone uses your package. preconstruct has automatically set it to `dist/a-random-number.cjs.js` which is based on the package name `a-random-number`.
-
-```json
-"module": "dist/a-random-number.esm.js",
-```
-
-The `module` field specifies what file newer bundlers like webpack should look at when someone uses your package.
-
-```json
-"scripts": {
-  "postinstall": "preconstruct dev"
-}
-```
-
-preconstruct has also added a script called `postinstall` which will be automatically run by package managers like Yarn and npm. `preconstruct dev` will create links from the dist files specified above to your source file so that your can import the directory that the package.json is in and you'll get the source files. While this is primarily useful in monorepos, it's also useful in single package repos because it allows you to run tests against your dist files but still run them against your source files in development for faster feedback loop.
-
-</details>
-
-## We need to compile our code with Babel
-
-If we run `yarn preconstruct build` now, we'll get a couple files but let's look at the ESM one.
-
-```jsx
-let random = Math.random();
-
-export { random };
-```
-
-This looks good but this file is using `let` which means that it'll break if people use the package with some toolchains.
-
-To fix this, we're going to use Babel. preconstruct uses Babel under the hood so if we add a Babel config, preconstruct will use it.
-
-We're going to install `@babel/preset-env` and add it to a `.babelrc`.
-
-```bash
-yarn add --dev @babel/preset-env
-```
-
-```json
-{
-  "presets": ["@babel/preset-env"]
-}
-```
-
-If we run `yarn preconstruct build` now, our code will be compiled with `@babel/preset-env` so our ESM file looks like this.
-
-```jsx
-var random = Math.random();
-
-export { random };
-```
-
-Now it's using `var` and it'll work everywhere 🎉
-
-## Publishing
-
-Now that our package is ready for people to use for all their random number needs we can publish it to npm.
-
-We're going to add some package scripts to make it easier and make sure that we don't publish our package without building it first.
-
-```json
-"scripts": {
-  "postinstall": "preconstruct dev",
-  "build": "preconstruct build",
-  "release": "yarn build && npm publish"
-}
-```
-
-So now we can run `yarn release` to do a release.
-
-## Going further
-
-preconstruct can do a lot more than building a simple package like this. You can learn more about what preconstruct can do by going through [preconstruct's guides](/guides)
+You'll now be able to build your project with `yarn preconstruct build`.
