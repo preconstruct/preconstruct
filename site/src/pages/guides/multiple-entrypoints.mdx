@@ -24,9 +24,12 @@ Then we can set what the entrypoints for our package should be.
 ```
 
 <details>
-  <summary>What does `"."` mean here?</summary>
 
-`"."` is referring to the current directory so in this context it means that the current directory should be an entrypoint. So consumers should be able to import `a-random-number` (`"."`) and `a-random-number/create`
+<summary>
+  What does <code>"."</code> mean here?
+</summary>
+
+`"."` is referring to the current directory so in this context it means that the current directory should be an entrypoint. So consumers should be able to import `a-random-number` (`"."`) and `a-random-number/create` (`"create"`)
 
 </details>
 
@@ -51,7 +54,7 @@ import { createRandom } from "./create";
 export let random = createRandom();
 ```
 
-Since the source file for our `source` entrypoint isn't at the default of `src/index.js` relative to the entrypoint, we need to use the `source` option in the `package.json` in the `source` directory.
+Since the source file for our `create` entrypoint isn't at the default of `src/index.js` relative to the entrypoint, we need to use the `source` option in the `package.json` in the `create` directory.
 
 ```json
 {

@@ -113,7 +113,7 @@ let components = {
           language={lang}
         >
           {({ className, style, tokens, getLineProps, getTokenProps }) => (
-            <pre className={className} style={style}>
+            <pre className={className} css={{ marginBottom: 0 }} style={style}>
               {tokens.map((line, i) => (
                 <div {...getLineProps({ line, key: i })}>
                   {line.map((token, key) => (
