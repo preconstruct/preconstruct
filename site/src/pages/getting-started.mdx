@@ -85,7 +85,7 @@ The `module` field specifies what file newer bundlers like webpack should look a
 }
 ```
 
-preconstruct has also added a script called `postinstall` which will be automatically run by package managers like Yarn and npm. `preconstruct dev` will create links from the dist files specified above to your sour ce file so that your can import the directory that the package.json is in and you'll get the source files. While this is primarily useful in monorepos, it's also useful in monorepos because it allows you to run tests against your dist files but still run them against your source files in development for faster feedback loop.
+preconstruct has also added a script called `postinstall` which will be automatically run by package managers like Yarn and npm. `preconstruct dev` will create links from the dist files specified above to your source file so that your can import the directory that the package.json is in and you'll get the source files. While this is primarily useful in monorepos, it's also useful in single package repos because it allows you to run tests against your dist files but still run them against your source files in development for faster feedback loop.
 
 </details>
 
