@@ -8,6 +8,110 @@ We have our `a-random-number` package from the [the Getting Started guide](/gett
 
 ## Setting up Yarn Workspaces
 
+Before we can use preconstruct, we need to setup Yarn Workspaces and create our packages.
+
+To setup Yarn workspaces, we're going to make a new directory and make a `package.json` that looks like this.
+
+```json
+{
+  "name": "not-random-numbers",
+  "version": "1.0.0",
+  "license": "MIT",
+  "private": true,
+  "workspaces": ["packages/*"]
+}
+```
+
+We're also going to create our first two packages.
+
+So we need to create a `packages/the-number-one` directory and `packages/the-number-one` directory.
+
+Now we can run `yarn init` in both of the package directories and answer yes to all the questions.
+
+We'll also need to create our source files.
+
+`packages/the-number-one/src/index.js`
+
+```jsx
+export default 1;
+```
+
+`packages/the-number-two/src/index.js`
+
+```jsx
+export default 2;
+```
+
 ## Setting up preconstruct to build all our packages
 
+Now that we have Yarn workspaces and our packages setup, we can install and setup preconstruct.
+
+```bash
+yarn add preconstruct
+```
+
+```bash
+yarn preconstruct init
+🎁 ? not-random-numbers what packages should preconstruct build? packages/*
+🎁 ? preconstruct is going to change the main field in your package.json, are you okay with that? (Press <space> to select, <a> to toggle all, <i> to invert selection)the-number-one, the-number-two
+🎁 ? would you like to generate module builds? this will write to the module field in your package.json (Press <space> to select, <a> to toggle all, <i> to invert selection)the-number-one, the-number-two
+🎁 ? not-random-numbers would you like preconstruct to automatically add `preconstruct dev` in a postinstall hook so that importing entrypoints during development will import the source Yes
+🎁 success initialised project!
+```
+
+preconstruct has asked us some slightly different questions since it's detected that we're in a monorepo. We're going to explain exactly what all these questions mean in the future but for now, answering yes to everything will work fine (TODO: write things explaining that stuff)
+
+Now we can run `preconstruct build` to build our packages.
+
 ## Setting up Changesets to version our packages
+
+[Changesets](https://github.com/Noviny/changesets) is an awesome tool for managing versioning and changelogs with a focus on monorepos which makes it a great fit for our project. It lets people add "changesets" which declare an intent to release certain packages and then you can combine all of the changesets to update the versions of packages and changelogs and finally publish the packages to npm.
+
+We need to install and initialise Changesets.
+
+```bash
+yarn add @changesets/cli
+```
+
+```bash
+yarn changeset init
+```
+
+Now we're going to add a couple of scripts to our root package.json so it'll look like this.
+
+```json
+{
+  "name": "not-random-numbers",
+  "version": "1.0.0",
+  "license": "MIT",
+  "private": true,
+  "workspaces": ["packages/*"],
+  "dependencies": {
+    "@changesets/cli": "^1.1.3",
+    "preconstruct": "^0.0.70"
+  },
+  "preconstruct": {
+    "packages": ["packages/*"]
+  },
+  "scripts": {
+    "postinstall": "preconstruct dev",
+    "changeset": "changeset",
+    "bump": "changeset bump",
+    "release": "preconstruct build && changeset release"
+  }
+}
+```
+
+Let's go through what all these scripts do:
+
+### `yarn changeset`
+
+This is what contributors can run to create a changeset describing what changes they've made.
+
+### `yarn bump`
+
+This is what bumps all of the package versions and changelogs.
+
+### `yarn release`
+
+This is what you can run to release all of the packages to npm.
