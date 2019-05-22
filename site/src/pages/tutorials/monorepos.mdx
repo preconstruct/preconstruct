@@ -61,7 +61,25 @@ yarn preconstruct init
 
 preconstruct has asked us some slightly different questions since it's detected that we're in a monorepo. We're going to explain exactly what all these questions mean in the future but for now, answering yes to everything will work fine (TODO: write things explaining that stuff)
 
-Now we can run `preconstruct build` to build our packages.
+### Adding Babel
+
+We'll also want to add Babel so that we can use modern features when writing our code but consumers don't have problems using it.
+
+We're going to install `@babel/core` and `@babel/preset-env` and add it our Babel config.
+
+```bash
+yarn add @babel/preset-env
+```
+
+`babel.config.js`
+
+```jsx
+module.exports = {
+  presets: ["@babel/preset-env"]
+};
+```
+
+Now we can run `preconstruct build` to build our packages. 🎉
 
 ## Setting up Changesets to version our packages
 
@@ -87,6 +105,8 @@ Now we're going to add a couple of scripts to our root package.json so it'll loo
   "private": true,
   "workspaces": ["packages/*"],
   "dependencies": {
+    "@babel/core": "^7.4.5",
+    "@babel/preset-env": "^7.4.5",
     "@changesets/cli": "^1.1.3",
     "preconstruct": "^0.0.70"
   },
