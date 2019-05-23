@@ -1,35 +1,15 @@
 // @flow
-import resolveFrom from "resolve-from";
 import * as fs from "fs-extra";
 import path from "path";
 import { createLanguageServiceHostClass } from "./some-thing";
 
-let unsafeRequire = require;
-
 export async function createDeclarationCreator(
+  typescript: any,
+  configFileName: string,
   dirname: string
 ): Promise<(filename: string) => { name: string, content: string }> {
-  let typescript;
-  try {
-    typescript = unsafeRequire(resolveFrom(dirname, "typescript"));
-  } catch (err) {
-    if (err.code === "MODULE_NOT_FOUND") {
-      throw new Error(
-        "an entrypoint source file ends with the .ts or .tsx extension but the typescript module could not be resolved from the project directory, please install it."
-      );
-    }
-    throw err;
-  }
-  let configFileName = typescript.findConfigFile(
-    dirname,
-    typescript.sys.fileExists
-  );
-  if (!configFileName) {
-    throw new Error(
-      "an entrypoint source file ends with the .ts extension but no TypeScript config exists, please create one."
-    );
-  }
   let configFileContents = await fs.readFile(configFileName, "utf8");
+
   const result = typescript.parseConfigFileTextToJson(
     configFileName,
     configFileContents
