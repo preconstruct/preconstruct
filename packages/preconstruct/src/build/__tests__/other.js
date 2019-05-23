@@ -47,7 +47,7 @@ test("browser no module", async () => {
   await snapshotDirectory(tmpPath, { files: "all" });
 });
 
-test.only("typescript", async () => {
+test("typescript", async () => {
   let tmpPath = f.copy("typescript");
 
   await install(tmpPath);

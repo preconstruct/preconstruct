@@ -317,8 +317,8 @@ if (process.env.NODE_ENV === \\"production\\") {
 `;
 
 exports[`typescript: dist/typescript.cjs.js.d.ts 1`] = `
-"export * from \\"../src/index\\";
-export { default } from \\"../src/index\\";
+"export * from \\"./declarations/src/index.d.ts\\";
+export { default } from \\"./declarations/src/index.d.ts\\";
 "
 `;
 
@@ -352,7 +352,8 @@ exports[`typescript: package.json 1`] = `
   \\"module\\": \\"dist/typescript.esm.js\\",
   \\"dependencies\\": {
     \\"@babel/core\\": \\"^7.4.3\\",
-    \\"@babel/preset-typescript\\": \\"^7.3.3\\"
+    \\"@babel/preset-typescript\\": \\"^7.3.3\\",
+    \\"typescript\\": \\"^3.4.5\\"
   }
 }
 "

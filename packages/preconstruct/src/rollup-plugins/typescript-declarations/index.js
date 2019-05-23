@@ -1,13 +1,20 @@
 // @flow
-import globby from "globby";
+import path from "path";
+import { FatalError } from "../../errors";
 import type { Plugin } from "../types";
 import { Package } from "../../package";
 import { createDeclarationCreator } from "./create-generator";
 
-export default function typescriptDeclarations(pkg: Package): Plugin {
-  let entrypointSourceFiles = pkg.entrypoints.map(x => x.source);
+let isTsPath = source => /\.tsx?/.test(source);
 
-  if (!entrypointSourceFiles.some(x => /\.tsx?/.test(x))) {
+function tsTemplate(hasDefaultExport: boolean, relativePath: string) {
+  return `export * from "${relativePath}";${
+    hasDefaultExport ? `\nexport { default } from "${relativePath}";` : ""
+  }\n`;
+}
+
+export default function typescriptDeclarations(pkg: Package): Plugin {
+  if (!pkg.entrypoints.some(({ source }) => isTsPath(source))) {
     return { name: "typescript-declarations" };
   }
   return {
@@ -17,20 +24,66 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
     async generateBundle(opts, bundle, something) {
       let creator = await createDeclarationCreator(pkg.directory);
 
-      let tsFiles = await globby(
-        ["**/*.ts{,x}", "!**/*.d.ts", "!node_modules"],
-        {
-          cwd: pkg.directory,
-          absolute: true
-        }
-      );
+      let srcFilenameToDtsFilenameMap = new Map<string, string>();
 
-      for (let filename of tsFiles) {
-        let { name, content } = creator(filename);
-        bundle[name] = {
-          fileName: name,
+      let doneModules = new Set();
+
+      for (const n in bundle) {
+        const file = bundle[n];
+        if (file.isAsset) {
+          continue;
+        }
+
+        for (let mod in file.modules) {
+          if (!doneModules.has(mod)) {
+            doneModules.add(mod);
+            let { name, content } = creator(mod);
+            srcFilenameToDtsFilenameMap.set(mod, name);
+            bundle[name] = {
+              fileName: name,
+              isAsset: true,
+              source: content
+            };
+          }
+        }
+      }
+
+      for (const n in bundle) {
+        const file = bundle[n];
+        // $FlowFixMe
+        let facadeModuleId = file.facadeModuleId;
+        if (file.isAsset || !file.isEntry || facadeModuleId == null) {
+          continue;
+        }
+
+        let dtsFilename = srcFilenameToDtsFilenameMap.get(facadeModuleId);
+
+        if (!dtsFilename) {
+          throw new FatalError(
+            `no dts file was found for the entrypoint at ${facadeModuleId} ${JSON.stringify(
+              [...srcFilenameToDtsFilenameMap.keys()]
+            )}`,
+            pkg
+          );
+        }
+
+        let mainFieldPath = file.fileName.replace(/\.prod\.js$/, ".js");
+        let relativeToSource = path.relative(
+          path.dirname(path.join(opts.dir, file.fileName)),
+          dtsFilename
+        );
+        if (!relativeToSource.startsWith(".")) {
+          relativeToSource = `./${relativeToSource}`;
+        }
+        let tsFileSource = tsTemplate(
+          file.exports.includes("default"),
+          relativeToSource
+        );
+        let tsFileName = mainFieldPath + ".d.ts";
+        bundle[tsFileName] = {
+          fileName: tsFileName,
           isAsset: true,
-          source: content
+          source: tsFileSource
         };
       }
     }
