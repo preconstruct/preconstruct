@@ -18,6 +18,8 @@
     "@babel/code-frame": "^7.0.0",
     "@babel/core": "^7.1.2",
     "@babel/plugin-transform-runtime": "^7.2.0",
+    "@emotion/weak-memoize": "^0.2.2",
+    "@preconstruct/hook": "^0.0.1",
     "builtin-modules": "^3.0.0",
     "chalk": "^2.3.2",
     "dataloader": "^1.4.0",
@@ -47,7 +49,6 @@
     "rollup-pluginutils": "^2.7.1",
     "sarcastic": "^1.5.0",
     "terser": "^3.14.1",
-    "xxhash-wasm": "^0.3.1",
-    "@preconstruct/hook": "^0.0.1"
+    "xxhash-wasm": "^0.3.1"
   }
 }

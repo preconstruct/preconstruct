@@ -13,6 +13,8 @@ const f = fixturez(__dirname);
 
 jest.mock("../../prompt");
 
+jest.setTimeout(30000);
+
 afterEach(() => {
   jest.resetAllMocks();
 });
@@ -45,7 +47,7 @@ test("browser no module", async () => {
   await snapshotDirectory(tmpPath, { files: "all" });
 });
 
-test("typescript", async () => {
+test.only("typescript", async () => {
   let tmpPath = f.copy("typescript");
 
   await install(tmpPath);
