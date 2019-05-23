@@ -2,7 +2,7 @@
 import path from "path";
 import type { Plugin } from "./types";
 import { getDevPath, getProdPath } from "../build/utils";
-import { flowTemplate, tsTemplate } from "../utils";
+import { flowTemplate } from "../utils";
 import { Package } from "../package";
 import { FatalError } from "../errors";
 
@@ -46,18 +46,7 @@ export default function flowAndNodeDevProdEntry(pkg: Package): Plugin {
 
         let isEntrySourceTypeScript = /\.tsx?$/.test(facadeModuleId);
 
-        if (isEntrySourceTypeScript) {
-          let tsFileSource = tsTemplate(
-            file.exports.includes("default"),
-            relativeToSource
-          );
-          let tsFileName = mainFieldPath + ".d.ts";
-          bundle[tsFileName] = {
-            fileName: tsFileName,
-            isAsset: true,
-            source: tsFileSource
-          };
-        } else {
+        if (!isEntrySourceTypeScript) {
           let flowMode = false;
 
           let source = await fs.readFile(facadeModuleId, "utf8");

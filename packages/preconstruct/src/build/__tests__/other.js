@@ -13,6 +13,8 @@ const f = fixturez(__dirname);
 
 jest.mock("../../prompt");
 
+jest.setTimeout(30000);
+
 afterEach(() => {
   jest.resetAllMocks();
 });

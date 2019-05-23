@@ -15,6 +15,7 @@ import { FatalError } from "../errors";
 import { confirms } from "../messages";
 import rewriteCjsRuntimeHelpers from "../rollup-plugins/rewrite-cjs-runtime-helpers";
 import flowAndNodeDevProdEntry from "../rollup-plugins/flow-and-prod-dev-entry";
+import typescriptDeclarations from "../rollup-plugins/typescript-declarations";
 import babel from "../rollup-plugins/babel";
 import terser from "../rollup-plugins/terser";
 import { limit } from "../prompt";
@@ -215,6 +216,7 @@ export let getRollupConfig = (
     },
     plugins: [
       type === "node-prod" && flowAndNodeDevProdEntry(pkg),
+      type === "node-prod" && typescriptDeclarations(pkg),
       babel({
         cwd: pkg.project.directory,
         plugins: [
