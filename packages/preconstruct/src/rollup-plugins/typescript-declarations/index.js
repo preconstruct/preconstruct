@@ -69,6 +69,8 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
         }
       }
 
+      await Promise.all(() => {});
+
       for (const n in bundle) {
         const file = bundle[n];
         // $FlowFixMe
