@@ -2,7 +2,7 @@
 import resolveFrom from "resolve-from";
 import * as fs from "fs-extra";
 import path from "path";
-import { createLanguageServiceHostClass } from "./some-thing";
+import { createLanguageServiceHostClass } from "./language-service-host";
 
 let unsafeRequire = require;
 
