@@ -1,5 +1,10 @@
 # preconstruct
 
+## 0.0.72
+### Patch Changes
+
+- [cd0979f](https://github.com/preconstruct/preconstruct/commit/cd0979f) - Change TS declaration filename
+
 ## 0.0.71
 ### Patch Changes
 
