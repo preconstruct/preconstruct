@@ -48,9 +48,6 @@ export let confirms = {
   ),
   createEntrypointPkgJson: createPromptConfirmLoader(
     "A package.json file does not exist for this entrypoint, would you like to create one automatically?"
-  ),
-  addPreconstructDevToPostinstall: createPromptConfirmLoader(
-    "would you like preconstruct to automatically add `preconstruct dev` in a postinstall hook so that importing entrypoints during development will import the source"
   )
 };
 

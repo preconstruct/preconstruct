@@ -97,24 +97,5 @@ export default async function init(directory: string) {
 
   await Promise.all(project.packages.map(doInit));
 
-  if (project.json.scripts && project.json.scripts.postinstall) {
-    if (!project.json.scripts.postinstall.includes("preconstruct dev")) {
-      info(
-        "your project already has a postinstall script. you should add `preconstruct dev` to it manually"
-      );
-    }
-  } else {
-    let shouldAddPreconstructDevToPostinstall = await confirms.addPreconstructDevToPostinstall(
-      project
-    );
-    if (shouldAddPreconstructDevToPostinstall) {
-      if (!project.json.scripts) {
-        project.json.scripts = {};
-      }
-      project.json.scripts.postinstall = "preconstruct dev";
-      await project.save();
-    }
-  }
-
   success("initialised project!");
 }
