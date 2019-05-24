@@ -1,1 +1,0 @@
-Add typescript declaration generation

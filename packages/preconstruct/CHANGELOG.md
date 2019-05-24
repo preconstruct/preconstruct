@@ -1,5 +1,10 @@
 # preconstruct
 
+## 0.0.71
+### Patch Changes
+
+- [ac2eb8a](https://github.com/preconstruct/preconstruct/commit/ac2eb8a) [#59](https://github.com/preconstruct/preconstruct/pulls/59) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Add typescript declaration generation
+
 ## 0.0.70
 ### Patch Changes
 
