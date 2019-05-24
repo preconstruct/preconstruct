@@ -294,6 +294,12 @@ export default thing;
 "
 `;
 
+exports[`typescript: dist/typescript.cjs.d.ts 1`] = `
+"export * from \\"./declarations/src/index.d.ts\\";
+export { default } from \\"./declarations/src/index.d.ts\\";
+"
+`;
+
 exports[`typescript: dist/typescript.cjs.dev.js 1`] = `
 "'use strict';
 
@@ -313,12 +319,6 @@ if (process.env.NODE_ENV === \\"production\\") {
 } else {
   module.exports = require(\\"./typescript.cjs.dev.js\\");
 }
-"
-`;
-
-exports[`typescript: dist/typescript.cjs.js.d.ts 1`] = `
-"export * from \\"./declarations/src/index.d.ts\\";
-export { default } from \\"./declarations/src/index.d.ts\\";
 "
 `;
 

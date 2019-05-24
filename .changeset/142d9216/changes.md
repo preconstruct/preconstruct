@@ -1,0 +1,1 @@
+Change TS declaration filename
