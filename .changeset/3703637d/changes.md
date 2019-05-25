@@ -1,0 +1,1 @@
+Change import path generated in TypeScript declarations

@@ -68,7 +68,7 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
         let mainFieldPath = file.fileName.replace(/\.prod\.js$/, "");
         let relativeToSource = path.relative(
           path.dirname(path.join(opts.dir, file.fileName)),
-          dtsFilename
+          dtsFilename.replace(/\.d\.ts$/, "")
         );
         if (!relativeToSource.startsWith(".")) {
           relativeToSource = `./${relativeToSource}`;

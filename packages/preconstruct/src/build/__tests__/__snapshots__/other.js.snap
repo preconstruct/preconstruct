@@ -295,8 +295,8 @@ export default thing;
 `;
 
 exports[`typescript: dist/typescript.cjs.d.ts 1`] = `
-"export * from \\"./declarations/src/index.d.ts\\";
-export { default } from \\"./declarations/src/index.d.ts\\";
+"export * from \\"./declarations/src/index\\";
+export { default } from \\"./declarations/src/index\\";
 "
 `;
 
