@@ -1,5 +1,10 @@
 # preconstruct
 
+## 0.0.73
+### Patch Changes
+
+- [2e01590](https://github.com/preconstruct/preconstruct/commit/2e01590) [#60](https://github.com/preconstruct/preconstruct/pulls/60) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Stop adding a postinstall script with preconstruct dev in preconstruct init. This was causing problems with single package repos so it's being removing for now.
+
 ## 0.0.72
 ### Patch Changes
 
