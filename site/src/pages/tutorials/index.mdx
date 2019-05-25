@@ -38,8 +38,6 @@ We can initialise preconstruct with `preconstruct init`.
 $ yarn preconstruct init
 🎁 ? a-random-number preconstruct is going to change the main field in your package.json, are you okay with that? Yes
 🎁 ? a-random-number would you like to generate module builds? this will write to the module field in your package.json Yes
-🎁 ? a-random-number would you like preconstruct to automatically add `preconstruct dev` in a postinstall hook so that importing entrypoints during development will import the s
-ource Yes
 🎁 success initialised project!
 ```
 
@@ -56,9 +54,6 @@ ource Yes
   "license": "MIT",
   "devDependencies": {
     "preconstruct": "^0.0.68"
-  },
-  "scripts": {
-    "postinstall": "preconstruct dev"
   }
 }
 ```
@@ -78,14 +73,6 @@ The `main` field specifies what file Node and older bundlers should look at when
 ```
 
 The `module` field specifies what file newer bundlers like webpack should look at when someone uses your package.
-
-```json
-"scripts": {
-  "postinstall": "preconstruct dev"
-}
-```
-
-preconstruct has also added a script called `postinstall` which will be automatically run by package managers like Yarn and npm. `preconstruct dev` will create links from the dist files specified above to your source file so that your can import the directory that the package.json is in and you'll get the source files. While this is primarily useful in monorepos, it's also useful in single package repos because it allows you to run tests against your dist files but still run them against your source files in development for faster feedback loop.
 
 </details>
 
@@ -133,7 +120,6 @@ We're going to add some package scripts to make it easier and make sure that we 
 
 ```json
 "scripts": {
-  "postinstall": "preconstruct dev",
   "build": "preconstruct build",
   "release": "yarn build && npm publish"
 }

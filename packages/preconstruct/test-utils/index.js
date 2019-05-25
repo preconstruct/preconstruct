@@ -30,12 +30,10 @@ import { confirms } from "../src/messages";
 export async function initBasic(directory: string) {
   confirms.writeMainField.mockReturnValue(true);
   confirms.writeModuleField.mockReturnValue(true);
-  confirms.addPreconstructDevToPostinstall.mockReturnValue(false);
 
   await init(directory);
   confirms.writeMainField.mockReset();
   confirms.writeModuleField.mockReset();
-  confirms.addPreconstructDevToPostinstall.mockReset();
 }
 
 function getPkgPath(tmpPath: string) {
