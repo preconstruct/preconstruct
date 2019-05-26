@@ -1,5 +1,10 @@
 # preconstruct
 
+## 0.0.74
+### Patch Changes
+
+- [f79b195](https://github.com/preconstruct/preconstruct/commit/f79b195) - Change import path generated in TypeScript declarations
+
 ## 0.0.73
 ### Patch Changes
 

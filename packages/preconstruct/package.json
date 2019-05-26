@@ -1,6 +1,6 @@
 {
   "name": "preconstruct",
-  "version": "0.0.73",
+  "version": "0.0.74",
   "description": "A smart build tool for libraries",
   "files": [
     "bin.js",
