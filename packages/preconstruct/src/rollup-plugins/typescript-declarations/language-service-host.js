@@ -21,6 +21,9 @@ export let createLanguageServiceHostClass = typescript =>
     setLanguageService(service) {
       this.service = service;
     }
+    getProjectVersion() {
+      return 1;
+    }
     setSnapshot(fileName, data) {
       fileName = normalize(fileName);
       const snapshot = typescript.ScriptSnapshot.fromString(data);

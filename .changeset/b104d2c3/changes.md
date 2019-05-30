@@ -1,0 +1,1 @@
+Improve TypeScript declaration generation performance

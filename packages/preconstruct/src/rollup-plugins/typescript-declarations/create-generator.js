@@ -1,10 +1,42 @@
 // @flow
 import resolveFrom from "resolve-from";
 import * as fs from "fs-extra";
+import weakMemoize from "@emotion/weak-memoize";
+import memoize from "@emotion/memoize";
 import path from "path";
 import { createLanguageServiceHostClass } from "./language-service-host";
 
 let unsafeRequire = require;
+
+let getService = weakMemoize(typescript =>
+  memoize(async configFileName => {
+    console.log("creating service");
+    let configFileContents = await fs.readFile(configFileName, "utf8");
+    const result = typescript.parseConfigFileTextToJson(
+      configFileName,
+      configFileContents
+    );
+
+    let thing = typescript.parseJsonConfigFileContent(
+      result,
+      typescript.sys,
+      process.cwd(),
+      undefined,
+      configFileName
+    );
+
+    let LanguageServiceHostClass = createLanguageServiceHostClass(typescript);
+
+    let servicesHost = new LanguageServiceHostClass(thing, []);
+
+    let service = typescript.createLanguageService(
+      servicesHost,
+      typescript.createDocumentRegistry()
+    );
+    servicesHost.setLanguageService(service);
+    return service;
+  })
+);
 
 export async function createDeclarationCreator(
   dirname: string
@@ -29,29 +61,7 @@ export async function createDeclarationCreator(
       "an entrypoint source file ends with the .ts extension but no TypeScript config exists, please create one."
     );
   }
-  let configFileContents = await fs.readFile(configFileName, "utf8");
-  const result = typescript.parseConfigFileTextToJson(
-    configFileName,
-    configFileContents
-  );
-
-  let thing = typescript.parseJsonConfigFileContent(
-    result,
-    typescript.sys,
-    process.cwd(),
-    undefined,
-    configFileName
-  );
-
-  let LanguageServiceHostClass = createLanguageServiceHostClass(typescript);
-
-  let servicesHost = new LanguageServiceHostClass(thing, []);
-
-  let service = typescript.createLanguageService(
-    servicesHost,
-    typescript.createDocumentRegistry()
-  );
-  servicesHost.setLanguageService(service);
+  let service = await getService(typescript)(configFileName);
 
   return (filename: string) => {
     let output = service.getEmitOutput(filename, true);

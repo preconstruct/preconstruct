@@ -1458,7 +1458,7 @@
   dependencies:
     "@emotion/memoize" "0.7.1"
 
-"@emotion/memoize@0.7.1":
+"@emotion/memoize@0.7.1", "@emotion/memoize@^0.7.1":
   version "0.7.1"
   resolved "https://registry.yarnpkg.com/@emotion/memoize/-/memoize-0.7.1.tgz#e93c13942592cf5ef01aa8297444dc192beee52f"
   integrity sha512-Qv4LTqO11jepd5Qmlp3M1YEjBumoTHcHFdgPTQ+sFlIL5myi/7xu/POwP7IRu6odBdmLXdtIs1D6TuW6kbwbbg==
