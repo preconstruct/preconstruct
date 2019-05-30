@@ -1,0 +1,14 @@
+# When should I use multiple entrypoints?
+
+My thoughts from react-select discussion:
+
+> I've been thinking about this and I think we need to ask the question: why do we have multiple entrypoints?
+>
+> I think the main answer is: To allow consumers to use one part of a package without incurring the cost of having to load all parts of the package.
+>
+> (Am I missing anything with the above?)
+>
+> So I think in general to answer "Should something be in its own entrypoint?" there are some questions that need to answered
+>
+> - Is the thing rarely used and large?
+> - If it's a dependency of something else exposed by the package(the dependent), will someone want to import it without also importing any dependents of this or is it likely that the dependent will be changed so it doesn't depend on the thing in the future?

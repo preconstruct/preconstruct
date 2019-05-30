@@ -223,6 +223,18 @@ export default ({
                 Exporting Multiple Entrypoints
               </NavLink>
             </div>
+            <NavLink to="/guides">Guides</NavLink>
+            <div css={{ marginLeft: 16 }}>
+              <NavLink to="/guides/configuring-babel">
+                Configuring Babel
+              </NavLink>
+              <NavLink to="/guides/using-preconstruct-dev-in-a-monorepo">
+                Using preconstruct dev in a monorepo
+              </NavLink>
+              <NavLink to="/guides/when-should-i-use-multiple-entrypoints">
+                When should I use multiple entrypoints?
+              </NavLink>
+            </div>
             <NavLink to="/commands">Commands</NavLink>
             <div css={{ marginLeft: 16 }}>
               <NavLink to="/commands/init">init</NavLink>
