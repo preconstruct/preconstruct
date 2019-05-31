@@ -1,5 +1,10 @@
 # preconstruct
 
+## 0.0.75
+### Patch Changes
+
+- [7bade91](https://github.com/preconstruct/preconstruct/commit/7bade91) - Improve TypeScript declaration generation performance
+
 ## 0.0.74
 ### Patch Changes
 
