@@ -4,14 +4,9 @@ import { FatalError } from "../../errors";
 import type { Plugin } from "../types";
 import { Package } from "../../package";
 import { createDeclarationCreator } from "./create-generator";
+import { tsTemplate } from "../../utils";
 
 let isTsPath = source => /\.tsx?/.test(source);
-
-function tsTemplate(hasDefaultExport: boolean, relativePath: string) {
-  return `export * from "${relativePath}";${
-    hasDefaultExport ? `\nexport { default } from "${relativePath}";` : ""
-  }\n`;
-}
 
 export default function typescriptDeclarations(pkg: Package): Plugin {
   if (!pkg.entrypoints.some(({ source }) => isTsPath(source))) {
