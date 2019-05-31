@@ -1,5 +1,10 @@
 # preconstruct
 
+## 0.0.76
+### Patch Changes
+
+- [ce8909b](https://github.com/preconstruct/preconstruct/commit/ce8909b) - Add file redirect instead of symlink redirect for TS in dev
+
 ## 0.0.75
 ### Patch Changes
 
