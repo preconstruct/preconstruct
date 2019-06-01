@@ -138,10 +138,6 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
   let hasBrowserField = strictEntrypoints[0].browser !== null;
 
   if (hasBrowserField) {
-    // i just realised that we're making the assumption that if you have a browser build
-    // you also have a module build. I feel like this is probably a safe assumption
-    // but might want to think about more.
-
     configs.push({
       config: getRollupConfig(pkg, strictEntrypoints, aliases, "browser"),
       outputs: [
