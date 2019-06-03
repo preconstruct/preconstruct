@@ -123,4 +123,6 @@ Balancing between having minimal to no configuration and being able to support e
 - [microbundle](https://github.com/developit/microbundle) was a huge inspiration for this! ❤️
 - [rollup](https://rollupjs.org) - rollup has done the really hard stuff that makes preconstruct possible!
 - [bolt](https://github.com/boltpkg/bolt) - lots of utils and things in this project were inspired by things in bolt
+- [Kye Hohenberger](https://github.com/tkh44) for thinking of the name preconstruct
+- Too many awesome people to name at [Thinkmill](https://thinkmill.com.au) who have given so much great feedback to make preconstruct better 💝
 - all the people who wrote all the dependencies for this project!
