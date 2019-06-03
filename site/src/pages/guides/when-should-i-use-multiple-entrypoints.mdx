@@ -1,5 +1,9 @@
 # When should I use multiple entrypoints?
 
+Having multiple entrypoints in a package means that someone can import from different paths in the same package, e.g. `react-dom` and `react-dom/server`.
+
+There are a couple reasons you may want to have multiple entrypoints in a package.
+
 My thoughts from react-select discussion:
 
 > I've been thinking about this and I think we need to ask the question: why do we have multiple entrypoints?

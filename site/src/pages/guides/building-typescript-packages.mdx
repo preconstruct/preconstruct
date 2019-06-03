@@ -1,0 +1,13 @@
+# Building TypeScript packages
+
+preconstruct uses Babel to compile code so you have to use `@babel/preset-typescript`
+
+```json
+{
+  "presets": ["@babel/preset-typescript"]
+}
+```
+
+## Generating TypeScript declarations
+
+preconstruct automatically generates TypeScript declarations for all entrypoints in a package so consumers can . There's no work required to configure this other than having your entrypoint source file be a `.ts` or `.tsx` file and having a `tsconfig.json`.
