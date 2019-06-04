@@ -10,7 +10,7 @@ We have our `a-random-number` package from the [the Getting Started guide](/gett
 
 Before we can use preconstruct, we need to setup Yarn Workspaces and create our packages.
 
-To setup Yarn workspaces, we're going to make a new directory and make a `package.json` that looks like this.
+To setup Yarn workspaces, we're going to create a new directory and make a `package.json` that looks like this.
 
 ```json
 {
@@ -60,9 +60,34 @@ yarn preconstruct init
 
 preconstruct has asked us some slightly different questions since it's detected that we're in a monorepo. We're going to explain exactly what all these questions mean in the future but for now, answering yes to everything will work fine (TODO: write things explaining that stuff)
 
+### Setting up `preconstruct dev`
+
+`preconstruct dev` is a command in preconstruct that lets you, see the [Using preconstruct dev in a monorepo guide](/guides/using-preconstruct-dev-in-a-monorepo) for more info.
+
+We're going to add it to a postinstall script so that yarn will run it after packages are installed. Our package.json will now look like this.
+
+```json
+{
+  "name": "not-random-numbers",
+  "version": "1.0.0",
+  "license": "MIT",
+  "private": true,
+  "workspaces": ["packages/*"],
+  "dependencies": {
+    "preconstruct": "^0.0.70"
+  },
+  "preconstruct": {
+    "packages": ["packages/*"]
+  },
+  "scripts": {
+    "postinstall": "preconstruct dev"
+  }
+}
+```
+
 ### Adding Babel
 
-We'll also want to add Babel so that we can use modern features when writing our code but consumers don't have problems using it.
+We'll also want to add Babel so that we can use modern features when writing our code but consumers don't have problems using it like the building your first package tutorial.
 
 We're going to install `@babel/core` and `@babel/preset-env` and add it our Babel config.
 
@@ -78,11 +103,13 @@ module.exports = {
 };
 ```
 
+> Curious about why we're going a babel.config.js file here instead of a .babelrc file? Read the [Configuring Babel guide](/guides/configuring-babel)
+
 Now we can run `preconstruct build` to build our packages. 🎉
 
 ## Setting up Changesets to version our packages
 
-[Changesets](https://github.com/Noviny/changesets) is an awesome tool for managing versioning and changelogs with a focus on monorepos which makes it a great fit for our project. It lets people add "changesets" which declare an intent to release certain packages and then you can combine all of the changesets to update the versions of packages and changelogs and finally publish the packages to npm.
+[Changesets](https://github.com/Noviny/changesets) is an awesome tool for managing versioning and changelogs with a focus on monorepos which makes it a great fit for our project. It lets people add "changesets" which declare an intent to release certain packages and then the tool can consume all the changesets to update the versions of packages and changelogs and publish the packages to npm.
 
 We need to install and initialise Changesets.
 
