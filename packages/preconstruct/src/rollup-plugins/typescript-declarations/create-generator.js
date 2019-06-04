@@ -10,7 +10,6 @@ let unsafeRequire = require;
 
 let getService = weakMemoize(typescript =>
   memoize(async configFileName => {
-    console.log("creating service");
     let configFileContents = await fs.readFile(configFileName, "utf8");
     const result = typescript.parseConfigFileTextToJson(
       configFileName,

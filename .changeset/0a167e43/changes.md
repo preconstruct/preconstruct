@@ -1,0 +1,1 @@
+Remove erroneous console.log
