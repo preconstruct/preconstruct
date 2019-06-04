@@ -1,5 +1,9 @@
 # preconstruct
 
+## 0.0.78
+- Updated dependencies [9efd990]:
+  - @preconstruct/hook@0.0.3
+
 ## 0.0.77
 - Updated dependencies [aea0c36]:
   - @preconstruct/hook@0.0.2

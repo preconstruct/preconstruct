@@ -1,5 +1,10 @@
 # @preconstruct/hook
 
+## 0.0.3
+### Patch Changes
+
+- [9efd990](https://github.com/preconstruct/preconstruct/commit/9efd990) - Fix source map support
+
 ## 0.0.2
 ### Patch Changes
 
