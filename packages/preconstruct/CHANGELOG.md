@@ -1,5 +1,9 @@
 # preconstruct
 
+## 0.0.77
+- Updated dependencies [aea0c36]:
+  - @preconstruct/hook@0.0.2
+
 ## 0.0.76
 ### Patch Changes
 

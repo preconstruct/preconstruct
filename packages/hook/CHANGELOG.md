@@ -1,5 +1,10 @@
 # @preconstruct/hook
 
+## 0.0.2
+### Patch Changes
+
+- [aea0c36](https://github.com/preconstruct/preconstruct/commit/aea0c36) - Only install source map support when the require hook is actually run
+
 ## 0.0.1
 
 ### Patch Changes
