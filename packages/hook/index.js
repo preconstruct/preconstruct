@@ -14,7 +14,7 @@ let babelPlugins = [
 exports.___internalHook = (cwd /*:string*/) => {
   let compiling = false;
   let sourceMaps = {};
-  let needsToInstallSourceMapSupport = false;
+  let needsToInstallSourceMapSupport = true;
   function compileHook(code, filename) {
     if (compiling) return code;
     // we do this lazily because jest has its own require implementation
