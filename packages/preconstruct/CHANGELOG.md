@@ -1,5 +1,10 @@
 # preconstruct
 
+## 0.0.79
+### Patch Changes
+
+- [525137a](https://github.com/preconstruct/preconstruct/commit/525137a) - Remove erroneous console.log
+
 ## 0.0.78
 - Updated dependencies [9efd990]:
   - @preconstruct/hook@0.0.3
