@@ -2857,18 +2857,6 @@ body-parser@1.18.3:
     raw-body "2.3.3"
     type-is "~1.6.16"
 
-bolt-check@^0.2.0:
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/bolt-check/-/bolt-check-0.2.0.tgz#7e408936bd60c63df89f4b666c9155fe0b7711d4"
-  integrity sha512-KRc3SUheiIIx8QspXBZklUO6voScfx/bEFKuB7K3xRVA3HQ+9ozvBWebd3IzNiFHcBR/9BSJxqHPfxCpBV4zaw==
-  dependencies:
-    chalk "^2.1.0"
-    detect-indent "^6.0.0"
-    fs-extra "^7.0.1"
-    get-workspaces "^0.3.0"
-    meow "^5.0.0"
-    semver "^5.4.1"
-
 bolt@^0.22.1:
   version "0.22.6"
   resolved "https://registry.yarnpkg.com/bolt/-/bolt-0.22.6.tgz#3bdafdb98679828b6153ac175c946c2cf740b736"
@@ -6367,14 +6355,6 @@ get-workspaces@^0.1.0:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/get-workspaces/-/get-workspaces-0.1.1.tgz#c17d57d7ef8cf06e46041ea4f22a41fbcdee3e7b"
   integrity sha512-ClBj54rZ782YDPLpF5ySeDoMbY49plX1yhU6pfPLXk3dNgmGuvd824W+AzR8Xy5354q2VSGNzkERtr0OODOLJA==
-  dependencies:
-    fs-extra "^7.0.1"
-    globby "^9.2.0"
-
-get-workspaces@^0.3.0:
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/get-workspaces/-/get-workspaces-0.3.0.tgz#6352c6cd32c9627cab81f5d33a2fa752515b7550"
-  integrity sha512-H1BcqsiZ7kIlx/ZLNkCUUAc9JqLF3cU8DR6iAYFVaXQa0iRZL3Mw+gnLVktzlmPWikp1u99oZSodrXQOIsypvQ==
   dependencies:
     fs-extra "^7.0.1"
     globby "^9.2.0"
@@ -11106,6 +11086,16 @@ react@^16.6.3:
     object-assign "^4.1.1"
     prop-types "^15.6.2"
     scheduler "^0.11.2"
+
+react@^16.8.6:
+  version "16.8.6"
+  resolved "https://registry.yarnpkg.com/react/-/react-16.8.6.tgz#ad6c3a9614fd3a4e9ef51117f54d888da01f2bbe"
+  integrity sha512-pC0uMkhLaHm11ZSJULfOBqV4tIZkx87ZLvbbQYunNixAAvjnC+snJCg0XQXn9VIsttVsbZP/H/ewzgsd5fxKXw==
+  dependencies:
+    loose-envify "^1.1.0"
+    object-assign "^4.1.1"
+    prop-types "^15.6.2"
+    scheduler "^0.13.6"
 
 read-cmd-shim@^1.0.1:
   version "1.0.1"
