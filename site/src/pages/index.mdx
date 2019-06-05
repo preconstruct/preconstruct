@@ -1,4 +1,4 @@
-import { FancyLink } from "../fancy-link";
+import { LinksContainer, FancyLink, FancyAnchor } from "../fancy-link";
 
 <h1 style={{textAlign:'center'}}> 🎁</h1>
 
@@ -6,7 +6,15 @@ import { FancyLink } from "../fancy-link";
 
 <h2 style={{ textAlign:'center' }}>A smart build tool for libraries</h2>
 
-<FancyLink to="/getting-started">Getting Started</FancyLink>
+<LinksContainer>
+  <FancyLink to="/getting-started">Getting Started</FancyLink>
+  <FancyAnchor
+    href="https://github.com/preconstruct/preconstruct"
+    target="_blank"
+  >
+    Source on GitHub
+  </FancyAnchor>
+</LinksContainer>
 
 <div style={{ paddingBottom: 16 }} />
 
