@@ -16,3 +16,5 @@ My thoughts from react-select discussion:
 >
 > - Is the thing rarely used and large?
 > - If it's a dependency of something else exposed by the package(the dependent), will someone want to import it without also importing any dependents of this or is it likely that the dependent will be changed so it doesn't depend on the thing in the future?
+
+Also, having seperate browser and node things a la `react-dom` and `react-dom/server`
