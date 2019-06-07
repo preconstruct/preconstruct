@@ -2857,6 +2857,19 @@ body-parser@1.18.3:
     raw-body "2.3.3"
     type-is "~1.6.16"
 
+bolt-check@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/bolt-check/-/bolt-check-0.3.0.tgz#f4f29efe4c5316e3b2c9a750552d2d4fa13b51a1"
+  integrity sha512-fXLKD3YzXeBsJcZOJxzbw074RpAcwBWcdYCIO1N8hmFbR5zY6dR3v0iYJiG/YHOgsmCYUHGmmanVzCdT3aa9pA==
+  dependencies:
+    "@babel/runtime" "^7.4.4"
+    chalk "^2.1.0"
+    detect-indent "^6.0.0"
+    fs-extra "^7.0.1"
+    get-workspaces "^0.3.1"
+    meow "^5.0.0"
+    semver "^5.4.1"
+
 bolt@^0.22.1:
   version "0.22.6"
   resolved "https://registry.yarnpkg.com/bolt/-/bolt-0.22.6.tgz#3bdafdb98679828b6153ac175c946c2cf740b736"
@@ -6355,6 +6368,14 @@ get-workspaces@^0.1.0:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/get-workspaces/-/get-workspaces-0.1.1.tgz#c17d57d7ef8cf06e46041ea4f22a41fbcdee3e7b"
   integrity sha512-ClBj54rZ782YDPLpF5ySeDoMbY49plX1yhU6pfPLXk3dNgmGuvd824W+AzR8Xy5354q2VSGNzkERtr0OODOLJA==
+  dependencies:
+    fs-extra "^7.0.1"
+    globby "^9.2.0"
+
+get-workspaces@^0.3.1:
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/get-workspaces/-/get-workspaces-0.3.1.tgz#8e0dc3ea8077725a84d2194be37410c011538536"
+  integrity sha512-TBP1EQTBfEfxn0irOdTYf9nvYefi4hrEJb9Cp7p81xFrKUEq16Mypa8C5459B5IjADujRYnCwWu59zhSobw1fg==
   dependencies:
     fs-extra "^7.0.1"
     globby "^9.2.0"
@@ -11077,16 +11098,6 @@ react-typography@^0.16.19:
   resolved "https://registry.yarnpkg.com/react-typography/-/react-typography-0.16.19.tgz#5736b47961dcf6b9605b6fa38d41980db2588e28"
   integrity sha512-kV2qLEsdm0x9P4YXQEDVc88tDb4Vg0h/vdVZGgbqaRn8ERvNzV76JHUeOby3vvcUYU5MPd5Kz5DPH9Bhp4I/iw==
 
-react@^16.6.3:
-  version "16.6.3"
-  resolved "https://registry.yarnpkg.com/react/-/react-16.6.3.tgz#25d77c91911d6bbdd23db41e70fb094cc1e0871c"
-  integrity sha512-zCvmH2vbEolgKxtqXL2wmGCUxUyNheYn/C+PD1YAjfxHC54+MhdruyhO7QieQrYsYeTxrn93PM2y0jRH1zEExw==
-  dependencies:
-    loose-envify "^1.1.0"
-    object-assign "^4.1.1"
-    prop-types "^15.6.2"
-    scheduler "^0.11.2"
-
 react@^16.8.6:
   version "16.8.6"
   resolved "https://registry.yarnpkg.com/react/-/react-16.8.6.tgz#ad6c3a9614fd3a4e9ef51117f54d888da01f2bbe"
@@ -11846,14 +11857,6 @@ sax@^1.2.4, sax@~1.2.4:
   version "1.2.4"
   resolved "https://registry.yarnpkg.com/sax/-/sax-1.2.4.tgz#2816234e2378bddc4e5354fab5caa895df7100d9"
   integrity sha512-NqVDv9TpANUjFm0N8uM5GxL36UgKi9/atZw+x7YFnQ8ckwFGKrl4xX4yWtrey3UJm5nP1kUbnYgLopqWNSRhWw==
-
-scheduler@^0.11.2:
-  version "0.11.2"
-  resolved "https://registry.yarnpkg.com/scheduler/-/scheduler-0.11.2.tgz#a8db5399d06eba5abac51b705b7151d2319d33d3"
-  integrity sha512-+WCP3s3wOaW4S7C1tl3TEXp4l9lJn0ZK8G3W3WKRWmw77Z2cIFUW2MiNTMHn5sCjxN+t7N43HAOOgMjyAg5hlg==
-  dependencies:
-    loose-envify "^1.1.0"
-    object-assign "^4.1.1"
 
 scheduler@^0.13.6:
   version "0.13.6"
