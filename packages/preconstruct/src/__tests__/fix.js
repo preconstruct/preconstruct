@@ -110,8 +110,7 @@ test("does not modify if already valid", async () => {
   expect(logMock.log.mock.calls).toMatchInlineSnapshot(`
 Array [
   Array [
-    "🎁 success",
-    "project already valid!",
+    "🎁 success project already valid!",
   ],
 ]
 `);
@@ -176,8 +175,7 @@ test("monorepo single package", async () => {
   expect(logMock.log.mock.calls).toMatchInlineSnapshot(`
 Array [
   Array [
-    "🎁 success",
-    "project already valid!",
+    "🎁 success project already valid!",
   ],
 ]
 `);

@@ -168,16 +168,13 @@ test("does not prompt or modify if already valid", async () => {
   expect(logMock.log.mock.calls).toMatchInlineSnapshot(`
 Array [
   Array [
-    "🎁 info valid-package",
-    "main field is valid",
+    "🎁 info valid-package main field is valid",
   ],
   Array [
-    "🎁 info valid-package",
-    "module field is valid",
+    "🎁 info valid-package module field is valid",
   ],
   Array [
-    "🎁 success",
-    "initialised project!",
+    "🎁 success initialised project!",
   ],
 ]
 `);
