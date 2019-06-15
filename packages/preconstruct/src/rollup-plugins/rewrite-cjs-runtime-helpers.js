@@ -1,4 +1,4 @@
-import { getWorker } from "../worker-client";
+const pattern = /require\((["'])@babel\/runtime\/helpers\/esm\/(\w+)["']\)/g;
 
 export default function rewriteCjsRuntimeHelpers() {
   return {
@@ -7,19 +7,9 @@ export default function rewriteCjsRuntimeHelpers() {
       if (format !== "cjs") {
         return null;
       }
-
-      return getWorker()
-        .transformBabel(
-          code,
-          JSON.stringify({
-            babelrc: false,
-            configFile: false,
-            plugins: [
-              require.resolve("../babel-plugins/rewrite-cjs-runtime-helpers")
-            ]
-          })
-        )
-        .then(({ code }) => code);
+      return code.replace(pattern, (_, quote, path) => {
+        return `require(${quote}@babel/runtime/helpers/${path}${quote})`;
+      });
     }
   };
 }

@@ -3,10 +3,10 @@
 exports[`basic: valid-package.cjs.dev.js 1`] = `
 "'use strict';
 
-Object.defineProperty(exports, '__esModule', {
-  value: true
-});
+Object.defineProperty(exports, '__esModule', { value: true });
+
 var index = \\"something\\";
+
 exports.default = index;
 "
 `;

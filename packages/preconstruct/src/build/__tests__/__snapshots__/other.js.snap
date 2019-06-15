@@ -3,17 +3,20 @@
 exports[`browser no module: dist/browser-no-module.browser.cjs.js 1`] = `
 "'use strict';
 
-Object.defineProperty(exports, '__esModule', {
-  value: true
-});
+Object.defineProperty(exports, '__esModule', { value: true });
+
 let thing = \\"wow\\";
+
 {
   thing = \\"something\\";
 }
+
 {
   thing += \\"other\\";
 }
+
 var thing$1 = thing;
+
 exports.default = thing$1;
 "
 `;
@@ -21,9 +24,8 @@ exports.default = thing$1;
 exports[`browser no module: dist/browser-no-module.cjs.dev.js 1`] = `
 "'use strict';
 
-Object.defineProperty(exports, '__esModule', {
-  value: true
-});
+Object.defineProperty(exports, '__esModule', { value: true });
+
 let thing = \\"wow\\";
 
 if (typeof window !== \\"undefined\\") {
@@ -35,6 +37,7 @@ if (typeof document !== undefined) {
 }
 
 var thing$1 = thing;
+
 exports.default = thing$1;
 "
 `;
@@ -99,17 +102,20 @@ export default thing;
 exports[`browser: dist/browser.browser.cjs.js 1`] = `
 "'use strict';
 
-Object.defineProperty(exports, '__esModule', {
-  value: true
-});
+Object.defineProperty(exports, '__esModule', { value: true });
+
 let thing = \\"wow\\";
+
 {
   thing = \\"something\\";
 }
+
 {
   thing += \\"other\\";
 }
+
 var thing$1 = thing;
+
 exports.default = thing$1;
 "
 `;
@@ -134,9 +140,8 @@ export default thing$1;
 exports[`browser: dist/browser.cjs.dev.js 1`] = `
 "'use strict';
 
-Object.defineProperty(exports, '__esModule', {
-  value: true
-});
+Object.defineProperty(exports, '__esModule', { value: true });
+
 let thing = \\"wow\\";
 
 if (typeof window !== \\"undefined\\") {
@@ -148,6 +153,7 @@ if (typeof document !== undefined) {
 }
 
 var thing$1 = thing;
+
 exports.default = thing$1;
 "
 `;
@@ -231,10 +237,10 @@ export default thing;
 exports[`react native: with-react-native-field.cjs.dev.js 1`] = `
 "'use strict';
 
-Object.defineProperty(exports, '__esModule', {
-  value: true
-});
+Object.defineProperty(exports, '__esModule', { value: true });
+
 var index = \\"react native\\";
+
 exports.default = index;
 "
 `;
@@ -273,10 +279,10 @@ export default index;
 exports[`react native: with-react-native-field.native.cjs.js 1`] = `
 "'use strict';
 
-Object.defineProperty(exports, '__esModule', {
-  value: true
-});
+Object.defineProperty(exports, '__esModule', { value: true });
+
 var index = \\"react native\\";
+
 exports.default = index;
 "
 `;
@@ -303,10 +309,10 @@ export { default } from \\"./declarations/src/index\\";
 exports[`typescript: dist/typescript.cjs.dev.js 1`] = `
 "'use strict';
 
-Object.defineProperty(exports, '__esModule', {
-  value: true
-});
+Object.defineProperty(exports, '__esModule', { value: true });
+
 let thing = \\"something\\";
+
 exports.default = thing;
 "
 `;
