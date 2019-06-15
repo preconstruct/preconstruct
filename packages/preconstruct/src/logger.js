@@ -2,8 +2,6 @@
 import chalk from "chalk";
 import util from "util";
 
-let preconstructEmoji = "🎁 ";
-
 export function format(
   args: Array<any>,
   messageType: "error" | "success" | "info",
@@ -14,8 +12,7 @@ export function format(
     success: chalk.green("success"),
     info: chalk.cyan("info")
   }[messageType];
-  let fullPrefix =
-    preconstructEmoji + " " + prefix + (scope === undefined ? "" : " " + scope);
+  let fullPrefix = "🎁 " + prefix + (scope === undefined ? "" : " " + scope);
   return (
     fullPrefix +
     util
