@@ -1,0 +1,1 @@
+Refactor logging and include package name in uncaught build errors

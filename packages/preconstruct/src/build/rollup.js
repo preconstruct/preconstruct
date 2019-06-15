@@ -189,7 +189,7 @@ export let getRollupConfig = (
               } else {
                 throw new FatalError(
                   `@babel/runtime should be in dependencies of ${pkg.name}`,
-                  pkg
+                  pkg.name
                 );
               }
             })();
@@ -200,7 +200,7 @@ export let getRollupConfig = (
                 pkg.directory,
                 warning.importer
               )}" but it is not specified in dependencies or peerDependencies`,
-              pkg
+              pkg.name
             );
           }
         }
@@ -209,7 +209,7 @@ export let getRollupConfig = (
             `There was an error compiling ${pkg.name}: ${chalk.red(
               warning.toString()
             )}`,
-            pkg
+            pkg.name
           );
         }
       }

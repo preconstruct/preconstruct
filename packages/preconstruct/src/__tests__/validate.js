@@ -21,28 +21,22 @@ test("reports correct result on valid package", async () => {
   expect(logMock.log.mock.calls).toMatchInlineSnapshot(`
 Array [
   Array [
-    "🎁 info valid-package",
-    "a valid entry point exists.",
+    "🎁 info valid-package a valid entry point exists.",
   ],
   Array [
-    "🎁 info valid-package",
-    "main field is valid",
+    "🎁 info valid-package main field is valid",
   ],
   Array [
-    "🎁 info valid-package",
-    "module field is valid",
+    "🎁 info valid-package module field is valid",
   ],
   Array [
-    "🎁 info valid-package",
-    "umd:main field is valid",
+    "🎁 info valid-package umd:main field is valid",
   ],
   Array [
-    "🎁 info valid-package",
-    "package entrypoints are valid",
+    "🎁 info valid-package package entrypoints are valid",
   ],
   Array [
-    "🎁 success",
-    "project is valid!",
+    "🎁 success project is valid!",
   ],
 ]
 `);
@@ -68,20 +62,16 @@ test("no module", async () => {
   expect(logMock.log.mock.calls).toMatchInlineSnapshot(`
 Array [
   Array [
-    "🎁 info no-module",
-    "a valid entry point exists.",
+    "🎁 info no-module a valid entry point exists.",
   ],
   Array [
-    "🎁 info no-module",
-    "main field is valid",
+    "🎁 info no-module main field is valid",
   ],
   Array [
-    "🎁 info no-module",
-    "package entrypoints are valid",
+    "🎁 info no-module package entrypoints are valid",
   ],
   Array [
-    "🎁 success",
-    "project is valid!",
+    "🎁 success project is valid!",
   ],
 ]
 `);
@@ -116,32 +106,25 @@ test("valid browser", async () => {
   expect(logMock.log.mock.calls).toMatchInlineSnapshot(`
 Array [
   Array [
-    "🎁 info valid-package",
-    "a valid entry point exists.",
+    "🎁 info valid-package a valid entry point exists.",
   ],
   Array [
-    "🎁 info valid-package",
-    "main field is valid",
+    "🎁 info valid-package main field is valid",
   ],
   Array [
-    "🎁 info valid-package",
-    "module field is valid",
+    "🎁 info valid-package module field is valid",
   ],
   Array [
-    "🎁 info valid-package",
-    "umd:main field is valid",
+    "🎁 info valid-package umd:main field is valid",
   ],
   Array [
-    "🎁 info valid-package",
-    "browser field is valid",
+    "🎁 info valid-package browser field is valid",
   ],
   Array [
-    "🎁 info valid-package",
-    "package entrypoints are valid",
+    "🎁 info valid-package package entrypoints are valid",
   ],
   Array [
-    "🎁 success",
-    "project is valid!",
+    "🎁 success project is valid!",
   ],
 ]
 `);
@@ -154,28 +137,22 @@ test("valid react-native", async () => {
   expect(logMock.log.mock.calls).toMatchInlineSnapshot(`
 Array [
   Array [
-    "🎁 info with-react-native-field",
-    "a valid entry point exists.",
+    "🎁 info with-react-native-field a valid entry point exists.",
   ],
   Array [
-    "🎁 info with-react-native-field",
-    "main field is valid",
+    "🎁 info with-react-native-field main field is valid",
   ],
   Array [
-    "🎁 info with-react-native-field",
-    "module field is valid",
+    "🎁 info with-react-native-field module field is valid",
   ],
   Array [
-    "🎁 info with-react-native-field",
-    "react-native field is valid",
+    "🎁 info with-react-native-field react-native field is valid",
   ],
   Array [
-    "🎁 info with-react-native-field",
-    "package entrypoints are valid",
+    "🎁 info with-react-native-field package entrypoints are valid",
   ],
   Array [
-    "🎁 success",
-    "project is valid!",
+    "🎁 success project is valid!",
   ],
 ]
 `);
@@ -188,20 +165,16 @@ test("monorepo single package", async () => {
   expect(logMock.log.mock.calls).toMatchInlineSnapshot(`
 Array [
   Array [
-    "🎁 info @some-scope/package-two-single-package",
-    "a valid entry point exists.",
+    "🎁 info @some-scope/package-two-single-package a valid entry point exists.",
   ],
   Array [
-    "🎁 info @some-scope/package-two-single-package",
-    "main field is valid",
+    "🎁 info @some-scope/package-two-single-package main field is valid",
   ],
   Array [
-    "🎁 info @some-scope/package-two-single-package",
-    "package entrypoints are valid",
+    "🎁 info @some-scope/package-two-single-package package entrypoints are valid",
   ],
   Array [
-    "🎁 success",
-    "project is valid!",
+    "🎁 success project is valid!",
   ],
 ]
 `);
