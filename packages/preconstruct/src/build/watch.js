@@ -63,7 +63,7 @@ async function watchPackage(pkg: Package, aliases: Aliases) {
                     .join(", ")
             )} → ${chalk.bold(event.output.map(relativePath).join(", "))}...`
           ),
-          pkg
+          pkg.name
         );
         break;
       }
@@ -75,13 +75,13 @@ async function watchPackage(pkg: Package, aliases: Aliases) {
               event.output.map(relativePath).join(", ")
             )} in ${chalk.bold(ms(event.duration))}`
           ),
-          pkg
+          pkg.name
         );
         break;
       }
 
       case "END": {
-        info("waiting for changes...", pkg);
+        info("waiting for changes...", pkg.name);
       }
     }
   });

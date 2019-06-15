@@ -100,12 +100,13 @@ export class Package extends Item {
               }
             );
             if (!shouldCreateEntrypointPkgJson) {
-              throw new FatalError(errors.noEntrypointPkgJson, {
-                name: nodePath.join(
+              throw new FatalError(
+                errors.noEntrypointPkgJson,
+                nodePath.join(
                   pkg.name,
                   nodePath.relative(pkg.directory, directory)
                 )
-              });
+              );
             }
             contents = getPlainEntrypointContent();
             await fs.writeFile(filename, contents);

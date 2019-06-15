@@ -22,14 +22,14 @@ export function validateEntrypointSource(entrypoint: Entrypoint) {
         `entrypoint source files must be inside their respective package directory but this entrypoint has specified its source file as ${
           entrypoint.configSource
         }`,
-        entrypoint
+        entrypoint.name
       );
     }
   } catch (e) {
     if (e.code === "MODULE_NOT_FOUND") {
       throw new FatalError(
         errors.noSource(entrypoint.configSource),
-        entrypoint
+        entrypoint.name
       );
     }
     throw e;
@@ -86,34 +86,34 @@ export function isUmdNameSpecified(entrypoint: Entrypoint) {
 export function validateEntrypoint(entrypoint: Entrypoint, log: boolean) {
   validateEntrypointSource(entrypoint);
   if (log) {
-    logger.info(infos.validEntrypoint, entrypoint);
+    logger.info(infos.validEntrypoint, entrypoint.name);
   }
   if (!isMainFieldValid(entrypoint)) {
-    throw new FixableError(errors.invalidMainField, entrypoint);
+    throw new FixableError(errors.invalidMainField, entrypoint.name);
   }
   if (log) {
-    logger.info(infos.validMainField, entrypoint);
+    logger.info(infos.validMainField, entrypoint.name);
   }
   if (entrypoint.module !== null) {
     if (isModuleFieldValid(entrypoint)) {
       if (log) {
-        logger.info(infos.validModuleField, entrypoint);
+        logger.info(infos.validModuleField, entrypoint.name);
       }
     } else {
-      throw new FixableError(errors.invalidModuleField, entrypoint);
+      throw new FixableError(errors.invalidModuleField, entrypoint.name);
     }
   }
   if (entrypoint.umdMain !== null) {
     if (isUmdMainFieldValid(entrypoint)) {
       if (isUmdNameSpecified(entrypoint)) {
         if (log) {
-          logger.info(infos.validUmdMainField, entrypoint);
+          logger.info(infos.validUmdMainField, entrypoint.name);
         }
       } else {
-        throw new FixableError(errors.umdNameNotSpecified, entrypoint);
+        throw new FixableError(errors.umdNameNotSpecified, entrypoint.name);
       }
     } else {
-      throw new FixableError(errors.invalidUmdMainField, entrypoint);
+      throw new FixableError(errors.invalidUmdMainField, entrypoint.name);
     }
   }
   if (entrypoint.browser !== null) {
@@ -121,9 +121,9 @@ export function validateEntrypoint(entrypoint: Entrypoint, log: boolean) {
       typeof entrypoint.browser === "string" ||
       !isBrowserFieldValid(entrypoint)
     ) {
-      throw new FixableError(errors.invalidBrowserField, entrypoint);
+      throw new FixableError(errors.invalidBrowserField, entrypoint.name);
     } else if (log) {
-      logger.info(infos.validBrowserField, entrypoint);
+      logger.info(infos.validBrowserField, entrypoint.name);
     }
   }
   if (entrypoint.reactNative !== null) {
@@ -131,22 +131,22 @@ export function validateEntrypoint(entrypoint: Entrypoint, log: boolean) {
       typeof entrypoint.reactNative === "string" ||
       !isReactNativeFieldValid(entrypoint)
     ) {
-      throw new FixableError(errors.invalidReactNativeField, entrypoint);
+      throw new FixableError(errors.invalidReactNativeField, entrypoint.name);
     } else if (log) {
-      logger.info(infos.validReactNativeField, entrypoint);
+      logger.info(infos.validReactNativeField, entrypoint.name);
     }
   }
 }
 
 export default async function validate(directory: string) {
-  let project = await Project.create(directory);
+  let project: Project = await Project.create(directory);
 
   for (let pkg of project.packages) {
     validatePackage(pkg);
     for (let entrypoint of pkg.entrypoints) {
       validateEntrypoint(entrypoint, true);
     }
-    logger.info(infos.validPackageEntrypoints, pkg);
+    logger.info(infos.validPackageEntrypoints, pkg.name);
   }
 
   logger.success(successes.validProject);

@@ -15,7 +15,7 @@ let camelToPkgJsonField = {
 
 export async function fixPackage(pkg: Package) {
   if (pkg.entrypoints.length === 0) {
-    throw new FatalError(errors.noEntrypoints, pkg);
+    throw new FatalError(errors.noEntrypoints, pkg.name);
   }
   let fields = {
     main: true,
@@ -35,7 +35,7 @@ export async function fixPackage(pkg: Package) {
 
 export function validatePackage(pkg: Package) {
   if (pkg.entrypoints.length === 0) {
-    throw new FatalError(errors.noEntrypoints, pkg);
+    throw new FatalError(errors.noEntrypoints, pkg.name);
   }
   let fields = {
     // main is intentionally not here, since it's always required
@@ -60,7 +60,7 @@ export function validatePackage(pkg: Package) {
           } build but ${entrypoint.name} does not have a ${
             camelToPkgJsonField[field]
           } build. Entrypoints in a package must either all have a particular build type or all not have a particular build type.`,
-          pkg
+          pkg.name
         );
       }
       if (
@@ -74,7 +74,7 @@ export function validatePackage(pkg: Package) {
           } does not have a ${
             camelToPkgJsonField[field]
           } build. Entrypoints in a package must either all have a particular build type or all not have a particular build type.`,
-          pkg
+          pkg.name
         );
       }
     });

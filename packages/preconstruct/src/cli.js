@@ -7,7 +7,7 @@ import watch from "./build/watch";
 import fix from "./fix";
 import dev from "./dev";
 import { error, info } from "./logger";
-import { FatalError, FixableError } from "./errors";
+import { FatalError, FixableError, UnexpectedBuildError } from "./errors";
 
 process.env.NODE_ENV = "production";
 
@@ -21,7 +21,7 @@ Commands
   watch        start a watch process to build the project
   validate     validate the project
   fix          infer as much information as possible and fix the project
-  dev          infer as much information as possible and fix the project
+  dev          create links so entrypoints can be imported
 
 `,
   {}
@@ -69,17 +69,19 @@ class CommandNotFoundError extends Error {}
   }
 })().catch(err => {
   if (err instanceof FixableError) {
-    error(err.message, err.item);
+    error(err.message, err.scope);
     info(
       "The above error can be fixed automatically by running preconstruct fix",
       err.item
     );
   } else if (err instanceof FatalError) {
-    error(err.message, err.item);
+    error(err.message, err.scope);
   } else if (err instanceof CommandNotFoundError) {
     error(errors.commandNotFound);
+  } else if (err instanceof UnexpectedBuildError) {
+    error(err, err.scope);
   } else {
-    console.error(err);
+    error(err);
   }
   process.exit(1);
 });

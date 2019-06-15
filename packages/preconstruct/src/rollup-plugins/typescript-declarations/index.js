@@ -56,7 +56,7 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
         if (!dtsFilename) {
           throw new FatalError(
             `no .d.ts file was found for the entrypoint at ${facadeModuleId}`,
-            pkg
+            pkg.name
           );
         }
 

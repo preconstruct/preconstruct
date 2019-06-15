@@ -25,7 +25,7 @@ export default function flowAndNodeDevProdEntry(pkg: Package): Plugin {
           pkg.directory,
           importer
         )}" is importing "${source}"`,
-        pkg
+        pkg.name
       );
     },
     // eslint-disable-next-line no-unused-vars

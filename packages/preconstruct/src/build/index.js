@@ -7,7 +7,7 @@ import { type Aliases, getAliases } from "./aliases";
 import * as logger from "../logger";
 import * as fs from "fs-extra";
 import { confirms, errors } from "../messages";
-import { FatalError } from "../errors";
+import { FatalError, UnexpectedBuildError } from "../errors";
 import { getRollupConfigs } from "./config";
 import { createWorker, destroyWorker } from "../worker-client";
 import { hasherPromise } from "../rollup-plugins/babel";
@@ -48,7 +48,7 @@ async function buildPackage(pkg: Package, aliases: Aliases) {
               pkg.setFieldOnEntrypoints("browser");
               await Promise.all(pkg.entrypoints.map(x => x.save()));
             } else {
-              throw new FatalError(errors.deniedWriteBrowserField, pkg);
+              throw new FatalError(errors.deniedWriteBrowserField, pkg.name);
             }
           })();
         }
@@ -66,7 +66,10 @@ async function retryableBuild(pkg: Package, aliases: Aliases) {
       await retryableBuild(pkg, aliases);
       return;
     }
-    throw err;
+    if (err instanceof FatalError) {
+      throw err;
+    }
+    throw new UnexpectedBuildError(err, pkg.name);
   }
 }
 
