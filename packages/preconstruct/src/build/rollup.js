@@ -33,67 +33,6 @@ const makeExternalPredicate = externalArr => {
   return (id: string) => pattern.test(id);
 };
 
-let unsafeRequire = require;
-
-let pkgJsonsAllowedToFail = [
-  // the package.json can't be found for this package on ci so for now,
-  // we're just going to ignore it
-  // TODO: investigate why it fails
-  "nopt"
-];
-
-function getChildPeerDeps(
-  finalPeerDeps: Array<string>,
-  isUMD: boolean,
-  depKeys: Array<string>,
-  doneDeps: Array<string>,
-  aliases: Aliases,
-  pkg: Package
-) {
-  depKeys
-    .filter(x => !doneDeps.includes(x))
-    .forEach(key => {
-      let pkgJson;
-      try {
-        pkgJson = unsafeRequire(
-          resolveFrom(pkg.directory, key + "/package.json")
-        );
-      } catch (err) {
-        if (
-          err.code === "MODULE_NOT_FOUND" &&
-          pkgJsonsAllowedToFail.includes(key)
-        ) {
-          return;
-        }
-        throw err;
-      }
-      if (pkgJson.peerDependencies) {
-        finalPeerDeps.push(...Object.keys(pkgJson.peerDependencies));
-        getChildPeerDeps(
-          finalPeerDeps,
-          isUMD,
-          Object.keys(pkgJson.peerDependencies),
-          doneDeps,
-          aliases,
-          pkg
-        );
-      }
-      // when we're building a UMD bundle, we're also bundling the dependencies so we need
-      // to get the peerDependencies of dependencies
-      if (pkgJson.dependencies && isUMD) {
-        doneDeps.push(...Object.keys(pkgJson.dependencies));
-        getChildPeerDeps(
-          finalPeerDeps,
-          isUMD,
-          Object.keys(pkgJson.dependencies),
-          doneDeps,
-          aliases,
-          pkg
-        );
-      }
-    });
-}
-
 import type { RollupSingleFileBuild } from "./types";
 
 export let rollup: RollupConfig => Promise<RollupSingleFileBuild> = _rollup;
@@ -124,16 +63,7 @@ export let getRollupConfig = (
   if (pkg.dependencies && type !== "umd") {
     external.push(...Object.keys(pkg.dependencies));
   }
-  getChildPeerDeps(
-    external,
-    type === "umd",
-    external.concat(
-      type === "umd" && pkg.dependencies ? Object.keys(pkg.dependencies) : []
-    ),
-    [],
-    aliases,
-    pkg
-  );
+
   if (type === "node-dev" || type === "node-prod") {
     external.push(...builtInModules);
   }
