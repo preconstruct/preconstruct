@@ -4,41 +4,8 @@ import { type RollupConfig, getRollupConfig } from "./rollup";
 import type { OutputOptions } from "./types";
 import type { Aliases } from "./aliases";
 import is from "sarcastic";
-import resolveFrom from "resolve-from";
 
-let unsafeRequire = require;
-
-function getChildDeps(
-  finalPeerDeps: Array<string>,
-  depKeys: Array<string>,
-  doneDeps: Array<string>,
-  aliases: Aliases,
-  pkg: Package
-) {
-  depKeys
-    .filter(x => !doneDeps.includes(x))
-    .forEach(key => {
-      let pkgJson = unsafeRequire(
-        resolveFrom(pkg.directory, key + "/package.json")
-      );
-
-      if (pkgJson.peerDependencies) {
-        finalPeerDeps.push(...Object.keys(pkgJson.peerDependencies));
-      }
-      if (pkgJson.dependencies) {
-        doneDeps.push(...Object.keys(pkgJson.dependencies));
-        getChildDeps(
-          finalPeerDeps,
-          Object.keys(pkgJson.dependencies),
-          doneDeps,
-          aliases,
-          pkg
-        );
-      }
-    });
-}
-
-function getGlobals(pkg: Package, aliases) {
+function getGlobals(pkg: Package) {
   let stuff = [];
 
   if (pkg.peerDependencies) {
@@ -52,13 +19,9 @@ function getGlobals(pkg: Package, aliases) {
     return {};
   }
 
-  let finalPeerDeps = pkg.peerDependencies
-    ? Object.keys(pkg.peerDependencies)
-    : [];
+  let peerDeps = pkg.peerDependencies ? Object.keys(pkg.peerDependencies) : [];
 
-  getChildDeps(finalPeerDeps, stuff, [], aliases, pkg);
-
-  return finalPeerDeps.reduce((obj, pkgName) => {
+  return peerDeps.reduce((obj, pkgName) => {
     obj[pkgName] = pkg.project.global(pkgName);
     return obj;
   }, {});
@@ -129,7 +92,7 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
               entryFileNames: "[name].umd.min.js",
               name: umdName,
               dir: pkg.directory,
-              globals: getGlobals(pkg, aliases)
+              globals: getGlobals(pkg)
             }
           ]
         });
