@@ -3,21 +3,14 @@
 exports[`needs @babel/runtime allow install: dist/use-babel-runtime.cjs.dev.js 1`] = `
 "'use strict';
 
-Object.defineProperty(exports, '__esModule', {
-  value: true
-});
+Object.defineProperty(exports, '__esModule', { value: true });
 
-function _interopDefault(ex) {
-  return ex && typeof ex === 'object' && 'default' in ex ? ex['default'] : ex;
-}
+function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
-var _possibleConstructorReturn = _interopDefault(require(\\"@babel/runtime/helpers/possibleConstructorReturn\\"));
-
-var _getPrototypeOf = _interopDefault(require(\\"@babel/runtime/helpers/getPrototypeOf\\"));
-
-var _inherits = _interopDefault(require(\\"@babel/runtime/helpers/inherits\\"));
-
-var _classCallCheck = _interopDefault(require(\\"@babel/runtime/helpers/classCallCheck\\"));
+var _possibleConstructorReturn = _interopDefault(require('@babel/runtime/helpers/possibleConstructorReturn'));
+var _getPrototypeOf = _interopDefault(require('@babel/runtime/helpers/getPrototypeOf'));
+var _inherits = _interopDefault(require('@babel/runtime/helpers/inherits'));
+var _classCallCheck = _interopDefault(require('@babel/runtime/helpers/classCallCheck'));
 
 var Bar = function Bar() {
   _classCallCheck(this, Bar);

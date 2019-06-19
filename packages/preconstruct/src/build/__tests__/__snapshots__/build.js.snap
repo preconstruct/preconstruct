@@ -3,9 +3,7 @@
 exports[`@babel/runtime installed: babel-runtime-installed.cjs.dev.js 1`] = `
 "'use strict';
 
-Object.defineProperty(exports, '__esModule', {
-  value: true
-});
+Object.defineProperty(exports, '__esModule', { value: true });
 
 class Bar {}
 
@@ -53,10 +51,10 @@ export { Foo };
 exports[`clears dist folder: already-has-things-in-dist.cjs.dev.js 1`] = `
 "'use strict';
 
-Object.defineProperty(exports, '__esModule', {
-  value: true
-});
+Object.defineProperty(exports, '__esModule', { value: true });
+
 var index = \\"something\\";
+
 exports.default = index;
 "
 `;
@@ -88,9 +86,8 @@ exports.default = index;
 exports[`flow: flow.cjs.dev.js 1`] = `
 "'use strict';
 
-Object.defineProperty(exports, '__esModule', {
-  value: true
-});
+Object.defineProperty(exports, '__esModule', { value: true });
+
 var a = \\"wow\\";
 
 function doSomething(arg) {
@@ -150,15 +147,13 @@ export { doSomething, a as something };
 exports[`flow: flow-export-default.cjs.dev.js 1`] = `
 "'use strict';
 
-Object.defineProperty(exports, '__esModule', {
-  value: true
-});
+Object.defineProperty(exports, '__esModule', { value: true });
 
 function doSomething(arg) {
   return \\"something\\" + arg;
 }
-
 var index = \\"wow\\";
+
 exports.default = index;
 exports.doSomething = doSomething;
 "
@@ -213,10 +208,10 @@ export { doSomething };
 exports[`monorepo single package: package-two-single-package.cjs.dev.js 1`] = `
 "'use strict';
 
-Object.defineProperty(exports, '__esModule', {
-  value: true
-});
+Object.defineProperty(exports, '__esModule', { value: true });
+
 var index = 2;
+
 exports.default = index;
 "
 `;
@@ -256,6 +251,7 @@ exports[`monorepo umd with dep on other module: package-four-umd-with-dep.cjs.de
 "'use strict';
 
 require('@some-scope/package-one-umd-with-dep');
+
 "
 `;
 
@@ -326,6 +322,7 @@ exports[`monorepo umd with dep on other module: package-three-umd-with-dep.cjs.d
 "'use strict';
 
 require('@some-scope/package-one-umd-with-dep');
+
 "
 `;
 
@@ -395,10 +392,10 @@ exports[`monorepo umd with dep on other module: package-two-umd-with-dep.umd.min
 exports[`monorepo: package-one.cjs.dev.js 1`] = `
 "'use strict';
 
-Object.defineProperty(exports, '__esModule', {
-  value: true
-});
+Object.defineProperty(exports, '__esModule', { value: true });
+
 var index = 1;
+
 exports.default = index;
 "
 `;
@@ -437,10 +434,10 @@ export default index;
 exports[`monorepo: package-two.cjs.dev.js 1`] = `
 "'use strict';
 
-Object.defineProperty(exports, '__esModule', {
-  value: true
-});
+Object.defineProperty(exports, '__esModule', { value: true });
+
 var index = 2;
+
 exports.default = index;
 "
 `;
@@ -479,10 +476,10 @@ export default index;
 exports[`no module: no-module.cjs.dev.js 1`] = `
 "'use strict';
 
-Object.defineProperty(exports, '__esModule', {
-  value: true
-});
+Object.defineProperty(exports, '__esModule', { value: true });
+
 var index = \\"this does not have a module build\\";
+
 exports.default = index;
 "
 `;
@@ -514,9 +511,7 @@ exports.default = index;
 exports[`prod checks: prod-checks.cjs.dev.js 1`] = `
 "'use strict';
 
-Object.defineProperty(exports, '__esModule', {
-  value: true
-});
+Object.defineProperty(exports, '__esModule', { value: true });
 
 function thing() {
   if (process.env.NODE_ENV !== \\"production\\") {

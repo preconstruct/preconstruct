@@ -3,9 +3,7 @@
 exports[`multiple entrypoints: dist/multiple-entrypoints.cjs.dev.js 1`] = `
 "'use strict';
 
-Object.defineProperty(exports, '__esModule', {
-  value: true
-});
+Object.defineProperty(exports, '__esModule', { value: true });
 
 let sum = (a, b) => a + b;
 
@@ -47,9 +45,7 @@ export { sum };
 exports[`multiple entrypoints: multiply/dist/multiple-entrypoints.cjs.dev.js 1`] = `
 "'use strict';
 
-Object.defineProperty(exports, '__esModule', {
-  value: true
-});
+Object.defineProperty(exports, '__esModule', { value: true });
 
 let multiply = (a, b) => a * b;
 
@@ -95,10 +91,10 @@ exports[`multiple entrypoints: src/sum.js 1`] = `"export let sum = (a, b) => a +
 exports[`source entrypoint option flow: source-entrypoint-option-flow.cjs.dev.js 1`] = `
 "'use strict';
 
-Object.defineProperty(exports, '__esModule', {
-  value: true
-});
+Object.defineProperty(exports, '__esModule', { value: true });
+
 let something = \\"\\";
+
 exports.something = something;
 "
 `;
@@ -136,10 +132,10 @@ exports.something = something;
 exports[`source entrypoint option: source-entrypoint-option.cjs.dev.js 1`] = `
 "'use strict';
 
-Object.defineProperty(exports, '__esModule', {
-  value: true
-});
+Object.defineProperty(exports, '__esModule', { value: true });
+
 let something = \\"\\";
+
 exports.something = something;
 "
 `;
@@ -171,9 +167,7 @@ exports.something = something;
 exports[`two entrypoints where one requires the other entrypoint: dist/importing-another-entrypoint.cjs.dev.js 1`] = `
 "'use strict';
 
-Object.defineProperty(exports, '__esModule', {
-  value: true
-});
+Object.defineProperty(exports, '__esModule', { value: true });
 
 let identity = x => x;
 
@@ -208,9 +202,7 @@ exports.identity = identity;
 exports[`two entrypoints where one requires the other entrypoint: multiply/dist/importing-another-entrypoint.cjs.dev.js 1`] = `
 "'use strict';
 
-Object.defineProperty(exports, '__esModule', {
-  value: true
-});
+Object.defineProperty(exports, '__esModule', { value: true });
 
 var importingAnotherEntrypoint = require('../../dist/importing-another-entrypoint.cjs.dev.js');
 
@@ -286,9 +278,7 @@ exports.identity = identity;
 exports[`two entrypoints with a common dependency: dist/common-dependency-two-entrypoints.cjs.dev.js 1`] = `
 "'use strict';
 
-Object.defineProperty(exports, '__esModule', {
-  value: true
-});
+Object.defineProperty(exports, '__esModule', { value: true });
 
 var __chunk_1 = require('./chunk-some-hash.cjs.dev.js');
 
@@ -338,9 +328,7 @@ export { sum };
 exports[`two entrypoints with a common dependency: multiply/dist/common-dependency-two-entrypoints.cjs.dev.js 1`] = `
 "'use strict';
 
-Object.defineProperty(exports, '__esModule', {
-  value: true
-});
+Object.defineProperty(exports, '__esModule', { value: true });
 
 var __chunk_1 = require('../../dist/chunk-some-hash.cjs.dev.js');
 
