@@ -2,7 +2,7 @@
 import fixturez from "fixturez";
 import path from "path";
 import validate from "../validate";
-import { logMock, modifyPkg, getPkg } from "../../test-utils";
+import { logMock, modifyPkg, getPkg, install } from "../../test-utils";
 import { FatalError } from "../errors";
 import { errors, confirms } from "../messages";
 
@@ -206,4 +206,20 @@ Object {
   "module": "dist/entrypoint-pkg-json-missing.esm.js",
 }
 `);
+});
+
+test("monorepo umd with dep on other module incorrect peerDeps", async () => {
+  let tmpPath = f.copy("monorepo-umd-with-dep-incorrect-peerdeps");
+
+  await install(tmpPath);
+
+  try {
+    await validate(tmpPath);
+  } catch (err) {
+    expect(err).toMatchInlineSnapshot(
+      `[Error: the package @some-scope-incorrect-peerdeps/package-four-umd-with-dep depends on @some-scope-incorrect-peerdeps/package-one-umd-with-dep which has a peerDependency on react but react is not specified in the dependencies or peerDependencies of @some-scope-incorrect-peerdeps/package-four-umd-with-dep. please add react to the dependencies or peerDependencies of @some-scope-incorrect-peerdeps/package-four-umd-with-dep]`
+    );
+    return;
+  }
+  expect(true).toBe(false);
 });
