@@ -1,5 +1,14 @@
 # preconstruct
 
+## 0.0.80
+
+### Patch Changes
+
+- [ccc162f](https://github.com/preconstruct/preconstruct/commit/ccc162f) [#64](https://github.com/preconstruct/preconstruct/pulls/64) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Refactor logging and include package name in uncaught build errors
+- [9cab2d1](https://github.com/preconstruct/preconstruct/commit/9cab2d1) [#65](https://github.com/preconstruct/preconstruct/pulls/65) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Replace internal Babel runtime helpers CJS transform from an AST transform to regex
+- [df58a43](https://github.com/preconstruct/preconstruct/commit/df58a43) [#68](https://github.com/preconstruct/preconstruct/pulls/68) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Add validation to disallow transitive peerDependencies where the peerDep is not specified in the direct parent
+- [ff49a6d](https://github.com/preconstruct/preconstruct/commit/ff49a6d) [#66](https://github.com/preconstruct/preconstruct/pulls/66) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Create rollup externals from dependencies and peerDependencies without checking nested deps. If you get an error saying that a dependency is missing when it previously worked, you should add that package as a dependency or peerDependency.
+
 ## 0.0.79
 
 ### Patch Changes
