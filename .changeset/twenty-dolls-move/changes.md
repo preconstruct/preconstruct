@@ -1,0 +1,1 @@
+Add validation to disallow transitive peerDependencies where the peerDep is not specified in the direct parent

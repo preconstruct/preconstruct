@@ -1,5 +1,5 @@
 {
-  "name": "@some-scope/package-four-umd-with-dep",
+  "name": "@some-scope-incorrect-peerdeps/package-four-umd-with-dep",
   "version": "1.0.0",
   "main": "dist/package-four-umd-with-dep.cjs.js",
   "umd:main": "dist/package-four-umd-with-dep.umd.min.js",
@@ -9,9 +9,6 @@
     "umdName": "packageFour"
   },
   "dependencies": {
-    "@some-scope/package-one-umd-with-dep": "1.0.0"
-  },
-  "peerDependencies": {
-    "react": "^16.6.3"
+    "@some-scope-incorrect-peerdeps/package-one-umd-with-dep": "1.0.0"
   }
 }
