@@ -1,5 +1,11 @@
 # preconstruct
 
+## 0.0.81
+
+### Patch Changes
+
+- [99f1549](https://github.com/preconstruct/preconstruct/commit/99f1549) - Remove dependency on some emotion packages that caused preconstruct to break when building emotion
+
 ## 0.0.80
 
 ### Patch Changes
