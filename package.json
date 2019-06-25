@@ -34,8 +34,6 @@
     "@changesets/cli": "^1.2.0",
     "@changesets/get-github-info": "^0.1.1",
     "@emotion/core": "^10.0.10",
-    "@emotion/memoize": "^0.7.1",
-    "@emotion/weak-memoize": "^0.2.2",
     "@mdx-js/mdx": "^1.0.18",
     "@mdx-js/react": "^1.0.16",
     "babel-core": "^7.0.0-bridge.0",

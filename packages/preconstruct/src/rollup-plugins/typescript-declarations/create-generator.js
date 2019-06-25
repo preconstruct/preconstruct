@@ -1,12 +1,33 @@
 // @flow
 import resolveFrom from "resolve-from";
 import * as fs from "fs-extra";
-import weakMemoize from "@emotion/weak-memoize";
-import memoize from "@emotion/memoize";
 import path from "path";
 import { createLanguageServiceHostClass } from "./language-service-host";
 
 let unsafeRequire = require;
+
+let weakMemoize = function<Arg, Return>(func: Arg => Return): Arg => Return {
+  // $FlowFixMe flow doesn't include all non-primitive types as allowed for weakmaps
+  let cache: WeakMap<Arg, Return> = new WeakMap();
+  return arg => {
+    if (cache.has(arg)) {
+      // $FlowFixMe
+      return cache.get(arg);
+    }
+    let ret = func(arg);
+    cache.set(arg, ret);
+    return ret;
+  };
+};
+
+function memoize<V>(fn: string => V): string => V {
+  const cache = {};
+
+  return (arg: string) => {
+    if (cache[arg] === undefined) cache[arg] = fn(arg);
+    return cache[arg];
+  };
+}
 
 let getService = weakMemoize(typescript =>
   memoize(async configFileName => {
