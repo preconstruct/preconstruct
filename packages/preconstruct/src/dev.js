@@ -8,6 +8,25 @@ import path from "path";
 
 let tsExtensionPattern = /tsx?$/;
 
+function cjsOnlyReexportTemplate(pathToSource: string) {
+  return `// 👋 hey!!
+// you might be reading this and seeing .esm in the filename
+// and being confused why there is commonjs below this filename
+// DON'T WORRY!
+// this is intentional
+// it's only commonjs with \`preconstruct dev\`
+// when you run \`preconstruct build\`, it will be ESM
+// why is it commonjs?
+// we need to re-export every export from the source file
+// but we can't do that with ESM without knowing what the exports are (because default exports aren't included in export/import *)
+// and they could change after running \`preconstruct dev\` so we can't look at the file without forcing people to
+// run preconstruct dev again which wouldn't be ideal
+// this solution could change but for now, it's working
+
+module.exports = require("${pathToSource}")
+  `;
+}
+
 async function getTypeSystem(
   entrypoint
 ): Promise<[null | "flow" | "typescript", string]> {
@@ -103,9 +122,9 @@ unregister();
           ];
           if (entrypoint.module) {
             promises.push(
-              fs.symlink(
-                entrypoint.source,
-                path.join(entrypoint.directory, entrypoint.module)
+              fs.writeFile(
+                path.join(entrypoint.directory, entrypoint.module),
+                cjsOnlyReexportTemplate(entrypoint.source)
               )
             );
           }
@@ -113,9 +132,9 @@ unregister();
           if (browserField) {
             for (let key of Object.keys(browserField)) {
               promises.push(
-                fs.symlink(
-                  entrypoint.source,
-                  path.join(entrypoint.directory, browserField[key])
+                fs.writeFile(
+                  path.join(entrypoint.directory, browserField[key]),
+                  cjsOnlyReexportTemplate(entrypoint.source)
                 )
               );
             }
@@ -124,9 +143,9 @@ unregister();
           if (rnField) {
             for (let key of Object.keys(rnField)) {
               promises.push(
-                fs.symlink(
-                  entrypoint.source,
-                  path.join(entrypoint.directory, rnField[key])
+                fs.writeFile(
+                  path.join(entrypoint.directory, rnField[key]),
+                  cjsOnlyReexportTemplate(entrypoint.source)
                 )
               );
             }
