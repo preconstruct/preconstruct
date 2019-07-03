@@ -49,8 +49,6 @@ test("all the build types", async () => {
 
   await dev(tmpPath);
 
-  let sourceFile = path.join(tmpPath, "src", "index.js");
-
   let distPath = path.join(tmpPath, "dist");
   expect(await fs.readdir(distPath)).toEqual([
     "all-the-build-types.browser.cjs.js",
@@ -61,11 +59,11 @@ test("all the build types", async () => {
     "all-the-build-types.native.esm.js"
   ]);
 
-  let cjsDistPath = path.join(distPath, "all-the-build-types.cjs.js");
-  let esmDistPath = path.join(distPath, "all-the-build-types.esm.js");
-
   expect(
-    (await fs.readFile(cjsDistPath, "utf-8"))
+    (await fs.readFile(
+      path.join(distPath, "all-the-build-types.cjs.js"),
+      "utf-8"
+    ))
       .replace(/require\('[^']+'\)/g, "thisWasARequireCall()")
       .replace(/___internalHook\('[^']+'\)/, "thisWasA___internalHookCall()")
   ).toMatchInlineSnapshot(`
@@ -79,9 +77,8 @@ unregister();
 "
 `);
 
-  expect(await fs.readlink(esmDistPath)).toBe(sourceFile);
-
-  let shouldBeSymlinkedToSource = [
+  let shouldBeCjsThingsToSource = [
+    "all-the-build-types.esm.js",
     "all-the-build-types.browser.cjs.js",
     "all-the-build-types.native.cjs.js",
     "all-the-build-types.browser.esm.js",
@@ -89,8 +86,25 @@ unregister();
   ];
 
   await Promise.all(
-    shouldBeSymlinkedToSource.map(async filename => {
-      expect(await fs.readlink(path.join(distPath, filename))).toBe(sourceFile);
+    shouldBeCjsThingsToSource.map(async filename => {
+      let content = await fs.readFile(path.join(distPath, filename), "utf8");
+
+      expect(content).toBe(`// 👋 hey!!
+// you might be reading this and seeing .esm in the filename
+// and being confused why there is commonjs below this filename
+// DON'T WORRY!
+// this is intentional
+// it's only commonjs with \`preconstruct dev\`
+// when you run \`preconstruct build\`, it will be ESM
+// why is it commonjs?
+// we need to re-export every export from the source file
+// but we can't do that with ESM without knowing what the exports are (because default exports aren't included in export/import *)
+// and they could change after running \`preconstruct dev\` so we can't look at the file without forcing people to
+// run preconstruct dev again which wouldn't be ideal
+// this solution could change but for now, it's working
+
+module.exports = require("${path.join(tmpPath, "src", "index.js")}")
+`);
     })
   );
 });

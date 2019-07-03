@@ -24,7 +24,7 @@ function cjsOnlyReexportTemplate(pathToSource: string) {
 // this solution could change but for now, it's working
 
 module.exports = require("${pathToSource}")
-  `;
+`;
 }
 
 async function getTypeSystem(
