@@ -1,5 +1,11 @@
 # preconstruct
 
+## 0.0.82
+
+### Patch Changes
+
+- [1e851be](https://github.com/preconstruct/preconstruct/commit/1e851be) [#69](https://github.com/preconstruct/preconstruct/pulls/69) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Switch symlinks in `preconstruct dev` to CommonJS re-exports to avoid issues when using Node's `--preserve-symlinks` option.
+
 ## 0.0.81
 
 ### Patch Changes
