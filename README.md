@@ -18,6 +18,8 @@ yarn preconstruct init
 yarn preconstruct build
 ```
 
+## [Read the docs on preconstruct.tools](https://preconstruct.tools)
+
 ## What does preconstruct do?
 
 preconstruct generates bundles for NPM packages with different module formats and enforces that consumer bundlers like webpack and Node can import those packages.
