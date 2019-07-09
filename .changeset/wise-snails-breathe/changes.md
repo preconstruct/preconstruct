@@ -1,0 +1,1 @@
+Prompt to delete package directories that do not contain package.jsons
