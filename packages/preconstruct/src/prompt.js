@@ -51,6 +51,18 @@ export function createPromptConfirmLoader(
   return (pkg: NamedThing) => loader.load(pkg);
 }
 
+export let promptConfirm = async (message: string): Promise<boolean> => {
+  let { confirm } = await inquirer.prompt([
+    {
+      type: "confirm",
+      name: "confirm",
+      message,
+      prefix: prefix
+    }
+  ]);
+  return confirm;
+};
+
 let doPromptInput = async (
   message: string,
   pkg: ItemUnion,

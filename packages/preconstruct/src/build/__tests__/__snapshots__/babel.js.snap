@@ -108,7 +108,7 @@ exports[`needs @babel/runtime allow install: package.json 1`] = `
   \\"dependencies\\": {
     \\"@babel/core\\": \\"^7.4.3\\",
     \\"@babel/preset-env\\": \\"^7.4.3\\",
-    \\"@babel/runtime\\": \\"^7.4.5\\"
+    \\"@babel/runtime\\": \\"^7.5.2\\"
   }
 }
 "

@@ -8,6 +8,8 @@ import globby from "globby";
 import * as fs from "fs-extra";
 import { Item } from "./item";
 import { Package } from "./package";
+import { error } from "./logger";
+import { promptConfirm } from "./prompt";
 import { PKG_JSON_CONFIG_FIELD } from "./constants";
 
 let unsafeRequire = require;
@@ -77,13 +79,44 @@ export class Project extends Item {
         expandDirectories: false
       });
 
+      let dirsWithoutPkgJson = [];
+      let lastErr;
+
       let packages = await Promise.all(
         filenames.map(async x => {
-          let pkg = await Package.create(x);
-          pkg.project = this;
-          return pkg;
+          try {
+            let pkg = await Package.create(x);
+            pkg.project = this;
+            return pkg;
+          } catch (err) {
+            if (
+              err.code === "ENOENT" &&
+              err.path === nodePath.join(x, "package.json")
+            ) {
+              lastErr = err;
+              dirsWithoutPkgJson.push(x);
+              return ((undefined: any): Package);
+            }
+            throw err;
+          }
         })
       );
+      if (dirsWithoutPkgJson.length) {
+        error(
+          "there are some package directories that do not have package.jsons\nthis is often caused by switching branches.\n\n" +
+            dirsWithoutPkgJson.join("\n") +
+            "\n"
+        );
+        if (
+          !(await promptConfirm(
+            "would you like preconstruct to delete these directories automatically?"
+          ))
+        ) {
+          throw lastErr;
+        }
+        await Promise.all(dirsWithoutPkgJson.map(dir => fs.remove(dir)));
+        return this._packages();
+      }
       return packages;
     } catch (error) {
       if (error instanceof is.AssertionError) {
