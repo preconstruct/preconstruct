@@ -1,5 +1,11 @@
 # preconstruct
 
+## 0.0.84
+
+### Patch Changes
+
+- [a71a4f4](https://github.com/preconstruct/preconstruct/commit/a71a4f4) - Move an internal file
+
 ## 0.0.83
 
 ### Patch Changes
