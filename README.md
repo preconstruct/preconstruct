@@ -1,6 +1,6 @@
 # 🎁 preconstruct
 
-> A tool to make building npm packages easier
+> A smart build tool for libraries
 
 > DISCLAIMER:
 >
