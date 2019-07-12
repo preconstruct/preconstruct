@@ -1,0 +1,8 @@
+{
+  "name": "json-package",
+  "version": "1.0.0",
+  "main": "dist/json-package.cjs.js",
+  "license": "MIT",
+  "private": true,
+  "module": "dist/json-package.esm.js"
+}

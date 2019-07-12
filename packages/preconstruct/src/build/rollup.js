@@ -16,6 +16,7 @@ import { confirms } from "../messages";
 import rewriteCjsRuntimeHelpers from "../rollup-plugins/rewrite-cjs-runtime-helpers";
 import flowAndNodeDevProdEntry from "../rollup-plugins/flow-and-prod-dev-entry";
 import typescriptDeclarations from "../rollup-plugins/typescript-declarations";
+import json from "rollup-plugin-json";
 import babel from "../rollup-plugins/babel";
 import terser from "../rollup-plugins/terser";
 import { limit } from "../prompt";
@@ -165,6 +166,7 @@ export let getRollupConfig = (
           "typeof window": JSON.stringify("object")
         }),
       rewriteCjsRuntimeHelpers(),
+      json({ namedExports: false }),
       type === "umd" && alias(rollupAliases),
       resolve({
         extensions: EXTENSIONS,
