@@ -96,7 +96,8 @@
     "spawndamnit": "^2.0.0",
     "terser": "^3.14.1",
     "typography": "^0.16.19",
-    "xxhash-wasm": "^0.3.1"
+    "xxhash-wasm": "^0.3.1",
+    "rollup-plugin-json": "^4.0.0"
   },
   "jest": {
     "reporters": [

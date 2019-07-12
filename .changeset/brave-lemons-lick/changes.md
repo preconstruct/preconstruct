@@ -1,0 +1,1 @@
+Allow importing JSON (only as a default export)

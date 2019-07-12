@@ -251,3 +251,11 @@ test("needs @babel/runtime disallow install", async () => {
   }
   expect(true).toBe(false);
 });
+
+test("json", async () => {
+  let tmpPath = f.copy("json");
+
+  await build(tmpPath);
+
+  await snapshotDistFiles(tmpPath);
+});
