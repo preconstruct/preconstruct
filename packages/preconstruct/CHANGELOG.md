@@ -1,5 +1,12 @@
 # preconstruct
 
+## 0.0.83
+
+### Patch Changes
+
+- [ee8278f](https://github.com/preconstruct/preconstruct/commit/ee8278f) [#71](https://github.com/preconstruct/preconstruct/pulls/71) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Allow importing JSON (only as a default export)
+- [e6f0b03](https://github.com/preconstruct/preconstruct/commit/e6f0b03) [#70](https://github.com/preconstruct/preconstruct/pulls/70) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Prompt to delete package directories that do not contain package.jsons
+
 ## 0.0.82
 
 ### Patch Changes
