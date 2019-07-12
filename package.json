@@ -36,7 +36,7 @@
     "@emotion/core": "^10.0.10",
     "@mdx-js/mdx": "^1.0.18",
     "@mdx-js/react": "^1.0.16",
-    "@mitchellhamilton/experimental-changesets-auto-release": "^0.0.0",
+    "@mitchellhamilton/experimental-changesets-auto-release": "^0.0.1",
     "babel-core": "^7.0.0-bridge.0",
     "babel-eslint": "^10.0.1",
     "babel-jest": "^24.0.0",
