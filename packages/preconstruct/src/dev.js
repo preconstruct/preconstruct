@@ -86,11 +86,6 @@ async function writeFlowFile(typeSystemPromise, entrypoint) {
   }
 }
 
-// escape backslashes such as in windows file paths
-function escape(filePath: string) {
-    return filePath.replace(/\\/g, '\\\\');
-}
-
 export default async function dev(projectDir: string) {
   let project: Project = await Project.create(projectDir);
   project.packages.forEach(({ entrypoints }) =>
@@ -113,13 +108,13 @@ export default async function dev(projectDir: string) {
             writeFlowFile(typeSystemPromise, entrypoint),
             fs.writeFile(
               path.join(entrypoint.directory, entrypoint.main),
-              `'use strict';
+              `"use strict";
 
-let unregister = require('${escape(require.resolve(
-                "@preconstruct/hook"
-              ))}').___internalHook('${escape(project.directory)}');
+let unregister = require(${JSON.stringify(
+                require.resolve("@preconstruct/hook")
+              )}).___internalHook(${JSON.stringify(project.directory)});
 
-module.exports = require('${entrypoint.source}');
+module.exports = require(${JSON.stringify(entrypoint.source)});
 
 unregister();
 `
