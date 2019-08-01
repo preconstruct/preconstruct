@@ -54,13 +54,18 @@ let getService = weakMemoize(typescript =>
       typescript.createDocumentRegistry()
     );
     servicesHost.setLanguageService(service);
-    return service;
+    return { service, options: thing.options };
   })
 );
 
 export async function createDeclarationCreator(
   dirname: string
-): Promise<(filename: string) => { name: string, content: string }> {
+): Promise<{
+  getDeps: (entrypoints: Array<string>) => Set<string>,
+  getDeclarationFile: (
+    filename: string
+  ) => Promise<{ name: string, content: string }>
+}> {
   let typescript;
   try {
     typescript = unsafeRequire(resolveFrom(dirname, "typescript"));
@@ -81,16 +86,96 @@ export async function createDeclarationCreator(
       "an entrypoint source file ends with the .ts extension but no TypeScript config exists, please create one."
     );
   }
-  let service = await getService(typescript)(configFileName);
+  let { service, options } = await getService(typescript)(configFileName);
+  let moduleResolutionCache = typescript.createModuleResolutionCache(
+    dirname,
+    x => x,
+    options
+  );
 
-  return (filename: string) => {
-    let output = service.getEmitOutput(filename, true);
-    return {
-      name: output.outputFiles[0].name.replace(
-        dirname,
-        path.join(dirname, "dist", "declarations")
-      ),
-      content: output.outputFiles[0].text
-    };
+  return {
+    getDeps: (entrypoints: Array<string>) => {
+      let program = service.getProgram();
+      if (!program) {
+        throw new Error(
+          "This is an internal error, please open an issue if you see this: program not found"
+        );
+      }
+      let resolvedEntrypointPaths = entrypoints.map(x => {
+        let { resolvedModule } = typescript.resolveModuleName(
+          path.join(path.dirname(x), path.basename(x, path.extname(x))),
+          dirname,
+          options,
+          typescript.sys,
+          moduleResolutionCache
+        );
+        if (!resolvedModule) {
+          throw new Error(
+            "This is an internal error, please open an issue if you see this: ts could not resolve module"
+          );
+        }
+        return resolvedModule.resolvedFileName;
+      });
+      let allDeps = new Set<string>(resolvedEntrypointPaths);
+
+      function searchDeps(deps: Set<string>) {
+        for (let dep of deps) {
+          let sourceFile = program.getSourceFile(dep);
+          if (!sourceFile) {
+            throw new Error(
+              "This is an internal error, please open an issue if you see this: source file not found"
+            );
+          }
+          let internalDeps = new Set();
+          for (let { text } of sourceFile.imports) {
+            let { resolvedModule } = typescript.resolveModuleName(
+              text,
+              dep,
+              options,
+              typescript.sys,
+              moduleResolutionCache
+            );
+            if (!resolvedModule) {
+              throw new Error(
+                "This is an internal error, please open an issue if you see this: ts could not resolve module"
+              );
+            }
+
+            if (
+              !allDeps.has(resolvedModule.resolvedFileName) &&
+              !resolvedModule.isExternalLibraryImport &&
+              resolvedModule.resolvedFileName.includes(dirname)
+            ) {
+              internalDeps.add(resolvedModule.resolvedFileName);
+              allDeps.add(resolvedModule.resolvedFileName);
+            }
+          }
+          searchDeps(internalDeps);
+        }
+      }
+      searchDeps(new Set(resolvedEntrypointPaths));
+      return allDeps;
+    },
+    getDeclarationFile: async (
+      filename: string
+    ): Promise<{ name: string, content: string }> => {
+      if (filename.endsWith(".d.ts")) {
+        return {
+          name: filename.replace(
+            dirname,
+            path.join(dirname, "dist", "declarations")
+          ),
+          content: await fs.readFile(filename, "utf8")
+        };
+      }
+      let output = service.getEmitOutput(filename, true);
+      return {
+        name: output.outputFiles[0].name.replace(
+          dirname,
+          path.join(dirname, "dist", "declarations")
+        ),
+        content: output.outputFiles[0].text
+      };
+    }
   };
 }

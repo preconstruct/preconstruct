@@ -21,27 +21,18 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
 
       let srcFilenameToDtsFilenameMap = new Map<string, string>();
 
-      let doneModules = new Set();
-
-      for (const n in bundle) {
-        const file = bundle[n];
-        if (file.isAsset) {
-          continue;
-        }
-
-        for (let mod in file.modules) {
-          if (!doneModules.has(mod)) {
-            doneModules.add(mod);
-            let { name, content } = creator(mod);
-            srcFilenameToDtsFilenameMap.set(mod, name);
-            bundle[name] = {
-              fileName: name,
-              isAsset: true,
-              source: content
-            };
-          }
-        }
-      }
+      let deps = creator.getDeps(pkg.entrypoints.map(x => x.source));
+      await Promise.all(
+        [...deps].map(async dep => {
+          let { name, content } = await creator.getDeclarationFile(dep);
+          srcFilenameToDtsFilenameMap.set(dep, name);
+          bundle[name] = {
+            fileName: name,
+            isAsset: true,
+            source: content
+          };
+        })
+      );
 
       for (const n in bundle) {
         const file = bundle[n];
