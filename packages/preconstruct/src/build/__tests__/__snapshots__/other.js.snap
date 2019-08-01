@@ -294,9 +294,23 @@ export default index;
 "
 `;
 
+exports[`typescript: dist/declarations/src/another-thing.d.ts 1`] = `
+"export declare type SomeType = string;
+"
+`;
+
 exports[`typescript: dist/declarations/src/index.d.ts 1`] = `
-"declare let thing: string;
+"import { SomeType } from \\"./another-thing\\";
+export * from \\"./one-more-thing\\";
+declare let thing: SomeType;
 export default thing;
+"
+`;
+
+exports[`typescript: dist/declarations/src/one-more-thing.d.ts 1`] = `
+"declare var obj: object;
+
+export { obj };
 "
 `;
 
@@ -311,9 +325,12 @@ exports[`typescript: dist/typescript.cjs.dev.js 1`] = `
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
+let obj = {};
+
 let thing = \\"something\\";
 
 exports.default = thing;
+exports.obj = obj;
 "
 `;
 
@@ -335,16 +352,19 @@ Object.defineProperty(exports, \\"__esModule\\", {
   value: !0
 });
 
-let thing = \\"something\\";
+let obj = {}, thing = \\"something\\";
 
-exports.default = thing;
+exports.default = thing, exports.obj = obj;
 "
 `;
 
 exports[`typescript: dist/typescript.esm.js 1`] = `
-"let thing = \\"something\\";
+"let obj = {};
+
+let thing = \\"something\\";
 
 export default thing;
+export { obj };
 "
 `;
 
@@ -365,10 +385,30 @@ exports[`typescript: package.json 1`] = `
 "
 `;
 
+exports[`typescript: src/another-thing.ts 1`] = `
+"export type SomeType = string;
+"
+`;
+
 exports[`typescript: src/index.ts 1`] = `
-"let thing: string = \\"something\\";
+"import { SomeType } from \\"./another-thing\\";
+export * from \\"./one-more-thing\\";
+
+let thing: SomeType = \\"something\\";
 
 export default thing;
+"
+`;
+
+exports[`typescript: src/one-more-thing.d.ts 1`] = `
+"declare var obj: object;
+
+export { obj };
+"
+`;
+
+exports[`typescript: src/one-more-thing.js 1`] = `
+"export let obj = {};
 "
 `;
 
