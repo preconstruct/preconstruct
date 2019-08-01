@@ -1,5 +1,11 @@
 # preconstruct
 
+## 0.0.85
+
+### Patch Changes
+
+- [cec3b9f](https://github.com/preconstruct/preconstruct/commit/cec3b9f) [#75](https://github.com/preconstruct/preconstruct/pulls/75) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Fix TypeScript declaration file generation where a file only exports types
+
 ## 0.0.84
 
 ### Patch Changes
