@@ -1,1 +1,0 @@
-Fix TypeScript declaration file generation where a file only exports types
