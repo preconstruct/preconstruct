@@ -1,5 +1,11 @@
 # preconstruct
 
+## 0.0.86
+
+### Patch Changes
+
+- [470de81](https://github.com/preconstruct/preconstruct/commit/470de81) [#77](https://github.com/preconstruct/preconstruct/pulls/77) Thanks [@bholloway](https://github.com/bholloway)! - support windows paths
+
 ## 0.0.85
 
 ### Patch Changes
