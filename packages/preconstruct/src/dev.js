@@ -23,7 +23,7 @@ function cjsOnlyReexportTemplate(pathToSource: string) {
 // run preconstruct dev again which wouldn't be ideal
 // this solution could change but for now, it's working
 
-module.exports = require("${pathToSource}")
+module.exports = require(${JSON.stringify(pathToSource)})
 `;
 }
 
