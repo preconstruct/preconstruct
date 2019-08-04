@@ -64,10 +64,10 @@ test("all the build types", async () => {
       path.join(distPath, "all-the-build-types.cjs.js"),
       "utf-8"
     ))
-      .replace(/require\('[^']+'\)/g, "thisWasARequireCall()")
-      .replace(/___internalHook\('[^']+'\)/, "thisWasA___internalHookCall()")
+      .replace(/require\("[^"]+"\)/g, "thisWasARequireCall()")
+      .replace(/___internalHook\("[^"]+"\)/, "thisWasA___internalHookCall()")
   ).toMatchInlineSnapshot(`
-"'use strict';
+"\\"use strict\\";
 
 let unregister = thisWasARequireCall().thisWasA___internalHookCall();
 

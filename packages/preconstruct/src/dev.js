@@ -23,7 +23,7 @@ function cjsOnlyReexportTemplate(pathToSource: string) {
 // run preconstruct dev again which wouldn't be ideal
 // this solution could change but for now, it's working
 
-module.exports = require("${pathToSource}")
+module.exports = require(${JSON.stringify(pathToSource)})
 `;
 }
 
@@ -108,13 +108,13 @@ export default async function dev(projectDir: string) {
             writeFlowFile(typeSystemPromise, entrypoint),
             fs.writeFile(
               path.join(entrypoint.directory, entrypoint.main),
-              `'use strict';
+              `"use strict";
 
-let unregister = require('${require.resolve(
-                "@preconstruct/hook"
-              )}').___internalHook('${project.directory}');
+let unregister = require(${JSON.stringify(
+                require.resolve("@preconstruct/hook")
+              )}).___internalHook(${JSON.stringify(project.directory)});
 
-module.exports = require('${entrypoint.source}');
+module.exports = require(${JSON.stringify(entrypoint.source)});
 
 unregister();
 `
