@@ -5,6 +5,7 @@ import globby from "globby";
 import fixturez from "fixturez";
 import spawn from "spawndamnit";
 import initHasher from "xxhash-wasm";
+import profiler from "v8-profiler-next";
 
 let f = fixturez(__dirname);
 
@@ -34,6 +35,24 @@ export async function initBasic(directory: string) {
   await init(directory);
   confirms.writeMainField.mockReset();
   confirms.writeModuleField.mockReset();
+}
+
+export function profile(name: string) {
+  profiler.startProfiling(name, true);
+
+  return () => {
+    let profile = profiler.stopProfiling();
+
+    new Promise<void>(resolve =>
+      profile
+        .export()
+        .pipe(fs.createWriteStream(name + ".cpuprofile"))
+        .on("finish", function() {
+          profile.delete();
+          resolve();
+        })
+    );
+  };
 }
 
 function getPkgPath(tmpPath: string) {

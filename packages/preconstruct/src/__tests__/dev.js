@@ -45,8 +45,6 @@ test("all the build types", async () => {
 
   let tmpPath = f.copy("all-the-build-types");
 
-  await install(tmpPath);
-
   await dev(tmpPath);
 
   let distPath = path.join(tmpPath, "dist");

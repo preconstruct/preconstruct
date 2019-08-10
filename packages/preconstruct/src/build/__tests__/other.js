@@ -73,7 +73,6 @@ test("package resolvable but not in deps", async () => {
 
 test("entrypoint outside package directory", async () => {
   let tmpPath = f.copy("entrypoint-outside-pkg-dir");
-  await install(tmpPath);
   try {
     await build(tmpPath);
   } catch (err) {
@@ -88,7 +87,6 @@ test("entrypoint outside package directory", async () => {
 
 test("module imported outside package directory", async () => {
   let tmpPath = f.copy("imports-outside-pkg-dir");
-  await install(tmpPath);
   try {
     await build(tmpPath);
   } catch (err) {
