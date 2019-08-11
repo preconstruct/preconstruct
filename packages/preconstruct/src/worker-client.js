@@ -5,11 +5,13 @@ let shouldUseWorker = process.env.DISABLE_PRECONSTRUCT_WORKER !== "true";
 
 let worker;
 
+let unsafeRequire = require;
+
 export function createWorker() {
   if (shouldUseWorker) {
     worker = new Worker(require.resolve("preconstruct/worker"));
   } else {
-    worker = require("preconstruct/worker");
+    worker = unsafeRequire("preconstruct/worker");
   }
 }
 
