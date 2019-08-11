@@ -215,7 +215,7 @@ export default ({
             }}
           >
             <NavLink to="/getting-started">Getting Started</NavLink>
-            <NavLink to="/concepts">Concepts</NavLink>
+            <NavLink to="/dictionary">Dictionary</NavLink>
             <NavLink to="/tutorials">Building your first package</NavLink>
             <div css={{ marginLeft: 16 }}>
               <NavLink to="/tutorials/monorepos">Building a Monorepo</NavLink>
@@ -228,8 +228,8 @@ export default ({
               <NavLink to="/guides/configuring-babel">
                 Configuring Babel
               </NavLink>
-              <NavLink to="/guides/using-preconstruct-dev-in-a-monorepo">
-                Using preconstruct dev in a monorepo
+              <NavLink to="/guides/using-preconstruct-dev-in-a-multi-package-repo">
+                Using preconstruct dev in a multi-package repo
               </NavLink>
               <NavLink to="/guides/when-should-i-use-multiple-entrypoints">
                 When should I use multiple entrypoints?

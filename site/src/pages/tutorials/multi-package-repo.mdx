@@ -1,10 +1,10 @@
-# Building a Monorepo
+# Building a Multi-package Repo
 
 > **Note:** this tutorial builds upon knowledge in [the Getting Started tutorial](/tutorials) so if you haven't gone through it, you should do that first.
 
-We're going to setup a monorepo that uses preconstruct to build its packages. We're also going to use [Yarn Workspaces](https://yarnpkg.com/en/docs/workspaces) for linking and [Changesets](https://github.com/Noviny/changesets) for versioning, these tools aren't required to use preconstruct in a monorepo but they work really well together with preconstruct.
+We're going to setup a multi-package repo that uses preconstruct to build its packages. We're also going to use [Yarn Workspaces](https://yarnpkg.com/en/docs/workspaces) for linking and [Changesets](https://github.com/Noviny/changesets) for versioning, these tools aren't required to use preconstruct in a multi-package repo but they work really well together with preconstruct.
 
-We have our `a-random-number` package from the [the Getting Started guide](/getting-started) which is awesome but we want to create a new set of packages with some other numbers, `the-number-one` and `the-number-two`. We're going to use a monorepo to manage it because we want to be able to manage all our packages together.
+We have our `a-random-number` package from the [the Getting Started guide](/getting-started) which is awesome but we want to create a new set of packages with some other numbers, `the-number-one` and `the-number-two`. We're going to use a multi-package repo to manage it because we want to be able to manage all our packages together.
 
 ## Setting up Yarn Workspaces
 
@@ -58,11 +58,11 @@ yarn preconstruct init
 🎁 success initialised project!
 ```
 
-preconstruct has asked us some slightly different questions since it's detected that we're in a monorepo. We're going to explain exactly what all these questions mean in the future but for now, answering yes to everything will work fine (TODO: write things explaining that stuff)
+preconstruct has asked us some slightly different questions since it's detected that we're in a multi-package repo. We're going to explain exactly what all these questions mean in the future but for now, answering yes to everything will work fine (TODO: write things explaining that stuff)
 
 ### Setting up `preconstruct dev`
 
-`preconstruct dev` is a command in preconstruct that lets you, see the [Using preconstruct dev in a monorepo guide](/guides/using-preconstruct-dev-in-a-monorepo) for more info.
+`preconstruct dev` is a command in preconstruct that lets you import your packages without having to build them every time you make a change or alias the dist files to source files in another tool like webpack, see the [Using preconstruct dev in a multi-package repo guide](/guides/using-preconstruct-dev-in-a-multi-package-repo) for more info.
 
 We're going to add it to a postinstall script so that yarn will run it after packages are installed. Our package.json will now look like this.
 
@@ -109,7 +109,7 @@ Now we can run `preconstruct build` to build our packages. 🎉
 
 ## Setting up Changesets to version our packages
 
-[Changesets](https://github.com/Noviny/changesets) is an awesome tool for managing versioning and changelogs with a focus on monorepos which makes it a great fit for our project. It lets people add "changesets" which declare an intent to release certain packages and then the tool can consume all the changesets to update the versions of packages and changelogs and publish the packages to npm.
+[Changesets](https://github.com/Noviny/changesets) is an awesome tool for managing versioning and changelogs with a focus on multi-package repos which makes it a great fit for our project. It lets people add "changesets" which declare an intent to release certain packages and then the tool can consume all the changesets to update the versions of packages and changelogs and publish the packages to npm.
 
 We need to install and initialise Changesets.
 

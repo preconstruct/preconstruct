@@ -1,9 +1,13 @@
 # Architecture and Design Decisions
 
-preconstruct is a heavily validation focussed build tool which enforces a number of restrictions on how it's used which enable certain powerful features.
+preconstruct's core principle is that applying constraints that restrict what users can do can improve the implementation and usage of a tool.
 
-- Support complex use cases with minimal configuration
-- Go beyond just building your project but solving problems that people encounter when building a project
+## Principles
+
+- There are other problems that libraries need to solve when they add a build tool and an integrated tool can solve them well
+- Solutions for multi-package repos scale down to single-package repos but the inverse is not true. Problems should therefore be solved with an emphasis on multi-package repos
+- Use cases generally considered complex can be supported easily if some constraints are applied
+- Making lots of inconsequential decisions has a large cost so arbitrary decisions should be made and enforced by a tool
 
 ## Random design questions you might have
 

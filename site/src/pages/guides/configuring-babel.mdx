@@ -1,17 +1,3 @@
 # Configuring Babel
 
-preconstruct uses Babel's normal configuration resolving logic so there isn't any preconstruct-specific way of configuring Babel but there are some things you'll want to keep in mind.
-
-...an example configuring Babel
-
-## Configuring Babel in a monorepo
-
-In a monorepo, you will mostly likely want to use a `babel.config.js` file over a `.babelrc`. This is because `.babelrc` files are only resolved up to the nearest package directory whereas in a monorepo, you will likely want
-
-...an example configuring Babel with a `babel.config.js` file
-
-For my reference when updating this:
-
-https://babeljs.io/docs/en/configuration
-
-https://babeljs.io/docs/en/config-files#monorepos
+preconstruct uses Babel's normal configuration resolving logic so there isn't any preconstruct-specific way of configuring Babel but there are some things you'll want to keep in mind. preconstruct doesn't include any Babel plugins that compile anything by default so you will generally want to add presets like `@babel/preset-env` for compiling newer syntax to ES5 or `@babel/preset-react` for compiling JSX. You can [learn more about configuring Babel on the Babel site](https://babeljs.io/docs/en/configuration) and specifically about [configuring multi-package repositories on the config files page](https://babeljs.io/docs/en/config-files#monorepos)
