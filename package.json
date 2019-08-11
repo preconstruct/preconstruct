@@ -109,5 +109,10 @@
       "default",
       "jest-junit"
     ]
+  },
+  "preconstruct": {
+    "packages": [
+      "packages/*"
+    ]
   }
 }

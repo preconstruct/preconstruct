@@ -97,6 +97,7 @@ export let getRollupConfig = (
     external: makeExternalPredicate(external),
     onwarn: (warning: *) => {
       switch (warning.code) {
+        case "CIRCULAR_DEPENDENCY":
         case "UNUSED_EXTERNAL_IMPORT": {
           break;
         }
@@ -162,8 +163,8 @@ export let getRollupConfig = (
         cjs({ include: ["**/node_modules/**", "node_modules/**"] }),
       (type === "browser" || type === "umd") &&
         replace({
-          "typeof document": JSON.stringify("object"),
-          "typeof window": JSON.stringify("object")
+          ["typeof " + "document"]: JSON.stringify("object"),
+          ["typeof " + "window"]: JSON.stringify("object")
         }),
       rewriteCjsRuntimeHelpers(),
       json({ namedExports: false }),
@@ -176,7 +177,8 @@ export let getRollupConfig = (
       }),
       (type === "umd" || type === "node-prod") &&
         replace({
-          "process.env.NODE_ENV": '"production"'
+          // tricking static analysis is fun...
+          ["process" + ".env.NODE_ENV"]: '"production"'
         }),
       type === "umd" && terser(),
       type === "node-prod" &&
