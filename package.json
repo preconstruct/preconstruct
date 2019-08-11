@@ -79,7 +79,6 @@
     "object-assign": "^4.1.1",
     "p-limit": "^2.0.0",
     "pirates": "^4.0.1",
-    "preconstruct": "0.0.85",
     "prettier": "^1.15.3",
     "prism-react-renderer": "^0.1.6",
     "quick-lru": "^4.0.0",
