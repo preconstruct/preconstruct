@@ -1,14 +1,14 @@
-const babel = require("@babel/core");
-const { minify } = require("terser");
+import * as babel from "@babel/core";
+import { minify } from "terser";
 
-exports.transformBabel = function transformBabel(code, options) {
+export function transformBabel(code, options) {
   options = JSON.parse(options);
   return babel.transformAsync(code, options).then(({ code, map }) => {
     return { code, map };
   });
-};
+}
 
-exports.transformTerser = (code, optionsString) => {
+export function transformTerser(code, optionsString) {
   const options = JSON.parse(optionsString);
   const result = minify(code, options);
   if (result.error) {
@@ -16,4 +16,4 @@ exports.transformTerser = (code, optionsString) => {
   } else {
     return Promise.resolve(result);
   }
-};
+}

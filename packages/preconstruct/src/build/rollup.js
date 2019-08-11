@@ -1,10 +1,10 @@
 // @flow
-const resolve = require("rollup-plugin-node-resolve");
-const alias = require("rollup-plugin-alias");
-const cjs = require("rollup-plugin-commonjs");
-const replace = require("rollup-plugin-replace");
-const resolveFrom = require("resolve-from");
-const chalk = require("chalk");
+import resolve from "rollup-plugin-node-resolve";
+import alias from "rollup-plugin-alias";
+import cjs from "rollup-plugin-commonjs";
+import replace from "rollup-plugin-replace";
+import resolveFrom from "resolve-from";
+import chalk from "chalk";
 import path from "path";
 import builtInModules from "builtin-modules";
 import { Package } from "../package";

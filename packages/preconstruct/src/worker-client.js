@@ -7,9 +7,9 @@ let worker;
 
 export function createWorker() {
   if (shouldUseWorker) {
-    worker = new Worker(require.resolve("./worker"));
+    worker = new Worker(require.resolve("preconstruct/worker"));
   } else {
-    worker = require("./worker");
+    worker = require("preconstruct/worker");
   }
 }
 
