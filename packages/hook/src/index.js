@@ -1,8 +1,7 @@
 // @flow
-"use strict";
-let { addHook } = require("pirates");
-let babel = require("@babel/core");
-let sourceMapSupport = require("source-map-support");
+import { addHook } from "pirates";
+import * as babel from "@babel/core";
+import sourceMapSupport from "source-map-support";
 
 let EXTENSIONS = [".js", ".jsx", ".ts", ".tsx"];
 
@@ -11,7 +10,7 @@ let babelPlugins = [
   require.resolve("@babel/plugin-transform-modules-commonjs")
 ];
 
-exports.___internalHook = (cwd /*:string*/) => {
+export let ___internalHook = (cwd: string) => {
   let compiling = false;
   let sourceMaps = {};
   let needsToInstallSourceMapSupport = true;

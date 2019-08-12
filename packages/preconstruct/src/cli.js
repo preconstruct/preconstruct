@@ -9,7 +9,9 @@ import dev from "./dev";
 import { error, info } from "./logger";
 import { FatalError, FixableError, UnexpectedBuildError } from "./errors";
 
-process.env.NODE_ENV = "production";
+// tricking static analysis is fun
+// $FlowFixMe
+process["e" + "nv"].NODE_ENV = "production";
 
 let { input } = meow(
   `

@@ -3,8 +3,9 @@
   "version": "0.0.65",
   "description": "A smart build tool for libraries",
   "scripts": {
-    "build": "cd packages/preconstruct && yarn build",
+    "build": "cd build && yarn preconstruct build",
     "test": "jest",
+    "postinstall": "cd build && yarn && yarn preconstruct dev",
     "changeset": "changeset",
     "version-packages": "changeset bump",
     "release": "yarn build && changeset release",
@@ -50,6 +51,7 @@
     "diff": "^4.0.1",
     "dotenv": "^8.0.0",
     "eslint": "^5.8.0",
+    "eslint-plugin-import": "^2.18.2",
     "eslint-plugin-prettier": "^3.0.0",
     "eslint-plugin-react": "^7.13.0",
     "fast-deep-equal": "^2.0.1",
@@ -105,6 +107,11 @@
     "reporters": [
       "default",
       "jest-junit"
+    ]
+  },
+  "preconstruct": {
+    "packages": [
+      "packages/*"
     ]
   }
 }
