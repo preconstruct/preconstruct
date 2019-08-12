@@ -68,23 +68,23 @@ jobs:
           name: "ESLint"
           command: yarn eslint .
 
-  # release:
-  #   docker:
-  #     - image: circleci/node:10.6.0
-  #   working_directory: ~/repo
-  #   steps:
-  #     - checkout
-  #     - restore_cache:
-  #         keys:
-  #           - v2-dependencies-{{ checksum "yarn.lock" }}
-  #           # fallback to using the latest cache if no exact match is found
-  #           - v2-dependencies-
-  #     - run:
-  #         name: Install
-  #         command: yarn install --pure-lockfile
-  #     - run:
-  #         name: "Release"
-  #         command: yarn experimental-changesets-auto-release
+  release:
+    docker:
+      - image: circleci/node:10.6.0
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v2-dependencies-{{ checksum "yarn.lock" }}
+            # fallback to using the latest cache if no exact match is found
+            - v2-dependencies-
+      - run:
+          name: Install
+          command: yarn install --pure-lockfile
+      - run:
+          name: "Release"
+          command: yarn experimental-changesets-auto-release
 
 workflows:
   version: 2
@@ -93,9 +93,9 @@ workflows:
       - test
       - lint
       - flow
-  # release:
-  #   jobs:
-  #     - release:
-  #         filters:
-  #           branches:
-  #             only: master
+  release:
+    jobs:
+      - release:
+          filters:
+            branches:
+              only: master

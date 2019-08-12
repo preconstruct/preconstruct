@@ -138,6 +138,13 @@
     resolve "^1.8.1"
     semver "^5.5.1"
 
+"@babel/runtime@^7.5.5":
+  version "7.5.5"
+  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.5.5.tgz#74fba56d35efbeca444091c7850ccd494fd2f132"
+  integrity sha512-28QvEGyQyNkB0/m2B4FU7IEZGK2NUrcMtT6BZEFALTguLk+AUT6ofsHtPk5QyjAdUkpMJ+/Em+quwz4HOt30AQ==
+  dependencies:
+    regenerator-runtime "^0.13.2"
+
 "@babel/template@^7.1.0", "@babel/template@^7.4.4":
   version "7.4.4"
   resolved "https://registry.yarnpkg.com/@babel/template/-/template-7.4.4.tgz#f4b88d1225689a08f5bc3a17483545be9e4ed237"
@@ -1552,14 +1559,15 @@ posix-character-classes@^0.1.0:
   resolved "https://registry.yarnpkg.com/posix-character-classes/-/posix-character-classes-0.1.1.tgz#01eac0fe3b5af71a2a6c02feabb8c1fef7e00eab"
   integrity sha1-AerA/jta9xoqbAL+q7jB/vfgDqs=
 
-preconstruct@^0.0.86:
-  version "0.0.86"
-  resolved "https://registry.yarnpkg.com/preconstruct/-/preconstruct-0.0.86.tgz#8c296a57f1c5031de532352a17eac306b671effe"
-  integrity sha512-XKCdJJgCWMvnzyLz5Sx4o8NaieIILYD17zPdCfF7FW19PJDwZu0GOCwe0T8Ao1dZoQB1ynACZK8mbRrJom4u0g==
+preconstruct@0.0.0-built-with-preconstruct.0:
+  version "0.0.0-built-with-preconstruct.0"
+  resolved "https://registry.yarnpkg.com/preconstruct/-/preconstruct-0.0.0-built-with-preconstruct.0.tgz#61edaf3d72d7f383210545073b969fe04eed3979"
+  integrity sha512-0Fhqu0H1eY+ruw8s9pFGmpuSExX/RQ9V6vQGbahG3hN5/KiO6XzWWBkfW+E1G6MjQrPX2mjXddRRZV1JlPcixg==
   dependencies:
     "@babel/code-frame" "^7.0.0"
     "@babel/core" "^7.1.2"
     "@babel/plugin-transform-runtime" "^7.2.0"
+    "@babel/runtime" "^7.5.5"
     "@preconstruct/hook" "^0.0.3"
     builtin-modules "^3.0.0"
     chalk "^2.3.2"
@@ -1650,6 +1658,11 @@ redent@^2.0.0:
   dependencies:
     indent-string "^3.0.0"
     strip-indent "^2.0.0"
+
+regenerator-runtime@^0.13.2:
+  version "0.13.3"
+  resolved "https://registry.yarnpkg.com/regenerator-runtime/-/regenerator-runtime-0.13.3.tgz#7cf6a77d8f5c6f60eb73c5fc1955b2ceb01e6bf5"
+  integrity sha512-naKIZz2GQ8JWh///G7L3X6LaQUAMp2lvb1rvwwsURe/VXwD6VMfr+/1NuNw3ag8v2kY1aQ/go5SNn79O9JU7yw==
 
 regex-not@^1.0.0, regex-not@^1.0.2:
   version "1.0.2"
