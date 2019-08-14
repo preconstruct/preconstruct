@@ -128,20 +128,14 @@ export async function createDeclarationCreator(
           }
           let internalDeps = new Set();
           for (let { text } of sourceFile.imports) {
-            if (text.startsWith(".")) {
-              let { resolvedModule } = typescript.resolveModuleName(
-                text,
-                dep,
-                options,
-                typescript.sys,
-                moduleResolutionCache
-              );
-              if (!resolvedModule) {
-                throw new Error(
-                  "This is an internal error, please open an issue if you see this: ts could not resolve module"
-                );
-              }
-
+            let { resolvedModule } = typescript.resolveModuleName(
+              text,
+              dep,
+              options,
+              typescript.sys,
+              moduleResolutionCache
+            );
+            if (resolvedModule) {
               if (
                 !allDeps.has(resolvedModule.resolvedFileName) &&
                 !resolvedModule.isExternalLibraryImport &&
