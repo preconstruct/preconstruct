@@ -302,6 +302,8 @@ exports[`typescript: dist/declarations/src/another-thing.d.ts 1`] = `
 exports[`typescript: dist/declarations/src/index.d.ts 1`] = `
 "import { SomeType } from \\"./another-thing\\";
 export * from \\"./one-more-thing\\";
+import * as path from \\"path\\";
+export { path };
 declare let thing: SomeType;
 export default thing;
 "
@@ -325,10 +327,13 @@ exports[`typescript: dist/typescript.cjs.dev.js 1`] = `
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
+var path = require('path');
+
 let obj = {};
 
 let thing = \\"something\\";
 
+exports.path = path;
 exports.default = thing;
 exports.obj = obj;
 "
@@ -352,14 +357,19 @@ Object.defineProperty(exports, \\"__esModule\\", {
   value: !0
 });
 
+var path = require(\\"path\\");
+
 let obj = {}, thing = \\"something\\";
 
-exports.default = thing, exports.obj = obj;
+exports.path = path, exports.default = thing, exports.obj = obj;
 "
 `;
 
 exports[`typescript: dist/typescript.esm.js 1`] = `
-"let obj = {};
+"import * as path from 'path';
+export { path };
+
+let obj = {};
 
 let thing = \\"something\\";
 
@@ -379,6 +389,7 @@ exports[`typescript: package.json 1`] = `
   \\"dependencies\\": {
     \\"@babel/core\\": \\"^7.4.3\\",
     \\"@babel/preset-typescript\\": \\"^7.3.3\\",
+    \\"@types/node\\": \\"^12.7.1\\",
     \\"typescript\\": \\"^3.4.5\\"
   }
 }
@@ -393,6 +404,9 @@ exports[`typescript: src/another-thing.ts 1`] = `
 exports[`typescript: src/index.ts 1`] = `
 "import { SomeType } from \\"./another-thing\\";
 export * from \\"./one-more-thing\\";
+import * as path from \\"path\\";
+
+export { path };
 
 let thing: SomeType = \\"something\\";
 
