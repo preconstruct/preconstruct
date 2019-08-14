@@ -1,5 +1,11 @@
 # preconstruct
 
+## 0.0.88
+
+### Patch Changes
+
+- [ba73086](https://github.com/preconstruct/preconstruct/commit/ba73086) - Fix typescript declaration generation in some cases
+
 ## 0.0.87
 
 ### Patch Changes

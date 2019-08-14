@@ -1,1 +1,0 @@
-Fix typescript declaration generation in some cases
