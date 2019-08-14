@@ -1,5 +1,12 @@
 # preconstruct
 
+## 0.0.87
+
+### Patch Changes
+
+- [19d36a4](https://github.com/preconstruct/preconstruct/commit/19d36a4) - Build preconstruct with preconstruct
+- [9c36a88](https://github.com/preconstruct/preconstruct/commit/9c36a88) - Allow empty bundles
+
 ## 0.0.86
 
 ### Patch Changes

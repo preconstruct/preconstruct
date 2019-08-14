@@ -1,1 +1,0 @@
-Allow empty bundles
