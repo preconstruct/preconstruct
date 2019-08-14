@@ -1,1 +1,0 @@
-Fix TypeScript declaration generation in some cases with resolving

@@ -1,5 +1,11 @@
 # preconstruct
 
+## 0.0.89
+
+### Patch Changes
+
+- [b147abd](https://github.com/preconstruct/preconstruct/commit/b147abd) - Fix TypeScript declaration generation in some cases with resolving
+
 ## 0.0.88
 
 ### Patch Changes
