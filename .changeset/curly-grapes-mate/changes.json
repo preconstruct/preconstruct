@@ -1,7 +1,0 @@
-{
-  "releases": [
-    { "name": "@preconstruct/hook", "type": "patch" },
-    { "name": "preconstruct", "type": "patch" }
-  ],
-  "dependents": []
-}
