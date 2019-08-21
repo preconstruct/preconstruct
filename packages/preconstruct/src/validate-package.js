@@ -37,7 +37,7 @@ export async function fixPackage(pkg: Package) {
 
 let unsafeRequire = require;
 
-export function validatePackage(pkg: Package) {
+export async function validatePackage(pkg: Package) {
   if (pkg.entrypoints.length === 0) {
     throw new FatalError(errors.noEntrypoints, pkg.name);
   }
