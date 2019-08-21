@@ -9,11 +9,14 @@ import { FatalError } from "./errors";
 export async function validateIncludedFiles(pkg: Package) {
   try {
     await Promise.all(
-      pkg.entrypoints.map(entrypoint => {
-        return fs.writeFile(
-          path.join(entrypoint.directory, "dist", "preconstruct-test-file"),
-          "test content"
+      pkg.entrypoints.map(async entrypoint => {
+        let filename = path.join(
+          entrypoint.directory,
+          "dist",
+          "preconstruct-test-file"
         );
+        await fs.ensureFile(filename);
+        return fs.writeFile(filename, "test content");
       })
     );
 
