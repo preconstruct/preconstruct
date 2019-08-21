@@ -12,7 +12,6 @@ import {
   getValidStringFieldContentForBuildType
 } from "./utils";
 import { errors, confirms } from "./messages";
-import { validateIncludedFiles } from "./validate-included-files";
 
 /*::
 import {Project} from './project'
@@ -116,8 +115,6 @@ export class Package extends Item {
         })
       );
     });
-
-    await validateIncludedFiles(pkg);
 
     return pkg;
   }
