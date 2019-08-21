@@ -1,0 +1,62 @@
+name: CI
+
+on: [push]
+
+jobs:
+  test:
+    name: Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+
+      - name: Set Node.js 10.x
+        uses: actions/setup-node@master
+        with:
+          version: 10.x
+
+      - name: Install Yarn
+        run: npm install --global yarn
+
+      - name: Install Dependencies
+        run: yarn
+
+      - name: Run Tests
+        run: yarn jest
+  flow:
+    name: Flow
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+
+      - name: Set Node.js 10.x
+        uses: actions/setup-node@master
+        with:
+          version: 10.x
+
+      - name: Install Yarn
+        run: npm install --global yarn
+
+      - name: Install Dependencies
+        run: yarn
+
+      - name: Check Flow
+        run: yarn flow:check
+  eslint:
+    name: ESLint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+
+      - name: Set Node.js 10.x
+        uses: actions/setup-node@master
+        with:
+          version: 10.x
+
+      - name: Install Yarn
+        run: npm install --global yarn
+
+      - name: Install Dependencies
+        run: yarn
+
+      - name: Run ESLint
+        run: yarn eslint .
