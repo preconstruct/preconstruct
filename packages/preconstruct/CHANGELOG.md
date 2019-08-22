@@ -1,5 +1,11 @@
 # preconstruct
 
+## 0.0.90
+
+### Patch Changes
+
+- [f1371f4](https://github.com/preconstruct/preconstruct/commit/f1371f4) [#84](https://github.com/preconstruct/preconstruct/pulls/84) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Check that all entrypoints and dist files will be included when published to npm
+
 ## 0.0.89
 
 ### Patch Changes
