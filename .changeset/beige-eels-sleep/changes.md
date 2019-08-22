@@ -1,1 +1,0 @@
-Check that all entrypoints and dist files will be included when published to npm
