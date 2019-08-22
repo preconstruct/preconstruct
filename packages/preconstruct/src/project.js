@@ -11,6 +11,7 @@ import { Package } from "./package";
 import { error } from "./logger";
 import { promptConfirm } from "./prompt";
 import { PKG_JSON_CONFIG_FIELD } from "./constants";
+import { validateIncludedFiles } from "./validate-included-files";
 
 let unsafeRequire = require;
 
@@ -117,6 +118,8 @@ export class Project extends Item {
         await Promise.all(dirsWithoutPkgJson.map(dir => fs.remove(dir)));
         return this._packages();
       }
+
+      await Promise.all(packages.map(pkg => validateIncludedFiles(pkg)));
       return packages;
     } catch (error) {
       if (error instanceof is.AssertionError) {

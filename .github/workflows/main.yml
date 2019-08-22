@@ -21,7 +21,12 @@ jobs:
         run: yarn
 
       - name: Run Tests
-        run: yarn jest
+        run: yarn jest --coverage
+
+      - name: Upload coverage to Codecov
+        run: bash <(curl -s https://codecov.io/bash) -C $GITHUB_SHA -B ${GITHUB_REF#refs/heads/} -Z
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
   flow:
     name: Flow
     runs-on: ubuntu-latest
