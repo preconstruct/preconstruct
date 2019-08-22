@@ -5,4 +5,5 @@ jobs:
     name: Test Thing
     runs-on: ubuntu-latest
     steps:
-      - run: node ../test.js
+      - uses: actions/checkout@master
+      - run: node test.js
