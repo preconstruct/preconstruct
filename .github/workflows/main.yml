@@ -22,6 +22,11 @@ jobs:
 
       - name: Run Tests
         run: yarn jest
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v1.0.0
+        with:
+          token: ${{secrets.CODECOV_TOKEN}}
   flow:
     name: Flow
     runs-on: ubuntu-latest
