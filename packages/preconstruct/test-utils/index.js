@@ -2,11 +2,12 @@
 import path from "path";
 import * as fs from "fs-extra";
 import globby from "globby";
-import fixturez from "fixturez";
 import spawn from "spawndamnit";
 import initHasher from "xxhash-wasm";
 import profiler from "v8-profiler-next";
-export { default as fixturez } from "./fixturez";
+import fixturez from "./fixturez";
+
+export { fixturez };
 
 let f = fixturez(__dirname);
 
