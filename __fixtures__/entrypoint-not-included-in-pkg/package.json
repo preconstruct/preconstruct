@@ -1,0 +1,18 @@
+{
+  "name": "entrypoint-not-included-in-pkg",
+  "version": "1.0.0",
+  "main": "dist/entrypoint-not-included-in-pkg.cjs.js",
+  "license": "MIT",
+  "private": true,
+  "module": "dist/entrypoint-not-included-in-pkg.esm.js",
+  "preconstruct": {
+    "source": "src/sum",
+    "entrypoints": [
+      ".",
+      "multiply"
+    ]
+  },
+  "files": [
+    "dist"
+  ]
+}
