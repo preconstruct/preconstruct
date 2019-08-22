@@ -24,7 +24,7 @@ jobs:
         run: yarn jest
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v1.0.0
+        run: bash <(curl -s https://codecov.io/bash) -C $GITHUB_SHA -B ${GITHUB_REF#refs/heads/} -Z
         with:
           token: ${{secrets.CODECOV_TOKEN}}
   flow:
