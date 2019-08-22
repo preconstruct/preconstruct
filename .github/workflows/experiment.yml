@@ -5,4 +5,4 @@ jobs:
     name: Test Thing
     runs-on: ubuntu-latest
     steps:
-      - runs: node ../test.js
+      - run: node ../test.js
