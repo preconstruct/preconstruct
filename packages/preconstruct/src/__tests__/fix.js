@@ -1,5 +1,4 @@
 // @flow
-import fixturez from "fixturez";
 import fix from "../fix";
 import path from "path";
 import { confirms, errors, inputs } from "../messages";
@@ -7,7 +6,8 @@ import {
   getPkg,
   modifyPkg,
   logMock,
-  createPackageCheckTestCreator
+  createPackageCheckTestCreator,
+  fixturez
 } from "../../test-utils";
 import { promptInput } from "../prompt";
 

@@ -1,12 +1,12 @@
 // @flow
 import build from "../";
-import fixturez from "fixturez";
 import path from "path";
 import {
   initBasic,
   getPkg,
   snapshotDistFiles,
-  install
+  install,
+  fixturez
 } from "../../../test-utils";
 import { promptInput } from "../../prompt";
 import { confirms } from "../../messages";
@@ -59,8 +59,6 @@ test("clears dist folder", async () => {
 test("flow", async () => {
   let tmpPath = f.copy("flow");
 
-  await install(tmpPath);
-
   await build(tmpPath);
 
   await snapshotDistFiles(tmpPath);
@@ -68,8 +66,6 @@ test("flow", async () => {
 
 test("flow", async () => {
   let tmpPath = f.copy("flow-export-default");
-
-  await install(tmpPath);
 
   await build(tmpPath);
 
@@ -89,8 +85,6 @@ jest.setTimeout(20000);
 
 test("umd with dep on other module", async () => {
   let tmpPath = f.copy("umd-with-dep");
-
-  await install(tmpPath);
 
   unsafePromptInput.mockImplementation(async question => {
     if (question === `What should the umdName of react be?`) {
@@ -139,7 +133,6 @@ test("monorepo umd with dep on other module", async () => {
     }
     throw new Error("unexpected question: " + question);
   });
-  await install(tmpPath);
   await build(tmpPath);
 
   await snapshotDistFiles(path.join(tmpPath, "packages", "package-one"));
@@ -214,8 +207,6 @@ Object {
 test("@babel/runtime installed", async () => {
   let tmpPath = f.copy("babel-runtime-installed");
 
-  await install(tmpPath);
-
   await build(tmpPath);
 
   await snapshotDistFiles(tmpPath);
@@ -236,7 +227,6 @@ test("monorepo single package", async () => {
 // this test is causing too much frustration
 test.skip("needs @babel/runtime disallow install", async () => {
   let tmpPath = f.copy("use-babel-runtime");
-  await install(tmpPath);
   confirms.shouldInstallBabelRuntime.mockReturnValue(Promise.resolve(false));
 
   try {

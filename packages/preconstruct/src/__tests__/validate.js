@@ -1,8 +1,7 @@
 // @flow
-import fixturez from "fixturez";
 import path from "path";
 import validate from "../validate";
-import { logMock, modifyPkg, getPkg, install } from "../../test-utils";
+import { logMock, modifyPkg, getPkg, fixturez } from "../../test-utils";
 import { FatalError } from "../errors";
 import { errors, confirms } from "../messages";
 
@@ -211,8 +210,6 @@ Object {
 test("monorepo umd with dep on other module incorrect peerDeps", async () => {
   let tmpPath = f.copy("monorepo-umd-with-dep-incorrect-peerdeps");
 
-  await install(tmpPath);
-
   try {
     await validate(tmpPath);
   } catch (err) {
@@ -227,8 +224,6 @@ test("monorepo umd with dep on other module incorrect peerDeps", async () => {
 test("dist not included in package", async () => {
   let tmpPath = f.copy("dist-not-included-in-pkg");
 
-  await install(tmpPath);
-
   try {
     await validate(tmpPath);
   } catch (err) {
@@ -242,8 +237,6 @@ test("dist not included in package", async () => {
 
 test("entrypoint not included in package", async () => {
   let tmpPath = f.copy("entrypoint-not-included-in-pkg");
-
-  await install(tmpPath);
 
   try {
     await validate(tmpPath);

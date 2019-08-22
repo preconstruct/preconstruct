@@ -1,9 +1,8 @@
 // @flow
-import fixturez from "fixturez";
 import spawn from "spawndamnit";
 import path from "path";
 import * as fs from "fs-extra";
-import { install } from "../../test-utils";
+import { install, fixturez } from "../../test-utils";
 import dev from "../dev";
 
 const f = fixturez(__dirname);
@@ -110,8 +109,6 @@ module.exports = require("${path.join(tmpPath, "src", "index.js")}")
 test("source maps work", async () => {
   let tmpPath = f.copy("uses-babel-and-throws-error");
 
-  await install(tmpPath);
-
   await dev(tmpPath);
 
   // i would require it but i don't want jest to do magical things
@@ -182,8 +179,6 @@ export { something as default };
 
 test("typescript", async () => {
   let tmpPath = f.copy("typescript");
-
-  await install(tmpPath);
 
   await dev(tmpPath);
 

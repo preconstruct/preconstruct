@@ -6,6 +6,7 @@ import fixturez from "fixturez";
 import spawn from "spawndamnit";
 import initHasher from "xxhash-wasm";
 import profiler from "v8-profiler-next";
+export { default as fixturez } from "./fixturez";
 
 let f = fixturez(__dirname);
 

@@ -1,11 +1,10 @@
 // @flow
 import build from "../";
-import fixturez from "fixturez";
 import { FatalError } from "../../errors";
 import {
   snapshotDistFiles,
   snapshotDirectory,
-  install
+  fixturez
 } from "../../../test-utils";
 import { confirms } from "../../messages";
 
@@ -50,7 +49,6 @@ test("browser no module", async () => {
 test("typescript", async () => {
   let tmpPath = f.copy("typescript");
 
-  await install(tmpPath);
   await build(tmpPath);
 
   await snapshotDirectory(tmpPath, { files: "all" });
@@ -58,7 +56,6 @@ test("typescript", async () => {
 
 test("package resolvable but not in deps", async () => {
   let tmpPath = f.copy("package-resolvable-but-not-in-deps");
-  await install(tmpPath);
   try {
     await build(tmpPath);
   } catch (err) {

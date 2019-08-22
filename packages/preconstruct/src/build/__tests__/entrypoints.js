@@ -1,12 +1,11 @@
 // @flow
 import build from "../";
-import fixturez from "fixturez";
 import path from "path";
 import {
   snapshotDistFiles,
   snapshotDirectory,
-  install,
-  stripHashes
+  stripHashes,
+  fixturez
 } from "../../../test-utils";
 
 const f = fixturez(__dirname);
@@ -27,8 +26,6 @@ test("source entrypoint option", async () => {
 
 test("source entrypoint option flow", async () => {
   let tmpPath = f.copy("source-entrypoint-option-flow");
-
-  await install(tmpPath);
 
   await build(tmpPath);
 

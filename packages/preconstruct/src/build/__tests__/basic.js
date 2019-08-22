@@ -1,7 +1,6 @@
 // @flow
 import build from "../";
-import fixturez from "fixturez";
-import { snapshotDistFiles } from "../../../test-utils";
+import { snapshotDistFiles, fixturez } from "../../../test-utils";
 
 const f = fixturez(__dirname);
 

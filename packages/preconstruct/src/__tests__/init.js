@@ -1,5 +1,4 @@
 // @flow
-import fixturez from "fixturez";
 import path from "path";
 import init from "../init";
 import { confirms, errors } from "../messages";
@@ -7,7 +6,8 @@ import {
   logMock,
   modifyPkg,
   getPkg,
-  createPackageCheckTestCreator
+  createPackageCheckTestCreator,
+  fixturez
 } from "../../test-utils";
 
 const f = fixturez(__dirname);
