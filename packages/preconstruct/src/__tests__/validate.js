@@ -1,7 +1,13 @@
 // @flow
 import path from "path";
 import validate from "../validate";
-import { logMock, modifyPkg, getPkg, fixturez } from "../../test-utils";
+import {
+  logMock,
+  modifyPkg,
+  getPkg,
+  fixturez,
+  install
+} from "../../test-utils";
 import { FatalError } from "../errors";
 import { errors, confirms } from "../messages";
 
@@ -209,7 +215,7 @@ Object {
 
 test("monorepo umd with dep on other module incorrect peerDeps", async () => {
   let tmpPath = f.copy("monorepo-umd-with-dep-incorrect-peerdeps");
-
+  await install(tmpPath);
   try {
     await validate(tmpPath);
   } catch (err) {
