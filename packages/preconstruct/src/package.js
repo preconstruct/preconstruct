@@ -70,16 +70,12 @@ export class Package extends Item {
                 ] = getValidStringFieldContentForBuildType(field, pkg.name);
               }
             }
-            for (let field of ["browser", "react-native"]) {
-              if (parsed[field] !== undefined) {
-                plainEntrypointObj[
-                  field
-                ] = getValidObjectFieldContentForBuildType(
-                  field,
-                  pkg.name,
-                  plainEntrypointObj.module !== undefined
-                );
-              }
+            if (parsed.browser !== undefined) {
+              plainEntrypointObj.browser = getValidObjectFieldContentForBuildType(
+                "browser",
+                pkg.name,
+                plainEntrypointObj.module !== undefined
+              );
             }
           }
         }
@@ -119,9 +115,7 @@ export class Package extends Item {
     return pkg;
   }
 
-  setFieldOnEntrypoints(
-    field: "main" | "browser" | "module" | "umdMain" | "reactNative"
-  ) {
+  setFieldOnEntrypoints(field: "main" | "browser" | "module" | "umdMain") {
     this.entrypoints.forEach(entrypoint => {
       switch (field) {
         case "main": {
@@ -150,14 +144,6 @@ export class Package extends Item {
           entrypoint.umdMain = getValidStringFieldContentForBuildType(
             "umd:main",
             this.name
-          );
-          break;
-        }
-        case "reactNative": {
-          entrypoint.reactNative = getValidObjectFieldContentForBuildType(
-            "react-native",
-            this.name,
-            entrypoint.module !== null
           );
           break;
         }

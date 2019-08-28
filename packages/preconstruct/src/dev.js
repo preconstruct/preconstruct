@@ -139,17 +139,7 @@ unregister();
               );
             }
           }
-          let rnField = entrypoint.reactNative;
-          if (rnField) {
-            for (let key of Object.keys(rnField)) {
-              promises.push(
-                fs.writeFile(
-                  path.join(entrypoint.directory, rnField[key]),
-                  cjsOnlyReexportTemplate(entrypoint.source)
-                )
-              );
-            }
-          }
+
           return Promise.all(promises);
         })
       );

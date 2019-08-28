@@ -13,13 +13,12 @@ let fields = [
   "main",
   "module",
   "umd:main",
-  "browser",
-  "react-native"
+  "browser"
 ];
 
 function setFieldInOrder(
   obj,
-  field: "main" | "module" | "umd:main" | "browser" | "react-native",
+  field: "main" | "module" | "umd:main" | "browser",
   value
 ) {
   if (field in obj) {
@@ -90,15 +89,6 @@ export class Entrypoint extends Item {
   set browser(option: { [key: string]: string }) {
     this.json = setFieldInOrder(this.json, "browser", option);
   }
-  get reactNative(): null | string | { [key: string]: string } {
-    return is(
-      this.json["react-native"],
-      is.maybe(is.either(is.string, is.objectOf(is.string)))
-    );
-  }
-  set reactNative(option: { [key: string]: string }) {
-    this.json = setFieldInOrder(this.json, "react-native", option);
-  }
 
   get umdMain(): string | null {
     return is(this.json["umd:main"], is.maybe(is.string));
@@ -154,12 +144,6 @@ export class StrictEntrypoint extends Entrypoint {
   }
   set browser(option: { [key: string]: string }) {
     this.json = setFieldInOrder(this.json, "browser", option);
-  }
-  get reactNative(): null | { [key: string]: string } {
-    return is(this.json["react-native"], is.maybe(is.objectOf(is.string)));
-  }
-  set reactNative(option: { [key: string]: string }) {
-    this.json = setFieldInOrder(this.json, "react-native", option);
   }
   updater(json: Object) {
     super.updater(json);

@@ -26,7 +26,7 @@ export function getValidStringFieldContentForBuildType(
 }
 
 export function getValidObjectFieldContentForBuildType(
-  type: "browser" | "react-native",
+  type: "browser",
   pkgName: string,
   hasModuleBuild: boolean
 ) {
@@ -38,15 +38,6 @@ export function getValidObjectFieldContentForBuildType(
       };
       if (hasModuleBuild) {
         obj[`./dist/${safeName}.esm.js`] = `./dist/${safeName}.browser.esm.js`;
-      }
-      return obj;
-    }
-    case "react-native": {
-      let obj = {
-        [`./dist/${safeName}.cjs.js`]: `./dist/${safeName}.native.cjs.js`
-      };
-      if (hasModuleBuild) {
-        obj[`./dist/${safeName}.esm.js`] = `./dist/${safeName}.native.esm.js`;
       }
       return obj;
     }
