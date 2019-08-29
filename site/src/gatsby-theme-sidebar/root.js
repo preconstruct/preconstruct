@@ -218,7 +218,9 @@ export default ({
             <NavLink to="/dictionary">Dictionary</NavLink>
             <NavLink to="/tutorials">Building your first package</NavLink>
             <div css={{ marginLeft: 16 }}>
-              <NavLink to="/tutorials/monorepos">Building a Monorepo</NavLink>
+              <NavLink to="/tutorials/multi-package-repo">
+                Building a Multi-package Repo
+              </NavLink>
               <NavLink to="/tutorials/multiple-entrypoints">
                 Exporting Multiple Entrypoints
               </NavLink>
