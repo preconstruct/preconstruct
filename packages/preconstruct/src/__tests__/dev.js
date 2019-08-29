@@ -52,9 +52,7 @@ test("all the build types", async () => {
     "all-the-build-types.browser.cjs.js",
     "all-the-build-types.browser.esm.js",
     "all-the-build-types.cjs.js",
-    "all-the-build-types.esm.js",
-    "all-the-build-types.native.cjs.js",
-    "all-the-build-types.native.esm.js"
+    "all-the-build-types.esm.js"
   ]);
 
   expect(
@@ -78,9 +76,7 @@ unregister();
   let shouldBeCjsThingsToSource = [
     "all-the-build-types.esm.js",
     "all-the-build-types.browser.cjs.js",
-    "all-the-build-types.native.cjs.js",
-    "all-the-build-types.browser.esm.js",
-    "all-the-build-types.native.esm.js"
+    "all-the-build-types.browser.esm.js"
   ];
 
   await Promise.all(
