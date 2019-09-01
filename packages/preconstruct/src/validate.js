@@ -68,17 +68,6 @@ export function isBrowserFieldValid(entrypoint: Entrypoint): boolean {
   );
 }
 
-export function isReactNativeFieldValid(entrypoint: Entrypoint): boolean {
-  return equal(
-    entrypoint.reactNative,
-    getValidObjectFieldContentForBuildType(
-      "react-native",
-      entrypoint.package.name,
-      entrypoint.module !== null
-    )
-  );
-}
-
 export function isUmdNameSpecified(entrypoint: Entrypoint) {
   return typeof entrypoint._config.umdName === "string";
 }
@@ -124,16 +113,6 @@ export function validateEntrypoint(entrypoint: Entrypoint, log: boolean) {
       throw new FixableError(errors.invalidBrowserField, entrypoint.name);
     } else if (log) {
       logger.info(infos.validBrowserField, entrypoint.name);
-    }
-  }
-  if (entrypoint.reactNative !== null) {
-    if (
-      typeof entrypoint.reactNative === "string" ||
-      !isReactNativeFieldValid(entrypoint)
-    ) {
-      throw new FixableError(errors.invalidReactNativeField, entrypoint.name);
-    } else if (log) {
-      logger.info(infos.validReactNativeField, entrypoint.name);
     }
   }
 }

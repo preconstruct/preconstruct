@@ -44,12 +44,7 @@ export function toUnsafeRollupConfig(config: RollupConfig): Object {
   return config;
 }
 
-export type RollupConfigType =
-  | "umd"
-  | "browser"
-  | "node-dev"
-  | "node-prod"
-  | "react-native";
+export type RollupConfigType = "umd" | "browser" | "node-dev" | "node-prod";
 
 export let getRollupConfig = (
   pkg: Package,

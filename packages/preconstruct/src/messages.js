@@ -10,7 +10,6 @@ export let errors = {
   invalidMainField: "main field is invalid",
   invalidUmdMainField: "umd:main field is invalid",
   invalidBrowserField: "browser field is invalid",
-  invalidReactNativeField: "react-native field is invalid",
   umdNameNotSpecified: `the umd:main field is specified but a umdName option is not specified. please add it to the ${PKG_JSON_CONFIG_FIELD} field in your package.json`,
   deniedWriteBrowserField:
     "building browser bundles for modules that include typeof" +
@@ -65,7 +64,6 @@ export let infos = {
   validUmdMainField: "umd:main field is valid",
   validEntrypoint: "a valid entry point exists.",
   validBrowserField: "browser field is valid",
-  validReactNativeField: "react-native field is valid",
   validPackageEntrypoints: "package entrypoints are valid"
 };
 

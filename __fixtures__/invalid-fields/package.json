@@ -4,6 +4,5 @@
   "main": "dist/index.js",
   "license": "MIT",
   "private": true,
-  "module": "dist/index.mjs",
-  "react-native": "dist/index.native.js"
+  "module": "dist/index.mjs"
 }

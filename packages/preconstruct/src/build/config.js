@@ -125,29 +125,5 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
     });
   }
 
-  if (strictEntrypoints[0].reactNative !== null) {
-    configs.push({
-      config: getRollupConfig(pkg, strictEntrypoints, aliases, "react-native"),
-      outputs: [
-        {
-          format: "cjs",
-          entryFileNames: "[name].native.cjs.js",
-          chunkFileNames: "dist/[name]-[hash].native.cjs.js",
-          dir: pkg.directory,
-          exports: "named"
-        },
-        ...(hasModuleField
-          ? [
-              {
-                format: "es",
-                entryFileNames: "[name].native.esm.js",
-                chunkFileNames: "dist/[name]-[hash].native.esm.js",
-                dir: pkg.directory
-              }
-            ]
-          : [])
-      ]
-    });
-  }
   return configs;
 }

@@ -1,0 +1,1 @@
+Remove react-native field support
