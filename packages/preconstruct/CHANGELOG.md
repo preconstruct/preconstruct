@@ -1,5 +1,12 @@
 # preconstruct
 
+## 0.1.1
+
+### Patch Changes
+
+- [f14c39e](https://github.com/preconstruct/preconstruct/commit/f14c39e) - Add a comment to the commonjs file for preconstruct dev explaining what it does
+- [7c278d2](https://github.com/preconstruct/preconstruct/commit/7c278d2) - Change redirect for flow in preconstruct dev to a file with export \* because symlinks seem to be breaking
+
 ## 0.1.0
 
 ### Minor Changes
