@@ -1,0 +1,36 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`all the build types 1`] = `
+"\\"use strict\\";
+
+let unregister = thisWasARequireCall().thisWasA___internalHookCall();
+
+module.exports = thisWasARequireCall();
+
+unregister();
+"
+`;
+
+exports[`flow 1`] = `
+"// @flow
+export * from \\"../src/index.js\\";
+"
+`;
+
+exports[`flow 2`] = `
+"// @flow
+export * from \\"../src/index.js\\";
+"
+`;
+
+exports[`flow 3`] = `
+"// @flow
+export * from \\"../src/index.js\\";
+"
+`;
+
+exports[`typescript 1`] = `
+"export * from \\"../src/index\\";
+export { default } from \\"../src/index\\";
+"
+`;

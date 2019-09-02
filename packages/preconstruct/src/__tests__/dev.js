@@ -31,12 +31,6 @@ test("dev command works in node", async () => {
     "message from package two but logged by package one",
     ""
   ]);
-  expect(stdout.toString()).toMatchInlineSnapshot(`
-    "message from package two
-    message from package one
-    message from package two but logged by package one
-    "
-  `);
   expect(stderr.toString()).toBe("");
 });
 
@@ -62,16 +56,7 @@ test("all the build types", async () => {
     ))
       .replace(/require\("[^"]+"\)/g, "thisWasARequireCall()")
       .replace(/___internalHook\("[^"]+"\)/, "thisWasA___internalHookCall()")
-  ).toMatchInlineSnapshot(`
-    "\\"use strict\\";
-
-    let unregister = thisWasARequireCall().thisWasA___internalHookCall();
-
-    module.exports = thisWasARequireCall();
-
-    unregister();
-    "
-  `);
+  ).toMatchSnapshot();
 
   let shouldBeCjsThingsToSource = [
     "all-the-build-types.esm.js",
@@ -139,33 +124,21 @@ test("flow", async () => {
       path.join(tmpPath, "dist", "flow-dev.cjs.js.flow"),
       "utf8"
     )
-  ).toMatchInlineSnapshot(`
-    "// @flow
-    export * from \\"../src/index.js\\";
-    "
-  `);
+  ).toMatchSnapshot();
 
   expect(
     await fs.readFile(
       path.join(tmpPath, "a", "dist", "flow-dev.cjs.js.flow"),
       "utf8"
     )
-  ).toMatchInlineSnapshot(`
-    "// @flow
-    export * from \\"../src/index.js\\";
-    "
-  `);
+  ).toMatchSnapshot();
 
   expect(
     await fs.readFile(
       path.join(tmpPath, "b", "dist", "flow-dev.cjs.js.flow"),
       "utf8"
     )
-  ).toMatchInlineSnapshot(`
-    "// @flow
-    export * from \\"../src/index.js\\";
-    "
-  `);
+  ).toMatchSnapshot();
 });
 
 test("typescript", async () => {
@@ -180,9 +153,5 @@ test("typescript", async () => {
       path.join(tmpPath, "dist", "typescript.cjs.js.ts"),
       "utf8"
     )
-  ).toMatchInlineSnapshot(`
-    "export * from \\"../src/index\\";
-    export { default } from \\"../src/index\\";
-    "
-  `);
+  ).toMatchSnapshot();
 });
