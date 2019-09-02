@@ -6,10 +6,6 @@
 
 - [2f50306](https://github.com/preconstruct/preconstruct/commit/2f50306) [#88](https://github.com/preconstruct/preconstruct/pulls/88) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Remove react-native field support(note: this doesn't mean you can't build libraries for react native with preconstruct, it just means preconstruct won't make a special build for react native)
 
-### Patch Changes
-
-- [2f50306](https://github.com/preconstruct/preconstruct/commit/2f50306) [#88](https://github.com/preconstruct/preconstruct/pulls/88) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Remove react-native field support
-
 ## 0.0.90
 
 ### Patch Changes
