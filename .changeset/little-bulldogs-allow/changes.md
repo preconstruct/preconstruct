@@ -1,1 +1,0 @@
-Add a comment to the commonjs file for preconstruct dev explaining what it does
