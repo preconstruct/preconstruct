@@ -32,11 +32,11 @@ test("dev command works in node", async () => {
     ""
   ]);
   expect(stdout.toString()).toMatchInlineSnapshot(`
-"message from package two
-message from package one
-message from package two but logged by package one
-"
-`);
+    "message from package two
+    message from package one
+    message from package two but logged by package one
+    "
+  `);
   expect(stderr.toString()).toBe("");
 });
 
@@ -63,15 +63,15 @@ test("all the build types", async () => {
       .replace(/require\("[^"]+"\)/g, "thisWasARequireCall()")
       .replace(/___internalHook\("[^"]+"\)/, "thisWasA___internalHookCall()")
   ).toMatchInlineSnapshot(`
-"\\"use strict\\";
+    "\\"use strict\\";
 
-let unregister = thisWasARequireCall().thisWasA___internalHookCall();
+    let unregister = thisWasARequireCall().thisWasA___internalHookCall();
 
-module.exports = thisWasARequireCall();
+    module.exports = thisWasARequireCall();
 
-unregister();
-"
-`);
+    unregister();
+    "
+  `);
 
   let shouldBeCjsThingsToSource = [
     "all-the-build-types.esm.js",
@@ -135,19 +135,15 @@ test("flow", async () => {
   await dev(tmpPath);
 
   expect(
-    await fs.readlink(path.join(tmpPath, "dist", "flow-dev.cjs.js.flow"))
-  ).toBe(path.join(tmpPath, "src", "index.js"));
-  expect(
     await fs.readFile(
       path.join(tmpPath, "dist", "flow-dev.cjs.js.flow"),
       "utf8"
     )
   ).toMatchInlineSnapshot(`
-"// @flow
-
-export let something = true;
-"
-`);
+    "// @flow
+    export * from \\"../src/index.js\\";
+    "
+  `);
 
   expect(
     await fs.readFile(
@@ -155,11 +151,10 @@ export let something = true;
       "utf8"
     )
   ).toMatchInlineSnapshot(`
-"// @flow
-
-export default \\"something\\";
-"
-`);
+    "// @flow
+    export * from \\"../src/index.js\\";
+    "
+  `);
 
   expect(
     await fs.readFile(
@@ -167,13 +162,10 @@ export default \\"something\\";
       "utf8"
     )
   ).toMatchInlineSnapshot(`
-"// @flow
-
-let something = true;
-
-export { something as default };
-"
-`);
+    "// @flow
+    export * from \\"../src/index.js\\";
+    "
+  `);
 });
 
 test("typescript", async () => {
@@ -189,8 +181,8 @@ test("typescript", async () => {
       "utf8"
     )
   ).toMatchInlineSnapshot(`
-"export * from \\"../src/index\\";
-export { default } from \\"../src/index\\";
-"
-`);
+    "export * from \\"../src/index\\";
+    export { default } from \\"../src/index\\";
+    "
+  `);
 });

@@ -1,7 +1,7 @@
 // @flow
 import { Project } from "./project";
 import { success, info } from "./logger";
-import { tsTemplate } from "./utils";
+import { tsTemplate, flowTemplate } from "./utils";
 import * as babel from "@babel/core";
 import * as fs from "fs-extra";
 import path from "path";
@@ -43,13 +43,31 @@ async function getTypeSystem(
   return [null, content];
 }
 
-async function writeFlowFile(typeSystemPromise, entrypoint) {
+async function writeTypeSystemFile(typeSystemPromise, entrypoint) {
   let [typeSystem, content] = await typeSystemPromise;
   if (typeSystem === null) return;
   let cjsDistPath = path.join(entrypoint.directory, entrypoint.main);
 
   if (typeSystem === "flow") {
-    await fs.symlink(entrypoint.source, cjsDistPath + ".flow");
+    // so...
+    // you might have noticed that this passes
+    // hasExportDefault=false
+    // and be thinking that default exports
+    // but flow seems to be
+    // then you might ask, if re-exporting the default
+    // export isn't necessary, why do it for actual builds?
+    // the reason is is that if preconstruct dev breaks because
+    // of a new version of flow that changes this, that's mostly okay
+    // because preconstruct dev can be fixed, a consumer can upgrade it
+    // and then everything is fine but if a production build is broken
+    // a consumer would have to do a new release and that's not ideal
+    await fs.writeFile(
+      cjsDistPath + ".flow",
+      flowTemplate(
+        false,
+        path.relative(path.dirname(cjsDistPath), entrypoint.source)
+      )
+    );
   }
   if (typeSystem === "typescript") {
     let ast = await babel.parseAsync(content, {
@@ -105,7 +123,7 @@ export default async function dev(projectDir: string) {
           await fs.ensureDir(path.join(entrypoint.directory, "dist"));
 
           let promises = [
-            writeFlowFile(typeSystemPromise, entrypoint),
+            writeTypeSystemFile(typeSystemPromise, entrypoint),
             fs.writeFile(
               path.join(entrypoint.directory, entrypoint.main),
               `"use strict";
