@@ -2,7 +2,7 @@
 
 > A repository with the end result of this tutorial is available at https://github.com/preconstruct/a-random-number
 
-Before we can use preconstruct, we need a package to build. We're going to build a package that export a random number.
+Before we can use Preconstruct, we need a package to build. We're going to build a package that export a random number.
 
 The first thing we're going to do is create a directory and run `yarn init` in it which will create a package.json for us.
 
@@ -20,19 +20,19 @@ question private:
 success Saved package.json
 ```
 
-Now we're going to create our source file. By default, preconstruct looks at the src directory to find the source file so we're going to create a file at `src/index.js` that looks like this.
+Now we're going to create our source file. By default, Preconstruct looks at the src directory to find the source file so we're going to create a file at `src/index.js` that looks like this.
 
 ```jsx
 export let random = Math.random();
 ```
 
-Now we can install preconstruct
+Now we can install Preconstruct.
 
 ```bash
 yarn add --dev preconstruct
 ```
 
-We can initialise preconstruct with `preconstruct init`.
+We can initialise Preconstruct with `preconstruct init`.
 
 ```bash
 $ yarn preconstruct init
@@ -66,7 +66,7 @@ $ yarn preconstruct init
 "main": "dist/a-random-number.cjs.js",
 ```
 
-The `main` field specifies what file Node and older bundlers should look at when someone uses your package. preconstruct has automatically set it to `dist/a-random-number.cjs.js` which is based on the package name `a-random-number`.
+The `main` field specifies what file Node and older bundlers should look at when someone uses your package. Preconstruct has automatically set it to `dist/a-random-number.cjs.js` which is based on the package name `a-random-number`.
 
 ```json
 "module": "dist/a-random-number.esm.js",
@@ -88,7 +88,7 @@ export { random };
 
 This looks good but this file is using `let` which means that it'll break if people use the package with some toolchains.
 
-To fix this, we're going to use Babel. preconstruct uses Babel under the hood so if we add a Babel config, preconstruct will use it.
+To fix this, we're going to use Babel. Preconstruct uses Babel under the hood so if we add a Babel config, Preconstruct will use it.
 
 We're going to install `@babel/preset-env` and add it to a `.babelrc`.
 
@@ -129,7 +129,7 @@ So now we can run `yarn release` to do a release.
 
 ## Going further
 
-preconstruct can do a lot more than building a simple package like this. You can learn more about what preconstruct can do by going through preconstruct's other tutorials:
+Preconstruct can do a lot more than building a simple package like this. You can learn more about what Preconstruct can do by going through Preconstruct's other tutorials:
 
 - [Setting up a package exports multiple entrypoints](/tutorials/multiple-entrypoints)
 - [Setting up a multi-package repo with preconstruct](/tutorials/multi-package-repo)
