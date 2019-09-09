@@ -18,7 +18,7 @@ let fields = [
 
 function setFieldInOrder(
   obj,
-  field: "main" | "module" | "umd:main" | "browser",
+  field: "main" | "module" | "umd:main" | "browser" | "types",
   value
 ) {
   if (field in obj) {
@@ -95,6 +95,13 @@ export class Entrypoint extends Item {
   }
   set umdMain(path: string) {
     this.json = setFieldInOrder(this.json, "umd:main", path);
+  }
+
+  get types(): string | null {
+    return is(this.json.types, is.maybe(is.string));
+  }
+  set types(path: string) {
+    this.json = setFieldInOrder(this.json, "types", path);
   }
 
   get configSource(): string {

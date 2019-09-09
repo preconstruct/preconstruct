@@ -227,3 +227,46 @@ test("entrypoint not included in package", async () => {
   }
   expect(true).toBe(false);
 });
+
+test("invalid types", async () => {
+  let tmpPath = f.copy("typescript");
+
+  await modifyPkg(tmpPath, pkg => {
+    pkg.types = "invalid.js";
+  });
+
+  try {
+    await validate(tmpPath);
+  } catch (e) {
+    expect(e).toBeInstanceOf(FatalError);
+    expect(e.message).toBe(errors.invalidTypesField);
+  }
+});
+
+test("valid types", async () => {
+  let tmpPath = f.copy("typescript");
+
+  await validate(tmpPath);
+  expect(logMock.log.mock.calls).toMatchInlineSnapshot(`
+Array [
+  Array [
+    "🎁 info typescript a valid entry point exists.",
+  ],
+  Array [
+    "🎁 info typescript main field is valid",
+  ],
+  Array [
+    "🎁 info typescript module field is valid",
+  ],
+  Array [
+    "🎁 info typescript types field is valid",
+  ],
+  Array [
+    "🎁 info typescript package entrypoints are valid",
+  ],
+  Array [
+    "🎁 success project is valid!",
+  ],
+]
+`);
+});

@@ -11,7 +11,8 @@ let camelToPkgJsonField = {
   main: "main",
   module: "module",
   umdMain: "umd:main",
-  browser: "browser"
+  browser: "browser",
+  types: "types",
 };
 
 export async function fixPackage(pkg: Package) {
@@ -22,7 +23,8 @@ export async function fixPackage(pkg: Package) {
     main: true,
     module: pkg.entrypoints.some(x => x.module),
     umdMain: pkg.entrypoints.some(x => x.umdMain),
-    browser: pkg.entrypoints.some(x => x.browser)
+    browser: pkg.entrypoints.some(x => x.browser),
+    types: pkg.entrypoints.some(x => x.types),
   };
 
   Object.keys(fields)
@@ -46,7 +48,8 @@ export function validatePackage(pkg: Package) {
     // which this function validates will never happen
     module: !!pkg.entrypoints[0].module,
     umdMain: !!pkg.entrypoints[0].umdMain,
-    browser: !!pkg.entrypoints[0].browser
+    browser: !!pkg.entrypoints[0].browser,
+    types: !!pkg.entrypoints[0].types
   };
 
   pkg.entrypoints.forEach(entrypoint => {

@@ -5,7 +5,7 @@ export function getNameForDist(name: string): string {
 }
 
 export function getValidStringFieldContentForBuildType(
-  type: "main" | "module" | "umd:main",
+  type: "main" | "module" | "umd:main" | "types",
   pkgName: string
 ) {
   let safeName = getNameForDist(pkgName);
@@ -18,6 +18,9 @@ export function getValidStringFieldContentForBuildType(
     }
     case "umd:main": {
       return `dist/${safeName}.umd.min.js`;
+    }
+    case "types": {
+      return `dist/${safeName}.cjs.js.ts`;
     }
   }
   throw new Error(

@@ -10,6 +10,7 @@ export let errors = {
   invalidMainField: "main field is invalid",
   invalidUmdMainField: "umd:main field is invalid",
   invalidBrowserField: "browser field is invalid",
+  invalidTypesField: "types field is invalid",
   umdNameNotSpecified: `the umd:main field is specified but a umdName option is not specified. please add it to the ${PKG_JSON_CONFIG_FIELD} field in your package.json`,
   deniedWriteBrowserField:
     "building browser bundles for modules that include typeof" +
@@ -34,6 +35,9 @@ export let confirms = {
   ),
   fixUmdBuild: createPromptConfirmLoader(
     "would you like to fix the umd field?"
+  ),
+  fixTypesField: createPromptConfirmLoader(
+    "would you like to fix the types field?"
   ),
   shouldInstallObjectAssign: createPromptConfirmLoader(
     "Object.assign is polyfilled with object-assign to reduce bundle size when used with react. would you like to install object-assign automatically?"
@@ -64,6 +68,7 @@ export let infos = {
   validUmdMainField: "umd:main field is valid",
   validEntrypoint: "a valid entry point exists.",
   validBrowserField: "browser field is valid",
+  validTypesField: "types field is valid",
   validPackageEntrypoints: "package entrypoints are valid"
 };
 

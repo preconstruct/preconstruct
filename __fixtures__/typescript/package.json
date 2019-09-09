@@ -5,6 +5,7 @@
   "license": "MIT",
   "private": true,
   "module": "dist/typescript.esm.js",
+  "types": "dist/typescript.cjs.js.ts",
   "dependencies": {
     "@babel/core": "^7.4.3",
     "@babel/preset-typescript": "^7.3.3",

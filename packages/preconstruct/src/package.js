@@ -63,7 +63,7 @@ export class Package extends Item {
         for (let descriptor of descriptors) {
           if (descriptor.contents !== null) {
             let parsed = JSON.parse(descriptor.contents);
-            for (let field of ["module", "umd:main"]) {
+            for (let field of ["module", "umd:main", "types"]) {
               if (parsed[field] !== undefined) {
                 plainEntrypointObj[
                   field
@@ -115,7 +115,7 @@ export class Package extends Item {
     return pkg;
   }
 
-  setFieldOnEntrypoints(field: "main" | "browser" | "module" | "umdMain") {
+  setFieldOnEntrypoints(field: "main" | "browser" | "module" | "umdMain" | "types") {
     this.entrypoints.forEach(entrypoint => {
       switch (field) {
         case "main": {
@@ -143,6 +143,13 @@ export class Package extends Item {
         case "umdMain": {
           entrypoint.umdMain = getValidStringFieldContentForBuildType(
             "umd:main",
+            this.name
+          );
+          break;
+        }
+        case "types": {
+          entrypoint.types = getValidStringFieldContentForBuildType(
+            "types",
             this.name
           );
           break;

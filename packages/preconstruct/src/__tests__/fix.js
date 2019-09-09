@@ -221,3 +221,31 @@ Object {
     expect(promptInput).toBeCalledTimes(1);
   }
 );
+
+test("fix types", async () => {
+  let tmpPath = f.copy("typescript");
+
+  await modifyPkg(tmpPath, pkg => {
+    pkg.types = "bad.js";
+  });
+
+  await fix(tmpPath);
+
+  expect(await getPkg(tmpPath)).toMatchInlineSnapshot(`
+Object {
+  "dependencies": Object {
+    "@babel/core": "^7.4.3",
+    "@babel/preset-typescript": "^7.3.3",
+    "@types/node": "^12.7.1",
+    "typescript": "^3.4.5",
+  },
+  "license": "MIT",
+  "main": "dist/typescript.cjs.js",
+  "module": "dist/typescript.esm.js",
+  "name": "typescript",
+  "private": true,
+  "types": "dist/typescript.cjs.js.ts",
+  "version": "1.0.0",
+}
+`);
+});

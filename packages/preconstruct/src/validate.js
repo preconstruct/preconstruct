@@ -68,6 +68,14 @@ export function isBrowserFieldValid(entrypoint: Entrypoint): boolean {
   );
 }
 
+export function isTypesFieldValid(entrypoint: Entrypoint) {
+        require('fs').writeFileSync('test.json', JSON.stringify(getValidStringFieldContentForBuildType("types", entrypoint.package.name)));
+  return (
+    entrypoint.types ===
+    getValidStringFieldContentForBuildType("types", entrypoint.package.name)
+  );
+}
+
 export function isUmdNameSpecified(entrypoint: Entrypoint) {
   return typeof entrypoint._config.umdName === "string";
 }
@@ -113,6 +121,17 @@ export function validateEntrypoint(entrypoint: Entrypoint, log: boolean) {
       throw new FixableError(errors.invalidBrowserField, entrypoint.name);
     } else if (log) {
       logger.info(infos.validBrowserField, entrypoint.name);
+    }
+  }
+  if (entrypoint.types !== null) {
+    if (
+      isTypesFieldValid(entrypoint)
+    ) {
+      if (log) {
+        logger.info(infos.validTypesField, entrypoint.name);
+      }
+    } else {
+      throw new FixableError(errors.invalidTypesField, entrypoint.name);
     }
   }
 }
