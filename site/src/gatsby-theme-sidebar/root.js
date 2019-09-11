@@ -140,7 +140,7 @@ export default ({
   ...props
 }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  console.log(props);
+  let isIndexPage = props.location.pathname === "/";
   return (
     <Layout
       css={{
@@ -183,7 +183,7 @@ export default ({
           <NavLink activeClassName="" to="/getting-started">
             Docs
           </NavLink>
-          {props.path !== "/" && (
+          {!isIndexPage && (
             <MobileOnly>
               <MenuButton
                 css={{ display: "inline-flex" }}
@@ -199,7 +199,7 @@ export default ({
         </div>
       </Header>
       <Main>
-        {props.path !== "/" && (
+        {!isIndexPage && (
           <Sidebar
             width={320}
             open={sidebarOpen}
@@ -269,7 +269,7 @@ export default ({
           css={{
             paddingTop: 32,
             paddingBottom: 32,
-            ...(props.path !== "/" && {
+            ...(!isIndexPage && {
               display: "flex",
               justifyContent: "center",
               alignItems: "center"
