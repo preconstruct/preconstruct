@@ -1,0 +1,1 @@
+Improve error message for Babel parse errors

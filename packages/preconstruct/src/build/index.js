@@ -7,7 +7,7 @@ import { type Aliases, getAliases } from "./aliases";
 import * as logger from "../logger";
 import * as fs from "fs-extra";
 import { confirms, errors } from "../messages";
-import { FatalError, UnexpectedBuildError } from "../errors";
+import { FatalError, UnexpectedBuildError, ScopelessError } from "../errors";
 import { getRollupConfigs } from "./config";
 import { createWorker, destroyWorker } from "../worker-client";
 import { hasherPromise } from "../rollup-plugins/babel";
@@ -66,8 +66,11 @@ async function retryableBuild(pkg: Package, aliases: Aliases) {
       await retryableBuild(pkg, aliases);
       return;
     }
-    if (err instanceof FatalError) {
+    if (err instanceof FatalError || err instanceof ScopelessError) {
       throw err;
+    }
+    if (err.pluginCode === "BABEL_PARSE_ERROR") {
+      throw new ScopelessError(err.message);
     }
     throw new UnexpectedBuildError(err, pkg.name);
   }

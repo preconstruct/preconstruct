@@ -4,13 +4,14 @@ import util from "util";
 
 export function format(
   args: Array<any>,
-  messageType: "error" | "success" | "info",
+  messageType: "error" | "success" | "info" | "none",
   scope?: string
 ) {
   let prefix = {
     error: chalk.red("error"),
     success: chalk.green("success"),
-    info: chalk.cyan("info")
+    info: chalk.cyan("info"),
+    none: ""
   }[messageType];
   let fullPrefix =
     "🎁 " + prefix + (scope === undefined ? "" : " " + chalk.cyan(scope));
@@ -32,4 +33,8 @@ export function success(message: string, scope?: string) {
 
 export function info(message: string, scope?: string) {
   console.log(format([message], "info", scope));
+}
+
+export function log(message: string) {
+  console.log(format([message], "none"));
 }

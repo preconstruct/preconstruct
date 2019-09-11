@@ -6,8 +6,13 @@ import build from "./build";
 import watch from "./build/watch";
 import fix from "./fix";
 import dev from "./dev";
-import { error, info } from "./logger";
-import { FatalError, FixableError, UnexpectedBuildError } from "./errors";
+import { error, info, log } from "./logger";
+import {
+  FatalError,
+  FixableError,
+  UnexpectedBuildError,
+  ScopelessError
+} from "./errors";
 
 // tricking static analysis is fun
 // $FlowFixMe
@@ -82,6 +87,8 @@ class CommandNotFoundError extends Error {}
     error(errors.commandNotFound);
   } else if (err instanceof UnexpectedBuildError) {
     error(err, err.scope);
+  } else if (err instanceof ScopelessError) {
+    log(err.message);
   } else {
     error(err);
   }
