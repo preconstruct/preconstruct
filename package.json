@@ -5,6 +5,7 @@
   "scripts": {
     "build": "cd build && yarn preconstruct build",
     "test": "jest",
+    "preconstruct": "cd build && yarn preconstruct",
     "postinstall": "manypkg check && cd build && yarn && yarn preconstruct dev",
     "changeset": "changeset",
     "version-packages": "changeset bump",
