@@ -9,7 +9,7 @@ module.exports = {
       }
     },
     {
-      resolve: "gatbys-plugin-page-creator",
+      resolve: "gatsby-plugin-page-creator",
       options: {
         path: `${__dirname}/src/pages/`
       }
