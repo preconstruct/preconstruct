@@ -23,14 +23,16 @@ jobs:
       - name: Run Tests
         run: yarn jest --coverage --testLocationInResults --json --outputFile=report.json
 
-      - name: Upload coverage to Codecov
-        run: bash <(curl -s https://codecov.io/bash) -C $GITHUB_SHA -B ${GITHUB_REF#refs/heads/} -Z
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       - name: Add Annotations for test failures
         uses: mitchellhamilton/jest-check-action@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        if: failure()
+
+      - name: Upload coverage to Codecov
+        run: bash <(curl -s https://codecov.io/bash) -C $GITHUB_SHA -B ${GITHUB_REF#refs/heads/} -Z
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   flow:
     name: Flow
