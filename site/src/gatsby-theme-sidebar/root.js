@@ -269,7 +269,7 @@ export default ({
           css={{
             paddingTop: 32,
             paddingBottom: 32,
-            ...(props["*"] === "" && {
+            ...(props.path !== "/" && {
               display: "flex",
               justifyContent: "center",
               alignItems: "center"
