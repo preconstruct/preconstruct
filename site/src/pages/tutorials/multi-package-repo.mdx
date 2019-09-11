@@ -2,7 +2,7 @@
 
 > **Note:** this tutorial builds upon knowledge in [the Getting Started tutorial](/tutorials) so if you haven't gone through it, you should do that first.
 
-We're going to setup a multi-package repo that uses Preconstruct to build its packages. We're also going to use [Yarn Workspaces](https://yarnpkg.com/en/docs/workspaces) for linking and [Changesets](https://github.com/Noviny/changesets) for versioning, these tools aren't required to use Preconstruct in a multi-package repo but they work really well together with Preconstruct.
+We're going to setup a multi-package repo that uses Preconstruct to build its packages. We're also going to use [Yarn Workspaces](https://yarnpkg.com/en/docs/workspaces) for linking, Yarn Workspaces isn't the only multi-package repo linking tool that you can use with Preconstruct, [Lerna](https://github.com/lerna/lerna) and [Bolt](https://github.com/boltpkg/bolt) will also work.
 
 We have our `a-random-number` package from the [the Getting Started guide](/getting-started) which is awesome but we want to create a new set of packages with some other numbers, `the-number-one` and `the-number-two`. We're going to use a multi-package repo to manage it because we want to be able to manage all our packages together.
 
@@ -106,58 +106,3 @@ module.exports = {
 > Curious about why we're going a babel.config.js file here instead of a .babelrc file? Read the [Configuring Babel guide](/guides/configuring-babel)
 
 Now we can run `preconstruct build` to build our packages. 🎉
-
-## Setting up Changesets to version our packages
-
-[Changesets](https://github.com/Noviny/changesets) is a tool for managing versioning and changelogs with a focus on multi-package repos which makes it a great fit for our project. It lets people add "changesets" which declare an intent to release certain packages and then the tool can consume all the changesets to update the versions of packages and changelogs and publish the packages to npm.
-
-We need to install and initialise Changesets.
-
-```bash
-yarn add @changesets/cli
-```
-
-```bash
-yarn changeset init
-```
-
-Now we're going to add a couple of scripts to our root package.json so it'll look like this.
-
-```json
-{
-  "name": "not-random-numbers",
-  "version": "1.0.0",
-  "license": "MIT",
-  "private": true,
-  "workspaces": ["packages/*"],
-  "dependencies": {
-    "@babel/core": "^7.4.5",
-    "@babel/preset-env": "^7.4.5",
-    "@changesets/cli": "^1.1.3",
-    "preconstruct": "^0.0.70"
-  },
-  "preconstruct": {
-    "packages": ["packages/*"]
-  },
-  "scripts": {
-    "postinstall": "preconstruct dev",
-    "changeset": "changeset",
-    "bump": "changeset bump",
-    "release": "preconstruct build && changeset release"
-  }
-}
-```
-
-Let's go through what all these scripts do:
-
-### `yarn changeset`
-
-This is what contributors can run to create a changeset describing what changes they've made.
-
-### `yarn bump`
-
-This is what bumps all of the package versions and changelogs.
-
-### `yarn release`
-
-This is what you can run to release all of the packages to npm.

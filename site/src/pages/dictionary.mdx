@@ -8,11 +8,15 @@ A repository which only contains a single package which is at the root of the re
 
 ## multi-package repo
 
-A repository that contains multiple packages, this is also commonly referred to as a monorepo but multi-package repo is referred because it more accurately describes what it is. This is generally linked together with a tool such as [Yarn Workspaces](https://yarnpkg.com/lang/en/docs/workspaces/), [Bolt](https://github.com/boltpkg/bolt) or [Lerna](https://lerna.js.org/)
+A repository that contains multiple packages, this is also commonly referred to as a monorepo but we use multi-package repo because it more clearly describes what it is. This is generally linked together with a tool such as [Yarn Workspaces](https://yarnpkg.com/lang/en/docs/workspaces/), [Bolt](https://github.com/boltpkg/bolt) or [Lerna](https://lerna.js.org/)
 
 ## entrypoint
 
-Something that is intended to be imported from outside a packages with an associated source file and build types
+Something that is intended to be imported from outside a package with an associated source file and build types
+
+## entrypoint source file
+
+The source file for an entrypoint that defaults to `src/index` and can be configured with the source option
 
 ## package
 

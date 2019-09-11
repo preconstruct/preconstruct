@@ -140,6 +140,7 @@ export default ({
   ...props
 }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  console.log(props);
   return (
     <Layout
       css={{
@@ -182,7 +183,7 @@ export default ({
           <NavLink activeClassName="" to="/getting-started">
             Docs
           </NavLink>
-          {props["*"] !== "" && (
+          {props.path !== "/" && (
             <MobileOnly>
               <MenuButton
                 css={{ display: "inline-flex" }}
@@ -198,7 +199,7 @@ export default ({
         </div>
       </Header>
       <Main>
-        {props["*"] !== "" && (
+        {props.path !== "/" && (
           <Sidebar
             width={320}
             open={sidebarOpen}
@@ -235,6 +236,9 @@ export default ({
               </NavLink>
               <NavLink to="/guides/when-should-i-use-multiple-entrypoints">
                 When should I use multiple entrypoints?
+              </NavLink>
+              <NavLink to="/guides/building-typescript-packages">
+                Building TypeScript packages
               </NavLink>
             </div>
             <NavLink to="/commands">Commands</NavLink>

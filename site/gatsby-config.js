@@ -1,7 +1,20 @@
 module.exports = {
-  __experimentalThemes: ["gatsby-theme-sidebar"],
   plugins: [
-    "gatsby-mdx",
+    "gatsby-theme-sidebar",
+    {
+      resolve: `gatsby-source-filesystem`,
+      options: {
+        name: `pages`,
+        path: `${__dirname}/src/pages/`
+      }
+    },
+    {
+      resolve: "gatbys-plugin-page-creator",
+      options: {
+        path: `${__dirname}/src/pages/`
+      }
+    },
+    "gatsby-plugin-mdx",
     {
       resolve: "gatsby-plugin-typography",
       options: {
