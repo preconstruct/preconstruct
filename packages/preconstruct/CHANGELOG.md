@@ -1,5 +1,13 @@
 # preconstruct
 
+## 0.1.2
+
+### Patch Changes
+
+- [13b79ea](https://github.com/preconstruct/preconstruct/commit/13b79ea642e74441cf4311beb8cec295a26ae1fd) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Add v8-compile-cache
+- [681537c](https://github.com/preconstruct/preconstruct/commit/681537cbb6cf7dc8e4011b5ee8a3f7f8e31ea831) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Remove unused dependencies
+- [6dcfc40](https://github.com/preconstruct/preconstruct/commit/6dcfc40b746004e5e6b28064f9f2939f8399a7ed) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Improve error message for Babel parse errors
+
 ## 0.1.1
 
 ### Patch Changes
