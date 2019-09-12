@@ -27,6 +27,18 @@ module.exports = {
       options: {
         trackingId: "UA-140394521-1"
       }
+    },
+    {
+      resolve: `gatsby-plugin-manifest`,
+      options: {
+        name: "Preconstruct",
+        short_name: "Preconstruct",
+        start_url: "/",
+        background_color: "#ea2929",
+        theme_color: "#ea2929",
+        display: "browser",
+        icon: "src/images/icon.png"
+      }
     }
   ]
 };
