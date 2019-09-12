@@ -34,8 +34,8 @@ module.exports = {
         name: "Preconstruct",
         short_name: "Preconstruct",
         start_url: "/",
-        background_color: "#6b37bf",
-        theme_color: "#6b37bf",
+        background_color: "#ea2929",
+        theme_color: "#ea2929",
         display: "browser",
         icon: "src/images/icon.png"
       }
