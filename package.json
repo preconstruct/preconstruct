@@ -9,7 +9,7 @@
     "postinstall": "manypkg check && cd build && yarn && yarn preconstruct dev",
     "changeset": "changeset",
     "version-packages": "changeset bump",
-    "release": "yarn build && changeset release",
+    "release": "yarn build && changeset publish",
     "start:site": "cd site && yarn start",
     "build:site": "cd site && yarn build",
     "flow:check": "flow check --flowconfig-name=.flowconfig-ci"
