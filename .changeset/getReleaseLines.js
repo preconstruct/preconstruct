@@ -133,23 +133,6 @@ async function getInfo(request) {
   };
 }
 
-/*
-Hey, welcome to the changeset config! This file has been generated
-for you with the default configs we use, and some comments around
-what options mean, so that it's easy to customise your workflow.
-
-You should update this as you need to craft your workflow.
-
-Config provided by a CI command takes precedence over the contents of this file.
-
-If a config option isn't present here, we will fall back to the defaults.
-*/
-
-const changesetOptions = {
-  // If true, we will automatically commit the changeset when the command is run
-  commit: false
-};
-
 // This function takes information about a changeset to generate an entry for it in your
 // changelog. We provide the full changeset object as well as the version.
 // It may be a good idea to replace the commit hash with a link to the commit.
@@ -196,30 +179,7 @@ const getDependencyReleaseLine = async (changesets, dependenciesUpdated) => {
   return [...changesetLinks, ...updatedDepenenciesList].join("\n");
 };
 
-const versionOptions = {
-  // If true, we will automatically commit the version updating when the command is run
-  commit: false,
-  // Adds a skipCI flag to the commit - only valid if `commit` is also true.
-  skipCI: false,
-  // Do not modify the `changelog.md` files for packages that are updated
-  updateChangelog: true,
-  // A function that returns a string. It takes in options about a change. This allows you to customise your changelog entries
-  getReleaseLine,
-  // A function that returns a string. It takes in options about when a pacakge is updated because
-  getDependencyReleaseLine,
-  // An array of arrays that defines packages that are linked.
-  // Linked packages are packages that should be at the same version when they're released.
-  // If you've used Lerna to version packages before, this is very similar.
-  linked: []
-};
-
-const publishOptions = {
-  // This sets whether unpublished packages are public by default. We err on the side of caution here.
-  public: true
-};
-
 module.exports = {
-  versionOptions,
-  changesetOptions,
-  publishOptions
+  getReleaseLine,
+  getDependencyReleaseLine
 };
