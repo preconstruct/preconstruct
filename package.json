@@ -8,8 +8,7 @@
     "preconstruct": "cd build && yarn preconstruct",
     "postinstall": "manypkg check && cd build && yarn && yarn preconstruct dev",
     "changeset": "changeset",
-    "version-packages": "changeset bump",
-    "release": "yarn build && changeset release",
+    "release": "yarn build && changeset publish",
     "start:site": "cd site && yarn start",
     "build:site": "cd site && yarn build",
     "flow:check": "flow check --flowconfig-name=.flowconfig-ci"
@@ -30,7 +29,7 @@
     "@babel/plugin-transform-runtime": "^7.2.0",
     "@babel/preset-env": "^7.1.0",
     "@babel/preset-flow": "^7.0.0",
-    "@changesets/cli": "^1.2.0",
+    "@changesets/cli": "^2.0.1",
     "@changesets/get-github-info": "^0.1.1",
     "@manypkg/cli": "^0.1.0",
     "@mitchellhamilton/experimental-changesets-auto-release": "^0.0.2",
