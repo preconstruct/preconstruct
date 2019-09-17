@@ -1,4 +1,3 @@
-// @flow
 import inquirer from "inquirer";
 import pLimit from "p-limit";
 import type { ItemUnion } from "./types";
@@ -65,7 +64,7 @@ export let promptConfirm = async (message: string): Promise<boolean> => {
 
 let doPromptInput = async (
   message: string,
-  pkg: ItemUnion,
+  pkg: { name: string },
   defaultAnswer?: string
 ): Promise<string> => {
   let { input } = await inquirer.prompt([
@@ -82,6 +81,6 @@ let doPromptInput = async (
 
 export let promptInput = (
   message: string,
-  pkg: ItemUnion,
+  pkg: { name: string },
   defaultAnswer?: string
 ) => limit(() => doPromptInput(message, pkg, defaultAnswer));

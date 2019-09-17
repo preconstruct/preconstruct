@@ -1,5 +1,3 @@
-// @flow
-
 export function getNameForDist(name: string): string {
   return name.replace(/.*\//, "");
 }

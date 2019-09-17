@@ -1,5 +1,3 @@
-// @flow
-
 export interface TransformSourceDescription extends SourceDescription {
   ast?: Object /*ESTree.Program*/;
   dependencies?: string[];
@@ -24,8 +22,8 @@ export type OptionsPaths = { [key: string]: string } | ((id: string) => string);
 
 export interface OutputOptions {
   amd?: {
-    define?: string,
-    id?: string
+    define?: string;
+    id?: string;
   };
   assetFileNames?: string;
   banner?: string | (() => string | Promise<string>);
@@ -100,7 +98,7 @@ export interface RenderedChunk {
   isDynamicEntry: boolean;
   isEntry: boolean;
   modules: {
-    [id: string]: RenderedModule
+    [id: string]: RenderedModule;
   };
   name: string;
 }
@@ -145,9 +143,9 @@ export interface RollupLogProps {
   hook?: string;
   id?: string;
   loc?: {
-    column: number,
-    file?: string,
-    line: number
+    column: number;
+    file?: string;
+    line: number;
   };
   message: string;
   name?: string;
@@ -201,8 +199,8 @@ export interface WatchOptions {
   atomic?: boolean | number;
   awaitWriteFinish?:
     | {
-        pollInterval?: number,
-        stabilityThreshold?: number
+        pollInterval?: number;
+        stabilityThreshold?: number;
       }
     | boolean;
   binaryInterval?: number;
@@ -247,8 +245,8 @@ export type TransformChunkHook = (
   code: string,
   options: OutputOptions
 ) =>
-  | Promise<{ code: string, map: RawSourceMap } | void>
-  | { code: string, map: RawSourceMap }
+  | Promise<{ code: string; map: RawSourceMap } | void>
+  | { code: string; map: RawSourceMap }
   | void
   | null;
 
@@ -257,8 +255,8 @@ export type RenderChunkHook = (
   chunk: RenderedChunk,
   options: OutputOptions
 ) =>
-  | Promise<{ code: string, map: RawSourceMap } | null>
-  | { code: string, map: RawSourceMap }
+  | Promise<{ code: string; map: RawSourceMap } | null>
+  | { code: string; map: RawSourceMap }
   | string
   | null;
 
@@ -279,10 +277,10 @@ export interface SourceMap {
 }
 
 export type OutputAsset = {
-  code?: void,
-  fileName: string,
-  isAsset: true,
-  source: string | Buffer
+  code?: void;
+  fileName: string;
+  isAsset: true;
+  source: string | Buffer;
 };
 
 export interface OutputChunk extends RenderedChunk {

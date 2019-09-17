@@ -1,4 +1,3 @@
-// @flow
 import { Package } from "./package";
 import { Project } from "./project";
 import { promptInput } from "./prompt";

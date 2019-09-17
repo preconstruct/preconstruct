@@ -1,4 +1,3 @@
-// @flow
 import { Entrypoint } from "./entrypoint";
 import { Project } from "./project";
 import { promptInput } from "./prompt";

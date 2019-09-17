@@ -1,4 +1,3 @@
-// @flow
 import util from "util";
 
 export class FatalError extends Error {

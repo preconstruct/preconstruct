@@ -1,4 +1,3 @@
-// @flow
 import * as babel from "@babel/core";
 import { createFilter } from "rollup-pluginutils";
 import { getWorker } from "../worker-client";

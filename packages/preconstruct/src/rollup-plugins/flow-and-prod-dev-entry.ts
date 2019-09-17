@@ -1,4 +1,3 @@
-// @flow
 import path from "path";
 import type { Plugin } from "./types";
 import { getDevPath, getProdPath } from "../build/utils";

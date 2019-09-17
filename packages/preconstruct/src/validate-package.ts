@@ -1,11 +1,8 @@
-// @flow
 import { FatalError, FixableError } from "./errors";
 import resolveFrom from "resolve-from";
 import chalk from "chalk";
 import { errors } from "./messages";
-/*:: 
 import { Package } from "./package";
-*/
 
 let camelToPkgJsonField = {
   main: "main",

@@ -1,4 +1,3 @@
-// @flow
 import { Project } from "./project";
 import { Entrypoint } from "./entrypoint";
 import { errors, successes, infos } from "./messages";

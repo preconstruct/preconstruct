@@ -1,4 +1,3 @@
-// @flow
 import is from "sarcastic";
 import nodePath from "path";
 import { promptInput } from "./prompt";

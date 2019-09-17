@@ -1,4 +1,3 @@
-// @flow
 // based on https://github.com/jamiebuilds/std-pkg but reading fewer things, adding setters and reading the file
 import is from "sarcastic";
 import globby from "globby";
