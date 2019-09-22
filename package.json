@@ -10,8 +10,7 @@
     "changeset": "changeset",
     "release": "yarn build && changeset publish",
     "start:site": "cd site && yarn start",
-    "build:site": "cd site && yarn build",
-    "flow:check": "flow check --flowconfig-name=.flowconfig-ci"
+    "build:site": "cd site && yarn build"
   },
   "repository": "https://github.com/preconstruct/preconstruct",
   "license": "MIT",
@@ -52,7 +51,6 @@
     "eslint-plugin-prettier": "^3.0.0",
     "eslint-plugin-react": "^7.13.0",
     "fixturez": "^1.1.0",
-    "flow-bin": "^0.94.0",
     "globby": "^10.0.1",
     "jest": "^24.0.0",
     "jest-in-case": "^1.0.2",

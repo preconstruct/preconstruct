@@ -31,8 +31,8 @@ jobs:
         run: bash <(curl -s https://codecov.io/bash) -C $GITHUB_SHA -B ${GITHUB_REF#refs/heads/} -Z
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-  flow:
-    name: Flow
+  typescript:
+    name: TypeScript
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
@@ -48,8 +48,8 @@ jobs:
       - name: Install Dependencies
         run: yarn
 
-      - name: Check Flow
-        run: yarn flow:check
+      - name: Check Types
+        run: yarn tsc
   eslint:
     name: ESLint
     runs-on: ubuntu-latest
