@@ -4,20 +4,20 @@ import * as fs from "fs-extra";
 import globby from "globby";
 import fixturez from "fixturez";
 import spawn from "spawndamnit";
+// @ts-ignore
 import initHasher from "xxhash-wasm";
+// @ts-ignore
 import profiler from "v8-profiler-next";
 
 let f = fixturez(__dirname);
 
 require("chalk").enabled = false;
-// $FlowFixMe
 console.error = jest.fn();
-// $FlowFixMe
 console.log = jest.fn();
 
 export let logMock = {
-  log: ((console.log: any): JestMockFn<any, void>),
-  error: ((console.error: any): JestMockFn<any, void>)
+  log: (console.log as any) as jest.MockInstance<void, any>,
+  error: (console.error as any) as jest.MockInstance<void, any>
 };
 
 afterEach(() => {
@@ -28,13 +28,15 @@ afterEach(() => {
 import init from "../src/init";
 import { confirms } from "../src/messages";
 
+let mockedConfirms = confirms as jest.Mocked<typeof confirms>;
+
 export async function initBasic(directory: string) {
-  confirms.writeMainField.mockReturnValue(true);
-  confirms.writeModuleField.mockReturnValue(true);
+  mockedConfirms.writeMainField.mockReturnValue(Promise.resolve(true));
+  mockedConfirms.writeModuleField.mockReturnValue(Promise.resolve(true));
 
   await init(directory);
-  confirms.writeMainField.mockReset();
-  confirms.writeModuleField.mockReset();
+  mockedConfirms.writeMainField.mockReset();
+  mockedConfirms.writeModuleField.mockReset();
 }
 
 export function profile(name: string) {
@@ -59,13 +61,18 @@ function getPkgPath(tmpPath: string) {
   return path.join(tmpPath, "package.json");
 }
 
-export async function getPkg(filepath: string): Object {
+export async function getPkg(
+  filepath: string
+): Promise<{ [key: string]: any }> {
   return JSON.parse(
     await fs.readFile(path.join(filepath, "package.json"), "utf-8")
   );
 }
 
-export async function modifyPkg(tmpPath: string, cb: Object => mixed) {
+export async function modifyPkg(
+  tmpPath: string,
+  cb: (pkgJson: { [key: string]: any }) => unknown
+) {
   let json = await getPkg(tmpPath);
   await cb(json);
 
@@ -74,13 +81,15 @@ export async function modifyPkg(tmpPath: string, cb: Object => mixed) {
 }
 
 export let createPackageCheckTestCreator = (
-  doResult: string => Promise<void>
+  doResult: (tmpPath: string) => Promise<void>
 ) => {
-  let createTestCreator = testFn => async (
+  let createTestCreator = (
+    testFn: (testName: string, func: () => Promise<void>) => void
+  ) => async (
     testName: string,
-    entrypoints: { [key: string]: Object },
+    entrypoints: { [key: string]: any },
     cb: (
-      doThing: () => Promise<{ [key: string]: Object }>,
+      doThing: () => Promise<{ [key: string]: any }>,
       stuff: { dir: string }
     ) => Promise<void>
   ) => {
@@ -100,7 +109,7 @@ export let createPackageCheckTestCreator = (
         async () => {
           await doResult(tmpPath);
 
-          let newThings = {};
+          let newThings: Record<string, any> = {};
 
           await Promise.all(
             things.map(async entrypointPath => {
@@ -119,9 +128,11 @@ export let createPackageCheckTestCreator = (
     });
   };
   let testFn = createTestCreator(test);
+  // @ts-ignore
   testFn.only = createTestCreator(test.only);
+  // @ts-ignore
   testFn.skip = createTestCreator(test.skip);
-  return testFn;
+  return testFn as typeof testFn & { only: typeof testFn; skip: typeof testFn };
 };
 
 export async function snapshotDistFiles(tmpPath: string) {
@@ -170,9 +181,9 @@ export async function snapshotDirectory(
     transformPath = x => x,
     transformContent = x => x
   }: {
-    files?: "all" | "js",
-    transformPath?: (path: string, contents: string) => string,
-    transformContent?: string => string
+    files?: "all" | "js";
+    transformPath?: (path: string, contents: string) => string;
+    transformContent?: (content: string) => string;
   } = {}
 ) {
   let paths = await globby(
@@ -181,8 +192,6 @@ export async function snapshotDirectory(
       cwd: tmpPath
     }
   );
-
-  console.log(paths);
 
   await Promise.all(
     paths.map(async x => {

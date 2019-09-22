@@ -2,7 +2,9 @@ import build from "../";
 import fixturez from "fixturez";
 import { FatalError } from "../../errors";
 import { snapshotDirectory, install } from "../../../test-utils";
-import { confirms } from "../../messages";
+import { confirms as _confirms } from "../../messages";
+
+let confirms = _confirms as jest.Mocked<typeof _confirms>;
 
 const f = fixturez(__dirname);
 

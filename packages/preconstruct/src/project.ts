@@ -1,4 +1,3 @@
-import is from "sarcastic";
 import nodePath from "path";
 import { promptInput } from "./prompt";
 import pLimit from "p-limit";
@@ -11,6 +10,7 @@ import { error } from "./logger";
 import { promptConfirm } from "./prompt";
 import { PKG_JSON_CONFIG_FIELD } from "./constants";
 import { validateIncludedFiles } from "./validate-included-files";
+import { FatalError } from "./errors";
 
 let unsafeRequire = require;
 
@@ -18,7 +18,20 @@ let askGlobalLimit = pLimit(1);
 
 export class Project extends Item {
   get configPackages(): Array<string> {
-    return is(this._config.packages, is.default(is.arrayOf(is.string), ["."]));
+    if (this._config.packages == null) {
+      return ["."];
+    }
+    if (
+      Array.isArray(this._config.packages) &&
+      this._config.packages.every(x => typeof x === "string")
+    ) {
+      return this._config.packages;
+    }
+
+    throw new FatalError(
+      "The packages option for this project is not an array of globs",
+      this.name
+    );
   }
   // probably gonna be irrelevant later but i want it for now
   get isBolt(): boolean {
@@ -40,25 +53,29 @@ export class Project extends Item {
   }
 
   get name(): string {
-    return is(this.json.name, is.string);
+    if (typeof this.json.name !== "string") {
+      throw new FatalError(
+        "The name field on this project is not a string",
+        this.directory
+      );
+    }
+    return this.json.name;
   }
   set name(name: string) {
     this.json.name = name;
   }
-  packages: Array<Package>;
+  packages!: Array<Package>;
 
   async _packages(): Promise<Array<Package>> {
     // suport bolt later probably
     // maybe lerna too though probably not
     if (!this._config.packages && this.json.workspaces) {
-      let _workspaces;
+      let workspaces;
       if (Array.isArray(this.json.workspaces)) {
-        _workspaces = this.json.workspaces;
+        workspaces = this.json.workspaces;
       } else if (Array.isArray(this.json.workspaces.packages)) {
-        _workspaces = this.json.workspaces.packages;
+        workspaces = this.json.workspaces.packages;
       }
-
-      let workspaces = is(_workspaces, is.arrayOf(is.string));
 
       let packages = await promptInput(
         "what packages should preconstruct build?",
@@ -71,61 +88,54 @@ export class Project extends Item {
       await this.save();
     }
 
-    try {
-      let filenames = await globby(this.configPackages, {
-        cwd: this.directory,
-        onlyDirectories: true,
-        absolute: true,
-        expandDirectories: false
-      });
+    let filenames = await globby(this.configPackages, {
+      cwd: this.directory,
+      onlyDirectories: true,
+      absolute: true,
+      expandDirectories: false
+    });
 
-      let dirsWithoutPkgJson = [];
-      let lastErr;
+    let dirsWithoutPkgJson: string[] = [];
+    let lastErr;
 
-      let packages = await Promise.all(
-        filenames.map(async x => {
-          try {
-            let pkg = await Package.create(x);
-            pkg.project = this;
-            return pkg;
-          } catch (err) {
-            if (
-              err.code === "ENOENT" &&
-              err.path === nodePath.join(x, "package.json")
-            ) {
-              lastErr = err;
-              dirsWithoutPkgJson.push(x);
-              return ((undefined: any): Package);
-            }
-            throw err;
+    let packages = await Promise.all(
+      filenames.map(async x => {
+        try {
+          let pkg = await Package.create(x);
+          pkg.project = this;
+          return pkg;
+        } catch (err) {
+          if (
+            err.code === "ENOENT" &&
+            err.path === nodePath.join(x, "package.json")
+          ) {
+            lastErr = err;
+            dirsWithoutPkgJson.push(x);
+            return (undefined as any) as Package;
           }
-        })
-      );
-      if (dirsWithoutPkgJson.length) {
-        error(
-          "there are some package directories that do not have package.jsons\nthis is often caused by switching branches.\n\n" +
-            dirsWithoutPkgJson.join("\n") +
-            "\n"
-        );
-        if (
-          !(await promptConfirm(
-            "would you like preconstruct to delete these directories automatically?"
-          ))
-        ) {
-          throw lastErr;
+          throw err;
         }
-        await Promise.all(dirsWithoutPkgJson.map(dir => fs.remove(dir)));
-        return this._packages();
+      })
+    );
+    if (dirsWithoutPkgJson.length) {
+      error(
+        "there are some package directories that do not have package.jsons\nthis is often caused by switching branches.\n\n" +
+          dirsWithoutPkgJson.join("\n") +
+          "\n"
+      );
+      if (
+        !(await promptConfirm(
+          "would you like preconstruct to delete these directories automatically?"
+        ))
+      ) {
+        throw lastErr;
       }
-
-      await Promise.all(packages.map(pkg => validateIncludedFiles(pkg)));
-      return packages;
-    } catch (error) {
-      if (error instanceof is.AssertionError) {
-        return [];
-      }
-      throw error;
+      await Promise.all(dirsWithoutPkgJson.map(dir => fs.remove(dir)));
+      return this._packages();
     }
+
+    await Promise.all(packages.map(pkg => validateIncludedFiles(pkg)));
+    return packages;
   }
 
   global(pkg: string) {

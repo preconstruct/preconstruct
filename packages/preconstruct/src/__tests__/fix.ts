@@ -1,19 +1,22 @@
-// @flow
 import fixturez from "fixturez";
 import fix from "../fix";
 import path from "path";
-import { confirms, errors, inputs } from "../messages";
+import { confirms as _confirms, errors, inputs } from "../messages";
 import {
   getPkg,
   modifyPkg,
   logMock,
   createPackageCheckTestCreator
 } from "../../test-utils";
-import { promptInput } from "../prompt";
+import { promptInput as _promptInput } from "../prompt";
 
 const f = fixturez(__dirname);
 
 jest.mock("../prompt");
+
+let confirms = _confirms as jest.Mocked<typeof _confirms>;
+
+let promptInput = _promptInput as jest.MockedFunction<typeof _promptInput>;
 
 let testFix = createPackageCheckTestCreator(fix);
 
@@ -29,7 +32,7 @@ test("no entrypoint", async () => {
 test("only main", async () => {
   let tmpPath = f.copy("no-module");
 
-  confirms.writeMainField.mockReturnValue(true);
+  confirms.writeMainField.mockReturnValue(Promise.resolve(true));
   let origJson = await getPkg(tmpPath);
   await modifyPkg(tmpPath, json => {
     json.main = "bad";
@@ -190,7 +193,7 @@ testFix(
     }
   },
   async run => {
-    (promptInput: any).mockImplementation((message, item) => {
+    promptInput.mockImplementation(async (message, item) => {
       expect(message).toBe(inputs.getUmdName);
       expect(item.name).toBe("something");
       return "somethingUmdName";

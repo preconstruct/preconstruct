@@ -1,5 +1,5 @@
 import path from "path";
-import type { Plugin } from "./types";
+import { Plugin, OutputAsset, OutputChunk } from "rollup";
 import { getDevPath, getProdPath } from "../build/utils";
 import { flowTemplate } from "../utils";
 import { Package } from "../package";
@@ -10,8 +10,10 @@ import * as fs from "fs-extra";
 export default function flowAndNodeDevProdEntry(pkg: Package): Plugin {
   return {
     name: "flow-and-prod-dev-entry",
-    async resolveId(source: string, importer: string) {
-      let resolved = await this.resolve(source, importer, { skipSelf: true });
+    async resolveId(source, importer) {
+      let resolved = (await this.resolve(source, importer, {
+        skipSelf: true
+      }))!;
 
       if (
         resolved.id.startsWith("\0") ||
@@ -30,23 +32,28 @@ export default function flowAndNodeDevProdEntry(pkg: Package): Plugin {
     // eslint-disable-next-line no-unused-vars
     async generateBundle(opts, bundle, something) {
       for (const n in bundle) {
-        const file = bundle[n];
-        // $FlowFixMe
-        let facadeModuleId = file.facadeModuleId;
-        if (file.isAsset || !file.isEntry || facadeModuleId == null) {
+        const _file = bundle[n];
+        const facadeModuleId = (_file as OutputChunk).facadeModuleId;
+        if (
+          (_file as OutputAsset).isAsset ||
+          !(_file as OutputChunk).isEntry ||
+          facadeModuleId == null
+        ) {
           continue;
         }
 
+        let file = _file as OutputChunk;
+
         let mainFieldPath = file.fileName.replace(/\.prod\.js$/, ".js");
         let relativeToSource = path.relative(
-          path.dirname(path.join(opts.dir, file.fileName)),
+          path.dirname(path.join(opts.dir!, file.fileName)),
           facadeModuleId
         );
 
         let isEntrySourceTypeScript = /\.tsx?$/.test(facadeModuleId);
 
         if (!isEntrySourceTypeScript) {
-          let flowMode = false;
+          let flowMode: false | "all" | "named" = false;
 
           let source = await fs.readFile(facadeModuleId, "utf8");
           if (source.includes("@flow")) {

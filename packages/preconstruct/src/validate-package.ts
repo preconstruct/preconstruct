@@ -11,6 +11,8 @@ let camelToPkgJsonField = {
   browser: "browser"
 };
 
+let keys: <Obj>(obj: Obj) => (keyof Obj)[] = Object.keys;
+
 export async function fixPackage(pkg: Package) {
   if (pkg.entrypoints.length === 0) {
     throw new FatalError(errors.noEntrypoints, pkg.name);
@@ -22,7 +24,7 @@ export async function fixPackage(pkg: Package) {
     browser: pkg.entrypoints.some(x => x.browser)
   };
 
-  Object.keys(fields)
+  keys(fields)
     .filter(x => fields[x])
     .forEach(field => {
       pkg.setFieldOnEntrypoints(field);
@@ -47,7 +49,7 @@ export function validatePackage(pkg: Package) {
   };
 
   pkg.entrypoints.forEach(entrypoint => {
-    Object.keys(fields).forEach(field => {
+    keys(fields).forEach(field => {
       if (
         // $FlowFixMe
         entrypoint[field] &&

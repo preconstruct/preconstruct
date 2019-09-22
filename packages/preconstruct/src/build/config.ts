@@ -1,9 +1,8 @@
 // @flow
 import { Package } from "../package";
-import { type RollupConfig, getRollupConfig } from "./rollup";
-import type { OutputOptions } from "./types";
-import type { Aliases } from "./aliases";
-import is from "sarcastic";
+import { getRollupConfig } from "./rollup";
+import { OutputOptions, RollupOptions } from "rollup";
+import { Aliases } from "./aliases";
 
 function getGlobals(pkg: Package) {
   let stuff = [];
@@ -21,16 +20,19 @@ function getGlobals(pkg: Package) {
 
   let peerDeps = pkg.peerDependencies ? Object.keys(pkg.peerDependencies) : [];
 
-  return peerDeps.reduce((obj, pkgName) => {
-    obj[pkgName] = pkg.project.global(pkgName);
-    return obj;
-  }, {});
+  return peerDeps.reduce(
+    (obj, pkgName) => {
+      obj[pkgName] = pkg.project.global(pkgName);
+      return obj;
+    },
+    {} as Record<string, string>
+  );
 }
 
 export function getRollupConfigs(pkg: Package, aliases: Aliases) {
   let configs: Array<{
-    config: RollupConfig,
-    outputs: Array<OutputOptions>
+    config: RollupOptions;
+    outputs: OutputOptions[];
   }> = [];
 
   let strictEntrypoints = pkg.entrypoints.map(x => x.strict());
@@ -41,16 +43,16 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
     config: getRollupConfig(pkg, strictEntrypoints, aliases, "node-dev"),
     outputs: [
       {
-        format: "cjs",
+        format: "cjs" as const,
         entryFileNames: "[name].cjs.dev.js",
         chunkFileNames: "dist/[name]-[hash].cjs.dev.js",
         dir: pkg.directory,
-        exports: "named"
+        exports: "named" as const
       },
       ...(hasModuleField
         ? [
             {
-              format: "es",
+              format: "es" as const,
               entryFileNames: "[name].esm.js",
               chunkFileNames: "dist/[name]-[hash].esm.js",
               dir: pkg.directory
@@ -80,17 +82,14 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
     pkg.entrypoints
       .map(x => x.strict())
       .forEach(entrypoint => {
-        let umdName = is(entrypoint._config.umdName, is.string);
-        is(entrypoint.umdMain, is.string);
-
         configs.push({
           config: getRollupConfig(pkg, [entrypoint], aliases, "umd"),
           outputs: [
             {
-              format: "umd",
+              format: "umd" as const,
               sourcemap: true,
               entryFileNames: "[name].umd.min.js",
-              name: umdName,
+              name: entrypoint.umdName!,
               dir: pkg.directory,
               globals: getGlobals(pkg)
             }
@@ -105,16 +104,16 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
       config: getRollupConfig(pkg, strictEntrypoints, aliases, "browser"),
       outputs: [
         {
-          format: "cjs",
+          format: "cjs" as const,
           entryFileNames: "[name].browser.cjs.js",
           chunkFileNames: "dist/[name]-[hash].browser.cjs.js",
           dir: pkg.directory,
-          exports: "named"
+          exports: "named" as const
         },
         ...(hasModuleField
           ? [
               {
-                format: "es",
+                format: "es" as const,
                 entryFileNames: "[name].browser.esm.js",
                 chunkFileNames: "dist/[name]-[hash].browser.esm.js",
                 dir: pkg.directory

@@ -5,6 +5,7 @@ import { tsTemplate, flowTemplate } from "./utils";
 import * as babel from "@babel/core";
 import * as fs from "fs-extra";
 import path from "path";
+import { StrictEntrypoint } from "./entrypoint";
 
 let tsExtensionPattern = /tsx?$/;
 
@@ -28,7 +29,7 @@ module.exports = require(${JSON.stringify(pathToSource)})
 }
 
 async function getTypeSystem(
-  entrypoint
+  entrypoint: StrictEntrypoint
 ): Promise<[null | "flow" | "typescript", string]> {
   let content = await fs.readFile(entrypoint.source, "utf8");
 
@@ -43,7 +44,10 @@ async function getTypeSystem(
   return [null, content];
 }
 
-async function writeTypeSystemFile(typeSystemPromise, entrypoint) {
+async function writeTypeSystemFile(
+  typeSystemPromise: Promise<[null | "flow" | "typescript", string]>,
+  entrypoint: StrictEntrypoint
+) {
   let [typeSystem, content] = await typeSystemPromise;
   if (typeSystem === null) return;
   let cjsDistPath = path.join(entrypoint.directory, entrypoint.main);
@@ -70,11 +74,11 @@ async function writeTypeSystemFile(typeSystemPromise, entrypoint) {
     );
   }
   if (typeSystem === "typescript") {
-    let ast = await babel.parseAsync(content, {
+    let ast = (await babel.parseAsync(content, {
       filename: entrypoint.source,
       sourceType: "module",
       cwd: entrypoint.package.project.directory
-    });
+    }))! as babel.types.File;
 
     let hasDefaultExport = false;
 
@@ -122,7 +126,7 @@ export default async function dev(projectDir: string) {
   );
   info("project is valid!");
 
-  let promises = [];
+  let promises: Promise<unknown>[] = [];
   await Promise.all(
     project.packages.map(pkg => {
       return Promise.all(

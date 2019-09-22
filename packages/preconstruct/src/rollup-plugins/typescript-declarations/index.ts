@@ -1,12 +1,12 @@
 // @flow
 import path from "path";
 import { FatalError } from "../../errors";
-import type { Plugin } from "../types";
+import { Plugin, OutputChunk, OutputAsset } from "rollup";
 import { Package } from "../../package";
 import { createDeclarationCreator } from "./create-generator";
 import { tsTemplate } from "../../utils";
 
-let isTsPath = source => /\.tsx?/.test(source);
+let isTsPath = (source: string) => /\.tsx?/.test(source);
 
 export default function typescriptDeclarations(pkg: Package): Plugin {
   if (!pkg.entrypoints.some(({ source }) => isTsPath(source))) {
@@ -35,12 +35,17 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
       );
 
       for (const n in bundle) {
-        const file = bundle[n];
-        // $FlowFixMe
-        let facadeModuleId = file.facadeModuleId;
-        if (file.isAsset || !file.isEntry || facadeModuleId == null) {
+        const _file = bundle[n];
+        const facadeModuleId = (_file as OutputChunk).facadeModuleId;
+        if (
+          (_file as OutputAsset).isAsset ||
+          !(_file as OutputChunk).isEntry ||
+          facadeModuleId == null
+        ) {
           continue;
         }
+
+        let file = _file as OutputChunk;
 
         let dtsFilename = srcFilenameToDtsFilenameMap.get(facadeModuleId);
 
@@ -53,7 +58,7 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
 
         let mainFieldPath = file.fileName.replace(/\.prod\.js$/, "");
         let relativeToSource = path.relative(
-          path.dirname(path.join(opts.dir, file.fileName)),
+          path.dirname(path.join(opts.dir!, file.fileName)),
           dtsFilename.replace(/\.d\.ts$/, "")
         );
         if (!relativeToSource.startsWith(".")) {

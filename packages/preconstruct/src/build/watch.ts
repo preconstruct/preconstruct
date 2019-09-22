@@ -7,8 +7,7 @@ import path from "path";
 import ms from "ms";
 import * as fs from "fs-extra";
 import { getRollupConfigs } from "./config";
-import { type Aliases, getAliases } from "./aliases";
-import { toUnsafeRollupConfig } from "./rollup";
+import { Aliases, getAliases } from "./aliases";
 import { success, info } from "../logger";
 import { successes } from "../messages";
 import { createWorker } from "../worker-client";
@@ -21,14 +20,14 @@ async function watchPackage(pkg: Package, aliases: Aliases) {
   const _configs = getRollupConfigs(pkg, aliases);
   await fs.remove(path.join(pkg.directory, "dist"));
   let configs = _configs.map(config => {
-    return { ...toUnsafeRollupConfig(config.config), output: config.outputs };
+    return { ...config.config, output: config.outputs };
   });
   const watcher = watch(configs);
-  let reject;
+  let reject: (reason?: unknown) => void;
   let errPromise = new Promise((resolve, _reject) => {
     reject = _reject;
   });
-  let startResolve;
+  let startResolve: (value?: unknown) => void;
   let startPromise = new Promise(resolve => {
     startResolve = resolve;
   });
@@ -58,7 +57,7 @@ async function watchPackage(pkg: Package, aliases: Aliases) {
                 : Array.isArray(event.input)
                 ? event.input.map(relativePath).join(", ")
                 : Object.values(event.input)
-                    // $FlowFixMe
+                    // @ts-ignore
                     .map(relativePath)
                     .join(", ")
             )} → ${chalk.bold(event.output.map(relativePath).join(", "))}...`
@@ -91,7 +90,7 @@ async function watchPackage(pkg: Package, aliases: Aliases) {
 async function retryableWatch(
   pkg: Package,
   aliases: Aliases,
-  getPromises: ({ start: Promise<*> }) => mixed,
+  getPromises: (arg: { start: Promise<unknown> }) => unknown,
   depth: number
 ) {
   try {

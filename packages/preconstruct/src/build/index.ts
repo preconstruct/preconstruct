@@ -2,8 +2,8 @@
 import { Package } from "../package";
 import { Project } from "../project";
 import path from "path";
-import { rollup } from "./rollup";
-import { type Aliases, getAliases } from "./aliases";
+import { rollup } from "rollup";
+import { Aliases, getAliases } from "./aliases";
 import * as logger from "../logger";
 import * as fs from "fs-extra";
 import { confirms, errors } from "../messages";

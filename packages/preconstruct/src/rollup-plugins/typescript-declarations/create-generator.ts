@@ -1,18 +1,20 @@
-// @flow
 import resolveFrom from "resolve-from";
 import * as fs from "fs-extra";
 import path from "path";
+// @ts-ignore
 import { createLanguageServiceHostClass } from "./language-service-host";
+
+type Typescript = typeof import("typescript");
 
 let unsafeRequire = require;
 
-let weakMemoize = function<Arg, Return>(func: Arg => Return): Arg => Return {
-  // $FlowFixMe flow doesn't include all non-primitive types as allowed for weakmaps
+let weakMemoize = function<Arg extends object, Return>(
+  func: (arg: Arg) => Return
+): (arg: Arg) => Return {
   let cache: WeakMap<Arg, Return> = new WeakMap();
   return arg => {
     if (cache.has(arg)) {
-      // $FlowFixMe
-      return cache.get(arg);
+      return cache.get(arg)!;
     }
     let ret = func(arg);
     cache.set(arg, ret);
@@ -20,8 +22,8 @@ let weakMemoize = function<Arg, Return>(func: Arg => Return): Arg => Return {
   };
 };
 
-function memoize<V>(fn: string => V): string => V {
-  const cache = {};
+function memoize<V>(fn: (arg: string) => V): (arg: string) => V {
+  const cache: { [key: string]: V } = {};
 
   return (arg: string) => {
     if (cache[arg] === undefined) cache[arg] = fn(arg);
@@ -29,8 +31,8 @@ function memoize<V>(fn: string => V): string => V {
   };
 }
 
-let getService = weakMemoize(typescript =>
-  memoize(async configFileName => {
+let getService = weakMemoize((typescript: Typescript) =>
+  memoize(async (configFileName: string) => {
     let configFileContents = await fs.readFile(configFileName, "utf8");
     const result = typescript.parseConfigFileTextToJson(
       configFileName,
@@ -61,12 +63,12 @@ let getService = weakMemoize(typescript =>
 export async function createDeclarationCreator(
   dirname: string
 ): Promise<{
-  getDeps: (entrypoints: Array<string>) => Set<string>,
+  getDeps: (entrypoints: Array<string>) => Set<string>;
   getDeclarationFile: (
     filename: string
-  ) => Promise<{ name: string, content: string }>
+  ) => Promise<{ name: string; content: string }>;
 }> {
-  let typescript;
+  let typescript: Typescript;
   try {
     typescript = unsafeRequire(resolveFrom(dirname, "typescript"));
   } catch (err) {
@@ -120,14 +122,14 @@ export async function createDeclarationCreator(
 
       function searchDeps(deps: Set<string>) {
         for (let dep of deps) {
-          let sourceFile = program.getSourceFile(dep);
+          let sourceFile = program!.getSourceFile(dep);
           if (!sourceFile) {
             throw new Error(
               "This is an internal error, please open an issue if you see this: source file not found"
             );
           }
-          let internalDeps = new Set();
-          for (let { text } of sourceFile.imports) {
+          let internalDeps = new Set<string>();
+          for (let { text } of (sourceFile as any).imports) {
             let { resolvedModule } = typescript.resolveModuleName(
               text,
               dep,
@@ -154,7 +156,7 @@ export async function createDeclarationCreator(
     },
     getDeclarationFile: async (
       filename: string
-    ): Promise<{ name: string, content: string }> => {
+    ): Promise<{ name: string; content: string }> => {
       if (filename.endsWith(".d.ts")) {
         return {
           name: filename.replace(

@@ -1,6 +1,8 @@
+import { Plugin } from "rollup";
+
 const pattern = /require\((["'])@babel\/runtime\/helpers\/esm\/(\w+)["']\)/g;
 
-export default function rewriteCjsRuntimeHelpers() {
+export default function rewriteCjsRuntimeHelpers(): Plugin {
   return {
     name: "rewrite-cjs-runtime-helpers",
     renderChunk(code, chunkInfo, { format }) {

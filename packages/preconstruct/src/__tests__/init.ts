@@ -1,8 +1,7 @@
-// @flow
 import fixturez from "fixturez";
 import path from "path";
 import init from "../init";
-import { confirms, errors } from "../messages";
+import { confirms as _confirms, errors } from "../messages";
 import {
   logMock,
   modifyPkg,
@@ -13,6 +12,8 @@ import {
 const f = fixturez(__dirname);
 
 jest.mock("../prompt");
+
+let confirms = _confirms as jest.Mocked<typeof _confirms>;
 
 let testInit = createPackageCheckTestCreator(init);
 
@@ -32,7 +33,7 @@ test("no entrypoint", async () => {
 test("do not allow write", async () => {
   let tmpPath = f.copy("basic-package");
 
-  confirms.writeMainField.mockReturnValue(true);
+  confirms.writeMainField.mockReturnValue(Promise.resolve(true));
 
   try {
     await init(tmpPath);
@@ -45,8 +46,8 @@ test("do not allow write", async () => {
 test("set only main field", async () => {
   let tmpPath = f.copy("basic-package");
 
-  confirms.writeMainField.mockReturnValue(true);
-  confirms.writeModuleField.mockReturnValue(false);
+  confirms.writeMainField.mockReturnValue(Promise.resolve(true));
+  confirms.writeModuleField.mockReturnValue(Promise.resolve(false));
 
   await init(tmpPath);
   expect(confirms.writeMainField).toBeCalledTimes(1);
@@ -67,8 +68,8 @@ Object {
 test("set main and module field", async () => {
   let tmpPath = f.copy("basic-package");
 
-  confirms.writeMainField.mockReturnValue(true);
-  confirms.writeModuleField.mockReturnValue(true);
+  confirms.writeMainField.mockReturnValue(Promise.resolve(true));
+  confirms.writeModuleField.mockReturnValue(Promise.resolve(true));
 
   await init(tmpPath);
   expect(confirms.writeMainField).toBeCalledTimes(1);
@@ -91,8 +92,8 @@ Object {
 test("scoped package", async () => {
   let tmpPath = f.copy("scoped");
 
-  confirms.writeMainField.mockReturnValue(true);
-  confirms.writeModuleField.mockReturnValue(true);
+  confirms.writeMainField.mockReturnValue(Promise.resolve(true));
+  confirms.writeModuleField.mockReturnValue(Promise.resolve(true));
 
   await init(tmpPath);
   expect(confirms.writeMainField).toBeCalledTimes(1);
@@ -114,8 +115,8 @@ Object {
 test("monorepo", async () => {
   let tmpPath = f.copy("monorepo");
 
-  confirms.writeMainField.mockReturnValue(true);
-  confirms.writeModuleField.mockReturnValue(true);
+  confirms.writeMainField.mockReturnValue(Promise.resolve(true));
+  confirms.writeModuleField.mockReturnValue(Promise.resolve(true));
 
   await init(tmpPath);
   expect(confirms.writeMainField).toBeCalledTimes(2);
@@ -183,8 +184,8 @@ Array [
 test("invalid fields", async () => {
   let tmpPath = f.copy("invalid-fields");
 
-  confirms.writeMainField.mockReturnValue(true);
-  confirms.writeModuleField.mockReturnValue(true);
+  confirms.writeMainField.mockReturnValue(Promise.resolve(true));
+  confirms.writeModuleField.mockReturnValue(Promise.resolve(true));
 
   await init(tmpPath);
 
@@ -208,7 +209,7 @@ Object {
 test("fix browser", async () => {
   let tmpPath = f.copy("valid-package");
 
-  confirms.fixBrowserField.mockReturnValue(true);
+  confirms.fixBrowserField.mockReturnValue(Promise.resolve(true));
 
   await modifyPkg(tmpPath, pkg => {
     pkg.browser = "invalid.js";
@@ -259,8 +260,8 @@ testInit(
   "three entrypoints, no main, only add main",
   basicThreeEntrypoints,
   async run => {
-    confirms.writeMainField.mockReturnValue(true);
-    confirms.writeModuleField.mockReturnValue(false);
+    confirms.writeMainField.mockReturnValue(Promise.resolve(true));
+    confirms.writeModuleField.mockReturnValue(Promise.resolve(false));
 
     let result = await run();
 
@@ -297,8 +298,8 @@ testInit(
   "three entrypoints, no main, add main and module",
   basicThreeEntrypoints,
   async run => {
-    confirms.writeMainField.mockReturnValue(true);
-    confirms.writeModuleField.mockReturnValue(true);
+    confirms.writeMainField.mockReturnValue(Promise.resolve(true));
+    confirms.writeModuleField.mockReturnValue(Promise.resolve(true));
 
     let result = await run();
 
@@ -340,9 +341,9 @@ testInit(
     "": { ...basicThreeEntrypoints[""], browser: "" }
   },
   async run => {
-    confirms.writeMainField.mockReturnValue(true);
-    confirms.writeModuleField.mockReturnValue(false);
-    confirms.fixBrowserField.mockReturnValue(true);
+    confirms.writeMainField.mockReturnValue(Promise.resolve(true));
+    confirms.writeModuleField.mockReturnValue(Promise.resolve(false));
+    confirms.fixBrowserField.mockReturnValue(Promise.resolve(true));
 
     let result = await run();
 

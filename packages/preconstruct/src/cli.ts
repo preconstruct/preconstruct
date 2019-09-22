@@ -14,7 +14,7 @@ import {
 } from "./errors";
 
 // tricking static analysis is fun
-// $FlowFixMe
+// @ts-ignore
 process["e" + "nv"].NODE_ENV = "production";
 
 let { input } = meow(
@@ -77,15 +77,14 @@ class CommandNotFoundError extends Error {}
   if (err instanceof FixableError) {
     error(err.message, err.scope);
     info(
-      "The above error can be fixed automatically by running preconstruct fix",
-      err.item
+      "The above error can be fixed automatically by running preconstruct fix"
     );
   } else if (err instanceof FatalError) {
     error(err.message, err.scope);
   } else if (err instanceof CommandNotFoundError) {
     error(errors.commandNotFound);
   } else if (err instanceof UnexpectedBuildError) {
-    error(err, err.scope);
+    error(err.message, err.scope);
   } else if (err instanceof ScopelessError) {
     log(err.message);
   } else {

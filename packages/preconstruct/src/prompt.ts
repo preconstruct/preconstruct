@@ -1,6 +1,5 @@
 import inquirer from "inquirer";
 import pLimit from "p-limit";
-import type { ItemUnion } from "./types";
 import DataLoader from "dataloader";
 import chalk from "chalk";
 
@@ -10,14 +9,14 @@ export let limit = pLimit(1);
 
 let prefix = `🎁 ${chalk.green("?")}`;
 
-type NamedThing = { +name: string };
+type NamedThing = { readonly name: string };
 
 export function createPromptConfirmLoader(
   message: string
 ): (pkg: NamedThing) => Promise<boolean> {
-  let loader = new DataLoader<NamedThing, boolean>(pkgs =>
-    limit(
-      () =>
+  let loader = new DataLoader<NamedThing, boolean>(
+    pkgs =>
+      limit(() =>
         (async () => {
           if (pkgs.length === 1) {
             let { confirm } = await inquirer.prompt([
@@ -42,9 +41,9 @@ export function createPromptConfirmLoader(
           return pkgs.map(pkg => {
             return answers.includes(pkg.name);
           });
-        })(),
-      { cache: false }
-    )
+        })()
+      ),
+    { cache: false }
   );
 
   return (pkg: NamedThing) => loader.load(pkg);

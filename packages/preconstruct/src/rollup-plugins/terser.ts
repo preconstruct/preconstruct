@@ -2,17 +2,16 @@
 // https://github.com/TrySound/rollup-plugin-terser
 import { codeFrameColumns } from "@babel/code-frame";
 import { getWorker } from "../worker-client";
+import { Plugin } from "rollup";
 
-export default function terser(userOptions: any = {}) {
+export default function terser(userOptions: any = {}): Plugin {
   if (userOptions.sourceMap != null) {
     throw Error("sourceMap option is removed, use sourcemap instead");
   }
 
   return {
     name: "terser",
-
-    renderChunk(code: string, chunk: any, outputOptions: any) {
-      // TODO rewrite with object spread after node6 drop
+    renderChunk(code, chunk, outputOptions) {
       const normalizedOptions = {
         ...userOptions,
         sourceMap: userOptions.sourcemap !== false,
@@ -25,7 +24,7 @@ export default function terser(userOptions: any = {}) {
 
       const result = getWorker()
         .transformTerser(code, JSON.stringify(normalizedOptions))
-        .catch(error => {
+        .catch((error: any) => {
           const { message, line, col: column } = error;
           console.error(
             codeFrameColumns(code, { start: { line, column } }, { message })

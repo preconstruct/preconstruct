@@ -4,6 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
+    "@babel/preset-typescript": "^7.6.0",
     "preconstruct": "^0.1.1"
   },
   "preconstruct": {

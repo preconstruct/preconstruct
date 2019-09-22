@@ -19,10 +19,10 @@ export async function validateIncludedFiles(pkg: Package) {
       })
     );
 
-    let result: Array<string> = await packlist({ path: pkg.directory });
+    let result = await packlist({ path: pkg.directory });
     // check that we're including the package.json and main file
     // TODO: add Flow and TS check and if they're ignored, don't write them
-    let messages = [];
+    let messages: string[] = [];
     pkg.entrypoints.forEach(entrypoint => {
       let pkgJsonPath = path.relative(
         pkg.directory,

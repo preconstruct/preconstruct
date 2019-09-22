@@ -1,5 +1,4 @@
 // based on https://github.com/jamiebuilds/std-pkg but reading fewer things, adding setters and reading the file
-import is from "sarcastic";
 import globby from "globby";
 import * as fs from "fs-extra";
 import nodePath from "path";
@@ -11,18 +10,25 @@ import {
   getValidStringFieldContentForBuildType
 } from "./utils";
 import { errors, confirms } from "./messages";
-
-/*::
-import {Project} from './project'
-*/
+import { Project } from "./project";
 
 export class Package extends Item {
-  project: Project;
-  entrypoints: Array<Entrypoint>;
+  project!: Project;
+  entrypoints!: Array<Entrypoint>;
   get configEntrypoints(): Array<string> {
-    return is(
-      this._config.entrypoints,
-      is.default(is.arrayOf(is.string), ["."])
+    if (this._config.entrypoints == null) {
+      return ["."];
+    }
+    if (
+      Array.isArray(this._config.entrypoints) &&
+      this._config.entrypoints.every(x => typeof x === "string")
+    ) {
+      return this._config.entrypoints;
+    }
+
+    throw new FatalError(
+      "The entrypoints option for this packages is not an array of globs",
+      this.name
     );
   }
   static async create(directory: string): Promise<Package> {
@@ -56,13 +62,15 @@ export class Package extends Item {
       })
     ).then(descriptors => {
       let getPlainEntrypointContent = () => {
-        let plainEntrypointObj: Object = {
+        let plainEntrypointObj: {
+          [key: string]: string | Record<string, string>;
+        } = {
           main: getValidStringFieldContentForBuildType("main", pkg.name)
         };
         for (let descriptor of descriptors) {
           if (descriptor.contents !== null) {
             let parsed = JSON.parse(descriptor.contents);
-            for (let field of ["module", "umd:main"]) {
+            for (let field of ["module", "umd:main"] as const) {
               if (parsed[field] !== undefined) {
                 plainEntrypointObj[
                   field
@@ -151,20 +159,26 @@ export class Package extends Item {
   }
 
   get name(): string {
-    return is(this.json.name, is.string);
+    if (typeof this.json.name !== "string") {
+      throw new FatalError(
+        "The name field on this package is not a string",
+        this.directory
+      );
+    }
+    return this.json.name;
   }
   set name(name: string) {
     this.json.name = name;
   }
 
   get dependencies(): null | { [key: string]: string } {
-    return is(this.json.dependencies, is.maybe(is.objectOf(is.string)));
+    return this.json.dependencies;
   }
   get peerDependencies(): null | { [key: string]: string } {
-    return is(this.json.peerDependencies, is.maybe(is.objectOf(is.string)));
+    return this.json.peerDependencies;
   }
 }
 
 export class StrictPackage extends Package {
-  strictEntrypoints: Array<StrictEntrypoint>;
+  strictEntrypoints!: Array<StrictEntrypoint>;
 }

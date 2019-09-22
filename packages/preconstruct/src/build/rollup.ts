@@ -1,5 +1,6 @@
 // @flow
 import resolve from "rollup-plugin-node-resolve";
+// @ts-ignore
 import alias from "rollup-plugin-alias";
 import cjs from "rollup-plugin-commonjs";
 import replace from "rollup-plugin-replace";
@@ -9,8 +10,8 @@ import path from "path";
 import builtInModules from "builtin-modules";
 import { Package } from "../package";
 import { StrictEntrypoint } from "../entrypoint";
-import { rollup as _rollup } from "rollup";
-import type { Aliases } from "./aliases";
+import { rollup as _rollup, RollupOptions } from "rollup";
+import { Aliases } from "./aliases";
 import { FatalError } from "../errors";
 import { confirms } from "../messages";
 import rewriteCjsRuntimeHelpers from "../rollup-plugins/rewrite-cjs-runtime-helpers";
@@ -22,27 +23,17 @@ import terser from "../rollup-plugins/terser";
 import { limit } from "../prompt";
 import { getNameForDist } from "../utils";
 import { EXTENSIONS } from "../constants";
-
+// @ts-ignore
 import installPackages from "install-packages";
 
 // this makes sure nested imports of external packages are external
-const makeExternalPredicate = externalArr => {
+const makeExternalPredicate = (externalArr: string[]) => {
   if (externalArr.length === 0) {
     return () => false;
   }
   const pattern = new RegExp(`^(${externalArr.join("|")})($|/)`);
   return (id: string) => pattern.test(id);
 };
-
-import type { RollupSingleFileBuild } from "./types";
-
-export let rollup: RollupConfig => Promise<RollupSingleFileBuild> = _rollup;
-
-export opaque type RollupConfig = Object;
-
-export function toUnsafeRollupConfig(config: RollupConfig): Object {
-  return config;
-}
 
 export type RollupConfigType = "umd" | "browser" | "node-dev" | "node-prod";
 
@@ -51,7 +42,7 @@ export let getRollupConfig = (
   entrypoints: Array<StrictEntrypoint>,
   aliases: Aliases,
   type: RollupConfigType
-): RollupConfig => {
+): RollupOptions => {
   let external = [];
   if (pkg.peerDependencies) {
     external.push(...Object.keys(pkg.peerDependencies));
@@ -64,7 +55,7 @@ export let getRollupConfig = (
     external.push(...builtInModules);
   }
 
-  let rollupAliases = {};
+  let rollupAliases: Record<string, string> = {};
 
   Object.keys(aliases).forEach(key => {
     try {
@@ -76,7 +67,7 @@ export let getRollupConfig = (
     }
   });
 
-  let input = {};
+  let input: Record<string, string> = {};
 
   entrypoints.forEach(entrypoint => {
     input[
@@ -87,10 +78,18 @@ export let getRollupConfig = (
     ] = entrypoint.strict().source;
   });
 
-  const config = {
+  const config: RollupOptions = {
     input,
     external: makeExternalPredicate(external),
-    onwarn: (warning: *) => {
+    onwarn: warning => {
+      if (typeof warning === "string") {
+        throw new FatalError(
+          `There was an error compiling ${pkg.name}: ${chalk.red(
+            warning.toString()
+          )}`,
+          pkg.name
+        );
+      }
       switch (warning.code) {
         case "EMPTY_BUNDLE":
         case "CIRCULAR_DEPENDENCY":
@@ -98,7 +97,7 @@ export let getRollupConfig = (
           break;
         }
         case "UNRESOLVED_IMPORT": {
-          if (/^@babel\/runtime\/helpers\//.test(warning.source)) {
+          if (/^@babel\/runtime\/helpers\//.test(warning.source!)) {
             throw (async () => {
               let shouldInstallBabelRuntime = await confirms.shouldInstallBabelRuntime(
                 pkg
@@ -122,11 +121,11 @@ export let getRollupConfig = (
               }
             })();
           }
-          if (!warning.source.startsWith(".")) {
+          if (!warning.source!.startsWith(".")) {
             throw new FatalError(
               `"${warning.source}" is imported by "${path.relative(
                 pkg.directory,
-                warning.importer
+                warning.importer!
               )}" but it is not specified in dependencies or peerDependencies`,
               pkg.name
             );
@@ -163,6 +162,7 @@ export let getRollupConfig = (
           ["typeof " + "window"]: JSON.stringify("object")
         }),
       rewriteCjsRuntimeHelpers(),
+      // @ts-ignore
       json({ namedExports: false }),
       type === "umd" && alias(rollupAliases),
       resolve({

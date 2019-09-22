@@ -1,10 +1,9 @@
-// @flow
 import fixturez from "fixturez";
 import path from "path";
 import validate from "../validate";
 import { logMock, modifyPkg, getPkg, install } from "../../test-utils";
 import { FatalError } from "../errors";
-import { errors, confirms } from "../messages";
+import { errors, confirms as _confirms } from "../messages";
 
 const f = fixturez(__dirname);
 
@@ -13,6 +12,8 @@ jest.mock("../prompt");
 afterEach(() => {
   jest.resetAllMocks();
 });
+
+let confirms = _confirms as jest.Mocked<typeof _confirms>;
 
 test("reports correct result on valid package", async () => {
   let tmpPath = f.find("valid-package");
@@ -166,7 +167,7 @@ test("one-entrypoint-with-browser-field-one-without", async () => {
 test("create package.json for an entrypoint", async () => {
   let tmpPath = f.copy("entrypoint-pkg-json-missing");
 
-  confirms.createEntrypointPkgJson.mockReturnValue(true);
+  confirms.createEntrypointPkgJson.mockReturnValue(Promise.resolve(true));
 
   await validate(tmpPath);
 
