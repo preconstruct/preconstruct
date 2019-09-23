@@ -6,6 +6,9 @@
   "dependencies": {
     "preconstruct": "^0.1.1"
   },
+  "resolutions": {
+    "**/@babel/parser": "7.6.0"
+  },
   "preconstruct": {
     "packages": [
       "../packages/*"
