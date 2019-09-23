@@ -1,5 +1,3 @@
-// @flow
-
 export type ModuleFormat =
   | "amd"
   | "cjs"
@@ -15,19 +13,19 @@ type OptionsPaths = { [key: string]: string } | ((id: string) => string);
 
 export type OutputOptions =
   | {
-      dir: string,
-      entryFileNames: string,
-      chunkFileNames: string,
-      format: ModuleFormat,
-      exports?: "named"
+      dir: string;
+      entryFileNames: string;
+      chunkFileNames: string;
+      format: ModuleFormat;
+      exports?: "named";
     }
   | {
-      format: "umd",
-      entryFileNames: string,
-      dir: string,
-      sourcemap: boolean,
-      name: string,
-      globals: Object
+      format: "umd";
+      entryFileNames: string;
+      dir: string;
+      sourcemap: boolean;
+      name: string;
+      globals: Object;
     };
 
 // https://github.com/rollup/rollup/blob/7746e0fd90a58e9ffa250e92c48410f49055584c/src/rollup/types.d.ts
@@ -35,47 +33,47 @@ export type OutputOptions =
 // eslint-disable-next-line no-unused-vars
 type ActualOutputOptions = {
   // only required for bundle.write
-  file: string,
+  file: string;
   // only required for bundles.write
-  dir: string,
+  dir: string;
   // this is optional at the base-level of RollupWatchOptions,
   // which extends from this interface through config merge
-  format?: ModuleFormat,
-  name?: string,
-  globals?: GlobalsOption,
-  chunkFileNames?: string,
-  entryFileNames?: string,
-  assetFileNames?: string,
+  format?: ModuleFormat;
+  name?: string;
+  globals?: GlobalsOption;
+  chunkFileNames?: string;
+  entryFileNames?: string;
+  assetFileNames?: string;
 
-  paths?: OptionsPaths,
-  banner?: string | (() => string | Promise<string>),
-  footer?: string | (() => string | Promise<string>),
-  intro?: string | (() => string | Promise<string>),
-  outro?: string | (() => string | Promise<string>),
-  sourcemap?: boolean | "inline",
-  sourcemapFile?: string,
-  sourcemapPathTransform?: (sourcePath: string) => string,
-  interop?: boolean,
-  extend?: boolean,
+  paths?: OptionsPaths;
+  banner?: string | (() => string | Promise<string>);
+  footer?: string | (() => string | Promise<string>);
+  intro?: string | (() => string | Promise<string>);
+  outro?: string | (() => string | Promise<string>);
+  sourcemap?: boolean | "inline";
+  sourcemapFile?: string;
+  sourcemapPathTransform?: (sourcePath: string) => string;
+  interop?: boolean;
+  extend?: boolean;
 
-  exports?: "default" | "named" | "none" | "auto",
+  exports?: "default" | "named" | "none" | "auto";
   amd?: {
-    id?: string,
-    define?: string
-  },
-  indent?: boolean,
-  strict?: boolean,
-  freeze?: boolean,
-  esModule?: boolean,
-  namespaceToStringTag?: boolean,
-  compact?: boolean,
+    id?: string;
+    define?: string;
+  };
+  indent?: boolean;
+  strict?: boolean;
+  freeze?: boolean;
+  esModule?: boolean;
+  namespaceToStringTag?: boolean;
+  compact?: boolean;
 
   // undocumented?
-  noConflict?: boolean,
+  noConflict?: boolean;
 
   // deprecated
-  dest?: string,
-  moduleId?: string
+  dest?: string;
+  moduleId?: string;
 };
 
 export interface RollupError {
@@ -85,9 +83,9 @@ export interface RollupError {
   url?: string;
   id?: string;
   loc?: {
-    file?: string,
-    line: number,
-    column: number
+    file?: string;
+    line: number;
+    column: number;
   };
   stack?: string;
   frame?: string;
@@ -132,7 +130,7 @@ export interface RenderedChunk {
   imports: string[];
   exports: string[];
   modules: {
-    [id: string]: RenderedModule
+    [id: string]: RenderedModule;
   };
 }
 
@@ -146,7 +144,7 @@ interface RenderedModule {
 export interface RollupSingleFileBuild {
   // TODO: consider deprecating to match code splitting
   imports: string[];
-  exports: { name: string, originalName: string, moduleId: string }[];
+  exports: { name: string; originalName: string; moduleId: string }[];
   cache: RollupCache;
   watchFiles: string[];
 

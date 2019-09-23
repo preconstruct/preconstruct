@@ -1,4 +1,3 @@
-// @flow
 import { Project } from "./project";
 import { success, info } from "./logger";
 import { tsTemplate, flowTemplate } from "./utils";

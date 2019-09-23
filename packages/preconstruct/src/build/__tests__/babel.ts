@@ -1,4 +1,3 @@
-// @flow
 import build from "../";
 import fixturez from "fixturez";
 import { confirms as _confirms } from "../../messages";

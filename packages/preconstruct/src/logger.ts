@@ -1,4 +1,3 @@
-// @flow
 import chalk from "chalk";
 import util from "util";
 

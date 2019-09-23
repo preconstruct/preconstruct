@@ -1,4 +1,3 @@
-// @flow
 import nodePath from "path";
 import { validateEntrypoint } from "./validate";
 import { Item } from "./item";

@@ -1,4 +1,3 @@
-// @flow
 import { Project } from "../project";
 import { Package } from "../package";
 import { watch } from "rollup";

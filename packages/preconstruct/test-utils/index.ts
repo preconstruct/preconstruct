@@ -1,4 +1,3 @@
-// @flow
 import path from "path";
 import * as fs from "fs-extra";
 import globby from "globby";

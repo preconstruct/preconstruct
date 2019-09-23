@@ -1,4 +1,3 @@
-// @flow
 import path from "path";
 import { FatalError } from "../../errors";
 import { Plugin, OutputChunk, OutputAsset } from "rollup";

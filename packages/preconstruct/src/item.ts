@@ -1,4 +1,3 @@
-// @flow
 import * as fs from "fs-extra";
 import nodePath from "path";
 import { PKG_JSON_CONFIG_FIELD } from "./constants";

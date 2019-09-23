@@ -1,4 +1,3 @@
-// @flow
 import { Package } from "../package";
 import { getRollupConfig } from "./rollup";
 import { OutputOptions, RollupOptions } from "rollup";

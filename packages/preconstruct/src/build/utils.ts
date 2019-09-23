@@ -1,5 +1,3 @@
-// @flow
-
 export function getDevPath(cjsPath: string) {
   return cjsPath.replace(/\.js$/, ".dev.js");
 }

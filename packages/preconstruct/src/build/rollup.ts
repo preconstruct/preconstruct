@@ -1,4 +1,3 @@
-// @flow
 import resolve from "rollup-plugin-node-resolve";
 // @ts-ignore
 import alias from "rollup-plugin-alias";
