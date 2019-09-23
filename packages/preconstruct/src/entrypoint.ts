@@ -123,7 +123,7 @@ export class Entrypoint extends Item {
 
   get configSource(): string {
     if (
-      this._config.source !== null &&
+      this._config.source != null &&
       typeof this._config.source !== "string"
     ) {
       throw new FatalError(

@@ -1,4 +1,3 @@
-// @flow
 import { addHook } from "pirates";
 import * as babel from "@babel/core";
 import sourceMapSupport from "source-map-support";
