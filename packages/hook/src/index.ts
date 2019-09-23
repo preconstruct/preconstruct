@@ -45,7 +45,7 @@ export let ___internalHook = (cwd: string) => {
         cwd
       })!;
       sourceMaps[filename] = output.map;
-      return output.code;
+      return output.code!;
     } finally {
       compiling = false;
     }
