@@ -166,7 +166,6 @@ test("one-entrypoint-with-browser-field-one-without", async () => {
 
 test("create package.json for an entrypoint", async () => {
   let tmpPath = f.copy("entrypoint-pkg-json-missing");
-
   confirms.createEntrypointPkgJson.mockReturnValue(Promise.resolve(true));
 
   await validate(tmpPath);

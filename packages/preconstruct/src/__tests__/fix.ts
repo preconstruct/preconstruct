@@ -31,7 +31,6 @@ test("no entrypoint", async () => {
 
 test("only main", async () => {
   let tmpPath = f.copy("no-module");
-
   confirms.writeMainField.mockReturnValue(Promise.resolve(true));
   let origJson = await getPkg(tmpPath);
   await modifyPkg(tmpPath, json => {

@@ -5,7 +5,7 @@
   "main": "dist/hook.cjs.js",
   "files": [
     "dist",
-    "!**/*.flow"
+    "!**/*.d.ts"
   ],
   "repository": "https://github.com/preconstruct/preconstruct/tree/master/packages/hook",
   "license": "MIT",

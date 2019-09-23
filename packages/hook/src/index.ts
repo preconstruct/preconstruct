@@ -11,9 +11,9 @@ let babelPlugins = [
 
 export let ___internalHook = (cwd: string) => {
   let compiling = false;
-  let sourceMaps = {};
+  let sourceMaps: Record<string, any> = {};
   let needsToInstallSourceMapSupport = true;
-  function compileHook(code, filename) {
+  function compileHook(code: string, filename: string) {
     if (compiling) return code;
     // we do this lazily because jest has its own require implementation
     // which means preconstruct's require hook won't be run
@@ -43,7 +43,7 @@ export let ___internalHook = (cwd: string) => {
         filename,
         sourceMaps: "both",
         cwd
-      });
+      })!;
       sourceMaps[filename] = output.map;
       return output.code;
     } finally {
