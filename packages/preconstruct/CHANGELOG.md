@@ -1,5 +1,14 @@
 # preconstruct
 
+## 0.1.3
+
+### Patch Changes
+
+- [aefeb4f](https://github.com/preconstruct/preconstruct/commit/aefeb4f55c11a847217a5f868e132bd20a373711) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Use TypeScript internally
+
+- Updated dependencies [aefeb4f]:
+  - @preconstruct/hook@undefined
+
 ## 0.1.2
 
 ### Patch Changes
