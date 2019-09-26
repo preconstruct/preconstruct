@@ -10,5 +10,8 @@
   },
   "dependencies": {
     "@some-scope/package-one-umd-with-dep": "1.0.0"
+  },
+  "peerDependencies": {
+    "react": "^16.6.3"
   }
 }

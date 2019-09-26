@@ -1,3 +1,4 @@
 #!/usr/bin/env node
 "use strict";
-require("./lib/cli");
+require("v8-compile-cache");
+require("./cli");

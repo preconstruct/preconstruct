@@ -6,3 +6,5 @@ coverage/
 .env
 .cache/
 public/
+dist/
+*.log

@@ -1,10 +1,6 @@
 # 🎁 preconstruct
 
-> A tool to make building npm packages easier
-
-> DISCLAIMER:
->
-> While preconstruct is pretty stable in terms of bugs and is used in big projects, a lot of things are still in flux and will change so please be aware of that. We're in 0.0.x versions for a reason.
+> A smart build tool for libraries
 
 ## Why?
 
@@ -17,6 +13,8 @@ yarn add --dev preconstruct
 yarn preconstruct init
 yarn preconstruct build
 ```
+
+## [Read the docs on preconstruct.tools](https://preconstruct.tools)
 
 ## What does preconstruct do?
 
@@ -81,6 +79,8 @@ preconstruct watch
 `preconstruct dev` creates files and symlinks in the dist folders of entrypoints which map to the appropriate source file so that the package can be imported from Node and in bundlers and the source file will be imported.
 
 ##### How should I use it?
+
+> Note: `preconstruct dev` is made for **multi-package repos**, it is NOT intended to be used in single-package repos.
 
 It's best to use the `dev` command in a postinstall hook so that people don't have to worry about running it.
 

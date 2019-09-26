@@ -1,9 +1,17 @@
 {
   "parser": "babel-eslint",
-  "plugins": ["react"],
+  "plugins": ["react", "import"],
   "rules": {
     "no-unused-vars": "error",
     "react/jsx-uses-react": "error",
     "react/jsx-uses-vars": "error"
-  }
+  },
+  "overrides": [
+    {
+      "files": ["**/src/**/*"],
+      "rules": {
+        "import/no-commonjs": "error"
+      }
+    }
+  ]
 }

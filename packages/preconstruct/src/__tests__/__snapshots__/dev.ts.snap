@@ -1,0 +1,58 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`all the build types 1`] = `
+"\\"use strict\\";
+// this file might look strange and you might be wondering what it's for
+// it's lets you import your source files by importing this entrypoint
+// as you would import it if it was built with preconstruct build
+// this file is slightly different to some others though
+// it has a require hook which compiles your code with Babel
+// this means that you don't have to set up @babel/register or anything like that
+// but you can still require this module and it'll be compiled
+
+// this bit of code imports the require hook and registers it
+let unregister = thisWasARequireCall().thisWasA___internalHookCall();
+
+// this re-exports the source file
+module.exports = thisWasARequireCall();
+
+// this unregisters the require hook so that any modules required after this one
+// aren't compiled with the require hook in case you have some other require hook
+// or something that should be used on other modules
+unregister();
+"
+`;
+
+exports[`flow 1`] = `
+"// @flow
+export * from \\"../src/index.js\\";
+"
+`;
+
+exports[`flow 2`] = `
+"// @flow
+export * from \\"../src/index.js\\";
+"
+`;
+
+exports[`flow 3`] = `
+"// @flow
+export * from \\"../src/index.js\\";
+"
+`;
+
+exports[`typescript 1`] = `
+"// are you seeing an error that a default export doesn't exist but your source file has a default export?
+// you should run \`yarn\` or \`yarn preconstruct dev\` if preconstruct dev isn't in your postinstall hook
+
+// curious why you need to?
+// this file exists so that you can import from the entrypoint normally
+// except that it points to your source file and you don't need to run build constantly
+// which means we need to re-export all of the modules from your source file
+// and since export * doesn't include default exports, we need to read your source file
+// to check for a default export and re-export it if it exists
+// it's not ideal, but it works pretty well ¯\\\\_(ツ)_/¯
+export * from \\"../src/index\\";
+export { default } from \\"../src/index\\";
+"
+`;

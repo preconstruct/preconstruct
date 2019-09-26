@@ -1,11 +1,25 @@
 # @preconstruct/hook
 
+## 0.0.5
+
+### Patch Changes
+
+- [aefeb4f](https://github.com/preconstruct/preconstruct/commit/aefeb4f55c11a847217a5f868e132bd20a373711) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Use TypeScript internally
+
+## 0.0.4
+
+### Patch Changes
+
+- [19d36a4](https://github.com/preconstruct/preconstruct/commit/19d36a4) - Build preconstruct with preconstruct
+
 ## 0.0.3
+
 ### Patch Changes
 
 - [9efd990](https://github.com/preconstruct/preconstruct/commit/9efd990) - Fix source map support
 
 ## 0.0.2
+
 ### Patch Changes
 
 - [aea0c36](https://github.com/preconstruct/preconstruct/commit/aea0c36) - Only install source map support when the require hook is actually run

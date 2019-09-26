@@ -1,0 +1,35 @@
+# Dictionary
+
+This page documents some common words and phrases that are used throughout this site and when discussing Preconstruct.
+
+## single-package repo
+
+A repository which only contains a single package which is at the root of the repo
+
+## multi-package repo
+
+A repository that contains multiple packages, this is also commonly referred to as a monorepo but we use multi-package repo because it more clearly describes what it is. This is generally linked together with a tool such as [Yarn Workspaces](https://yarnpkg.com/lang/en/docs/workspaces/), [Bolt](https://github.com/boltpkg/bolt) or [Lerna](https://lerna.js.org/)
+
+## entrypoint
+
+Something that is intended to be imported from outside a package with an associated source file and build types
+
+## entrypoint source file
+
+The source file for an entrypoint that defaults to `src/index` and can be configured with the source option
+
+## package
+
+A set of entrypoints with dependencies that is generally published to a package registry such as npm
+
+## project
+
+The overarching structure where all Preconstruct commands are run with a set of packages and global config
+
+## build type
+
+A file or group of files that Preconstruct outputs that is differentiated by its module type, whether it is intended for the browser or etc.
+
+## externals
+
+Modules that shouldn't be bundled and should instead be left as imports

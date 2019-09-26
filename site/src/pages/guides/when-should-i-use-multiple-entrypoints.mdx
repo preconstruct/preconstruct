@@ -4,15 +4,12 @@ Having multiple entrypoints in a package means that someone can import from diff
 
 There are a couple reasons you may want to have multiple entrypoints in a package.
 
-My thoughts from react-select discussion:
+The most common reason is if you have some client side code and some server side code and you don't want users to pay the cost of loading that server side code or the server side code depends on some modules which aren't available for the browser.
 
-> I've been thinking about this and I think we need to ask the question: why do we have multiple entrypoints?
->
-> I think the main answer is: To allow consumers to use one part of a package without incurring the cost of having to load all parts of the package.
->
-> (Am I missing anything with the above?)
->
-> So I think in general to answer "Should something be in its own entrypoint?" there are some questions that need to answered
->
-> - Is the thing rarely used and large?
-> - If it's a dependency of something else exposed by the package(the dependent), will someone want to import it without also importing any dependents of this or is it likely that the dependent will be changed so it doesn't depend on the thing in the future?
+The other significant reason to use multiple entrypoints that's more applicable to client side code is if you a sizable amount of code that you want people to be able to use but most people won't need it. A way to answer the question of "Should something be in its own entrypoint?" for this case, you can ask yourself these questions.
+
+- Is the thing rarely used in comparison to the primary part of your package?
+- Is the amount of code large?
+- If it's a dependency of something else exposed by the package(the dependent), will someone wnat to import it without also importing any dependents of this or is it likely that the dependent will be changed to so it doesn't depend on the thing in the future?
+
+If your answer to these questions is mostly yes then having multiple entrypoints might make sense for your package.

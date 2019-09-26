@@ -140,6 +140,7 @@ export default ({
   ...props
 }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  let isIndexPage = props.location.pathname === "/";
   return (
     <Layout
       css={{
@@ -182,7 +183,7 @@ export default ({
           <NavLink activeClassName="" to="/getting-started">
             Docs
           </NavLink>
-          {props["*"] !== "" && (
+          {!isIndexPage && (
             <MobileOnly>
               <MenuButton
                 css={{ display: "inline-flex" }}
@@ -198,7 +199,7 @@ export default ({
         </div>
       </Header>
       <Main>
-        {props["*"] !== "" && (
+        {!isIndexPage && (
           <Sidebar
             width={320}
             open={sidebarOpen}
@@ -215,10 +216,12 @@ export default ({
             }}
           >
             <NavLink to="/getting-started">Getting Started</NavLink>
-            <NavLink to="/concepts">Concepts</NavLink>
+            <NavLink to="/dictionary">Dictionary</NavLink>
             <NavLink to="/tutorials">Building your first package</NavLink>
             <div css={{ marginLeft: 16 }}>
-              <NavLink to="/tutorials/monorepos">Building a Monorepo</NavLink>
+              <NavLink to="/tutorials/multi-package-repo">
+                Building a Multi-package Repo
+              </NavLink>
               <NavLink to="/tutorials/multiple-entrypoints">
                 Exporting Multiple Entrypoints
               </NavLink>
@@ -228,11 +231,14 @@ export default ({
               <NavLink to="/guides/configuring-babel">
                 Configuring Babel
               </NavLink>
-              <NavLink to="/guides/using-preconstruct-dev-in-a-monorepo">
-                Using preconstruct dev in a monorepo
+              <NavLink to="/guides/using-preconstruct-dev-in-a-multi-package-repo">
+                Using preconstruct dev in a multi-package repo
               </NavLink>
               <NavLink to="/guides/when-should-i-use-multiple-entrypoints">
                 When should I use multiple entrypoints?
+              </NavLink>
+              <NavLink to="/guides/building-typescript-packages">
+                Building TypeScript packages
               </NavLink>
             </div>
             <NavLink to="/commands">Commands</NavLink>
@@ -263,7 +269,7 @@ export default ({
           css={{
             paddingTop: 32,
             paddingBottom: 32,
-            ...(props["*"] === "" && {
+            ...(!isIndexPage && {
               display: "flex",
               justifyContent: "center",
               alignItems: "center"
