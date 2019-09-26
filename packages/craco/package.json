@@ -1,0 +1,14 @@
+{
+  "name": "@preconstruct/craco",
+  "version": "0.0.0",
+  "description": "A plugin for craco to work with preconstruct repos",
+  "files": [
+    "index.js",
+    "jest-babel-transform.js"
+  ],
+  "repository": "https://github.com/preconstruct/preconstruct/tree/master/packages/craco",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  }
+}

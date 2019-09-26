@@ -11,7 +11,8 @@
   },
   "preconstruct": {
     "packages": [
-      "../packages/*"
+      "../packages/*",
+      "!../packages/craco"
     ]
   }
 }
