@@ -64,7 +64,7 @@ export let createLanguageServiceHostClass = (typescript: any) =>
     getCompilationSettings() {
       return this.parsedConfig.options;
     }
-    getDefaultLibFileName(opts) {
+    getDefaultLibFileName(opts: any) {
       return typescript.getDefaultLibFilePath(opts);
     }
     useCaseSensitiveFileNames() {
