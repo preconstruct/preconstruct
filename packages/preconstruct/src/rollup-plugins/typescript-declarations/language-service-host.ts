@@ -1,12 +1,19 @@
 import * as fs from "fs";
 
-export function normalize(fileName) {
+export function normalize(fileName: string) {
   return fileName.split("\\").join("/");
 }
 
-export let createLanguageServiceHostClass = typescript =>
+export let createLanguageServiceHostClass = (typescript: any) =>
   class LanguageServiceHost {
-    constructor(parsedConfig, transformers) {
+    parsedConfig: any;
+    transformers: any;
+    cwd: string;
+    snapshots: any;
+    versions: any;
+    fileNames: any;
+    service: any;
+    constructor(parsedConfig: any, transformers: any) {
       this.parsedConfig = parsedConfig;
       this.transformers = transformers;
       this.cwd = process.cwd();
@@ -18,13 +25,13 @@ export let createLanguageServiceHostClass = typescript =>
       this.snapshots = {};
       this.versions = {};
     }
-    setLanguageService(service) {
+    setLanguageService(service: any) {
       this.service = service;
     }
     getProjectVersion() {
       return 1;
     }
-    setSnapshot(fileName, data) {
+    setSnapshot(fileName: string, data: any) {
       fileName = normalize(fileName);
       const snapshot = typescript.ScriptSnapshot.fromString(data);
       this.snapshots[fileName] = snapshot;
@@ -47,7 +54,7 @@ export let createLanguageServiceHostClass = typescript =>
     getCurrentDirectory() {
       return this.cwd;
     }
-    getScriptVersion(fileName) {
+    getScriptVersion(fileName: string) {
       fileName = normalize(fileName);
       return (this.versions[fileName] || 0).toString();
     }
@@ -63,22 +70,22 @@ export let createLanguageServiceHostClass = typescript =>
     useCaseSensitiveFileNames() {
       return typescript.sys.useCaseSensitiveFileNames;
     }
-    readDirectory(path, extensions, exclude, include) {
+    readDirectory(path: string, extensions: any, exclude: any, include: any) {
       return typescript.sys.readDirectory(path, extensions, exclude, include);
     }
-    readFile(path, encoding) {
+    readFile(path: string, encoding: string) {
       return typescript.sys.readFile(path, encoding);
     }
-    fileExists(path) {
+    fileExists(path: string) {
       return typescript.sys.fileExists(path);
     }
     getTypeRootsVersion() {
       return 0;
     }
-    directoryExists(directoryName) {
+    directoryExists(directoryName: string) {
       return typescript.sys.directoryExists(directoryName);
     }
-    getDirectories(directoryName) {
+    getDirectories(directoryName: string) {
       return typescript.sys.getDirectories(directoryName);
     }
     getCustomTransformers() {
