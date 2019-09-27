@@ -29,7 +29,7 @@ export let createLanguageServiceHostClass = (typescript: any) =>
       this.service = service;
     }
     getProjectVersion() {
-      return 1;
+      return "1";
     }
     setSnapshot(fileName: string, data: any) {
       fileName = normalize(fileName);
@@ -39,7 +39,7 @@ export let createLanguageServiceHostClass = (typescript: any) =>
       this.fileNames.add(fileName);
       return snapshot;
     }
-    getScriptSnapshot(fileName) {
+    getScriptSnapshot(fileName: string) {
       fileName = normalize(fileName);
       if (this.snapshots[fileName]) return this.snapshots[fileName];
       if (fs.existsSync(fileName)) {
