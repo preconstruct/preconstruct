@@ -1,4 +1,4 @@
-module.exports = nextConfig => {
+module.exports = (nextConfig = {}) => {
   let originalWebpack = nextConfig.webpack;
 
   nextConfig.webpack = (webpackConfig, options) => {
