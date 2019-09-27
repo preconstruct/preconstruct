@@ -1,5 +1,12 @@
 // based off https://github.com/jackwilsdon/craco-use-babelrc/blob/master/index.js
 
+const { getLoaders, loaderByName } = require("@craco/craco");
+
+// A list of all of the known transform keys from different CRA versions.
+const BABEL_TRANSFORM_KEYS = ["^.+\\.(js|jsx)$", "^.+\\.(js|jsx|ts|tsx)$"];
+
+const BABEL_TRANSFORM_PATH = require.resolve("./babel-jest-transform");
+
 module.exports = {
   overrideWebpackConfig: ({ webpackConfig }) => {
     // Search for all instances of babel-loader.

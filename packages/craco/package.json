@@ -1,6 +1,6 @@
 {
   "name": "@preconstruct/craco",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A plugin for craco to work with preconstruct repos",
   "files": [
     "index.js",
