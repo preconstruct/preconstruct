@@ -72,7 +72,8 @@
   "preconstruct": {
     "packages": [
       "packages/*",
-      "!packages/craco"
+      "!packages/craco",
+      "!packages/next"
     ]
   }
 }

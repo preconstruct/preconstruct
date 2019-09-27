@@ -1,0 +1,10 @@
+{
+  "name": "@preconstruct/next",
+  "version": "0.0.0",
+  "description": "A Next.js plugin to work with preconstruct repos",
+  "files": [
+    "index.js"
+  ],
+  "repository": "https://github.com/preconstruct/preconstruct/tree/master/packages/next",
+  "license": "MIT"
+}
