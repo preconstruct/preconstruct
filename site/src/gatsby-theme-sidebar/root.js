@@ -240,6 +240,9 @@ export default ({
               <NavLink to="/guides/building-typescript-packages">
                 Building TypeScript packages
               </NavLink>
+              <NavLink to="/guides/adding-a-second-entrypoint">
+                Adding a Second Entrypoint
+              </NavLink>
             </div>
             <NavLink to="/commands">Commands</NavLink>
             <div css={{ marginLeft: 16 }}>
