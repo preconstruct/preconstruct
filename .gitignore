@@ -7,3 +7,4 @@ coverage/
 .cache/
 public/
 dist/
+*.log

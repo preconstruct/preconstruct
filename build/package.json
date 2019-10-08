@@ -4,14 +4,16 @@
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
-    "preconstruct": "^0.1.1"
+    "preconstruct": "^0.1.2"
   },
   "resolutions": {
     "**/@babel/parser": "7.6.0"
   },
   "preconstruct": {
     "packages": [
-      "../packages/*"
+      "../packages/*",
+      "!../packages/craco",
+      "!../packages/next"
     ]
   }
 }
