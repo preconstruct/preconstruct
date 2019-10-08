@@ -1,5 +1,11 @@
 # preconstruct
 
+## 0.2.0
+
+### Minor Changes
+
+- [72989b6](https://github.com/preconstruct/preconstruct/commit/72989b6693ea245a50c2be92813ad794e0eb5e02) [#106](https://github.com/preconstruct/preconstruct/pull/106) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Prompt to create an entrypoint if a glob is a path and the directory doesn't exist
+
 ## 0.1.3
 
 ### Patch Changes
