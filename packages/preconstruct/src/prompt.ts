@@ -34,8 +34,8 @@ export function createPromptConfirmLoader(
             type: "multiselect",
             name: "answers",
             message,
-            // @ts-ignore
             choices: pkgs.map(pkg => ({ name: pkg.name, checked: true })),
+            // @ts-ignore
             prefix
           }
         ]);
