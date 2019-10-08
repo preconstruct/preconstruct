@@ -58,7 +58,7 @@ export let createLanguageServiceHostClass = (typescript: any) =>
       fileName = normalize(fileName);
       return (this.versions[fileName] || 0).toString();
     }
-    getScriptFileNames() {
+    getScriptFileNames(): string[] {
       return Array.from(this.fileNames.values());
     }
     getCompilationSettings() {

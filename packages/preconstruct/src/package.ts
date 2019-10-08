@@ -11,6 +11,7 @@ import {
 } from "./utils";
 import { errors, confirms } from "./messages";
 import { Project } from "./project";
+import { getUselessGlobsThatArentReallyGlobs } from "./glob-thing";
 
 export class Package extends Item {
   project!: Project;
@@ -58,9 +59,9 @@ export class Package extends Item {
           }
         }
 
-        return { filename, contents };
+        return { filename, contents, hasAccepted: false };
       })
-    ).then(descriptors => {
+    ).then(async descriptors => {
       let getPlainEntrypointContent = () => {
         let plainEntrypointObj: {
           [key: string]: string | Record<string, string>;
@@ -86,30 +87,71 @@ export class Package extends Item {
             }
           }
         }
-        let plainEntrypointContents = JSON.stringify(plainEntrypointObj);
+        let plainEntrypointContents =
+          JSON.stringify(plainEntrypointObj, null, 2) + "\n";
         getPlainEntrypointContent = () => plainEntrypointContents;
         return plainEntrypointContents;
       };
 
-      return Promise.all(
-        descriptors.map(async ({ filename, contents }) => {
-          if (contents === null) {
-            let shouldCreateEntrypointPkgJson = await confirms.createEntrypointPkgJson(
-              {
+      let globErrors = await getUselessGlobsThatArentReallyGlobs(
+        pkg.configEntrypoints,
+        pkg.directory
+      );
+
+      if (globErrors.some(x => x !== undefined)) {
+        await Promise.all(
+          globErrors.map(async (globError, index) => {
+            if (globError !== undefined) {
+              let shouldCreateEntrypoint = await confirms.createEntrypoint({
                 name: nodePath.join(
                   pkg.name,
-                  nodePath.relative(pkg.directory, directory)
+                  nodePath.relative(pkg.directory, globError)
                 )
+              });
+              if (shouldCreateEntrypoint) {
+                descriptors.push({
+                  contents: null,
+                  filename: nodePath.resolve(
+                    pkg.directory,
+                    globError,
+                    "package.json"
+                  ),
+                  hasAccepted: true
+                });
+                await fs.mkdirp(globError);
+              } else {
+                delete pkg._config.entrypoints[index];
               }
-            );
-            if (!shouldCreateEntrypointPkgJson) {
-              throw new FatalError(
-                errors.noEntrypointPkgJson,
-                nodePath.join(
-                  pkg.name,
-                  nodePath.relative(pkg.directory, directory)
-                )
+            }
+          })
+        );
+        pkg._config.entrypoints = pkg._config.entrypoints.filter(
+          (x: string | undefined) => x
+        );
+        await pkg.save();
+      }
+
+      return Promise.all(
+        descriptors.map(async ({ filename, contents, hasAccepted }) => {
+          if (contents === null || hasAccepted) {
+            if (!hasAccepted) {
+              let shouldCreateEntrypointPkgJson = await confirms.createEntrypointPkgJson(
+                {
+                  name: nodePath.join(
+                    pkg.name,
+                    nodePath.relative(pkg.directory, directory)
+                  )
+                }
               );
+              if (!shouldCreateEntrypointPkgJson) {
+                throw new FatalError(
+                  errors.noEntrypointPkgJson,
+                  nodePath.join(
+                    pkg.name,
+                    nodePath.relative(pkg.directory, directory)
+                  )
+                );
+              }
             }
             contents = getPlainEntrypointContent();
             await fs.writeFile(filename, contents);
