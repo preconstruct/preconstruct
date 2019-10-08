@@ -49,6 +49,9 @@ export let confirms = {
   ),
   createEntrypointPkgJson: createPromptConfirmLoader(
     "A package.json file does not exist for this entrypoint, would you like to create one automatically?"
+  ),
+  createEntrypoint: createPromptConfirmLoader(
+    "This glob does not match anything, would you like to create an entrypoint for it?"
   )
 };
 

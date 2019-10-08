@@ -4,31 +4,27 @@ import micromatch from "micromatch";
 import * as fs from "fs-extra";
 import path from "path";
 
-export async function execGlobs(globs: string[], cwd: string) {
-  return (await Promise.all(
+export async function getUselessGlobsThatArentReallyGlobs(
+  globs: string[],
+  cwd: string
+) {
+  return Promise.all(
     globs.map(async glob => {
       let parsedGlobResult = parseGlob(glob);
       if (!parsedGlobResult.is.glob) {
-        let resolvedPath = path.resolve(cwd, glob);
-        try {
-          let contents = await fs.readdir(resolvedPath);
-          if (!contents.includes("package.json")) {
-            return {
-              dir: resolvedPath,
-              type: "no-package-json"
-            } as const;
+        let result = micromatch([glob], globs);
+        if (result.length) {
+          let resolvedPath = path.resolve(cwd, glob);
+          try {
+            await fs.readdir(resolvedPath);
+          } catch (err) {
+            if (err.code !== "ENOENT") {
+              throw err;
+            }
+            return resolvedPath;
           }
-        } catch (err) {
-          if (err.code !== "ENOENT") {
-            throw err;
-          }
-          return {
-            dir: resolvedPath,
-            type: "no-dir"
-          } as const;
         }
       }
-      return undefined as { dir: string };
     })
-  )).filter(x => x);
+  );
 }
