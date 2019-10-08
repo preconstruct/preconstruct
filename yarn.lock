@@ -1959,11 +1959,6 @@
   resolved "https://registry.yarnpkg.com/@types/get-port/-/get-port-0.0.4.tgz#eb6bb7423d9f888b632660dc7d2fd3e69a35643e"
   integrity sha1-62u3Qj2fiItjJmDcfS/T5po1ZD4=
 
-"@types/glob-base@^0.3.0":
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/@types/glob-base/-/glob-base-0.3.0.tgz#a581d688347e10e50dd7c17d6f2880a10354319d"
-  integrity sha1-pYHWiDR+EOUN18F9byiAoQNUMZ0=
-
 "@types/glob@^5.0.30":
   version "5.0.36"
   resolved "https://registry.yarnpkg.com/@types/glob/-/glob-5.0.36.tgz#0c80a9c8664fc7d19781de229f287077fd622cb2"
