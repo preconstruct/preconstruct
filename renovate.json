@@ -3,5 +3,6 @@
     "config:base"
   ],
   "ignorePaths": ["__fixtures__/**/*"],
-  "rangeStrategy": "replace"
+  "rangeStrategy": "replace",
+  "prHourlyLimit": 0
 }
