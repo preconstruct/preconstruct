@@ -3,5 +3,9 @@
   "ignorePaths": ["__fixtures__/**/*"],
   "rangeStrategy": "bump",
   "prHourlyLimit": 0,
-  "lockFileMaintenance": { "enabled": true }
+  "lockFileMaintenance": { "enabled": true },
+  "automerge": true,
+  "major": {
+    "automerge": false
+  }
 }
