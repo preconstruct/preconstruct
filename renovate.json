@@ -2,5 +2,6 @@
   "extends": [
     "config:base"
   ],
-  "ignorePaths": ["__fixtures__/**/*"]
+  "ignorePaths": ["__fixtures__/**/*"],
+  "rangeStrategy": "replace"
 }
