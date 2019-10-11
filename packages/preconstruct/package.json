@@ -35,7 +35,7 @@
     "npm-packlist": "^1.4.6",
     "p-limit": "^2.2.1",
     "parse-glob": "^3.0.4",
-    "quick-lru": "^4.0.0",
+    "quick-lru": "^4.0.1",
     "resolve": "^1.10.0",
     "resolve-from": "^5.0.0",
     "rollup": "^1.12.2",
