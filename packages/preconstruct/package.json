@@ -24,7 +24,7 @@
     "dataloader": "^1.4.0",
     "enquirer": "^2.3.2",
     "fast-deep-equal": "^2.0.1",
-    "fs-extra": "^8.0.0",
+    "fs-extra": "^8.1.0",
     "globby": "^10.0.1",
     "install-packages": "^0.2.5",
     "jest-worker": "24.9.0",
