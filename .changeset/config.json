@@ -1,6 +1,9 @@
 {
   "$schema": "https://unpkg.com/@changesets/config@0.2.0/schema.json",
-  "changelog": "./getReleaseLines",
+  "changelog": [
+    "@changesets/changelog-github",
+    { "repo": "preconstruct/preconstruct" }
+  ],
   "commit": false,
   "linked": [],
   "access": "public"
