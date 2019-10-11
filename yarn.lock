@@ -1260,10 +1260,10 @@
     "@changesets/types" "^0.2.0"
     fs-extra "^7.0.1"
 
-"@changesets/get-github-info@^0.1.1":
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/@changesets/get-github-info/-/get-github-info-0.1.1.tgz#f47e4635b5466957daab9e98c06edcb9564683b3"
-  integrity sha512-d3PGEVnsppnsGanwN9xQWzBgllOfXPwxIOMEdWJYYsSeB2vbSnfsdOFqojwJ92kcZV3ej+HvNCa2pXFD7YY/OQ==
+"@changesets/get-github-info@^0.3.0":
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/@changesets/get-github-info/-/get-github-info-0.3.0.tgz#1776a6b5ed2f9f1d16d076ef19acbc29003ef81c"
+  integrity sha512-PTFJk1hiMUZ1YGzULmRNo6a6w6LTV6iCY1muCBTby+k4WWGbGgAaqKfUVhpZBosd1fvFIlXl3wqxdA93PLkRaQ==
   dependencies:
     dataloader "^1.4.0"
     node-fetch "^2.5.0"
