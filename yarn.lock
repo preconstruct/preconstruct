@@ -12153,10 +12153,10 @@ quick-lru@^1.0.0:
   resolved "https://registry.yarnpkg.com/quick-lru/-/quick-lru-1.1.0.tgz#4360b17c61136ad38078397ff11416e186dcfbb8"
   integrity sha1-Q2CxfGETatOAeDl/8RQW4Ybc+7g=
 
-quick-lru@^4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/quick-lru/-/quick-lru-4.0.0.tgz#a44d44010a776d787af65b1226566dd1ae7b9649"
-  integrity sha512-5cS39FEMrySKt/8c66v10HrmoexP2iYOsJBhtbVrlAr6Cbuc6khFMN8CHJG87c+QsdxBABivfVscgk20I/rPDw==
+quick-lru@^4.0.1:
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/quick-lru/-/quick-lru-4.0.1.tgz#5b8878f113a58217848c6482026c73e1ba57727f"
+  integrity sha512-ARhCpm70fzdcvNQfPoy49IaanKkTlRWF2JMzqhcJbhSFRZv7nPTvZJdcY7301IPmvW+/p0RgIWnQDLJxifsQ7g==
 
 randombytes@^2.0.0, randombytes@^2.0.1, randombytes@^2.0.5:
   version "2.1.0"
