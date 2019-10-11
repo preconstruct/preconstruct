@@ -19,7 +19,7 @@
     "gatsby-plugin-typography": "^2.3.6",
     "gatsby-source-filesystem": "^2.1.22",
     "gatsby-theme-sidebar": "^0.0.2",
-    "prism-react-renderer": "^0.1.7",
+    "prism-react-renderer": "^1.0.1",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-typography": "^0.16.19",
