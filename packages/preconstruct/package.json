@@ -42,7 +42,7 @@
     "rollup-plugin-alias": "^1.5.2",
     "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-json": "^4.0.0",
-    "rollup-plugin-node-resolve": "^5.0.0",
+    "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-replace": "^2.2.0",
     "rollup-pluginutils": "^2.7.1",
     "terser": "^3.14.1",
