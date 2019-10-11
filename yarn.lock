@@ -1727,20 +1727,23 @@
     "@types/istanbul-reports" "^1.1.1"
     "@types/yargs" "^13.0.0"
 
-"@manypkg/cli@^0.1.0":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@manypkg/cli/-/cli-0.1.0.tgz#4d09ce03ce8301e9536293c2676737ec290ba159"
-  integrity sha512-uyEK0GQDNCRnElGCu7uiLtgIGnEJiDKvyc2Y8QuxKnnuH3vSG0gnpraAyVBP89EYo4A1JiGJ7V29MnUJJgK9+A==
+"@manypkg/cli@^0.7.0":
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/@manypkg/cli/-/cli-0.7.0.tgz#2849798d231006d22073155482b226d40a66392a"
+  integrity sha512-yu6SDfwkgrMw/EBR8EwFI5cmgfYABK7Yttz906qDQaDiBLvmH7+KLg/j/OOc61uCqQzSWA8jNVFsx6rPX+0yJw==
   dependencies:
     "@babel/runtime" "^7.5.5"
     chalk "^2.4.2"
     detect-indent "^6.0.0"
-    find-workspaces-root "0.1.0"
+    find-up "^4.1.0"
+    find-workspaces-root "^0.1.0"
     fs-extra "^8.1.0"
     get-workspaces "^0.4.0"
     meow "^5.0.0"
+    p-limit "^2.2.1"
+    sembear "^0.4.0"
     semver "^6.3.0"
-    sver "^1.8.2"
+    spawndamnit "^2.0.0"
     validate-npm-package-name "^3.0.0"
 
 "@mdx-js/mdx@^1.0.18":
@@ -2166,6 +2169,11 @@
   version "6.0.0"
   resolved "https://registry.yarnpkg.com/@types/semver/-/semver-6.0.0.tgz#86ba89f02a414e39c68d02b351872e4ed31bd773"
   integrity sha512-OO0srjOGH99a4LUN2its3+r6CBYcplhJ466yLqs+zvAWgphCpS8hYZEZ797tRDP/QKcqTdb/YCN6ifASoAWkrQ==
+
+"@types/semver@^6.0.1":
+  version "6.0.2"
+  resolved "https://registry.yarnpkg.com/@types/semver/-/semver-6.0.2.tgz#5e8b09f0e4af53034b1d0fb9977a277847836205"
+  integrity sha512-G1Ggy7/9Nsa1Jt2yiBR2riEuyK2DFNnqow6R7cromXPMNynackRY1vqFTLz/gwnef1LHokbXThcPhqMRjUbkpQ==
 
 "@types/source-map-support@^0.5.0":
   version "0.5.0"
@@ -6314,7 +6322,7 @@ find-up@^4.1.0:
     locate-path "^5.0.0"
     path-exists "^4.0.0"
 
-find-workspaces-root@0.1.0:
+find-workspaces-root@^0.1.0:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/find-workspaces-root/-/find-workspaces-root-0.1.0.tgz#0afc33920eca22ad58f87e1e9a49ac97d176c25f"
   integrity sha512-NIVJ0SB4+BMwN0MXAPYPj5SWgcyYh2bCP2ZJTVW74uSuQ3oWp6hVPfW1HHBYqPuzWbzKbDbwk6kUKXw6Jr+Qsg==
@@ -12980,6 +12988,14 @@ selfsigned@^1.10.4:
   dependencies:
     node-forge "0.7.5"
 
+sembear@^0.4.0:
+  version "0.4.1"
+  resolved "https://registry.yarnpkg.com/sembear/-/sembear-0.4.1.tgz#c1599bba0fd29cce68a25382576891e5fae84990"
+  integrity sha512-q3LJepi7qgDbkR9eDe1OVYfbD8A14vuC8TtETtEvpAQ4GxynA9B0fhG6ts8scBMDe/GwLlVUeU+Icnl1oidH7g==
+  dependencies:
+    "@types/semver" "^6.0.1"
+    semver "^6.3.0"
+
 semver-diff@^2.0.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/semver-diff/-/semver-diff-2.1.0.tgz#4bbb8437c8d37e4b0cf1a68fd726ec6d645d6d36"
@@ -13848,11 +13864,6 @@ supports-color@^6.0.0, supports-color@^6.1.0:
   integrity sha512-qe1jfm1Mg7Nq/NSh6XE24gPXROEVsWHxC1LIx//XNlD9iw7YZQGjZNjYN7xGaEG6iKdA8EtNFW6R0gjnVXp+wQ==
   dependencies:
     has-flag "^3.0.0"
-
-sver@^1.8.2:
-  version "1.8.2"
-  resolved "https://registry.yarnpkg.com/sver/-/sver-1.8.2.tgz#d5bd07e00f52c6d707517d1808c66121b131bc8a"
-  integrity sha512-kPfLmvlrz5MRomgOKgYW+oul+0lhH+3jKio9O2JwQYlrffkky0NjmjBNpu3Q/9jd38BXqOg9hMny6xtjNzwFpQ==
 
 svgo@^1.0.0:
   version "1.2.2"
