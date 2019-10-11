@@ -28,7 +28,7 @@
     "globby": "^10.0.1",
     "install-packages": "^0.2.5",
     "jest-worker": "24.9.0",
-    "magic-string": "^0.25.1",
+    "magic-string": "^0.25.4",
     "meow": "^5.0.0",
     "micromatch": "^4.0.2",
     "ms": "^2.1.2",
