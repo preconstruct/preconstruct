@@ -1,5 +1,6 @@
 {
   "extends": [
     "config:base"
-  ]
+  ],
+  "ignorePaths": ["__fixtures__/**/*"]
 }
