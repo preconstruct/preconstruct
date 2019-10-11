@@ -1,8 +1,7 @@
 {
-  "extends": [
-    "config:base"
-  ],
+  "extends": ["config:base"],
   "ignorePaths": ["__fixtures__/**/*"],
-  "rangeStrategy": "replace",
-  "prHourlyLimit": 0
+  "rangeStrategy": "bump",
+  "prHourlyLimit": 0,
+  "lockFileMaintenance": { "enabled": true }
 }
