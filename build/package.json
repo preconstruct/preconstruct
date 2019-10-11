@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
-    "preconstruct": "^0.1.2"
+    "preconstruct": "^0.2.0"
   },
   "resolutions": {
     "**/@babel/parser": "7.6.0"
