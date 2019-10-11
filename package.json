@@ -60,7 +60,7 @@
     "globby": "^10.0.1",
     "jest": "^24.9.0",
     "jest-in-case": "^1.0.2",
-    "jest-junit": "^6.1.0",
+    "jest-junit": "^8.0.0",
     "prettier": "^1.15.3",
     "typescript": "^3.6.3",
     "v8-profiler-next": "^1.1.1"
