@@ -61,7 +61,7 @@
     "jest-in-case": "^1.0.2",
     "jest-junit": "^8.0.0",
     "prettier": "^1.18.2",
-    "typescript": "^3.6.3",
+    "typescript": "^3.6.4",
     "v8-profiler-next": "^1.1.1"
   },
   "jest": {
