@@ -255,7 +255,7 @@ exports[`two entrypoints with a common dependency: dist/common-dependency-two-en
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-var identity = require('./identity-1c86f68b.cjs.dev.js');
+var identity = require('./identity-9dd8332e.cjs.dev.js');
 
 let sum = (a, b) => identity.identity(a + b);
 
@@ -282,7 +282,7 @@ Object.defineProperty(exports, \\"__esModule\\", {
   value: !0
 });
 
-var identity = require(\\"./identity-8f39eb9a.cjs.prod.js\\");
+var identity = require(\\"./identity-c307b1c8.cjs.prod.js\\");
 
 let sum = (a, b) => identity.identity(a + b);
 
@@ -291,8 +291,8 @@ exports.identity = identity.identity, exports.sum = sum;
 `;
 
 exports[`two entrypoints with a common dependency: dist/common-dependency-two-entrypoints.esm.js 1`] = `
-"import { i as identity } from './identity-4a7b4549.esm.js';
-export { i as identity } from './identity-4a7b4549.esm.js';
+"import { i as identity } from './identity-b4bc4bda.esm.js';
+export { i as identity } from './identity-b4bc4bda.esm.js';
 
 let sum = (a, b) => identity(a + b);
 
@@ -300,7 +300,7 @@ export { sum };
 "
 `;
 
-exports[`two entrypoints with a common dependency: dist/identity-1c86f68b.cjs.dev.js 1`] = `
+exports[`two entrypoints with a common dependency: dist/identity-9dd8332e.cjs.dev.js 1`] = `
 "'use strict';
 
 let identity = x => x;
@@ -309,14 +309,14 @@ exports.identity = identity;
 "
 `;
 
-exports[`two entrypoints with a common dependency: dist/identity-4a7b4549.esm.js 1`] = `
+exports[`two entrypoints with a common dependency: dist/identity-b4bc4bda.esm.js 1`] = `
 "let identity = x => x;
 
 export { identity as i };
 "
 `;
 
-exports[`two entrypoints with a common dependency: dist/identity-8f39eb9a.cjs.prod.js 1`] = `
+exports[`two entrypoints with a common dependency: dist/identity-c307b1c8.cjs.prod.js 1`] = `
 "\\"use strict\\";
 
 let identity = x => x;
@@ -330,7 +330,7 @@ exports[`two entrypoints with a common dependency: multiply/dist/common-dependen
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-var identity = require('../../dist/identity-1c86f68b.cjs.dev.js');
+var identity = require('../../dist/identity-9dd8332e.cjs.dev.js');
 
 let multiply = (a, b) => identity.identity(a * b);
 
@@ -357,7 +357,7 @@ Object.defineProperty(exports, \\"__esModule\\", {
   value: !0
 });
 
-var identity = require(\\"../../dist/identity-8f39eb9a.cjs.prod.js\\");
+var identity = require(\\"../../dist/identity-c307b1c8.cjs.prod.js\\");
 
 let multiply = (a, b) => identity.identity(a * b);
 
@@ -366,8 +366,8 @@ exports.identity = identity.identity, exports.multiply = multiply;
 `;
 
 exports[`two entrypoints with a common dependency: multiply/dist/common-dependency-two-entrypoints.esm.js 1`] = `
-"import { i as identity } from '../../dist/identity-4a7b4549.esm.js';
-export { i as identity } from '../../dist/identity-4a7b4549.esm.js';
+"import { i as identity } from '../../dist/identity-b4bc4bda.esm.js';
+export { i as identity } from '../../dist/identity-b4bc4bda.esm.js';
 
 let multiply = (a, b) => identity(a * b);
 

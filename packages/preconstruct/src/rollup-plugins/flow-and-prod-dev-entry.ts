@@ -63,7 +63,11 @@ export default function flowAndNodeDevProdEntry(pkg: Package): Plugin {
               relativeToSource
             );
             let flowFileName = mainFieldPath + ".flow";
-            this.emitAsset(flowFileName, flowFileSource);
+            this.emitFile({
+              type: "asset",
+              fileName: flowFileName,
+              source: flowFileSource
+            });
           }
         }
 
@@ -77,7 +81,11 @@ if (${
 } else {
   module.exports = require("./${path.basename(getDevPath(mainFieldPath))}");
 }\n`;
-        this.emitAsset(mainFieldPath, mainEntrySource);
+        this.emitFile({
+          type: "asset",
+          fileName: mainFieldPath,
+          source: mainEntrySource
+        });
       }
     }
   };
