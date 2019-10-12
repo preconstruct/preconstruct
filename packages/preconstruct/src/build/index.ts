@@ -1,7 +1,7 @@
 import { Package } from "../package";
 import { Project } from "../project";
 import path from "path";
-import { rollup } from "rollup";
+import { rollup, OutputChunk } from "rollup";
 import { Aliases, getAliases } from "./aliases";
 import * as logger from "../logger";
 import * as fs from "fs-extra";
@@ -38,7 +38,10 @@ async function buildPackage(pkg: Package, aliases: Aliases) {
       const nodeDevOutput = result[0].output;
 
       if (!hasCheckedBrowser) {
-        let allCode = nodeDevOutput.map(({ code }) => code).join("\n");
+        let allCode = nodeDevOutput
+          .filter((x): x is OutputChunk => x.type === "chunk")
+          .map(({ code }) => code)
+          .join("\n");
         hasCheckedBrowser = true;
         if (browserPattern.test(allCode)) {
           throw (async () => {
