@@ -8,8 +8,8 @@
     "build": "gatsby build"
   },
   "dependencies": {
-    "@mdx-js/mdx": "^1.0.18",
-    "@mdx-js/react": "^1.0.16",
+    "@mdx-js/mdx": "^1.5.1",
+    "@mdx-js/react": "^1.5.1",
     "gatsby": "^2.15.36",
     "gatsby-plugin-emotion": "^4.1.10",
     "gatsby-plugin-google-analytics": "^2.1.21",
