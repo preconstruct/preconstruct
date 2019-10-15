@@ -45,7 +45,7 @@
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-replace": "^2.2.0",
     "rollup-pluginutils": "^2.8.2",
-    "terser": "^3.17.0",
+    "terser": "^4.3.9",
     "v8-compile-cache": "^2.1.0",
     "xxhash-wasm": "^0.3.1"
   },
