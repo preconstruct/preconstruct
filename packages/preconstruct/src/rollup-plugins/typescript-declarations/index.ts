@@ -27,7 +27,7 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
           srcFilenameToDtsFilenameMap.set(dep, name);
           this.emitFile({
             type: "asset",
-            fileName: name,
+            fileName: path.relative(opts.dir!, name),
             source: content
           });
         })
