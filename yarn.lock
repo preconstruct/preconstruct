@@ -6772,10 +6772,10 @@ gatsby-theme-sidebar@^0.0.2:
     gatsby-plugin-emotion "^4.0.4"
     lodash.merge "^4.6.1"
 
-gatsby@^2.16.2:
-  version "2.16.2"
-  resolved "https://registry.yarnpkg.com/gatsby/-/gatsby-2.16.2.tgz#af852766bf6f7e2cd32b7c778dcaa9708e9d90d3"
-  integrity sha512-mWs9ODu3hY30TP+pTbhrGjbaMo/Q13Ju97L8l1KtXdxmV8wNMUFOKqDIAKnACTgoUJikDL4oFKRla/RZbO9Y2Q==
+gatsby@^2.16.3:
+  version "2.16.3"
+  resolved "https://registry.yarnpkg.com/gatsby/-/gatsby-2.16.3.tgz#07ca9d4851aa2cf622e8a5abd9d329b8424d88b3"
+  integrity sha512-P7l3JyXE+3Wcubl2ZbGkkyhj+HUQk9O8cpcSihC28/2si1FQzAp7UsckBMz1xtDcGfahohMIUyBGhruiK4AAkA==
   dependencies:
     "@babel/code-frame" "^7.5.5"
     "@babel/core" "^7.6.4"
