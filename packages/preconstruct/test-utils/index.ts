@@ -155,18 +155,18 @@ export async function snapshotDistFiles(tmpPath: string) {
   );
 }
 
-export let stripHashes = async () => {
+export let stripHashes = async (chunkName: string) => {
   let { h64 } = await initHasher();
 
   let transformer = (pathname: string, content: string) => {
-    return pathname.replace(/chunk-[^\.]+/g, () => {
+    return pathname.replace(new RegExp(`${chunkName}-[^\\.]+`, "g"), () => {
       return `chunk-this-is-not-the-real-hash-${h64(content)}`;
     });
   };
   return {
     transformPath: transformer,
     transformContent: (content: string) => {
-      return content.replace(/chunk-[^\.]+/g, () => {
+      return content.replace(new RegExp(`${chunkName}-[^\\.]+`, "g"), () => {
         return "chunk-some-hash";
       });
     }

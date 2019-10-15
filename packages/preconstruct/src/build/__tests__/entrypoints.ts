@@ -60,7 +60,7 @@ test("two entrypoints with a common dependency", async () => {
 
   await build(tmpPath);
 
-  await snapshotDirectory(tmpPath, await stripHashes());
+  await snapshotDirectory(tmpPath, await stripHashes("identity"));
   let root = unsafeRequire(tmpPath);
   let other = unsafeRequire(path.join(tmpPath, "multiply"));
   expect(typeof root.identity).toBe("function");
