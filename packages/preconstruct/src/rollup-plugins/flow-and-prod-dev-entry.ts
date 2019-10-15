@@ -11,7 +11,7 @@ export default function flowAndNodeDevProdEntry(pkg: Package): Plugin {
   return {
     name: "flow-and-prod-dev-entry",
     async resolveId(source, importer) {
-      let resolved = (await this.resolve(source, importer, {
+      let resolved = (await this.resolve(source, importer!, {
         skipSelf: true
       }))!;
 
@@ -24,7 +24,7 @@ export default function flowAndNodeDevProdEntry(pkg: Package): Plugin {
       throw new FatalError(
         `all relative imports in a package should only import modules inside of their package directory but "${path.relative(
           pkg.directory,
-          importer
+          importer!
         )}" is importing "${source}"`,
         pkg.name
       );
@@ -32,30 +32,27 @@ export default function flowAndNodeDevProdEntry(pkg: Package): Plugin {
     // eslint-disable-next-line no-unused-vars
     async generateBundle(opts, bundle, something) {
       for (const n in bundle) {
-        const _file = bundle[n];
-        const facadeModuleId = (_file as OutputChunk).facadeModuleId;
+        const file = bundle[n];
         if (
-          (_file as OutputAsset).isAsset ||
-          !(_file as OutputChunk).isEntry ||
-          facadeModuleId == null
+          file.type === "asset" ||
+          !(file.type === "chunk" && file.isEntry) ||
+          file.facadeModuleId == null
         ) {
           continue;
         }
 
-        let file = _file as OutputChunk;
-
         let mainFieldPath = file.fileName.replace(/\.prod\.js$/, ".js");
         let relativeToSource = path.relative(
           path.dirname(path.join(opts.dir!, file.fileName)),
-          facadeModuleId
+          file.facadeModuleId
         );
 
-        let isEntrySourceTypeScript = /\.tsx?$/.test(facadeModuleId);
+        let isEntrySourceTypeScript = /\.tsx?$/.test(file.facadeModuleId);
 
         if (!isEntrySourceTypeScript) {
           let flowMode: false | "all" | "named" = false;
 
-          let source = await fs.readFile(facadeModuleId, "utf8");
+          let source = await fs.readFile(file.facadeModuleId, "utf8");
           if (source.includes("@flow")) {
             flowMode = file.exports.includes("default") ? "all" : "named";
           }
@@ -66,11 +63,11 @@ export default function flowAndNodeDevProdEntry(pkg: Package): Plugin {
               relativeToSource
             );
             let flowFileName = mainFieldPath + ".flow";
-            bundle[flowFileName] = {
+            this.emitFile({
+              type: "asset",
               fileName: flowFileName,
-              isAsset: true,
               source: flowFileSource
-            };
+            });
           }
         }
 
@@ -84,11 +81,11 @@ if (${
 } else {
   module.exports = require("./${path.basename(getDevPath(mainFieldPath))}");
 }\n`;
-        bundle[mainFieldPath] = {
+        this.emitFile({
+          type: "asset",
           fileName: mainFieldPath,
-          isAsset: true,
           source: mainEntrySource
-        };
+        });
       }
     }
   };

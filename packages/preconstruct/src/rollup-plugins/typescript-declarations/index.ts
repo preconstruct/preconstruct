@@ -25,11 +25,11 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
         [...deps].map(async dep => {
           let { name, content } = await creator.getDeclarationFile(dep);
           srcFilenameToDtsFilenameMap.set(dep, name);
-          bundle[name] = {
-            fileName: name,
-            isAsset: true,
+          this.emitFile({
+            type: "asset",
+            fileName: path.relative(opts.dir!, name),
             source: content
-          };
+          });
         })
       );
 
@@ -68,11 +68,11 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
           relativeToSource
         );
         let tsFileName = mainFieldPath + ".d.ts";
-        bundle[tsFileName] = {
+        this.emitFile({
+          type: "asset",
           fileName: tsFileName,
-          isAsset: true,
           source: tsFileSource
-        };
+        });
       }
     }
   };
