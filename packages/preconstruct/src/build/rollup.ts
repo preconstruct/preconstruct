@@ -24,6 +24,9 @@ import { getNameForDist } from "../utils";
 import { EXTENSIONS } from "../constants";
 // @ts-ignore
 import installPackages from "install-packages";
+import DataLoader from "dataloader";
+
+let installPackagePromises = new Map<string, Promise<void>>();
 
 // this makes sure nested imports of external packages are external
 const makeExternalPredicate = (externalArr: string[]) => {
@@ -74,7 +77,7 @@ export let getRollupConfig = (
         pkg.directory,
         path.join(entrypoint.directory, "dist", getNameForDist(pkg.name))
       )
-    ] = entrypoint.strict().source;
+    ] = entrypoint.source;
   });
 
   const config: RollupOptions = {
@@ -101,17 +104,21 @@ export let getRollupConfig = (
               let shouldInstallBabelRuntime = await confirms.shouldInstallBabelRuntime(
                 pkg
               );
-
               if (shouldInstallBabelRuntime) {
-                await limit(() =>
-                  installPackages({
-                    packages: ["@babel/runtime"],
-                    cwd: pkg.directory,
-                    installPeers: false,
-                    packageManager: pkg.project.isBolt ? "bolt" : undefined
-                  })
-                );
-                await pkg.refresh();
+                await limit(async () => {
+                  if (
+                    !pkg.dependencies ||
+                    !pkg.dependencies["@babel/runtime"]
+                  ) {
+                    await installPackages({
+                      packages: ["@babel/runtime"],
+                      cwd: pkg.directory,
+                      installPeers: false,
+                      packageManager: pkg.project.isBolt ? "bolt" : undefined
+                    });
+                    await pkg.refresh();
+                  }
+                });
               } else {
                 throw new FatalError(
                   `@babel/runtime should be in dependencies of ${pkg.name}`,
