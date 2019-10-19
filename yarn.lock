@@ -858,10 +858,10 @@
     "@changesets/types" "^0.3.0"
     dotenv "^8.1.0"
 
-"@changesets/cli@^2.1.0":
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/@changesets/cli/-/cli-2.1.0.tgz#9cbfcd0fcc6c384cb67fce30838dc48be3742805"
-  integrity sha512-uXfIlTPcTZhioO3mU4o7iOsZXo4EcUIDMavMxnoh3q3FY3aeV537trBhmJxV5Vc6/KfSLRF43aaCTELHPixnpA==
+"@changesets/cli@^2.1.2":
+  version "2.1.2"
+  resolved "https://registry.yarnpkg.com/@changesets/cli/-/cli-2.1.2.tgz#79f10ae34af5130663ee7e4b346f166b4c907a21"
+  integrity sha512-iJKg4lKQAB88r01EkQAZnGXZR98r8zymkoiGwqlS63IJmNx9wf/b+MMZPppwLsbK0XKgMFgRWVbQhUit/o7ycA==
   dependencies:
     "@babel/runtime" "^7.4.4"
     "@changesets/apply-release-plan" "^0.2.2"

@@ -32,7 +32,7 @@
     "@babel/preset-env": "^7.6.3",
     "@babel/preset-typescript": "^7.6.0",
     "@changesets/changelog-github": "^0.1.0",
-    "@changesets/cli": "^2.1.0",
+    "@changesets/cli": "^2.1.2",
     "@manypkg/cli": "^0.7.0",
     "@mitchellhamilton/experimental-changesets-auto-release": "^0.0.2",
     "@types/babel__code-frame": "^7.0.1",
