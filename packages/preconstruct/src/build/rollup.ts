@@ -12,18 +12,13 @@ import { StrictEntrypoint } from "../entrypoint";
 import { rollup as _rollup, RollupOptions } from "rollup";
 import { Aliases } from "./aliases";
 import { FatalError } from "../errors";
-import { confirms } from "../messages";
-import rewriteCjsRuntimeHelpers from "../rollup-plugins/rewrite-cjs-runtime-helpers";
 import flowAndNodeDevProdEntry from "../rollup-plugins/flow-and-prod-dev-entry";
 import typescriptDeclarations from "../rollup-plugins/typescript-declarations";
 import json from "rollup-plugin-json";
 import babel from "../rollup-plugins/babel";
 import terser from "../rollup-plugins/terser";
-import { limit } from "../prompt";
 import { getNameForDist } from "../utils";
 import { EXTENSIONS } from "../constants";
-// @ts-ignore
-import installPackages from "install-packages";
 
 // this makes sure nested imports of external packages are external
 const makeExternalPredicate = (externalArr: string[]) => {
@@ -96,34 +91,6 @@ export let getRollupConfig = (
           break;
         }
         case "UNRESOLVED_IMPORT": {
-          if (/^@babel\/runtime\/helpers\//.test(warning.source!)) {
-            throw (async () => {
-              let shouldInstallBabelRuntime = await confirms.shouldInstallBabelRuntime(
-                pkg
-              );
-              if (shouldInstallBabelRuntime) {
-                await limit(async () => {
-                  if (
-                    !pkg.dependencies ||
-                    !pkg.dependencies["@babel/runtime"]
-                  ) {
-                    await installPackages({
-                      packages: ["@babel/runtime"],
-                      cwd: pkg.directory,
-                      installPeers: false,
-                      packageManager: pkg.project.isBolt ? "bolt" : undefined
-                    });
-                    await pkg.refresh();
-                  }
-                });
-              } else {
-                throw new FatalError(
-                  `@babel/runtime should be in dependencies of ${pkg.name}`,
-                  pkg.name
-                );
-              }
-            })();
-          }
           if (!warning.source!.startsWith(".")) {
             throw new FatalError(
               `"${warning.source}" is imported by "${path.relative(
@@ -149,12 +116,6 @@ export let getRollupConfig = (
       type === "node-prod" && typescriptDeclarations(pkg),
       babel({
         cwd: pkg.project.directory,
-        plugins: [
-          [
-            require.resolve("@babel/plugin-transform-runtime"),
-            { useESModules: true }
-          ]
-        ],
         extensions: EXTENSIONS
       }),
       type === "umd" &&
@@ -164,7 +125,6 @@ export let getRollupConfig = (
           ["typeof " + "document"]: JSON.stringify("object"),
           ["typeof " + "window"]: JSON.stringify("object")
         }),
-      rewriteCjsRuntimeHelpers(),
       // @ts-ignore
       json({ namedExports: false }),
       type === "umd" && alias(rollupAliases),

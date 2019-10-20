@@ -212,16 +212,6 @@ Object {
 `);
 });
 
-test("@babel/runtime installed", async () => {
-  let tmpPath = f.copy("babel-runtime-installed");
-
-  await install(tmpPath);
-
-  await build(tmpPath);
-
-  await snapshotDistFiles(tmpPath);
-});
-
 test("monorepo single package", async () => {
   let tmpPath = f.copy("monorepo-single-package");
   await initBasic(tmpPath);
@@ -232,26 +222,6 @@ test("monorepo single package", async () => {
   await snapshotDistFiles(pkgPath);
 
   expect(unsafeRequire(pkgPath).default).toBe(2);
-});
-
-// this test is causing too much frustration
-test.skip("needs @babel/runtime disallow install", async () => {
-  let tmpPath = f.copy("use-babel-runtime");
-  await install(tmpPath);
-  confirms.shouldInstallBabelRuntime.mockReturnValue(Promise.resolve(false));
-
-  try {
-    await build(tmpPath);
-  } catch (err) {
-    expect(err).toBeInstanceOf(FatalError);
-    expect(err.message).toMatchInlineSnapshot(
-      `"@babel/runtime should be in dependencies of use-babel-runtime"`
-    );
-    // TODO: investigate why this is called more than one time
-    expect(confirms.shouldInstallBabelRuntime).toBeCalled();
-    return;
-  }
-  expect(true).toBe(false);
 });
 
 test("json", async () => {
