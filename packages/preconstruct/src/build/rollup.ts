@@ -24,9 +24,6 @@ import { getNameForDist } from "../utils";
 import { EXTENSIONS } from "../constants";
 // @ts-ignore
 import installPackages from "install-packages";
-import DataLoader from "dataloader";
-
-let installPackagePromises = new Map<string, Promise<void>>();
 
 // this makes sure nested imports of external packages are external
 const makeExternalPredicate = (externalArr: string[]) => {
