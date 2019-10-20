@@ -9,17 +9,12 @@ import {
 } from "../../../test-utils";
 import { promptInput } from "../../prompt";
 import { confirms as _confirms } from "../../messages";
-import { FatalError } from "../../errors";
 
 const f = fixturez(__dirname);
 
 jest.mock("../../prompt");
 
-let confirms = _confirms as jest.Mocked<typeof _confirms>;
-
 let unsafePromptInput = promptInput as jest.MockedFunction<typeof promptInput>;
-
-jest.mock("install-packages");
 
 let unsafeRequire = require;
 
