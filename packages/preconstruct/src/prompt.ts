@@ -24,7 +24,8 @@ export function createPromptConfirmLoader(
               name: "confirm",
               message,
               // @ts-ignore
-              prefix: prefix + " " + pkgs[0].name
+              prefix: prefix + " " + pkgs[0].name,
+              initial: true
             }
           ]);
           return [confirm];
@@ -34,7 +35,7 @@ export function createPromptConfirmLoader(
             type: "multiselect",
             name: "answers",
             message,
-            choices: pkgs.map(pkg => ({ name: pkg.name, checked: true })),
+            choices: pkgs.map(pkg => ({ name: pkg.name, initial: true })),
             // @ts-ignore
             prefix
           }
@@ -56,7 +57,8 @@ export let promptConfirm = async (message: string): Promise<boolean> => {
       name: "confirm",
       message,
       // @ts-ignore
-      prefix: prefix
+      prefix: prefix,
+      initial: true
     }
   ]);
   return confirm;
@@ -74,7 +76,7 @@ let doPromptInput = async (
       message,
       // @ts-ignore
       prefix: prefix + " " + pkg.name,
-      default: defaultAnswer
+      initial: defaultAnswer
     }
   ]);
   return input;

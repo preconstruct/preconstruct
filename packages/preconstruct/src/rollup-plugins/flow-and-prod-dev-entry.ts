@@ -11,9 +11,18 @@ export default function flowAndNodeDevProdEntry(pkg: Package): Plugin {
   return {
     name: "flow-and-prod-dev-entry",
     async resolveId(source, importer) {
-      let resolved = (await this.resolve(source, importer!, {
+      let resolved = await this.resolve(source, importer!, {
         skipSelf: true
-      }))!;
+      });
+      if (resolved === null) {
+        throw new FatalError(
+          "could not resolve: " +
+            JSON.stringify(source) +
+            " from " +
+            JSON.stringify(importer),
+          pkg.name
+        );
+      }
 
       if (
         resolved.id.startsWith("\0") ||
