@@ -2,26 +2,78 @@ import { Package } from "../package";
 import { getRollupConfig } from "./rollup";
 import { OutputOptions, RollupOptions } from "rollup";
 import { Aliases } from "./aliases";
+import { PKG_JSON_CONFIG_FIELD } from "../constants";
+import { limit, promptInput } from "../prompt";
+import path from "path";
+import resolveFrom from "resolve-from";
+import { Project } from "../project";
+
+function getGlobal(project: Project, name: string) {
+  if (project._config.globals !== undefined && project._config.globals[name]) {
+    return project._config.globals[name];
+  } else {
+    try {
+      let pkgJson = require(resolveFrom(
+        project.directory,
+        path.join(name, "package.json")
+      ));
+      if (
+        pkgJson &&
+        pkgJson[PKG_JSON_CONFIG_FIELD] &&
+        pkgJson[PKG_JSON_CONFIG_FIELD].umdName
+      ) {
+        return pkgJson[PKG_JSON_CONFIG_FIELD].umdName;
+      }
+    } catch (err) {
+      if (err.code !== "MODULE_NOT_FOUND") {
+        throw err;
+      }
+    }
+    throw limit(() =>
+      (async () => {
+        // if while we were waiting, that global was added, return
+        if (
+          project._config.globals !== undefined &&
+          project._config.globals[name]
+        ) {
+          return;
+        }
+        let response = await promptInput(
+          `What should the umdName of ${name} be?`,
+          project
+        );
+        if (!project._config.globals) {
+          project._config.globals = {};
+        }
+        project._config.globals[name] = response;
+
+        await project.save();
+      })()
+    );
+  }
+}
 
 function getGlobals(pkg: Package) {
   let stuff = [];
 
-  if (pkg.peerDependencies) {
-    stuff.push(...Object.keys(pkg.peerDependencies));
+  if (pkg.json.peerDependencies) {
+    stuff.push(...Object.keys(pkg.json.peerDependencies));
   }
-  if (pkg.dependencies) {
-    stuff.push(...Object.keys(pkg.dependencies));
+  if (pkg.json.dependencies) {
+    stuff.push(...Object.keys(pkg.json.dependencies));
   }
 
   if (stuff.length === 0) {
     return {};
   }
 
-  let peerDeps = pkg.peerDependencies ? Object.keys(pkg.peerDependencies) : [];
+  let peerDeps = pkg.json.peerDependencies
+    ? Object.keys(pkg.json.peerDependencies)
+    : [];
 
   return peerDeps.reduce(
     (obj, pkgName) => {
-      obj[pkgName] = pkg.project.global(pkgName);
+      obj[pkgName] = getGlobal(pkg.project, pkgName);
       return obj;
     },
     {} as Record<string, string>

@@ -212,15 +212,4 @@ export class Package extends Item {
   set name(name: string) {
     this.json.name = name;
   }
-
-  get dependencies(): null | { [key: string]: string } {
-    return this.json.dependencies;
-  }
-  get peerDependencies(): null | { [key: string]: string } {
-    return this.json.peerDependencies;
-  }
-}
-
-export class StrictPackage extends Package {
-  strictEntrypoints!: Array<StrictEntrypoint>;
 }

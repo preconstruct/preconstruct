@@ -6,18 +6,15 @@ import { success, info } from "./logger";
 import { infos, confirms, errors, inputs } from "./messages";
 import {
   validateEntrypointSource,
-  isMainFieldValid,
-  isModuleFieldValid,
-  isUmdMainFieldValid,
-  isUmdNameSpecified,
-  isBrowserFieldValid
+  isFieldValid,
+  isUmdNameSpecified
 } from "./validate";
 
 async function doInit(pkg: Package) {
   pkg.entrypoints.forEach(entrypoint => {
     validateEntrypointSource(entrypoint);
   });
-  if (pkg.entrypoints.every(entrypoint => isMainFieldValid(entrypoint))) {
+  if (pkg.entrypoints.every(entrypoint => isFieldValid.main(entrypoint))) {
     info(infos.validMainField, pkg.name);
   } else {
     let canWriteMainField = await confirms.writeMainField(pkg);
@@ -31,7 +28,7 @@ async function doInit(pkg: Package) {
     entrypoint => entrypoint.module === null
   );
   let someEntrypointsAreNotValid = pkg.entrypoints.some(
-    entrypoint => !isModuleFieldValid(entrypoint)
+    entrypoint => !isFieldValid.module(entrypoint)
   );
   if (allEntrypointsAreMissingAModuleField || someEntrypointsAreNotValid) {
     let canWriteModuleField = await confirms.writeModuleField(pkg);
@@ -48,7 +45,7 @@ async function doInit(pkg: Package) {
     entrypoint => entrypoint.umdMain !== null
   );
   let someUmdMainFieldsAreInvalid = pkg.entrypoints.some(
-    entrypoint => !isUmdMainFieldValid(entrypoint)
+    entrypoint => !isFieldValid.umdMain(entrypoint)
   );
   let someUmdNamesAreNotSpecified = pkg.entrypoints.some(
     entrypoint => !isUmdNameSpecified(entrypoint)
@@ -74,7 +71,7 @@ async function doInit(pkg: Package) {
   );
 
   let someEntrypointsHaveAnInvalidBrowserField = pkg.entrypoints.some(
-    entrypoint => !isBrowserFieldValid(entrypoint)
+    entrypoint => !isFieldValid.browser(entrypoint)
   );
   if (
     someEntrypointsHaveABrowserField &&
