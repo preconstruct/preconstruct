@@ -12,7 +12,6 @@
   "dependencies": {
     "@babel/core": "^7.6.4",
     "@babel/plugin-transform-modules-commonjs": "^7.6.0",
-    "@babel/plugin-transform-runtime": "^7.6.2",
     "pirates": "^4.0.1",
     "source-map-support": "^0.5.13"
   },

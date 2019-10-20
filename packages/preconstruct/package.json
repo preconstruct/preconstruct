@@ -16,7 +16,6 @@
   "dependencies": {
     "@babel/code-frame": "^7.5.5",
     "@babel/core": "^7.6.4",
-    "@babel/plugin-transform-runtime": "^7.6.2",
     "@babel/runtime": "^7.6.3",
     "@preconstruct/hook": "^0.0.5",
     "builtin-modules": "^3.1.0",
@@ -26,7 +25,6 @@
     "fast-deep-equal": "^2.0.1",
     "fs-extra": "^8.1.0",
     "globby": "^10.0.1",
-    "install-packages": "^0.2.5",
     "jest-worker": "24.9.0",
     "magic-string": "^0.25.4",
     "meow": "^5.0.0",

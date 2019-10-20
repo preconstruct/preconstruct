@@ -5,7 +5,6 @@ import sourceMapSupport from "source-map-support";
 let EXTENSIONS = [".js", ".jsx", ".ts", ".tsx"];
 
 let babelPlugins = [
-  require.resolve("@babel/plugin-transform-runtime"),
   require.resolve("@babel/plugin-transform-modules-commonjs")
 ];
 
