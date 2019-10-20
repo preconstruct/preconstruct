@@ -16,10 +16,7 @@ jobs:
       - name: Set Node.js 10.x
         uses: actions/setup-node@master
         with:
-          version: 10.x
-
-      - name: Install Yarn
-        run: npm install --global yarn
+          node-version: 10.x
 
       - name: Install Dependencies
         run: yarn
@@ -40,10 +37,7 @@ jobs:
       - name: Set Node.js 10.x
         uses: actions/setup-node@master
         with:
-          version: 10.x
-
-      - name: Install Yarn
-        run: npm install --global yarn
+          node-version: 10.x
 
       - name: Install Dependencies
         run: yarn
@@ -59,10 +53,7 @@ jobs:
       - name: Set Node.js 10.x
         uses: actions/setup-node@master
         with:
-          version: 10.x
-
-      - name: Install Yarn
-        run: npm install --global yarn
+          node-version: 10.x
 
       - name: Install Dependencies
         run: yarn
