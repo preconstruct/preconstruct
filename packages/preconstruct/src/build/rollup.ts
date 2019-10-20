@@ -38,11 +38,11 @@ export let getRollupConfig = (
   type: RollupConfigType
 ): RollupOptions => {
   let external = [];
-  if (pkg.peerDependencies) {
-    external.push(...Object.keys(pkg.peerDependencies));
+  if (pkg.json.peerDependencies) {
+    external.push(...Object.keys(pkg.json.peerDependencies));
   }
-  if (pkg.dependencies && type !== "umd") {
-    external.push(...Object.keys(pkg.dependencies));
+  if (pkg.json.dependencies && type !== "umd") {
+    external.push(...Object.keys(pkg.json.dependencies));
   }
 
   if (type === "node-dev" || type === "node-prod") {

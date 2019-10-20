@@ -18,9 +18,7 @@ export function validateEntrypointSource(entrypoint: Entrypoint) {
   try {
     if (!entrypoint.source.startsWith(entrypoint.package.directory)) {
       throw new FatalError(
-        `entrypoint source files must be inside their respective package directory but this entrypoint has specified its source file as ${
-          entrypoint.configSource
-        }`,
+        `entrypoint source files must be inside their respective package directory but this entrypoint has specified its source file as ${entrypoint.configSource}`,
         entrypoint.name
       );
     }
@@ -35,37 +33,39 @@ export function validateEntrypointSource(entrypoint: Entrypoint) {
   }
 }
 
-export function isMainFieldValid(entrypoint: Entrypoint) {
-  return (
-    entrypoint.main ===
-    getValidStringFieldContentForBuildType("main", entrypoint.package.name)
-  );
-}
-
-export function isModuleFieldValid(entrypoint: Entrypoint) {
-  return (
-    entrypoint.module ===
-    getValidStringFieldContentForBuildType("module", entrypoint.package.name)
-  );
-}
-
-export function isUmdMainFieldValid(entrypoint: Entrypoint) {
-  return (
-    entrypoint.umdMain ===
-    getValidStringFieldContentForBuildType("umd:main", entrypoint.package.name)
-  );
-}
-
-export function isBrowserFieldValid(entrypoint: Entrypoint): boolean {
-  return equal(
-    entrypoint.browser,
-    getValidObjectFieldContentForBuildType(
-      "browser",
-      entrypoint.package.name,
-      entrypoint.module !== null
-    )
-  );
-}
+export const isFieldValid = {
+  main(entrypoint: Entrypoint) {
+    return (
+      entrypoint.main ===
+      getValidStringFieldContentForBuildType("main", entrypoint.package.name)
+    );
+  },
+  module(entrypoint: Entrypoint) {
+    return (
+      entrypoint.module ===
+      getValidStringFieldContentForBuildType("module", entrypoint.package.name)
+    );
+  },
+  umdMain(entrypoint: Entrypoint) {
+    return (
+      entrypoint.umdMain ===
+      getValidStringFieldContentForBuildType(
+        "umd:main",
+        entrypoint.package.name
+      )
+    );
+  },
+  browser(entrypoint: Entrypoint): boolean {
+    return equal(
+      entrypoint.browser,
+      getValidObjectFieldContentForBuildType(
+        "browser",
+        entrypoint.package.name,
+        entrypoint.module !== null
+      )
+    );
+  }
+};
 
 export function isUmdNameSpecified(entrypoint: Entrypoint) {
   return typeof entrypoint._config.umdName === "string";
@@ -76,14 +76,14 @@ export function validateEntrypoint(entrypoint: Entrypoint, log: boolean) {
   if (log) {
     logger.info(infos.validEntrypoint, entrypoint.name);
   }
-  if (!isMainFieldValid(entrypoint)) {
+  if (!isFieldValid.main(entrypoint)) {
     throw new FixableError(errors.invalidMainField, entrypoint.name);
   }
   if (log) {
     logger.info(infos.validMainField, entrypoint.name);
   }
   if (entrypoint.module !== null) {
-    if (isModuleFieldValid(entrypoint)) {
+    if (isFieldValid.module(entrypoint)) {
       if (log) {
         logger.info(infos.validModuleField, entrypoint.name);
       }
@@ -92,7 +92,7 @@ export function validateEntrypoint(entrypoint: Entrypoint, log: boolean) {
     }
   }
   if (entrypoint.umdMain !== null) {
-    if (isUmdMainFieldValid(entrypoint)) {
+    if (isFieldValid.umdMain(entrypoint)) {
       if (isUmdNameSpecified(entrypoint)) {
         if (log) {
           logger.info(infos.validUmdMainField, entrypoint.name);
@@ -107,7 +107,7 @@ export function validateEntrypoint(entrypoint: Entrypoint, log: boolean) {
   if (entrypoint.browser !== null) {
     if (
       typeof entrypoint.browser === "string" ||
-      !isBrowserFieldValid(entrypoint)
+      !isFieldValid.browser(entrypoint)
     ) {
       throw new FixableError(errors.invalidBrowserField, entrypoint.name);
     } else if (log) {

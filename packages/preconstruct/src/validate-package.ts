@@ -56,11 +56,7 @@ export function validatePackage(pkg: Package) {
         !fields[field]
       ) {
         throw new FixableError(
-          `${pkg.entrypoints[0].name} has a ${
-            camelToPkgJsonField[field]
-          } build but ${entrypoint.name} does not have a ${
-            camelToPkgJsonField[field]
-          } build. Entrypoints in a package must either all have a particular build type or all not have a particular build type.`,
+          `${pkg.entrypoints[0].name} has a ${camelToPkgJsonField[field]} build but ${entrypoint.name} does not have a ${camelToPkgJsonField[field]} build. Entrypoints in a package must either all have a particular build type or all not have a particular build type.`,
           pkg.name
         );
       }
@@ -70,11 +66,7 @@ export function validatePackage(pkg: Package) {
         fields[field]
       ) {
         throw new FixableError(
-          `${entrypoint.name} has a ${camelToPkgJsonField[field]} build but ${
-            pkg.entrypoints[0].name
-          } does not have a ${
-            camelToPkgJsonField[field]
-          } build. Entrypoints in a package must either all have a particular build type or all not have a particular build type.`,
+          `${entrypoint.name} has a ${camelToPkgJsonField[field]} build but ${pkg.entrypoints[0].name} does not have a ${camelToPkgJsonField[field]} build. Entrypoints in a package must either all have a particular build type or all not have a particular build type.`,
           pkg.name
         );
       }
@@ -90,11 +82,13 @@ export function validatePackage(pkg: Package) {
     // this will likely change in the future
 
     let sortaAllDeps = new Set([
-      ...(pkg.peerDependencies ? Object.keys(pkg.peerDependencies) : []),
-      ...(pkg.dependencies ? Object.keys(pkg.dependencies) : [])
+      ...(pkg.json.peerDependencies
+        ? Object.keys(pkg.json.peerDependencies)
+        : []),
+      ...(pkg.json.dependencies ? Object.keys(pkg.json.dependencies) : [])
     ]);
 
-    for (let depName in pkg.dependencies) {
+    for (let depName in pkg.json.dependencies) {
       let depPkgJson = unsafeRequire(
         resolveFrom(pkg.directory, depName + "/package.json")
       );

@@ -1,20 +1,13 @@
 import nodePath from "path";
 import { promptInput } from "./prompt";
-import pLimit from "p-limit";
-import resolveFrom from "resolve-from";
 import globby from "globby";
 import * as fs from "fs-extra";
 import { Item } from "./item";
 import { Package } from "./package";
 import { error } from "./logger";
 import { promptConfirm } from "./prompt";
-import { PKG_JSON_CONFIG_FIELD } from "./constants";
 import { validateIncludedFiles } from "./validate-included-files";
 import { FatalError } from "./errors";
-
-let unsafeRequire = require;
-
-let askGlobalLimit = pLimit(1);
 
 export class Project extends Item {
   get configPackages(): Array<string> {
@@ -136,49 +129,5 @@ export class Project extends Item {
 
     await Promise.all(packages.map(pkg => validateIncludedFiles(pkg)));
     return packages;
-  }
-
-  global(pkg: string) {
-    if (this._config.globals !== undefined && this._config.globals[pkg]) {
-      return this._config.globals[pkg];
-    } else {
-      try {
-        let pkgJson = unsafeRequire(
-          resolveFrom(this.directory, nodePath.join(pkg, "package.json"))
-        );
-        if (
-          pkgJson &&
-          pkgJson[PKG_JSON_CONFIG_FIELD] &&
-          pkgJson[PKG_JSON_CONFIG_FIELD].umdName
-        ) {
-          return pkgJson[PKG_JSON_CONFIG_FIELD].umdName;
-        }
-      } catch (err) {
-        if (err.code !== "MODULE_NOT_FOUND") {
-          throw err;
-        }
-      }
-      throw askGlobalLimit(() =>
-        (async () => {
-          // if while we were waiting, that global was added, return
-          if (this._config.globals !== undefined && this._config.globals[pkg]) {
-            return;
-          }
-          let response = await promptInput(
-            `What should the umdName of ${pkg} be?`,
-            this
-          );
-          this._addGlobal(pkg, response);
-          await this.save();
-        })()
-      );
-    }
-  }
-
-  _addGlobal(pkg: string, name: string) {
-    if (!this._config.globals) {
-      this._config.globals = {};
-    }
-    this._config.globals[pkg] = name;
   }
 }

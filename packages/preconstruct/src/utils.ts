@@ -2,6 +2,8 @@ export function getNameForDist(name: string): string {
   return name.replace(/.*\//, "");
 }
 
+export let fieldValues = {};
+
 export function getValidStringFieldContentForBuildType(
   type: "main" | "module" | "umd:main",
   pkgName: string
