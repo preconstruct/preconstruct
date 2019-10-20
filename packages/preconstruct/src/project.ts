@@ -26,16 +26,6 @@ export class Project extends Item {
       this.name
     );
   }
-  // probably gonna be irrelevant later but i want it for now
-  get isBolt(): boolean {
-    // we only want to return true when there is bolt config
-    // AND no yarn workspaces config
-    // because emotion has a bolt config and yarn workspaces
-    // and if you have both, you probably want workspaces
-    let hasBolt = !!this.json.bolt;
-    let hasYarnWorkspaces = !!this.json.workspaces;
-    return hasBolt && !hasYarnWorkspaces;
-  }
   static async create(directory: string): Promise<Project> {
     let filePath = nodePath.join(directory, "package.json");
     let contents = await fs.readFile(filePath, "utf-8");
