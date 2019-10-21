@@ -12,6 +12,7 @@ import {
 import { errors, confirms } from "./messages";
 import { Project } from "./project";
 import { getUselessGlobsThatArentReallyGlobs } from "./glob-thing";
+import detectIndent from "detect-indent";
 
 export class Package extends Item {
   project!: Project;
@@ -88,7 +89,11 @@ export class Package extends Item {
           }
         }
         let plainEntrypointContents =
-          JSON.stringify(plainEntrypointObj, null, 2) + "\n";
+          JSON.stringify(
+            plainEntrypointObj,
+            null,
+            detectIndent(contents).indent || "  "
+          ) + "\n";
         getPlainEntrypointContent = () => plainEntrypointContents;
         return plainEntrypointContents;
       };
