@@ -50,7 +50,8 @@ export let confirms = {
 };
 
 export let inputs = {
-  getUmdName: "what should the name used for UMD bundles be?"
+  getUmdName: "what should the name used for UMD bundles be?",
+  getSource: "what should the source file for this entrypoint be?"
 };
 
 export let infos = {
