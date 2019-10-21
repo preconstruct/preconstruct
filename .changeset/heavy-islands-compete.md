@@ -1,5 +1,0 @@
----
-"preconstruct": patch
----
-
-Update dependencies

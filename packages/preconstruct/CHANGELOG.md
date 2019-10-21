@@ -1,5 +1,28 @@
 # preconstruct
 
+## 0.3.0
+
+### Minor Changes
+
+- [`f02cce5`](https://github.com/preconstruct/preconstruct/commit/f02cce5b05650485da522f29dd7758b290505986) [#163](https://github.com/preconstruct/preconstruct/pull/163) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Remove automatic inclusion of `@babel/plugin-transform-runtime`.
+
+  Preconstruct no longer automatically includes `@babel/plugin-transform-runtime` to reduce confusion where code works when built with Preconstruct but fails if built using another tool which directly uses a project's Babel config. You should **include `@babel/plugin-transform-runtime`** in your Babel config unless it is already included.
+
+  ```js
+  {
+    "plugins": ["@babel/plugin-transform-runtime"]
+  }
+  ```
+
+### Patch Changes
+
+- [`a24784a`](https://github.com/preconstruct/preconstruct/commit/a24784a302028b95bb5686921cf948cac096d530) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Update dependencies
+
+* [`11e0f62`](https://github.com/preconstruct/preconstruct/commit/11e0f621983da71215953a06f0aa66c482048568) [#170](https://github.com/preconstruct/preconstruct/pull/170) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Use detected indentation when writing package.json files
+
+* Updated dependencies [[`f02cce5`](https://github.com/preconstruct/preconstruct/commit/f02cce5b05650485da522f29dd7758b290505986)]:
+  - @preconstruct/hook@0.1.0
+
 ## 0.2.0
 
 ### Minor Changes
