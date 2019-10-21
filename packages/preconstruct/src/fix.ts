@@ -7,6 +7,7 @@ import { validateEntrypointSource, isUmdNameSpecified } from "./validate";
 import { fixPackage } from "./validate-package";
 
 async function fixEntrypoint(entrypoint: Entrypoint) {
+  let hasBeenModified = false;
   // we're only doing this on entrypoints that aren't at the root of the package
   // because at the root of the package, you're less likely to want to change the entrypoint source
   if (entrypoint.directory !== entrypoint.package.directory) {
@@ -27,7 +28,7 @@ async function fixEntrypoint(entrypoint: Entrypoint) {
           val !== "src/index.tsx"
         ) {
           entrypoint._config.source = val;
-          await entrypoint.save();
+          hasBeenModified = true;
         } else {
           logger.info(
             `${val} is the default value for source files so it will not be written`
@@ -44,10 +45,9 @@ async function fixEntrypoint(entrypoint: Entrypoint) {
     let umdName = await promptInput(inputs.getUmdName, entrypoint);
     entrypoint.umdName = umdName;
     await entrypoint.save();
-
-    return true;
+    hasBeenModified = true;
   }
-  return false;
+  return hasBeenModified;
 }
 
 export default async function fix(directory: string) {
