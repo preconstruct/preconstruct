@@ -221,8 +221,12 @@ testFix(
   }
 );
 
-test("fix browser", async () => {
+test("create entrypoint", async () => {
   let tmpPath = f.copy("valid-package");
+  await fs.writeFile(
+    path.join(tmpPath, "src", "another.js"),
+    "export let x = 1"
+  );
 
   confirms.createEntrypoint.mockImplementation(async x => {
     if (x.name === "valid-package/another") {
@@ -232,16 +236,29 @@ test("fix browser", async () => {
       throw new Error("this should never happen: " + x.name);
     }
   });
+  let x = 0;
+
+  promptInput.mockImplementation(async (message, { name }, defaultAnswer) => {
+    if (x === 0) {
+      x++;
+      expect(message).toBe(inputs.getSource);
+      expect(name).toBe("valid-package/another");
+      expect(defaultAnswer).toBe("src/index");
+      return "../src/another";
+    } else if (x === 1) {
+      expect(message).toBe(inputs.getUmdName);
+      expect(name).toBe("valid-package/another");
+      return "another";
+    }
+    throw new Error("unexpected call");
+  });
 
   await modifyPkg(tmpPath, pkg => {
     pkg.preconstruct.entrypoints = [".", "another"];
   });
-  try {
-    await fix(tmpPath);
-  } catch (err) {
-    expect(err.message).toBe(errors.noSource("src/index"));
-  }
+  await fix(tmpPath);
 
+  expect(promptInput).toBeCalledTimes(2);
   expect(confirms.createEntrypoint).toBeCalledTimes(1);
 
   expect(
@@ -250,7 +267,11 @@ test("fix browser", async () => {
     "{
       \\"main\\": \\"dist/valid-package.cjs.js\\",
       \\"module\\": \\"dist/valid-package.esm.js\\",
-      \\"umd:main\\": \\"dist/valid-package.umd.min.js\\"
+      \\"umd:main\\": \\"dist/valid-package.umd.min.js\\",
+      \\"preconstruct\\": {
+        \\"source\\": \\"../src/another\\",
+        \\"umdName\\": \\"another\\"
+      }
     }
     "
   `);
