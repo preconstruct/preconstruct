@@ -15,11 +15,7 @@ async function fixEntrypoint(entrypoint: Entrypoint) {
       entrypoint.source;
     } catch (err) {
       if (err.code === "MODULE_NOT_FOUND") {
-        let val = await promptInput(
-          "what should the source",
-          entrypoint,
-          "src/index"
-        );
+        let val = await promptInput(inputs.getSource, entrypoint, "src/index");
         if (
           val !== "src/index" &&
           val !== "src/index.js" &&
