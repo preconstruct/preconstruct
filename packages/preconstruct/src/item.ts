@@ -1,5 +1,6 @@
 import * as fs from "fs-extra";
 import nodePath from "path";
+import detectIndent from "detect-indent";
 import { PKG_JSON_CONFIG_FIELD } from "./constants";
 
 let itemsByPath: { [key: string]: Set<Item> } = {};
@@ -44,7 +45,14 @@ export class Item {
     }
     let stringified = JSON.stringify(this.json, null, 2);
     if (stringified !== this._stringifiedSavedJson) {
-      await fs.writeFile(this.path, JSON.stringify(this.json, null, 2) + "\n");
+      await fs.writeFile(
+        this.path,
+        JSON.stringify(
+          this.json,
+          null,
+          detectIndent(this._contents).indent || "  "
+        ) + "\n"
+      );
 
       this._config = this.json[PKG_JSON_CONFIG_FIELD] || {};
       for (let item of itemsByPath[this.path]) {
