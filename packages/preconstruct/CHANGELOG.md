@@ -1,5 +1,11 @@
 # preconstruct
 
+## 0.3.1
+
+### Patch Changes
+
+- [`078886b`](https://github.com/preconstruct/preconstruct/commit/078886b9de4c060a89a100751ef0bf42cbf3e95b) [#171](https://github.com/preconstruct/preconstruct/pull/171) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Prompt for entrypoint source when not the entrypoint is not at the root of the package
+
 ## 0.3.0
 
 ### Minor Changes
