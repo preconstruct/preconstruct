@@ -20,8 +20,8 @@
     "gatsby-source-filesystem": "^2.1.33",
     "gatsby-theme-sidebar": "^0.0.2",
     "prism-react-renderer": "^1.0.2",
-    "react": "^16.10.2",
-    "react-dom": "^16.10.2",
+    "react": "^16.11.0",
+    "react-dom": "^16.11.0",
     "react-typography": "^0.16.19",
     "typography": "^0.16.19"
   }
