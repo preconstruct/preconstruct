@@ -1299,10 +1299,10 @@
     "@types/istanbul-reports" "^1.1.1"
     "@types/yargs" "^13.0.0"
 
-"@manypkg/cli@^0.7.0":
-  version "0.7.0"
-  resolved "https://registry.yarnpkg.com/@manypkg/cli/-/cli-0.7.0.tgz#2849798d231006d22073155482b226d40a66392a"
-  integrity sha512-yu6SDfwkgrMw/EBR8EwFI5cmgfYABK7Yttz906qDQaDiBLvmH7+KLg/j/OOc61uCqQzSWA8jNVFsx6rPX+0yJw==
+"@manypkg/cli@^0.8.0":
+  version "0.8.0"
+  resolved "https://registry.yarnpkg.com/@manypkg/cli/-/cli-0.8.0.tgz#eb19b2ca406c3861a1ddded8cc082b51ae6c74c6"
+  integrity sha512-svaovvlTN1dDVPNZKZV6E3Tgsc0QxnJTp3UWSVBFa3GaNvX8a/O2eKMCTBSqqdrMUxGVeGZjKDErQMNgtx3R4Q==
   dependencies:
     "@babel/runtime" "^7.5.5"
     chalk "^2.4.2"
@@ -1310,10 +1310,10 @@
     find-up "^4.1.0"
     find-workspaces-root "^0.1.0"
     fs-extra "^8.1.0"
-    get-workspaces "^0.4.0"
+    get-workspaces "^0.5.0"
     meow "^5.0.0"
     p-limit "^2.2.1"
-    sembear "^0.4.0"
+    sembear "^0.4.1"
     semver "^6.3.0"
     spawndamnit "^2.0.0"
     validate-npm-package-name "^3.0.0"
@@ -6299,14 +6299,6 @@ get-value@^2.0.3, get-value@^2.0.6:
   version "2.0.6"
   resolved "https://registry.yarnpkg.com/get-value/-/get-value-2.0.6.tgz#dc15ca1c672387ca76bd37ac0a395ba2042a2c28"
   integrity sha1-3BXKHGcjh8p2vTesCjlbogQqLCg=
-
-get-workspaces@^0.4.0:
-  version "0.4.2"
-  resolved "https://registry.yarnpkg.com/get-workspaces/-/get-workspaces-0.4.2.tgz#b887b9632bc5dcc2001c0ba124f00581453597b4"
-  integrity sha512-TZtSe6nltU8BEeJt9Te5BQpY0A1NpW4SK3syIsorRiXEiwfu1KYpvaljefReY44AO96AztUyxy+qTFQhMgwXkQ==
-  dependencies:
-    fs-extra "^7.0.1"
-    globby "^9.2.0"
 
 get-workspaces@^0.5.0:
   version "0.5.0"
@@ -12073,7 +12065,7 @@ selfsigned@^1.10.7:
   dependencies:
     node-forge "0.9.0"
 
-sembear@^0.4.0:
+sembear@^0.4.1:
   version "0.4.1"
   resolved "https://registry.yarnpkg.com/sembear/-/sembear-0.4.1.tgz#c1599bba0fd29cce68a25382576891e5fae84990"
   integrity sha512-q3LJepi7qgDbkR9eDe1OVYfbD8A14vuC8TtETtEvpAQ4GxynA9B0fhG6ts8scBMDe/GwLlVUeU+Icnl1oidH7g==
