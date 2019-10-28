@@ -13,7 +13,7 @@
     "@babel/core": "^7.6.4",
     "@babel/plugin-transform-modules-commonjs": "^7.6.0",
     "pirates": "^4.0.1",
-    "source-map-support": "^0.5.13"
+    "source-map-support": "^0.5.15"
   },
   "publishConfig": {
     "access": "public"
