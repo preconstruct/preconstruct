@@ -851,13 +851,13 @@
     "@changesets/types" "^0.4.0"
     semver "^5.4.1"
 
-"@changesets/changelog-github@^0.1.0":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@changesets/changelog-github/-/changelog-github-0.1.0.tgz#32b9b025e3686c3c0563763540e97af4a88cc794"
-  integrity sha512-0s9vT743lkJwkuCrOIl7V7uEJq2vSY3GQ7u2haALHEAJSDkh7B/IoiL774cj9nzLbuVJE+B1pALJC/5TNtr/0w==
+"@changesets/changelog-github@^0.1.1":
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/@changesets/changelog-github/-/changelog-github-0.1.1.tgz#04f3c40de15c53eb7b6c0b870cee13e76fd91fbf"
+  integrity sha512-xwwyc7nSVVEUmVCiqT1dyju1rxe2awk5XOWLEwpsez3j9gXKwixlK43daG5jP1caGuXFc9f1BOSod2oJTUbtew==
   dependencies:
     "@changesets/get-github-info" "^0.3.0"
-    "@changesets/types" "^0.3.0"
+    "@changesets/types" "^0.4.0"
     dotenv "^8.1.0"
 
 "@changesets/cli@^2.3.0":
@@ -994,11 +994,6 @@
     "@changesets/parse" "^0.3.1"
     "@changesets/types" "^0.4.0"
     fs-extra "^7.0.1"
-
-"@changesets/types@^0.3.0":
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/@changesets/types/-/types-0.3.0.tgz#ca7b609c1e778448c8763ca8cdb0bbd776c39c9b"
-  integrity sha512-9fwlRVzvfzF6vf7178vu1HDg4N80Z4Y/B0pS9zUWmmEruLzmzN94OoDk3obQ3P8M0EUH+oHnq8QVuKPLAR9VAw==
 
 "@changesets/types@^0.4.0":
   version "0.4.0"
