@@ -1,5 +1,11 @@
 # preconstruct
 
+## 0.3.2
+
+### Patch Changes
+
+- [`21bbc08`](https://github.com/preconstruct/preconstruct/commit/21bbc084418589e931773e529e913df120c2fb16) [#205](https://github.com/preconstruct/preconstruct/pull/205) Thanks [@Vultraz](https://github.com/Vultraz)! - Fixed dist file check failing on Windows due to path separator mismatch
+
 ## 0.3.1
 
 ### Patch Changes
