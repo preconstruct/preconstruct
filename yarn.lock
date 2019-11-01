@@ -1329,10 +1329,10 @@
     "@types/istanbul-reports" "^1.1.1"
     "@types/yargs" "^13.0.0"
 
-"@manypkg/cli@^0.8.0":
-  version "0.8.0"
-  resolved "https://registry.yarnpkg.com/@manypkg/cli/-/cli-0.8.0.tgz#eb19b2ca406c3861a1ddded8cc082b51ae6c74c6"
-  integrity sha512-svaovvlTN1dDVPNZKZV6E3Tgsc0QxnJTp3UWSVBFa3GaNvX8a/O2eKMCTBSqqdrMUxGVeGZjKDErQMNgtx3R4Q==
+"@manypkg/cli@^0.8.1":
+  version "0.8.1"
+  resolved "https://registry.yarnpkg.com/@manypkg/cli/-/cli-0.8.1.tgz#0cf3290d57a0f9a0380372c315b0af7bf703f5d9"
+  integrity sha512-AFWwD5Je9O2sqZOwGs1wU7gBkE0YL5sUawPwB9PwopCA9Ms0S0+DqdlB34DA0bdHqH3iRoEPUoCZ4VkhARLyng==
   dependencies:
     "@babel/runtime" "^7.5.5"
     chalk "^2.4.2"
