@@ -20,6 +20,13 @@ export async function validateIncludedFiles(pkg: Package) {
     );
 
     let result = await packlist({ path: pkg.directory });
+
+    // Ensure consistent path separators. Without this, there's a mismatch between this result and the path it
+    // checks on Windows. This value will have a forward slash (dist/preconstruct-test-file), whereas the value
+    // of distFilePath below will have a backslash (dist\preconstruct-test-file). Obviously these two won't match,
+    // so the distfile check will fail.
+    result = result.map(p => path.normalize(p));
+
     // check that we're including the package.json and main file
     // TODO: add Flow and TS check and if they're ignored, don't write them
     let messages: string[] = [];
