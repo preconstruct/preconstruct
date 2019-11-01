@@ -936,10 +936,10 @@ pirates@^4.0.1:
   dependencies:
     node-modules-regexp "^1.0.0"
 
-preconstruct@^0.3.1:
-  version "0.3.1"
-  resolved "https://registry.yarnpkg.com/preconstruct/-/preconstruct-0.3.1.tgz#36d256dad9e87d3628c99f24bf8071d887ad47b6"
-  integrity sha512-9uSXlK0rZLwgWWnxSOssa4MBamnHccuyZYsX1xldFY5xxFGzWs56Xij06WGMry9zzPOKsAh/2POjILrqxYkslQ==
+preconstruct@^0.3.2:
+  version "0.3.2"
+  resolved "https://registry.yarnpkg.com/preconstruct/-/preconstruct-0.3.2.tgz#50220eb24ab61b0158d4ba77cd16b73c8b3ab090"
+  integrity sha512-ni/2U6wE2j2txQdlfgmcSP/iF+efLuKPgrRvhR7svb8gIernHBM1u62axNlR1bb+o621v1s1xofFCj/I1gvdpQ==
   dependencies:
     "@babel/code-frame" "^7.5.5"
     "@babel/core" "^7.6.4"
@@ -964,7 +964,7 @@ preconstruct@^0.3.1:
     quick-lru "^4.0.1"
     resolve "^1.12.0"
     resolve-from "^5.0.0"
-    rollup "^1.25.1"
+    rollup "^1.26.2"
     rollup-plugin-alias "^1.5.2"
     rollup-plugin-commonjs "^10.1.0"
     rollup-plugin-json "^4.0.0"
@@ -1083,10 +1083,10 @@ rollup-pluginutils@^2.5.0, rollup-pluginutils@^2.6.0, rollup-pluginutils@^2.8.1,
   dependencies:
     estree-walker "^0.6.1"
 
-rollup@^1.25.1:
-  version "1.26.0"
-  resolved "https://registry.yarnpkg.com/rollup/-/rollup-1.26.0.tgz#cf40fd5e1edc4d7f3d4235a0a43f1c2be1cf294b"
-  integrity sha512-5HljNYn9icFvXX+Oe97qY5TWvnWhKqgGT0HGeWWqFPx7w7+Anzg7dfHMtUif7YYy6QxAgynDSwK6uxbgcrVUxw==
+rollup@^1.26.2:
+  version "1.26.2"
+  resolved "https://registry.yarnpkg.com/rollup/-/rollup-1.26.2.tgz#33d1ad23ee94aff1057448bae267be51dab4bdc1"
+  integrity sha512-TLM8hlYP85TFFptYlXmr2VnhCLA8GaYXG4LBdWsHu9oBH/Wm5MMPAE9wsAnohfV21Dqq0ZvRHdmsKXomshaDSg==
   dependencies:
     "@types/estree" "*"
     "@types/node" "*"
