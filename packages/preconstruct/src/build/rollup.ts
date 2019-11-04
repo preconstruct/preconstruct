@@ -78,7 +78,7 @@ export let getRollupConfig = (
     onwarn: warning => {
       if (typeof warning === "string") {
         throw new FatalError(
-          `There was an error compiling ${pkg.name}: ${chalk.red(
+          `An unhandled Rollup error occurred: ${chalk.red(
             warning.toString()
           )}`,
           pkg.name
@@ -96,14 +96,14 @@ export let getRollupConfig = (
               `"${warning.source}" is imported by "${path.relative(
                 pkg.directory,
                 warning.importer!
-              )}" but it is not specified in dependencies or peerDependencies`,
+              )}" but the package is not specified in dependencies or peerDependencies`,
               pkg.name
             );
           }
         }
         default: {
           throw new FatalError(
-            `There was an error compiling ${pkg.name}: ${chalk.red(
+            `An unhandled Rollup error occurred: ${chalk.red(
               warning.toString()
             )}`,
             pkg.name
