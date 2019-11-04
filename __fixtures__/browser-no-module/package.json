@@ -3,5 +3,8 @@
   "version": "1.0.0",
   "main": "dist/browser-no-module.cjs.js",
   "license": "MIT",
-  "private": true
+  "private": true,
+  "browser": {
+    "./dist/browser-no-module.cjs.js": "./dist/browser-no-module.browser.cjs.js"
+  }
 }

@@ -197,6 +197,9 @@ export async function snapshotDirectory(
       let content = transformContent(
         await fs.readFile(path.join(tmpPath, x), "utf-8")
       );
+      if (x.endsWith(".json") && !x.endsWith("tsconfig.json")) {
+        content = JSON.parse(content);
+      }
       expect(content).toMatchSnapshot(transformPath(x, content));
     })
   );
