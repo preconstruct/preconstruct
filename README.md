@@ -9,7 +9,7 @@ Generating small, performant bundles and making consumer bundlers use the right 
 ## Getting Started
 
 ```bash
-yarn add --dev preconstruct
+yarn add --dev @preconstruct/cli
 yarn preconstruct init
 yarn preconstruct build
 ```
