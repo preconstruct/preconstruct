@@ -8,10 +8,10 @@ let unsafeRequire = require;
 
 export function createWorker() {
   if (shouldUseWorker) {
-    worker = new Worker(require.resolve("preconstruct/worker")) as Worker &
+    worker = new Worker(require.resolve("@preconstruct/cli/worker")) as Worker &
       typeof import("./worker");
   } else {
-    worker = unsafeRequire("preconstruct/worker");
+    worker = unsafeRequire("@preconstruct/cli/worker");
   }
 }
 
