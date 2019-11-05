@@ -1,20 +1,38 @@
-# Getting Started
+# Introduction
 
-> **Note:** If you're new to building packages, you should go through [Preconstruct's tutorials](/tutorials)
+> Dev and build your code painlessly in monorepos
 
-Preconstruct is a build tool that aims to simplify a lot of the complexity in building packages.
+## Key Features
 
-Assuming you've already got a package and your source file is at `src/index.js`(or `src/index.ts` if you're using TypeScript) or you have a monorepo with Yarn Workspaces that has packages with source files, you can install Preconstruct and run `preconstruct init` to setup Preconstruct.
+- In dev mode, your code behaves the same as it will in production, including locally linked in monorepos
+- Add multiple entrypoints to your packages for publishing
+- CLI helps walk you through set-up and making changes to your configs
+- Works with different kinds of JS monorepos
+- Also works for single package repos!
+- Builds your code with rollup
+
+## Getting Started
+
+Assuming you already have a source file at src/index.js (or src/index.ts) or you're using Yarn Workspaces and have packages with src/index.js (or src/index.ts), you can setup Preconstruct like this.
 
 ```bash
 yarn add --dev @preconstruct/cli
 yarn preconstruct init
 ```
 
-Preconstruct will ask some questions about your project and then update your package.json.
+If you're in a monorepo, you should also run `yarn preconstruct dev` and add it to a postinstall script(`"postinstall": "preconstruct dev"`) that runs preconstruct dev so that you can import your code without having to rebuild your project every time in changes.
 
-You'll now be able to build your project.
+## Publishing packages
 
-```bash
-yarn preconstruct build
-```
+Before you publish packages to npm, run `preconstruct build`. reconstruct will use your Babel config and build flat bundles so make sure to [configure Babel](/guides/configuring-babel) with the transforms you want.
+
+> We strongly recomment making a single script in your package.json that runs both build and publish, to stop broken publishes, such as `"release": "preconstruct build && yarn publish:packages`. If you're in a single-package repo, you can also run `preconstruct build` in a `prepare` or `prepublishOnly` script.
+
+## Further Guides
+
+There are a number of tasks that become easier with preconstruct that lie slightly outside the main workflow. Check out the following guides for setting these up.
+
+- [A more detailed account of getting set up](/tutorials)
+- [Setting up a second entrypoint](/guides/adding-a-second-entrypoint)
+- [CLI command documentation](/commands)
+- [Other configuration](/configuration)

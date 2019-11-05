@@ -212,7 +212,7 @@ export default ({
             backgroundColor: colors.pink
           }}
         >
-          <NavLink to="/">Getting Started</NavLink>
+          <NavLink to="/">Introduction</NavLink>
           <NavLink to="/dictionary">Dictionary</NavLink>
           <NavLink to="/tutorials">Building your first package</NavLink>
           <div css={{ marginLeft: 16 }}>
@@ -238,12 +238,7 @@ export default ({
             </NavLink>
           </div>
           <NavLink to="/commands">Commands</NavLink>
-          <NavLink to="/config">Configuration</NavLink>
-          <div css={{ marginLeft: 16 }}>
-            <NavLink to="/config/projects">Projects</NavLink>
-            <NavLink to="/config/packages">Packages</NavLink>
-            <NavLink to="/config/entrypoints">Entrypoints</NavLink>
-          </div>
+          <NavLink to="/configuration">Configuration</NavLink>
           <NavLink to="/errors">Errors</NavLink>
           <NavLink to="/decisions">Architecture and Design Decisions</NavLink>
         </Sidebar>
