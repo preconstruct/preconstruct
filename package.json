@@ -3,10 +3,10 @@
   "version": "0.0.65",
   "description": "A smart build tool for libraries",
   "scripts": {
-    "build": "cd build && yarn preconstruct build",
+    "build": "yarn preconstruct build",
     "test": "jest",
-    "preconstruct": "cd build && yarn preconstruct",
-    "postinstall": "manypkg check && cd build && yarn && yarn preconstruct dev",
+    "preconstruct": "node ./build/node_modules/.bin/preconstruct",
+    "postinstall": "manypkg check && cd build && yarn && cd .. && yarn preconstruct dev",
     "changeset": "changeset",
     "release": "yarn build && changeset publish",
     "start:site": "cd site && yarn start",
@@ -73,8 +73,8 @@
   "preconstruct": {
     "packages": [
       "packages/*",
-      "!packages/craco",
-      "!packages/next"
+      "!packages/next",
+      "!packages/preconstruct"
     ]
   }
 }

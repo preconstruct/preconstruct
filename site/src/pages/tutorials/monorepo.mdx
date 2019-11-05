@@ -1,10 +1,10 @@
-# Building a Multi-package Repo
+# Building a Monorepo
 
 > **Note:** this tutorial builds upon knowledge in [the Getting Started tutorial](/tutorials) so if you haven't gone through it, you should do that first.
 
-We're going to setup a multi-package repo that uses Preconstruct to build its packages. We're also going to use [Yarn Workspaces](https://yarnpkg.com/en/docs/workspaces) for linking, Yarn Workspaces isn't the only multi-package repo linking tool that you can use with Preconstruct, [Lerna](https://github.com/lerna/lerna) and [Bolt](https://github.com/boltpkg/bolt) will also work.
+We're going to setup a monorepo that uses Preconstruct to build its packages. We're also going to use [Yarn Workspaces](https://yarnpkg.com/en/docs/workspaces) for linking. Yarn Workspaces isn't the only monorepo linking tool that you can use with Preconstruct, [Lerna](https://github.com/lerna/lerna), [Bolt](https://github.com/boltpkg/bolt) and any other tool that does this will also work.
 
-We have our `a-random-number` package from the [the Getting Started guide](/getting-started) which is awesome but we want to create a new set of packages with some other numbers, `the-number-one` and `the-number-two`. We're going to use a multi-package repo to manage it because we want to be able to manage all our packages together.
+We have our `a-random-number` package from the [the Getting Started guide](/getting-started) which is awesome but we want to create a new set of packages with some other numbers, `the-number-one` and `the-number-two`. We're going to use a monorepo to manage it because we want to be able to manage all our packages together.
 
 ## Setting up Yarn Workspaces
 
@@ -47,7 +47,7 @@ export default 2;
 Now that we have Yarn workspaces and our packages setup, we can install and setup Preconstruct.
 
 ```bash
-yarn add preconstruct
+yarn add @preconstruct/cli
 ```
 
 ```bash
@@ -58,11 +58,11 @@ yarn preconstruct init
 🎁 success initialised project!
 ```
 
-Preconstruct has asked us some slightly different questions since it's detected that we're in a multi-package repo. We're going to explain exactly what all these questions mean in the future but for now, answering yes to everything will work fine (TODO: write things explaining that stuff)
+Preconstruct has asked us some slightly different questions since it's detected that we're in a monorepo. We're going to explain exactly what all these questions mean in the future but for now, answering yes to everything will work fine (TODO: write things explaining that stuff)
 
 ### Setting up `preconstruct dev`
 
-`preconstruct dev` is a command in Preconstruct that lets you import your packages without having to build them every time you make a change or alias the dist files to source files in another tool like webpack, see the [Using Preconstruct dev in a multi-package repo guide](/guides/using-Preconstruct-dev-in-a-multi-package-repo) for more info.
+`preconstruct dev` is a command in Preconstruct that lets you import your packages without having to build them every time you make a change or alias the dist files to source files in another tool like webpack, see the [Using Preconstruct dev in a monorepo guide](/guides/using-Preconstruct-dev-in-a-monorepo) for more info.
 
 We're going to add it to a postinstall script so that yarn will run it after packages are installed. Our package.json will now look like this.
 
@@ -74,7 +74,7 @@ We're going to add it to a postinstall script so that yarn will run it after pac
   "private": true,
   "workspaces": ["packages/*"],
   "dependencies": {
-    "preconstruct": "^0.0.70"
+    "@preconstruct/cli": "^1.0.0"
   },
   "preconstruct": {
     "packages": ["packages/*"]
