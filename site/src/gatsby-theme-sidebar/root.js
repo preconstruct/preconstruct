@@ -6,26 +6,24 @@ import Highlight, { defaultProps } from "prism-react-renderer";
 import colors from "../colors";
 import { theme as codeTheme } from "../code-theme";
 
+let linkStyles = {
+  display: "block",
+  color: "inherit",
+  textDecoration: "none",
+  fontWeight: "bold",
+  paddingLeft: 32,
+  paddingRight: 32,
+  paddingTop: 8,
+  paddingBottom: 8,
+  marginLeft: -32,
+  marginRight: -32,
+  "&.active": {
+    color: colors.active
+  }
+};
+
 const NavLink = props => (
-  <Link
-    activeClassName="active"
-    css={{
-      display: "block",
-      color: "inherit",
-      textDecoration: "none",
-      fontWeight: "bold",
-      paddingLeft: 32,
-      paddingRight: 32,
-      paddingTop: 8,
-      paddingBottom: 8,
-      marginLeft: -32,
-      marginRight: -32,
-      "&.active": {
-        color: colors.active
-      }
-    }}
-    {...props}
-  />
+  <Link activeClassName="active" css={linkStyles} {...props} />
 );
 
 const MenuButton = props => (
@@ -140,7 +138,6 @@ export default ({
   ...props
 }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  let isIndexPage = props.location.pathname === "/";
   return (
     <Layout
       css={{
@@ -180,103 +177,85 @@ export default ({
             alignItems: "center"
           }}
         >
-          <NavLink activeClassName="" to="/getting-started">
-            Docs
-          </NavLink>
-          {!isIndexPage && (
-            <MobileOnly>
-              <MenuButton
-                css={{ display: "inline-flex" }}
-                title="toggleMenu"
-                onClick={() => {
-                  setSidebarOpen(!sidebarOpen);
-                }}
-              >
-                {hamburger}
-              </MenuButton>
-            </MobileOnly>
-          )}
+          <a
+            css={linkStyles}
+            href="https://github.com/preconstruct/preconstruct"
+          >
+            GitHub
+          </a>
+          <MobileOnly>
+            <MenuButton
+              css={{ display: "inline-flex" }}
+              title="toggleMenu"
+              onClick={() => {
+                setSidebarOpen(!sidebarOpen);
+              }}
+            >
+              {hamburger}
+            </MenuButton>
+          </MobileOnly>
         </div>
       </Header>
       <Main>
-        {!isIndexPage && (
-          <Sidebar
-            width={320}
-            open={sidebarOpen}
-            onClick={() => {
-              setSidebarOpen(false);
-            }}
-            onDismiss={() => {
-              setSidebarOpen(false);
-            }}
-            css={{
-              paddingTop: 32,
-              paddingBottom: 32,
-              backgroundColor: colors.pink
-            }}
-          >
-            <NavLink to="/getting-started">Getting Started</NavLink>
-            <NavLink to="/dictionary">Dictionary</NavLink>
-            <NavLink to="/tutorials">Building your first package</NavLink>
-            <div css={{ marginLeft: 16 }}>
-              <NavLink to="/tutorials/multi-package-repo">
-                Building a Multi-package Repo
-              </NavLink>
-              <NavLink to="/tutorials/multiple-entrypoints">
-                Exporting Multiple Entrypoints
-              </NavLink>
-            </div>
-            <NavLink to="/guides">Guides</NavLink>
-            <div css={{ marginLeft: 16 }}>
-              <NavLink to="/guides/configuring-babel">
-                Configuring Babel
-              </NavLink>
-              <NavLink to="/guides/using-preconstruct-dev-in-a-multi-package-repo">
-                Using preconstruct dev in a multi-package repo
-              </NavLink>
-              <NavLink to="/guides/when-should-i-use-multiple-entrypoints">
-                When should I use multiple entrypoints?
-              </NavLink>
-              <NavLink to="/guides/building-typescript-packages">
-                Building TypeScript packages
-              </NavLink>
-              <NavLink to="/guides/adding-a-second-entrypoint">
-                Adding a Second Entrypoint
-              </NavLink>
-            </div>
-            <NavLink to="/commands">Commands</NavLink>
-            <div css={{ marginLeft: 16 }}>
-              <NavLink to="/commands/init">init</NavLink>
-              <NavLink to="/commands/build">build</NavLink>
-              <NavLink to="/commands/dev">dev</NavLink>
-              <NavLink to="/commands/fix">fix</NavLink>
-              <NavLink to="/commands/validate">validate</NavLink>
-              <NavLink to="/commands/watch">watch</NavLink>
-            </div>
-            <NavLink to="/config">Configuration</NavLink>
-            <div css={{ marginLeft: 16 }}>
-              <NavLink to="/config/projects">Projects</NavLink>
-              <NavLink to="/config/packages">Packages</NavLink>
-              <NavLink to="/config/entrypoints">Entrypoints</NavLink>
-            </div>
-            <NavLink to="/errors">Errors</NavLink>
-            <div css={{ marginLeft: 16 }}>
-              {/* <NavLink to="/errors/something">Monorepos</NavLink> */}
-            </div>
+        <Sidebar
+          width={320}
+          open={sidebarOpen}
+          onClick={() => {
+            setSidebarOpen(false);
+          }}
+          onDismiss={() => {
+            setSidebarOpen(false);
+          }}
+          css={{
+            paddingTop: 32,
+            paddingBottom: 32,
+            backgroundColor: colors.pink
+          }}
+        >
+          <NavLink to="/">Getting Started</NavLink>
+          <NavLink to="/dictionary">Dictionary</NavLink>
+          <NavLink to="/tutorials">Building your first package</NavLink>
+          <div css={{ marginLeft: 16 }}>
+            <NavLink to="/tutorials/monorepo">Building a Monorepo</NavLink>
+            <NavLink to="/tutorials/multiple-entrypoints">
+              Exporting Multiple Entrypoints
+            </NavLink>
+          </div>
+          <NavLink to="/guides">Guides</NavLink>
+          <div css={{ marginLeft: 16 }}>
+            <NavLink to="/guides/configuring-babel">Configuring Babel</NavLink>
+            <NavLink to="/guides/using-preconstruct-dev-in-a-monorepo">
+              Using preconstruct dev in a monorepo
+            </NavLink>
+            <NavLink to="/guides/when-should-i-use-multiple-entrypoints">
+              When should I use multiple entrypoints?
+            </NavLink>
+            <NavLink to="/guides/building-typescript-packages">
+              Building TypeScript packages
+            </NavLink>
+            <NavLink to="/guides/adding-a-second-entrypoint">
+              Adding a Second Entrypoint
+            </NavLink>
+          </div>
+          <NavLink to="/commands">Commands</NavLink>
+          <NavLink to="/config">Configuration</NavLink>
+          <div css={{ marginLeft: 16 }}>
+            <NavLink to="/config/projects">Projects</NavLink>
+            <NavLink to="/config/packages">Packages</NavLink>
+            <NavLink to="/config/entrypoints">Entrypoints</NavLink>
+          </div>
+          <NavLink to="/errors">Errors</NavLink>
+          <div css={{ marginLeft: 16 }}>
+            {/* <NavLink to="/errors/something">Monorepos</NavLink> */}
+          </div>
 
-            <NavLink to="/decisions">Architecture and Design Decisions</NavLink>
-          </Sidebar>
-        )}
+          <NavLink to="/decisions">Architecture and Design Decisions</NavLink>
+        </Sidebar>
 
         <Content
           css={{
             paddingTop: 32,
             paddingBottom: 32,
-            ...(!isIndexPage && {
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center"
-            }),
             "h1 code, h2 code, h3 code, h4 code, h5 code, h6 code": {
               fontSize: "inherit"
             },

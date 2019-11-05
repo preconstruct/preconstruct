@@ -1,54 +1,20 @@
-import { LinksContainer, FancyLink, FancyAnchor } from "../fancy-link";
+# Getting Started
 
-<h1 style={{textAlign:'center'}}> 🎁</h1>
+> **Note:** If you're new to building packages, you should go through [Preconstruct's tutorials](/tutorials)
 
-<h1 style={{textAlign:'center'}}>Preconstruct</h1>
+Preconstruct is a build tool that aims to simplify a lot of the complexity in building packages.
 
-<h2 style={{ textAlign:'center' }}>A smart build tool for libraries</h2>
+Assuming you've already got a package and your source file is at `src/index.js`(or `src/index.ts` if you're using TypeScript) or you have a monorepo with Yarn Workspaces that has packages with source files, you can install Preconstruct and run `preconstruct init` to setup Preconstruct.
 
-<LinksContainer>
-  <FancyLink to="/getting-started">Getting Started</FancyLink>
-  <FancyAnchor
-    href="https://github.com/preconstruct/preconstruct"
-    target="_blank"
-  >
-    Source on GitHub
-  </FancyAnchor>
-</LinksContainer>
+```bash
+yarn add --dev @preconstruct/cli
+yarn preconstruct init
+```
 
-<div style={{ paddingBottom: 16 }} />
+Preconstruct will ask some questions about your project and then update your package.json.
 
-- Designed for complex uses cases but scales down to simple use cases
-- Minimal configuration
-- Strong validation and auto-fixing
-- ESM and CJS bundles
-- Supports multi-entrypoint packages
-- Built with multi-package repos in mind
-- Module resolution to source files in development
-- Probably other things, summarising things is hard
+You'll now be able to build your project.
 
-## What does Preconstruct do?
-
-Preconstruct helps you build libraries by generating bundles for NPM packages with different module formats and enforces that consumer bundlers like webpack and Node can import those packages along with making development easier with module resolution to source files in development.
-
-### package.json Validation & Autofixing
-
-Preconstruct strictly enforces that the relevant fields in your package.json which tell Node and bundlers like webpack where to look for your bundles are correct, so you don't have to worry about them, and you'll always be publishing working versions of your packages. Preconstruct can also fix most validation problems automatically by running `preconstruct fix`
-
-### Minimal Configuration
-
-Rather than having to configure everything, Preconstruct infers how to build your project. For example, if you have a `module` field in your package.json, Preconstruct creates an ESM bundle, but if you don't have a `module` field in your package.json, Preconstruct won't create an ESM bundle.
-
-### Multi-package Repos
-
-Preconstruct is built with multi-package repos in mind, rather than having to manage and build packages on an individual level, Preconstruct lets you manage and build all of your packages together as a single project.
-
-### Custom Entrypoints
-
-Preconstruct lets you create entrypoints beyond the standard entrypoint of `package-name` so a single package can have other entrypoints like `package-name/some-cool-thing` and `my-package/another-cool-thing`. These entrypoints still have bundles in multiple module formats, so Node and consumer bundlers can still get the right module format for them.
-
-### Module resolution to source files in development
-
-### Performant Bundles
-
-Preconstruct generates development and production CommonJS bundles so that you can have `process.env.NODE_ENV` checks to have helpful warnings and errors without slowing down production along with building browser specific bundles when you use `typeof window` so that you can have Node.js specific code which is dead code eliminated from browser bundles.
+```bash
+yarn preconstruct build
+```

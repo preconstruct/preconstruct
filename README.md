@@ -80,7 +80,7 @@ preconstruct watch
 
 ##### How should I use it?
 
-> Note: `preconstruct dev` is made for **multi-package repos**, it is NOT intended to be used in single-package repos.
+> Note: `preconstruct dev` is made for **monorepos**, it is NOT intended to be used in single-package repos.
 
 It's best to use the `dev` command in a postinstall hook so that people don't have to worry about running it.
 

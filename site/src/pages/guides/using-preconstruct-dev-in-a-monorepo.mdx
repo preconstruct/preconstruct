@@ -1,6 +1,6 @@
-# Using preconstruct dev in a multi-package repo
+# Using preconstruct dev in a Monorepo
 
-A common use case in multi-packages repos is that there are some packages which depend on each other and you want to test them. This creates a problem if you're building them with a tool like Preconstruct though. When you import packages, you'll be importing the dist files, so you have to run `preconstruct watch` or `preconstruct build` which is slow and requires running another process.
+A common use case in monorepos is that there are some packages which depend on each other and you want to test them. This creates a problem if you're building them with a tool like Preconstruct though. When you import packages, you'll be importing the dist files, so you have to run `preconstruct watch` or `preconstruct build` which is slow and requires running another process.
 
 `preconstruct dev` aims to solve this. The recommended way to use it is to add it to a postinstall script in your package.json.
 
