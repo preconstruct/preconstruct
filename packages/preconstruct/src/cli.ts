@@ -90,5 +90,11 @@ class CommandNotFoundError extends Error {}
   } else {
     error(err);
   }
+  info(
+    "If want to learn more about the above error, check https://preconstruct.tools/errors"
+  );
+  info(
+    "If the error is not there and you want to learn more about it, open an issue at https://github.com/preconstruct/preconstruct/issues/new"
+  );
   process.exit(1);
 });

@@ -44,7 +44,7 @@ test("package resolvable but not in deps", async () => {
   } catch (err) {
     expect(err).toBeInstanceOf(FatalError);
     expect(err.message).toMatchInlineSnapshot(
-      `"\\"react\\" is imported by \\"src/index.js\\" but it is not specified in dependencies or peerDependencies"`
+      `"\\"react\\" is imported by \\"src/index.js\\" but the package is not specified in dependencies or peerDependencies"`
     );
     return;
   }
