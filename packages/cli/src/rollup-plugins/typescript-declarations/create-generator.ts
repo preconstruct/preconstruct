@@ -3,6 +3,8 @@ import * as fs from "fs-extra";
 import path from "path";
 // @ts-ignore
 import { createLanguageServiceHostClass } from "./language-service-host";
+import { Project } from "../../project";
+import { Package } from "../../package";
 
 type Typescript = typeof import("typescript");
 
@@ -32,38 +34,54 @@ function memoize<V>(fn: (arg: string) => V): (arg: string) => V {
 }
 
 let getService = weakMemoize((typescript: Typescript) =>
-  memoize(async (configFileName: string) => {
-    let configFileContents = await fs.readFile(configFileName, "utf8");
-    const result = typescript.parseConfigFileTextToJson(
-      configFileName,
-      configFileContents
-    );
+  weakMemoize((project: Project) =>
+    memoize(async (configFileName: string) => {
+      let configFileContents = await fs.readFile(configFileName, "utf8");
+      const result = typescript.parseConfigFileTextToJson(
+        configFileName,
+        configFileContents
+      );
 
-    let thing = typescript.parseJsonConfigFileContent(
-      result,
-      typescript.sys,
-      process.cwd(),
-      undefined,
-      configFileName
-    );
-    thing.options.declaration = true;
-    thing.options.noEmit = false;
+      let thing = typescript.parseJsonConfigFileContent(
+        result,
+        typescript.sys,
+        process.cwd(),
+        undefined,
+        configFileName
+      );
+      // thing.options.paths = {
+      //   ...thing.options.paths
+      // };
+      // for (let pkg of project.packages) {
+      //   for (let entrypoint of pkg.entrypoints) {
+      //     thing.options.paths[entrypoint.name] = [
+      //       path.join(
+      //         pkg.name,
+      //         path.relative(entrypoint.directory, entrypoint.source)
+      //       )
+      //     ];
+      //   }
+      // }
+      // debugger;
+      thing.options.declaration = true;
+      thing.options.noEmit = false;
 
-    let LanguageServiceHostClass = createLanguageServiceHostClass(typescript);
+      let LanguageServiceHostClass = createLanguageServiceHostClass(typescript);
 
-    let servicesHost = new LanguageServiceHostClass(thing, []);
+      let servicesHost = new LanguageServiceHostClass(thing, [], project);
 
-    let service = typescript.createLanguageService(
-      servicesHost,
-      typescript.createDocumentRegistry()
-    );
-    servicesHost.setLanguageService(service);
-    return { service, options: thing.options };
-  })
+      let service = typescript.createLanguageService(
+        servicesHost,
+        typescript.createDocumentRegistry()
+      );
+      servicesHost.setLanguageService(service);
+      return { service, options: thing.options };
+    })
+  )
 );
 
 export async function createDeclarationCreator(
-  dirname: string
+  pkg: Package
 ): Promise<{
   getDeps: (entrypoints: Array<string>) => Set<string>;
   getDeclarationFile: (
@@ -72,7 +90,7 @@ export async function createDeclarationCreator(
 }> {
   let typescript: Typescript;
   try {
-    typescript = unsafeRequire(resolveFrom(dirname, "typescript"));
+    typescript = unsafeRequire(resolveFrom(pkg.directory, "typescript"));
   } catch (err) {
     if (err.code === "MODULE_NOT_FOUND") {
       throw new Error(
@@ -82,7 +100,7 @@ export async function createDeclarationCreator(
     throw err;
   }
   let configFileName = typescript.findConfigFile(
-    dirname,
+    pkg.directory,
     typescript.sys.fileExists
   );
   if (!configFileName) {
@@ -90,9 +108,11 @@ export async function createDeclarationCreator(
       "an entrypoint source file ends with the .ts extension but no TypeScript config exists, please create one."
     );
   }
-  let { service, options } = await getService(typescript)(configFileName);
+  let { service, options } = await getService(typescript)(pkg.project)(
+    configFileName
+  );
   let moduleResolutionCache = typescript.createModuleResolutionCache(
-    dirname,
+    pkg.directory,
     x => x,
     options
   );
@@ -108,7 +128,7 @@ export async function createDeclarationCreator(
       let resolvedEntrypointPaths = entrypoints.map(x => {
         let { resolvedModule } = typescript.resolveModuleName(
           path.join(path.dirname(x), path.basename(x, path.extname(x))),
-          dirname,
+          pkg.directory,
           options,
           typescript.sys,
           moduleResolutionCache
@@ -143,7 +163,7 @@ export async function createDeclarationCreator(
               if (
                 !allDeps.has(resolvedModule.resolvedFileName) &&
                 !resolvedModule.isExternalLibraryImport &&
-                resolvedModule.resolvedFileName.includes(dirname)
+                resolvedModule.resolvedFileName.includes(pkg.directory)
               ) {
                 internalDeps.add(resolvedModule.resolvedFileName);
                 allDeps.add(resolvedModule.resolvedFileName);
@@ -162,8 +182,8 @@ export async function createDeclarationCreator(
       if (filename.endsWith(".d.ts")) {
         return {
           name: filename.replace(
-            dirname,
-            path.join(dirname, "dist", "declarations")
+            pkg.directory,
+            path.join(pkg.directory, "dist", "declarations")
           ),
           content: await fs.readFile(filename, "utf8")
         };
@@ -171,8 +191,8 @@ export async function createDeclarationCreator(
       let output = service.getEmitOutput(filename, true);
       return {
         name: output.outputFiles[0].name.replace(
-          dirname,
-          path.join(dirname, "dist", "declarations")
+          pkg.directory,
+          path.join(pkg.directory, "dist", "declarations")
         ),
         content: output.outputFiles[0].text
       };

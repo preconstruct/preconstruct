@@ -28,7 +28,7 @@ test("browser no module", async () => {
 });
 
 test("typescript", async () => {
-  let tmpPath = f.copy("typescript");
+  let tmpPath = f.copy("typescript-monorepo");
 
   await install(tmpPath);
   await build(tmpPath);

@@ -7,3 +7,5 @@ export { path };
 let thing: SomeType = "something";
 
 export default thing;
+
+export let somethingElse = () => "yes";

@@ -14,8 +14,9 @@ async function buildPackage(pkg: Package, aliases: Aliases) {
   let configs = getRollupConfigs(pkg, aliases);
   await Promise.all([
     fs.remove(path.join(pkg.directory, "dist")),
-    ...pkg.entrypoints.map(entrypoint => {
-      return fs.remove(path.join(entrypoint.directory, "dist"));
+    ...pkg.entrypoints.map(async entrypoint => {
+      await fs.remove(path.join(entrypoint.directory, "dist"));
+      await fs.mkdir(path.join(entrypoint.directory, "dist"));
     })
   ]);
 

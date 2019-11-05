@@ -1,0 +1,10 @@
+{
+  "name": "@typescript-some-scope/package-two",
+  "version": "1.0.0",
+  "main": "dist/package-two.cjs.js",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "@typescript-some-scope/package-one": "1.0.0"
+  }
+}

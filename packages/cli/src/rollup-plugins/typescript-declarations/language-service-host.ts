@@ -1,4 +1,7 @@
 import * as fs from "fs";
+import { Project } from "../../project";
+import path from "path";
+import { tsTemplate } from "../../utils";
 
 export function normalize(fileName: string) {
   return fileName.split("\\").join("/");
@@ -13,13 +16,34 @@ export let createLanguageServiceHostClass = (typescript: any) =>
     versions: any;
     fileNames: any;
     service: any;
-    constructor(parsedConfig: any, transformers: any) {
+    redirectFiles: Map<string, string>;
+    redirectDirectories: Map<string, string>;
+    constructor(parsedConfig: any, transformers: any, project: Project) {
       this.parsedConfig = parsedConfig;
       this.transformers = transformers;
       this.cwd = process.cwd();
       this.snapshots = {};
       this.versions = {};
       this.fileNames = new Set(parsedConfig.fileNames);
+      this.redirectFiles = new Map();
+      for (let pkg of project.packages) {
+        for (let entrypoint of pkg.entrypoints) {
+          this.redirectFiles.set(
+            path.resolve(entrypoint.directory, entrypoint.main!),
+            ""
+          );
+          this.redirectFiles.set(
+            path.resolve(entrypoint.directory, entrypoint.main + ".d.ts"),
+            tsTemplate(
+              true,
+              path.relative(
+                path.join(entrypoint.directory, "dist"),
+                entrypoint.source
+              )
+            )
+          );
+        }
+      }
     }
     reset() {
       this.snapshots = {};
