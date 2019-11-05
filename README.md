@@ -1,6 +1,6 @@
 # 🎁 preconstruct
 
-> A smart build tool for libraries
+> Dev and build your code painlessly in monorepos
 
 ## Why?
 

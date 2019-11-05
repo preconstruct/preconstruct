@@ -71,17 +71,16 @@ exports.default = thing$1;
 `;
 
 exports[`browser no module: package.json 1`] = `
-"{
-  \\"name\\": \\"browser-no-module\\",
-  \\"version\\": \\"1.0.0\\",
-  \\"main\\": \\"dist/browser-no-module.cjs.js\\",
-  \\"browser\\": {
-    \\"./dist/browser-no-module.cjs.js\\": \\"./dist/browser-no-module.browser.cjs.js\\"
+Object {
+  "browser": Object {
+    "./dist/browser-no-module.cjs.js": "./dist/browser-no-module.browser.cjs.js",
   },
-  \\"license\\": \\"MIT\\",
-  \\"private\\": true
+  "license": "MIT",
+  "main": "dist/browser-no-module.cjs.js",
+  "name": "browser-no-module",
+  "private": true,
+  "version": "1.0.0",
 }
-"
 `;
 
 exports[`browser no module: src/index.js 1`] = `
@@ -204,19 +203,18 @@ export default thing$1;
 `;
 
 exports[`browser: package.json 1`] = `
-"{
-  \\"name\\": \\"browser\\",
-  \\"version\\": \\"1.0.0\\",
-  \\"main\\": \\"dist/browser.cjs.js\\",
-  \\"license\\": \\"MIT\\",
-  \\"private\\": true,
-  \\"module\\": \\"dist/browser.esm.js\\",
-  \\"browser\\": {
-    \\"./dist/browser.cjs.js\\": \\"./dist/browser.browser.cjs.js\\",
-    \\"./dist/browser.esm.js\\": \\"./dist/browser.browser.esm.js\\"
-  }
+Object {
+  "browser": Object {
+    "./dist/browser.cjs.js": "./dist/browser.browser.cjs.js",
+    "./dist/browser.esm.js": "./dist/browser.browser.esm.js",
+  },
+  "license": "MIT",
+  "main": "dist/browser.cjs.js",
+  "module": "dist/browser.esm.js",
+  "name": "browser",
+  "private": true,
+  "version": "1.0.0",
 }
-"
 `;
 
 exports[`browser: src/index.js 1`] = `
@@ -319,21 +317,20 @@ export { obj };
 `;
 
 exports[`typescript: package.json 1`] = `
-"{
-  \\"name\\": \\"typescript\\",
-  \\"version\\": \\"1.0.0\\",
-  \\"main\\": \\"dist/typescript.cjs.js\\",
-  \\"license\\": \\"MIT\\",
-  \\"private\\": true,
-  \\"module\\": \\"dist/typescript.esm.js\\",
-  \\"dependencies\\": {
-    \\"@babel/core\\": \\"^7.4.3\\",
-    \\"@babel/preset-typescript\\": \\"^7.3.3\\",
-    \\"@types/node\\": \\"^12.7.1\\",
-    \\"typescript\\": \\"^3.4.5\\"
-  }
+Object {
+  "dependencies": Object {
+    "@babel/core": "^7.4.3",
+    "@babel/preset-typescript": "^7.3.3",
+    "@types/node": "^12.7.1",
+    "typescript": "^3.4.5",
+  },
+  "license": "MIT",
+  "main": "dist/typescript.cjs.js",
+  "module": "dist/typescript.esm.js",
+  "name": "typescript",
+  "private": true,
+  "version": "1.0.0",
 }
-"
 `;
 
 exports[`typescript: src/another-thing.ts 1`] = `

@@ -2,9 +2,6 @@ import build from "../";
 import fixturez from "fixturez";
 import { FatalError } from "../../errors";
 import { snapshotDirectory, install } from "../../../test-utils";
-import { confirms as _confirms } from "../../messages";
-
-let confirms = _confirms as jest.Mocked<typeof _confirms>;
 
 const f = fixturez(__dirname);
 
@@ -19,20 +16,14 @@ afterEach(() => {
 test("browser", async () => {
   let tmpPath = f.copy("browser");
 
-  confirms.addBrowserField.mockReturnValue(Promise.resolve(true));
-
   await build(tmpPath);
-  expect(confirms.addBrowserField).toBeCalledTimes(1);
   await snapshotDirectory(tmpPath, { files: "all" });
 });
 
 test("browser no module", async () => {
   let tmpPath = f.copy("browser-no-module");
 
-  confirms.addBrowserField.mockReturnValue(Promise.resolve(true));
-
   await build(tmpPath);
-  expect(confirms.addBrowserField).toBeCalledTimes(1);
   await snapshotDirectory(tmpPath, { files: "all" });
 });
 
@@ -53,7 +44,7 @@ test("package resolvable but not in deps", async () => {
   } catch (err) {
     expect(err).toBeInstanceOf(FatalError);
     expect(err.message).toMatchInlineSnapshot(
-      `"\\"react\\" is imported by \\"src/index.js\\" but it is not specified in dependencies or peerDependencies"`
+      `"\\"react\\" is imported by \\"src/index.js\\" but the package is not specified in dependencies or peerDependencies"`
     );
     return;
   }

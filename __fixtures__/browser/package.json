@@ -4,5 +4,9 @@
   "main": "dist/browser.cjs.js",
   "license": "MIT",
   "private": true,
-  "module": "dist/browser.esm.js"
+  "module": "dist/browser.esm.js",
+  "browser": {
+    "./dist/browser.cjs.js": "./dist/browser.browser.cjs.js",
+    "./dist/browser.esm.js": "./dist/browser.browser.esm.js"
+  }
 }

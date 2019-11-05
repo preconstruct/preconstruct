@@ -245,10 +245,6 @@ export default ({
             <NavLink to="/config/entrypoints">Entrypoints</NavLink>
           </div>
           <NavLink to="/errors">Errors</NavLink>
-          <div css={{ marginLeft: 16 }}>
-            {/* <NavLink to="/errors/something">Monorepos</NavLink> */}
-          </div>
-
           <NavLink to="/decisions">Architecture and Design Decisions</NavLink>
         </Sidebar>
 

@@ -9,10 +9,6 @@ export let errors = {
   invalidUmdMainField: "umd:main field is invalid",
   invalidBrowserField: "browser field is invalid",
   umdNameNotSpecified: `the umd:main field is specified but a umdName option is not specified. please add it to the ${PKG_JSON_CONFIG_FIELD} field in your package.json`,
-  deniedWriteBrowserField:
-    "building browser bundles for modules that include typeof" +
-    " window or typeof" +
-    " document is currently required",
   noEntrypointPkgJson: "There is a missing package.json for an entrypoint",
   noEntrypoints:
     "packages must have at least one entrypoint, this package has no entrypoints"
@@ -32,11 +28,6 @@ export let confirms = {
   ),
   fixUmdBuild: createPromptConfirmLoader(
     "would you like to fix the umd field?"
-  ),
-  addBrowserField: createPromptConfirmLoader(
-    "typeof" +
-      " window or typeof" +
-      " document is used in this package. would you like build seperate browser builds for better browser bundle sizes?"
   ),
   fixBrowserField: createPromptConfirmLoader(
     "would you like to fix the browser build?"
