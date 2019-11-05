@@ -1,5 +1,11 @@
 # preconstruct
 
+## 1.0.0
+
+### Major Changes
+
+- [`c4886ea`](https://github.com/preconstruct/preconstruct/commit/c4886ea432a839291437c3346ddc6253b462c918) [#218](https://github.com/preconstruct/preconstruct/pull/218) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Rename package to @preconstruct/cli
+
 ## 0.3.2
 
 ### Patch Changes
