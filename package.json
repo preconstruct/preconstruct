@@ -6,7 +6,7 @@
     "build": "yarn preconstruct build",
     "test": "jest",
     "preconstruct": "node ./build/node_modules/.bin/preconstruct",
-    "postinstall": "manypkg check && cd build && yarn && yarn preconstruct dev",
+    "postinstall": "manypkg check && cd build && yarn && cd .. && yarn preconstruct dev",
     "changeset": "changeset",
     "release": "yarn build && changeset publish",
     "start:site": "cd site && yarn start",

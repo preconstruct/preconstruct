@@ -8,12 +8,5 @@
   },
   "resolutions": {
     "**/@babel/parser": "7.6.0"
-  },
-  "preconstruct": {
-    "packages": [
-      "../packages/*",
-      "!../packages/craco",
-      "!../packages/next"
-    ]
   }
 }
