@@ -46,6 +46,8 @@ let getService = weakMemoize((typescript: Typescript) =>
       undefined,
       configFileName
     );
+    thing.options.declaration = true;
+    thing.options.noEmit = false;
 
     let LanguageServiceHostClass = createLanguageServiceHostClass(typescript);
 
