@@ -1,5 +1,11 @@
 # preconstruct
 
+## 1.0.2
+
+### Patch Changes
+
+- [`37ff280`](https://github.com/preconstruct/preconstruct/commit/37ff2804057d4c214f47a0ab8d0bd1c7403f3525) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Add README to package
+
 ## 1.0.1
 
 ### Patch Changes
