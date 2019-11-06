@@ -1,5 +1,11 @@
 # preconstruct
 
+## 1.0.1
+
+### Patch Changes
+
+- [`887349e`](https://github.com/preconstruct/preconstruct/commit/887349ef4d1d8d1c9e91c032ecd1c6cc1c220772) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Replace `rollup-plugin-alias` with `@rollup/plugin-alias` and `rollup-plugin-replace` with `@rollup/plugin-replace`
+
 ## 1.0.0
 
 ### Major Changes
