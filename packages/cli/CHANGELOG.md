@@ -1,5 +1,23 @@
 # preconstruct
 
+## 1.0.0
+
+### Major Changes
+
+- [`c4886ea`](https://github.com/preconstruct/preconstruct/commit/c4886ea432a839291437c3346ddc6253b462c918) [#218](https://github.com/preconstruct/preconstruct/pull/218) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Rename package to @preconstruct/cli
+
+### Minor Changes
+
+- [`0ac7b7f`](https://github.com/preconstruct/preconstruct/commit/0ac7b7fd34cf3589c62e1cf94a9b9488e8e3bf85) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Stop prompting to create browser build because people often don't want it/it isn't useful for most cases. Note that support for the field hasn't been removed, you can still add the field manually
+
+### Patch Changes
+
+- [`c4886ea`](https://github.com/preconstruct/preconstruct/commit/c4886ea432a839291437c3346ddc6253b462c918) [#218](https://github.com/preconstruct/preconstruct/pull/218) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Fix TypeScript declaration generation in TypeScript 3.7
+
+* [`7dd4014`](https://github.com/preconstruct/preconstruct/commit/7dd4014bded6f747db8b0e0a5eb9fa04f5f9d67e) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Improve error messages
+
+- [`8e5635d`](https://github.com/preconstruct/preconstruct/commit/8e5635db58e231cefdd686fe315f0af32c47b1ca) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Mention errors page when an error occurs
+
 ## 0.3.2
 
 ### Patch Changes
