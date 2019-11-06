@@ -1,6 +1,6 @@
 # @preconstruct/next
 
-A [Next.js](https://nextjs.org/) plugin for [Preconstruct](https://preconstruct.tools)
+A [Next.js](https://nextjs.org/) plugin to make Next sites work with [`preconstruct dev`](https://preconstruct.tools/guides/using-preconstruct-dev-in-a-monorepo).
 
 ## Install
 
