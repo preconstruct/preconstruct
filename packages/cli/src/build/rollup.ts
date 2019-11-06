@@ -1,8 +1,8 @@
 import resolve from "rollup-plugin-node-resolve";
 // @ts-ignore
-import alias from "rollup-plugin-alias";
+import alias from "@rollup/plugin-alias";
 import cjs from "rollup-plugin-commonjs";
-import replace from "rollup-plugin-replace";
+import replace from "@rollup/plugin-replace";
 import resolveFrom from "resolve-from";
 import chalk from "chalk";
 import path from "path";
@@ -127,7 +127,7 @@ export let getRollupConfig = (
         }),
       // @ts-ignore
       json({ namedExports: false }),
-      type === "umd" && alias(rollupAliases),
+      type === "umd" && alias({ entries: rollupAliases }),
       resolve({
         extensions: EXTENSIONS,
         customResolveOptions: {
