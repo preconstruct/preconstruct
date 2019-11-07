@@ -18,6 +18,14 @@ jobs:
         with:
           node-version: 10.x
 
+    - name: Cache Dependencies
+      uses: actions/cache@v1
+      with:
+        path: node_modules
+        key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
+
       - name: Install Dependencies
         run: yarn
 
@@ -39,6 +47,14 @@ jobs:
         with:
           node-version: 10.x
 
+    - name: Cache Dependencies
+      uses: actions/cache@v1
+      with:
+        path: node_modules
+        key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
+
       - name: Install Dependencies
         run: yarn
 
@@ -54,6 +70,15 @@ jobs:
         uses: actions/setup-node@master
         with:
           node-version: 10.x
+
+    - name: Cache Dependencies
+      uses: actions/cache@v1
+      with:
+        path: node_modules
+        key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
+
 
       - name: Install Dependencies
         run: yarn
