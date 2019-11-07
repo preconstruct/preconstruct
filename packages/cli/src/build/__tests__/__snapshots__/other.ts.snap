@@ -429,3 +429,83 @@ exports[`typescript: tsconfig.json 1`] = `
 }
 "
 `;
+
+exports[`using external @babel/runtime helpers: dist/external-babel-runtime.cjs.dev.js 1`] = `
+"'use strict';
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
+
+var _classCallCheck = _interopDefault(require('@babel/runtime/helpers/classCallCheck'));
+
+var Foo = function Foo() {
+  _classCallCheck(this, Foo);
+};
+
+exports.default = Foo;
+"
+`;
+
+exports[`using external @babel/runtime helpers: dist/external-babel-runtime.cjs.js 1`] = `
+"'use strict';
+
+if (process.env.NODE_ENV === \\"production\\") {
+  module.exports = require(\\"./external-babel-runtime.cjs.prod.js\\");
+} else {
+  module.exports = require(\\"./external-babel-runtime.cjs.dev.js\\");
+}
+"
+`;
+
+exports[`using external @babel/runtime helpers: dist/external-babel-runtime.cjs.prod.js 1`] = `
+"\\"use strict\\";
+
+function _interopDefault(ex) {
+  return ex && \\"object\\" == typeof ex && \\"default\\" in ex ? ex.default : ex;
+}
+
+Object.defineProperty(exports, \\"__esModule\\", {
+  value: !0
+});
+
+var _classCallCheck = _interopDefault(require(\\"@babel/runtime/helpers/classCallCheck\\")), Foo = function Foo() {
+  _classCallCheck(this, Foo);
+};
+
+exports.default = Foo;
+"
+`;
+
+exports[`using external @babel/runtime helpers: dist/external-babel-runtime.esm.js 1`] = `
+"import _classCallCheck from '@babel/runtime/helpers/esm/classCallCheck';
+
+var Foo = function Foo() {
+  _classCallCheck(this, Foo);
+};
+
+export default Foo;
+"
+`;
+
+exports[`using external @babel/runtime helpers: package.json 1`] = `
+Object {
+  "dependencies": Object {
+    "@babel/core": "^7.4.3",
+    "@babel/plugin-transform-runtime": "^7.0.0",
+    "@babel/preset-env": "^7.0.0",
+    "@babel/runtime": "^7.0.0",
+  },
+  "license": "MIT",
+  "main": "dist/external-babel-runtime.cjs.js",
+  "module": "dist/external-babel-runtime.esm.js",
+  "name": "external-babel-runtime",
+  "private": true,
+  "version": "1.0.0",
+}
+`;
+
+exports[`using external @babel/runtime helpers: src/index.js 1`] = `
+"export default class Foo {}
+"
+`;
