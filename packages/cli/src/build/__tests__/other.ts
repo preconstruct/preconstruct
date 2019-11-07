@@ -78,3 +78,12 @@ test("module imported outside package directory", async () => {
   }
   expect(true).toBe(false);
 });
+
+test("using external @babel/runtime helpers", async () => {
+  let tmpPath = f.copy("external-babel-runtime");
+
+  await install(tmpPath);
+  await build(tmpPath);
+
+  await snapshotDirectory(tmpPath, { files: "all" });
+});

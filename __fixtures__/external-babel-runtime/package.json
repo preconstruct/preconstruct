@@ -1,0 +1,14 @@
+{
+  "name": "external-babel-runtime",
+  "version": "1.0.0",
+  "main": "dist/external-babel-runtime.cjs.js",
+  "license": "MIT",
+  "private": true,
+  "module": "dist/external-babel-runtime.esm.js",
+  "dependencies": {
+    "@babel/core": "^7.4.3",
+    "@babel/plugin-transform-runtime": "^7.0.0",
+    "@babel/preset-env": "^7.0.0",
+    "@babel/runtime": "^7.0.0"
+  }
+}

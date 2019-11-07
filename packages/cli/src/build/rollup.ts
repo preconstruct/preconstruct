@@ -12,6 +12,7 @@ import { StrictEntrypoint } from "../entrypoint";
 import { rollup as _rollup, RollupOptions } from "rollup";
 import { Aliases } from "./aliases";
 import { FatalError } from "../errors";
+import rewriteBabelRuntimeHelpers from "../rollup-plugins/rewrite-babel-runtime-helpers";
 import flowAndNodeDevProdEntry from "../rollup-plugins/flow-and-prod-dev-entry";
 import typescriptDeclarations from "../rollup-plugins/typescript-declarations";
 import json from "rollup-plugin-json";
@@ -119,15 +120,22 @@ export let getRollupConfig = (
         extensions: EXTENSIONS
       }),
       type === "umd" &&
-        cjs({ include: ["**/node_modules/**", "node_modules/**"] }),
+        cjs({
+          include: ["**/node_modules/**", "node_modules/**"]
+        }),
       (type === "browser" || type === "umd") &&
         replace({
           ["typeof " + "document"]: JSON.stringify("object"),
           ["typeof " + "window"]: JSON.stringify("object")
         }),
-      // @ts-ignore
-      json({ namedExports: false }),
-      type === "umd" && alias({ entries: rollupAliases }),
+      rewriteBabelRuntimeHelpers(), // @ts-ignore
+      json({
+        namedExports: false
+      }),
+      type === "umd" &&
+        alias({
+          entries: rollupAliases
+        }),
       resolve({
         extensions: EXTENSIONS,
         customResolveOptions: {
