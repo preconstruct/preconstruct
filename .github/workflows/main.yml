@@ -27,7 +27,7 @@ jobs:
       - name: Upload coverage to Codecov
         run: bash <(curl -s https://codecov.io/bash) -C $GITHUB_SHA -B ${GITHUB_REF#refs/heads/} -Z
         env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+          CODECOV_TOKEN: dc4ed93e-11a9-421e-b141-8a2f11913593
   typescript:
     name: TypeScript
     runs-on: ubuntu-latest
