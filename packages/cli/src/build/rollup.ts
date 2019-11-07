@@ -128,8 +128,9 @@ export let getRollupConfig = (
           ["typeof " + "document"]: JSON.stringify("object"),
           ["typeof " + "window"]: JSON.stringify("object")
         }),
-      rewriteBabelRuntimeHelpers(), // @ts-ignore
+      rewriteBabelRuntimeHelpers(),
       json({
+        // @ts-ignore
         namedExports: false
       }),
       type === "umd" &&
