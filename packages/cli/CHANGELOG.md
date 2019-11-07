@@ -1,5 +1,11 @@
 # preconstruct
 
+## 1.1.0
+
+### Minor Changes
+
+- [`b2e1118`](https://github.com/preconstruct/preconstruct/commit/b2e1118b47037d6d2fb03eef39aeaeceec2d20e5) [#224](https://github.com/preconstruct/preconstruct/pull/224) Thanks [@Andarist](https://github.com/Andarist)! - Rewrite references to @babel/runtime helpers when they are externalized in ESM builds.
+
 ## 1.0.2
 
 ### Patch Changes
