@@ -3,7 +3,7 @@ import { getRollupConfig } from "./rollup";
 import { OutputOptions, RollupOptions } from "rollup";
 import { Aliases } from "./aliases";
 import { PKG_JSON_CONFIG_FIELD } from "../constants";
-import { limit, promptInput } from "../prompt";
+import { limit, doPromptInput } from "../prompt";
 import path from "path";
 import resolveFrom from "resolve-from";
 import { Project } from "../project";
@@ -38,7 +38,7 @@ function getGlobal(project: Project, name: string) {
         ) {
           return;
         }
-        let response = await promptInput(
+        let response = await doPromptInput(
           `What should the umdName of ${name} be?`,
           project
         );
@@ -51,33 +51,6 @@ function getGlobal(project: Project, name: string) {
       })()
     );
   }
-}
-
-function getGlobals(pkg: Package) {
-  let stuff = [];
-
-  if (pkg.json.peerDependencies) {
-    stuff.push(...Object.keys(pkg.json.peerDependencies));
-  }
-  if (pkg.json.dependencies) {
-    stuff.push(...Object.keys(pkg.json.dependencies));
-  }
-
-  if (stuff.length === 0) {
-    return {};
-  }
-
-  let peerDeps = pkg.json.peerDependencies
-    ? Object.keys(pkg.json.peerDependencies)
-    : [];
-
-  return peerDeps.reduce(
-    (obj, pkgName) => {
-      obj[pkgName] = getGlobal(pkg.project, pkgName);
-      return obj;
-    },
-    {} as Record<string, string>
-  );
 }
 
 export function getRollupConfigs(pkg: Package, aliases: Aliases) {
@@ -142,7 +115,12 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
               entryFileNames: "[name].umd.min.js",
               name: entrypoint.umdName!,
               dir: pkg.directory,
-              globals: getGlobals(pkg)
+              globals: (name: string) => {
+                if (name === entrypoint.umdName!) {
+                  return name;
+                }
+                return getGlobal(pkg.project, name);
+              }
             }
           ]
         });

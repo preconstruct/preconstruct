@@ -232,6 +232,52 @@ export default thing;
 "
 `;
 
+exports[`should lazily get globals: dist/umd-unused-peer-dep.cjs.dev.js 1`] = `
+"'use strict';
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+var index = \\"something\\";
+
+exports.default = index;
+"
+`;
+
+exports[`should lazily get globals: dist/umd-unused-peer-dep.cjs.js 1`] = `
+"'use strict';
+
+if (process.env.NODE_ENV === \\"production\\") {
+  module.exports = require(\\"./umd-unused-peer-dep.cjs.prod.js\\");
+} else {
+  module.exports = require(\\"./umd-unused-peer-dep.cjs.dev.js\\");
+}
+"
+`;
+
+exports[`should lazily get globals: dist/umd-unused-peer-dep.cjs.prod.js 1`] = `
+"\\"use strict\\";
+
+Object.defineProperty(exports, \\"__esModule\\", {
+  value: !0
+});
+
+var index = \\"something\\";
+
+exports.default = index;
+"
+`;
+
+exports[`should lazily get globals: dist/umd-unused-peer-dep.umd.min.js 1`] = `
+"!function(e,t){\\"object\\"==typeof exports&&\\"undefined\\"!=typeof module?module.exports=t():\\"function\\"==typeof define&&define.amd?define(t):(e=e||self).validPackage=t()}(this,(function(){\\"use strict\\";return\\"something\\"}));
+//# sourceMappingURL=umd-unused-peer-dep.umd.min.js.map
+"
+`;
+
+exports[`should lazily get globals: src/index.js 1`] = `
+"export default \\"something\\";
+"
+`;
+
 exports[`typescript: dist/declarations/src/another-thing.d.ts 1`] = `
 "export declare type SomeType = string;
 "
