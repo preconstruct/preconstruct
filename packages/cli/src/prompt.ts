@@ -64,7 +64,7 @@ export let promptConfirm = async (message: string): Promise<boolean> => {
   return confirm;
 };
 
-let doPromptInput = async (
+export let doPromptInput = async (
   message: string,
   pkg: { name: string },
   defaultAnswer?: string

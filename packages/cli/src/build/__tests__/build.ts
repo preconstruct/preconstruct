@@ -7,14 +7,16 @@ import {
   snapshotDistFiles,
   install
 } from "../../../test-utils";
-import { promptInput } from "../../prompt";
+import { doPromptInput as _doPromptInput } from "../../prompt";
 import { confirms as _confirms } from "../../messages";
 
 const f = fixturez(__dirname);
 
 jest.mock("../../prompt");
 
-let unsafePromptInput = promptInput as jest.MockedFunction<typeof promptInput>;
+let doPromptInput = _doPromptInput as jest.MockedFunction<
+  typeof _doPromptInput
+>;
 
 let unsafeRequire = require;
 
@@ -88,7 +90,7 @@ test("umd with dep on other module", async () => {
 
   await install(tmpPath);
 
-  unsafePromptInput.mockImplementation(async question => {
+  doPromptInput.mockImplementation(async question => {
     if (question === `What should the umdName of react be?`) {
       return "React";
     }
@@ -125,7 +127,7 @@ Object {
 test("monorepo umd with dep on other module", async () => {
   let tmpPath = f.copy("monorepo-umd-with-dep");
   let asked = false;
-  unsafePromptInput.mockImplementation(async question => {
+  doPromptInput.mockImplementation(async question => {
     if (asked) {
       throw new Error("only one prompt should happen: " + question);
     }

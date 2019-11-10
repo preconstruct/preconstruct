@@ -2,6 +2,7 @@ import build from "../";
 import fixturez from "fixturez";
 import { FatalError } from "../../errors";
 import { snapshotDirectory, install } from "../../../test-utils";
+import { doPromptInput } from "../../prompt";
 
 const f = fixturez(__dirname);
 
@@ -86,4 +87,25 @@ test("using external @babel/runtime helpers", async () => {
   await build(tmpPath);
 
   await snapshotDirectory(tmpPath, { files: "all" });
+});
+
+test("should lazily get globals", async () => {
+  let tmpPath = f.copy("umd-unused-peer-dep");
+
+  (doPromptInput as jest.MockedFunction<
+    typeof doPromptInput
+  >).mockImplementation((question, { name }, thing) => {
+    console.log("called");
+    throw new Error(
+      `this should never be called: ${JSON.stringify({
+        question,
+        name,
+        thing
+      })}`
+    );
+  });
+
+  await build(tmpPath);
+
+  await snapshotDirectory(tmpPath);
 });
