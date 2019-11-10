@@ -1,5 +1,11 @@
 # preconstruct
 
+## 1.1.1
+
+### Patch Changes
+
+- [`c1cfc05`](https://github.com/preconstruct/preconstruct/commit/c1cfc0503f73a197487d6cba6ada607fe957f527) [#226](https://github.com/preconstruct/preconstruct/pull/226) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Fixed global prompt never showing up and get each global lazily so that peerDependencies which are never imported are not required to have a global
+
 ## 1.1.0
 
 ### Minor Changes
