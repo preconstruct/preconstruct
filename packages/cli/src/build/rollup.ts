@@ -9,9 +9,9 @@ import path from "path";
 import builtInModules from "builtin-modules";
 import { Package } from "../package";
 import { StrictEntrypoint } from "../entrypoint";
-import { rollup as _rollup, RollupOptions } from "rollup";
+import { RollupOptions, Plugin } from "rollup";
 import { Aliases } from "./aliases";
-import { FatalError } from "../errors";
+import { FatalError, BatchError } from "../errors";
 import rewriteBabelRuntimeHelpers from "../rollup-plugins/rewrite-babel-runtime-helpers";
 import flowAndNodeDevProdEntry from "../rollup-plugins/flow-and-prod-dev-entry";
 import typescriptDeclarations from "../rollup-plugins/typescript-declarations";
@@ -73,17 +73,22 @@ export let getRollupConfig = (
     ] = entrypoint.source;
   });
 
+  let warnings: Array<FatalError> = [];
+
   const config: RollupOptions = {
     input,
     external: makeExternalPredicate(external),
     onwarn: warning => {
       if (typeof warning === "string") {
-        throw new FatalError(
-          `An unhandled Rollup error occurred: ${chalk.red(
-            warning.toString()
-          )}`,
-          pkg.name
+        warnings.push(
+          new FatalError(
+            `An unhandled Rollup error occurred: ${chalk.red(
+              warning.toString()
+            )}`,
+            pkg.name
+          )
         );
+        return;
       }
       switch (warning.code) {
         case "EMPTY_BUNDLE":
@@ -93,26 +98,39 @@ export let getRollupConfig = (
         }
         case "UNRESOLVED_IMPORT": {
           if (!warning.source!.startsWith(".")) {
-            throw new FatalError(
-              `"${warning.source}" is imported by "${path.relative(
-                pkg.directory,
-                warning.importer!
-              )}" but the package is not specified in dependencies or peerDependencies`,
-              pkg.name
+            warnings.push(
+              new FatalError(
+                `"${warning.source}" is imported by "${path.relative(
+                  pkg.directory,
+                  warning.importer!
+                )}" but the package is not specified in dependencies or peerDependencies`,
+                pkg.name
+              )
             );
+            return;
           }
         }
         default: {
-          throw new FatalError(
-            `An unhandled Rollup error occurred: ${chalk.red(
-              warning.toString()
-            )}`,
-            pkg.name
+          warnings.push(
+            new FatalError(
+              `An unhandled Rollup error occurred: ${chalk.red(
+                warning.toString()
+              )}`,
+              pkg.name
+            )
           );
         }
       }
     },
     plugins: [
+      {
+        name: "throw-warnings",
+        buildEnd() {
+          if (warnings.length) {
+            throw new BatchError(warnings);
+          }
+        }
+      } as Plugin,
       type === "node-prod" && flowAndNodeDevProdEntry(pkg),
       type === "node-prod" && typescriptDeclarations(pkg),
       babel({

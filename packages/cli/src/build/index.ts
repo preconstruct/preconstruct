@@ -5,7 +5,12 @@ import { rollup, OutputChunk } from "rollup";
 import { Aliases, getAliases } from "./aliases";
 import * as logger from "../logger";
 import * as fs from "fs-extra";
-import { FatalError, UnexpectedBuildError, ScopelessError } from "../errors";
+import {
+  FatalError,
+  UnexpectedBuildError,
+  ScopelessError,
+  BatchError
+} from "../errors";
 import { getRollupConfigs } from "./config";
 import { createWorker, destroyWorker } from "../worker-client";
 import { hasherPromise } from "../rollup-plugins/babel";
@@ -40,7 +45,11 @@ async function retryableBuild(pkg: Package, aliases: Aliases) {
       await retryableBuild(pkg, aliases);
       return;
     }
-    if (err instanceof FatalError || err instanceof ScopelessError) {
+    if (
+      err instanceof FatalError ||
+      err instanceof BatchError ||
+      err instanceof ScopelessError
+    ) {
       throw err;
     }
     if (err.pluginCode === "BABEL_PARSE_ERROR") {
@@ -60,9 +69,24 @@ export default async function build(directory: string) {
     logger.info("building bundles!");
 
     let aliases = getAliases(project);
+    let errors: FatalError[] = [];
     await Promise.all(
-      project.packages.map(pkg => retryableBuild(pkg, aliases))
+      project.packages.map(async pkg => {
+        try {
+          await retryableBuild(pkg, aliases);
+        } catch (err) {
+          if (err instanceof BatchError) {
+            errors.push(...err.errors);
+          } else {
+            errors.push(err);
+          }
+        }
+      })
     );
+
+    if (errors.length) {
+      throw new BatchError(errors);
+    }
 
     logger.success("built bundles!");
   } finally {
