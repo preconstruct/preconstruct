@@ -85,7 +85,11 @@ export default async function build(directory: string) {
     );
 
     if (errors.length) {
-      throw new BatchError(errors);
+      throw new BatchError(
+        errors.sort((a, b) =>
+          (a.scope + a.message).localeCompare(b.scope + b.message)
+        )
+      );
     }
 
     logger.success("built bundles!");

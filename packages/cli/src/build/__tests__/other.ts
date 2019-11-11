@@ -116,9 +116,9 @@ test("batches build errors", async () => {
     error = err;
   }
   expect(error).toMatchInlineSnapshot(`
-    [Error: 🎁  @errors/package-two "something" is imported by "src/index.js" but the package is not specified in dependencies or peerDependencies
-    🎁  @errors/package-two "something-2" is imported by "src/index.js" but the package is not specified in dependencies or peerDependencies
+    [Error: 🎁  @errors/package-one "something-2" is imported by "src/index.js" but the package is not specified in dependencies or peerDependencies
     🎁  @errors/package-one "something" is imported by "src/index.js" but the package is not specified in dependencies or peerDependencies
-    🎁  @errors/package-one "something-2" is imported by "src/index.js" but the package is not specified in dependencies or peerDependencies]
+    🎁  @errors/package-two "something-2" is imported by "src/index.js" but the package is not specified in dependencies or peerDependencies
+    🎁  @errors/package-two "something" is imported by "src/index.js" but the package is not specified in dependencies or peerDependencies]
   `);
 });
