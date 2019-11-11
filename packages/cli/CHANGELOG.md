@@ -1,5 +1,11 @@
 # preconstruct
 
+## 1.1.2
+
+### Patch Changes
+
+- [`1e37a5d`](https://github.com/preconstruct/preconstruct/commit/1e37a5de036ca4f897c990457676c33a6ae287bc) [#228](https://github.com/preconstruct/preconstruct/pull/228) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Batch build errors together
+
 ## 1.1.1
 
 ### Patch Changes
