@@ -131,7 +131,7 @@ export let getRollupConfig = (
           }
         }
       } as Plugin,
-      type === "node-prod" && flowAndNodeDevProdEntry(pkg),
+      type === "node-prod" && flowAndNodeDevProdEntry(pkg, warnings),
       type === "node-prod" && typescriptDeclarations(pkg),
       babel({
         cwd: pkg.project.directory,

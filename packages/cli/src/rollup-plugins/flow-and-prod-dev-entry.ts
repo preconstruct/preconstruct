@@ -1,5 +1,5 @@
 import path from "path";
-import { Plugin, OutputAsset, OutputChunk } from "rollup";
+import { Plugin } from "rollup";
 import { getDevPath, getProdPath } from "../build/utils";
 import { flowTemplate } from "../utils";
 import { Package } from "../package";
@@ -7,19 +7,40 @@ import { FatalError } from "../errors";
 
 import * as fs from "fs-extra";
 
-export default function flowAndNodeDevProdEntry(pkg: Package): Plugin {
+export default function flowAndNodeDevProdEntry(
+  pkg: Package,
+  warnings: FatalError[]
+): Plugin {
   return {
     name: "flow-and-prod-dev-entry",
+    load(id) {
+      if (id === "could-not-resolve") {
+        return "";
+      }
+      return null;
+    },
     async resolveId(source, importer) {
       let resolved = await this.resolve(source, importer!, {
         skipSelf: true
       });
       if (resolved === null) {
+        if (!source.startsWith(".")) {
+          warnings.push(
+            new FatalError(
+              `"${source}" is imported by "${path.relative(
+                pkg.directory,
+                importer!
+              )}" but the package is not specified in dependencies or peerDependencies`,
+              pkg.name
+            )
+          );
+          return "could-not-resolve";
+        }
         throw new FatalError(
-          "could not resolve: " +
-            JSON.stringify(source) +
-            " from " +
-            JSON.stringify(importer),
+          `Could not resolve ${source} from ${path.relative(
+            pkg.directory,
+            importer!
+          )}`,
           pkg.name
         );
       }
@@ -30,13 +51,16 @@ export default function flowAndNodeDevProdEntry(pkg: Package): Plugin {
       ) {
         return resolved;
       }
-      throw new FatalError(
-        `all relative imports in a package should only import modules inside of their package directory but "${path.relative(
-          pkg.directory,
-          importer!
-        )}" is importing "${source}"`,
-        pkg.name
+      warnings.push(
+        new FatalError(
+          `all relative imports in a package should only import modules inside of their package directory but "${path.relative(
+            pkg.directory,
+            importer!
+          )}" is importing "${source}"`,
+          pkg.name
+        )
       );
+      return "could-not-resolve";
     },
     // eslint-disable-next-line no-unused-vars
     async generateBundle(opts, bundle, something) {
