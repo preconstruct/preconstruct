@@ -1,6 +1,5 @@
 import build from "../";
 import fixturez from "fixturez";
-import { FatalError } from "../../errors";
 import { snapshotDirectory, install } from "../../../test-utils";
 import { doPromptInput } from "../../prompt";
 
@@ -43,9 +42,8 @@ test("package resolvable but not in deps", async () => {
   try {
     await build(tmpPath);
   } catch (err) {
-    expect(err).toBeInstanceOf(FatalError);
     expect(err.message).toMatchInlineSnapshot(
-      `"\\"react\\" is imported by \\"src/index.js\\" but the package is not specified in dependencies or peerDependencies"`
+      `"🎁  package-resolvable-but-not-in-deps \\"react\\" is imported by \\"src/index.js\\" but the package is not specified in dependencies or peerDependencies"`
     );
     return;
   }
@@ -57,7 +55,6 @@ test("entrypoint outside package directory", async () => {
   try {
     await build(tmpPath);
   } catch (err) {
-    expect(err).toBeInstanceOf(FatalError);
     expect(err.message).toMatchInlineSnapshot(
       `"entrypoint source files must be inside their respective package directory but this entrypoint has specified its source file as ../some-file"`
     );
@@ -71,9 +68,8 @@ test("module imported outside package directory", async () => {
   try {
     await build(tmpPath);
   } catch (err) {
-    expect(err).toBeInstanceOf(FatalError);
     expect(err.message).toMatchInlineSnapshot(
-      `"all relative imports in a package should only import modules inside of their package directory but \\"src/index.js\\" is importing \\"../../some-file\\""`
+      `"🎁  @imports-outside-pkg-dir/pkg-a all relative imports in a package should only import modules inside of their package directory but \\"src/index.js\\" is importing \\"../../some-file\\""`
     );
     return;
   }
@@ -108,4 +104,21 @@ test("should lazily get globals", async () => {
   await build(tmpPath);
 
   await snapshotDirectory(tmpPath);
+});
+
+test("batches build errors", async () => {
+  let tmpPath = f.copy("lots-of-errors");
+  let error;
+  try {
+    await build(tmpPath);
+    throw new Error("should never happen");
+  } catch (err) {
+    error = err;
+  }
+  expect(error).toMatchInlineSnapshot(`
+    [Error: 🎁  @errors/package-one "something-2" is imported by "src/index.js" but the package is not specified in dependencies or peerDependencies
+    🎁  @errors/package-one "something" is imported by "src/index.js" but the package is not specified in dependencies or peerDependencies
+    🎁  @errors/package-two "something-2" is imported by "src/index.js" but the package is not specified in dependencies or peerDependencies
+    🎁  @errors/package-two "something" is imported by "src/index.js" but the package is not specified in dependencies or peerDependencies]
+  `);
 });

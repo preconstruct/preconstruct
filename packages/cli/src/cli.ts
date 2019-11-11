@@ -10,7 +10,8 @@ import {
   FatalError,
   FixableError,
   UnexpectedBuildError,
-  ScopelessError
+  ScopelessError,
+  BatchError
 } from "./errors";
 
 // tricking static analysis is fun
@@ -81,6 +82,10 @@ class CommandNotFoundError extends Error {}
     );
   } else if (err instanceof FatalError) {
     error(err.message, err.scope);
+  } else if (err instanceof BatchError) {
+    for (let fatalError of err.errors) {
+      error(fatalError.message, fatalError.scope);
+    }
   } else if (err instanceof CommandNotFoundError) {
     error(errors.commandNotFound);
   } else if (err instanceof UnexpectedBuildError) {
