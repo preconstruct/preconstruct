@@ -1,5 +1,11 @@
 # preconstruct
 
+## 1.1.3
+
+### Patch Changes
+
+- [`3098cfc`](https://github.com/preconstruct/preconstruct/commit/3098cfc5a26cccc7b051c417cee164b216ff6f84) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Improve error when a package.json is invalid JSON
+
 ## 1.1.2
 
 ### Patch Changes
