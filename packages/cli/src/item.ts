@@ -1,6 +1,7 @@
 import * as fs from "fs-extra";
 import nodePath from "path";
 import detectIndent from "detect-indent";
+import parseJson from "parse-json";
 import { PKG_JSON_CONFIG_FIELD } from "./constants";
 
 let itemsByPath: { [key: string]: Set<Item> } = {};
@@ -14,7 +15,7 @@ export class Item {
   json: Record<string, any>;
   _config: Record<string, any>;
   constructor(filePath: string, contents: string) {
-    this.json = JSON.parse(contents);
+    this.json = parseJson(contents, filePath);
     this._stringifiedSavedJson = JSON.stringify(this.json, null, 2);
     this._contents = contents;
     this.path = filePath;
@@ -32,7 +33,7 @@ export class Item {
 
   async refresh() {
     let contents: string = await fs.readFile(this.path, "utf-8");
-    let json = JSON.parse(contents);
+    let json = parseJson(contents, this.path);
     for (let item of itemsByPath[this.path]) {
       item.updater(json);
     }

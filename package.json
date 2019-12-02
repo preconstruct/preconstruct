@@ -44,6 +44,7 @@
     "@types/node": "^12.12.5",
     "@types/npm-packlist": "^1.1.1",
     "@types/parse-glob": "^3.0.29",
+    "@types/parse-json": "^4.0.0",
     "@types/rollup-plugin-json": "^3.0.2",
     "@types/source-map-support": "^0.5.0",
     "@types/terser": "^3.12.0",

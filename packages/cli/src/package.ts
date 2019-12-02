@@ -4,7 +4,9 @@ import * as fs from "fs-extra";
 import nodePath from "path";
 import { Item } from "./item";
 import { FatalError } from "./errors";
-import { Entrypoint, StrictEntrypoint } from "./entrypoint";
+import { Entrypoint } from "./entrypoint";
+import jsonParse from "parse-json";
+
 import {
   getValidObjectFieldContentForBuildType,
   getValidStringFieldContentForBuildType
@@ -71,7 +73,7 @@ export class Package extends Item {
         };
         for (let descriptor of descriptors) {
           if (descriptor.contents !== null) {
-            let parsed = JSON.parse(descriptor.contents);
+            let parsed = jsonParse(descriptor.contents, descriptor.filename);
             for (let field of ["module", "umd:main"] as const) {
               if (parsed[field] !== undefined) {
                 plainEntrypointObj[
