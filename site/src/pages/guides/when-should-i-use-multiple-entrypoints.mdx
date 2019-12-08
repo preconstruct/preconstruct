@@ -10,6 +10,6 @@ The other significant reason to use multiple entrypoints that's more applicable 
 
 - Is the thing rarely used in comparison to the primary part of your package?
 - Is the amount of code large?
-- If it's a dependency of something else exposed by the package(the dependent), will someone wnat to import it without also importing any dependents of this or is it likely that the dependent will be changed to so it doesn't depend on the thing in the future?
+- If it's a dependency of something else exposed by the package (the dependent), will someone want to import it without also importing any dependents of this or is it likely that the dependent will be changed to so it doesn't depend on the thing in the future?
 
 If your answer to these questions is mostly yes then having multiple entrypoints might make sense for your package.
