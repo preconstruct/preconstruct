@@ -1,6 +1,7 @@
 import resolveFrom from "resolve-from";
 import * as fs from "fs-extra";
 import path from "path";
+import { FatalError } from "../../errors";
 // @ts-ignore
 import { createLanguageServiceHostClass } from "./language-service-host";
 
@@ -126,8 +127,9 @@ export async function createDeclarationCreator(
         for (let dep of deps) {
           let sourceFile = program!.getSourceFile(dep);
           if (!sourceFile) {
-            throw new Error(
-              "This is an internal error, please open an issue if you see this: source file not found"
+            throw new FatalError(
+              `Could not generate type declarations because ${dep} does not exist or is not a TypeScript file`,
+              dep
             );
           }
           let internalDeps = new Set<string>();
