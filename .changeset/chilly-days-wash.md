@@ -2,4 +2,4 @@
 "@preconstruct/cli": patch
 ---
 
-improve searchDeps error message content
+Improve error message when attempting to create a TypeScript declaration file for a non-TypeScript file
