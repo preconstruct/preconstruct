@@ -64,7 +64,8 @@ let getService = weakMemoize((typescript: Typescript) =>
 );
 
 export async function createDeclarationCreator(
-  dirname: string
+  dirname: string,
+  pkgName: string
 ): Promise<{
   getDeps: (entrypoints: Array<string>) => Set<string>;
   getDeclarationFile: (
@@ -129,7 +130,7 @@ export async function createDeclarationCreator(
           if (!sourceFile) {
             throw new FatalError(
               `Could not generate type declarations because ${dep} does not exist or is not a TypeScript file`,
-              dep
+              pkgName
             );
           }
           let internalDeps = new Set<string>();
