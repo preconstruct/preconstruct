@@ -1,5 +1,13 @@
 # preconstruct
 
+## 1.1.4
+
+### Patch Changes
+
+- [`fd875bb`](https://github.com/preconstruct/preconstruct/commit/fd875bbf6bf5fddc79c195a90c3804d6c2bfde57) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Improve error message when attempting to create a TypeScript declaration file for a non-TypeScript file
+
+* [`fd875bb`](https://github.com/preconstruct/preconstruct/commit/fd875bbf6bf5fddc79c195a90c3804d6c2bfde57) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Update npm-packlist to fix bug where npm-normalize-package-bin wasn't specified in the dependencies of npm-packlist
+
 ## 1.1.3
 
 ### Patch Changes
