@@ -278,12 +278,123 @@ exports[`should lazily get globals: src/index.js 1`] = `
 "
 `;
 
-exports[`typescript: dist/declarations/src/another-thing.d.ts 1`] = `
+exports[`typescript: babel.config.js 1`] = `
+"module.exports = {
+  presets: [\\"@babel/preset-typescript\\"]
+};
+"
+`;
+
+exports[`typescript: package.json 1`] = `
+Object {
+  "dependencies": Object {
+    "@babel/core": "^7.4.3",
+    "@babel/preset-typescript": "^7.3.3",
+    "@types/node": "^12.7.1",
+    "typescript": "^3.4.5",
+  },
+  "license": "MIT",
+  "name": "some-scope-typescript",
+  "preconstruct": Object {
+    "packages": Array [
+      "packages/*",
+    ],
+  },
+  "private": true,
+  "version": "1.0.0",
+  "workspaces": Array [
+    "packages/*",
+  ],
+}
+`;
+
+exports[`typescript: packages/package-one/dist/declarations/src/index.d.ts 1`] = `
+"export declare function something(): string;
+"
+`;
+
+exports[`typescript: packages/package-one/dist/package-one.cjs.d.ts 1`] = `
+"export * from \\"./declarations/src/index\\";
+"
+`;
+
+exports[`typescript: packages/package-one/dist/package-one.cjs.dev.js 1`] = `
+"'use strict';
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
+
+var thing = _interopDefault(require('@some-scope-typescript/package-two'));
+
+function something() {
+  return thing;
+}
+
+exports.something = something;
+"
+`;
+
+exports[`typescript: packages/package-one/dist/package-one.cjs.js 1`] = `
+"'use strict';
+
+if (process.env.NODE_ENV === \\"production\\") {
+  module.exports = require(\\"./package-one.cjs.prod.js\\");
+} else {
+  module.exports = require(\\"./package-one.cjs.dev.js\\");
+}
+"
+`;
+
+exports[`typescript: packages/package-one/dist/package-one.cjs.prod.js 1`] = `
+"\\"use strict\\";
+
+function _interopDefault(ex) {
+  return ex && \\"object\\" == typeof ex && \\"default\\" in ex ? ex.default : ex;
+}
+
+Object.defineProperty(exports, \\"__esModule\\", {
+  value: !0
+});
+
+var thing = _interopDefault(require(\\"@some-scope-typescript/package-two\\"));
+
+function something() {
+  return thing;
+}
+
+exports.something = something;
+"
+`;
+
+exports[`typescript: packages/package-one/package.json 1`] = `
+Object {
+  "dependencies": Object {
+    "@some-scope-typescript/package-two": "^1.0.0",
+  },
+  "license": "MIT",
+  "main": "dist/package-one.cjs.js",
+  "name": "@some-scope-typescript/package-one",
+  "private": true,
+  "version": "1.0.0",
+}
+`;
+
+exports[`typescript: packages/package-one/src/index.ts 1`] = `
+"import thing from \\"@some-scope-typescript/package-two\\";
+
+export function something() {
+  return thing;
+}
+"
+`;
+
+exports[`typescript: packages/package-two/dist/declarations/src/another-thing.d.ts 1`] = `
 "export declare type SomeType = string;
 "
 `;
 
-exports[`typescript: dist/declarations/src/index.d.ts 1`] = `
+exports[`typescript: packages/package-two/dist/declarations/src/index.d.ts 1`] = `
 "import { SomeType } from \\"./another-thing\\";
 export * from \\"./one-more-thing\\";
 import * as path from \\"path\\";
@@ -293,20 +404,20 @@ export default thing;
 "
 `;
 
-exports[`typescript: dist/declarations/src/one-more-thing.d.ts 1`] = `
+exports[`typescript: packages/package-two/dist/declarations/src/one-more-thing.d.ts 1`] = `
 "declare var obj: object;
 
 export { obj };
 "
 `;
 
-exports[`typescript: dist/typescript.cjs.d.ts 1`] = `
+exports[`typescript: packages/package-two/dist/package-two.cjs.d.ts 1`] = `
 "export * from \\"./declarations/src/index\\";
 export { default } from \\"./declarations/src/index\\";
 "
 `;
 
-exports[`typescript: dist/typescript.cjs.dev.js 1`] = `
+exports[`typescript: packages/package-two/dist/package-two.cjs.dev.js 1`] = `
 "'use strict';
 
 Object.defineProperty(exports, '__esModule', { value: true });
@@ -323,18 +434,18 @@ exports.obj = obj;
 "
 `;
 
-exports[`typescript: dist/typescript.cjs.js 1`] = `
+exports[`typescript: packages/package-two/dist/package-two.cjs.js 1`] = `
 "'use strict';
 
 if (process.env.NODE_ENV === \\"production\\") {
-  module.exports = require(\\"./typescript.cjs.prod.js\\");
+  module.exports = require(\\"./package-two.cjs.prod.js\\");
 } else {
-  module.exports = require(\\"./typescript.cjs.dev.js\\");
+  module.exports = require(\\"./package-two.cjs.dev.js\\");
 }
 "
 `;
 
-exports[`typescript: dist/typescript.cjs.prod.js 1`] = `
+exports[`typescript: packages/package-two/dist/package-two.cjs.prod.js 1`] = `
 "\\"use strict\\";
 
 Object.defineProperty(exports, \\"__esModule\\", {
@@ -349,42 +460,22 @@ exports.path = path, exports.default = thing, exports.obj = obj;
 "
 `;
 
-exports[`typescript: dist/typescript.esm.js 1`] = `
-"import * as path from 'path';
-export { path };
-
-let obj = {};
-
-let thing = \\"something\\";
-
-export default thing;
-export { obj };
-"
-`;
-
-exports[`typescript: package.json 1`] = `
+exports[`typescript: packages/package-two/package.json 1`] = `
 Object {
-  "dependencies": Object {
-    "@babel/core": "^7.4.3",
-    "@babel/preset-typescript": "^7.3.3",
-    "@types/node": "^12.7.1",
-    "typescript": "^3.4.5",
-  },
   "license": "MIT",
-  "main": "dist/typescript.cjs.js",
-  "module": "dist/typescript.esm.js",
-  "name": "typescript",
+  "main": "dist/package-two.cjs.js",
+  "name": "@some-scope-typescript/package-two",
   "private": true,
   "version": "1.0.0",
 }
 `;
 
-exports[`typescript: src/another-thing.ts 1`] = `
+exports[`typescript: packages/package-two/src/another-thing.ts 1`] = `
 "export type SomeType = string;
 "
 `;
 
-exports[`typescript: src/index.ts 1`] = `
+exports[`typescript: packages/package-two/src/index.ts 1`] = `
 "import { SomeType } from \\"./another-thing\\";
 export * from \\"./one-more-thing\\";
 import * as path from \\"path\\";
@@ -397,14 +488,14 @@ export default thing;
 "
 `;
 
-exports[`typescript: src/one-more-thing.d.ts 1`] = `
+exports[`typescript: packages/package-two/src/one-more-thing.d.ts 1`] = `
 "declare var obj: object;
 
 export { obj };
 "
 `;
 
-exports[`typescript: src/one-more-thing.js 1`] = `
+exports[`typescript: packages/package-two/src/one-more-thing.js 1`] = `
 "export let obj = {};
 "
 `;

@@ -16,7 +16,7 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
 
     // eslint-disable-next-line no-unused-vars
     async generateBundle(opts, bundle, something) {
-      let creator = await createDeclarationCreator(pkg.directory, pkg.name);
+      let creator = await createDeclarationCreator(pkg);
 
       let srcFilenameToDtsFilenameMap = new Map<string, string>();
 
