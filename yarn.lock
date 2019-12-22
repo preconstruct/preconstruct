@@ -1334,10 +1334,10 @@
     "@types/istanbul-reports" "^1.1.1"
     "@types/yargs" "^13.0.0"
 
-"@manypkg/cli@^0.8.1":
-  version "0.8.1"
-  resolved "https://registry.yarnpkg.com/@manypkg/cli/-/cli-0.8.1.tgz#0cf3290d57a0f9a0380372c315b0af7bf703f5d9"
-  integrity sha512-AFWwD5Je9O2sqZOwGs1wU7gBkE0YL5sUawPwB9PwopCA9Ms0S0+DqdlB34DA0bdHqH3iRoEPUoCZ4VkhARLyng==
+"@manypkg/cli@^0.9.0":
+  version "0.9.0"
+  resolved "https://registry.yarnpkg.com/@manypkg/cli/-/cli-0.9.0.tgz#152714d12b7bcfb89caa5141bbc2a907b1b8a56b"
+  integrity sha512-Y0V+GTDzeDCSoNSS75nVSSk2V5HgGZyVOID6XUeBhRVzs1ZLqTfUCS3F8+KLVES06GP/6sRQJaUgC7zmmjYelA==
   dependencies:
     "@babel/runtime" "^7.5.5"
     chalk "^2.4.2"
@@ -1348,7 +1348,7 @@
     get-workspaces "^0.5.0"
     meow "^5.0.0"
     p-limit "^2.2.1"
-    sembear "^0.4.1"
+    sembear "^0.5.0"
     semver "^6.3.0"
     spawndamnit "^2.0.0"
     validate-npm-package-name "^3.0.0"
@@ -12090,10 +12090,10 @@ selfsigned@^1.10.7:
   dependencies:
     node-forge "0.9.0"
 
-sembear@^0.4.1:
-  version "0.4.1"
-  resolved "https://registry.yarnpkg.com/sembear/-/sembear-0.4.1.tgz#c1599bba0fd29cce68a25382576891e5fae84990"
-  integrity sha512-q3LJepi7qgDbkR9eDe1OVYfbD8A14vuC8TtETtEvpAQ4GxynA9B0fhG6ts8scBMDe/GwLlVUeU+Icnl1oidH7g==
+sembear@^0.5.0:
+  version "0.5.1"
+  resolved "https://registry.yarnpkg.com/sembear/-/sembear-0.5.1.tgz#52ce0631b2f63057e1f44a937580019e7cf059e5"
+  integrity sha512-M7Xz8IAShYntqgzyDSRFEsTAPZFgej/+u7EvxSDdNckmpHdXIyItlR6S1g8XWUI2PznkauPnew7bBT6WnUrvCg==
   dependencies:
     "@types/semver" "^6.0.1"
     semver "^6.3.0"
