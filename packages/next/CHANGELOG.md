@@ -1,5 +1,11 @@
 # @preconstruct/next
 
+## 1.0.1
+
+### Patch Changes
+
+- [`0b7914f`](https://github.com/preconstruct/preconstruct/commit/0b7914f20c775b60c1fc68d34b8323ecb2edba52) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Remove debugger statements
+
 ## 1.0.0
 
 ### Major Changes
