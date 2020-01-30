@@ -15,7 +15,7 @@ import { FatalError, BatchError } from "../errors";
 import rewriteBabelRuntimeHelpers from "../rollup-plugins/rewrite-babel-runtime-helpers";
 import flowAndNodeDevProdEntry from "../rollup-plugins/flow-and-prod-dev-entry";
 import typescriptDeclarations from "../rollup-plugins/typescript-declarations";
-import json from "rollup-plugin-json";
+import json from "@rollup/plugin-json";
 import babel from "../rollup-plugins/babel";
 import terser from "../rollup-plugins/terser";
 import { getNameForDist } from "../utils";
@@ -83,6 +83,7 @@ export let getRollupConfig = (
         warnings.push(
           new FatalError(
             `An unhandled Rollup error occurred: ${chalk.red(
+              // @ts-ignore
               warning.toString()
             )}`,
             pkg.name
@@ -147,8 +148,8 @@ export let getRollupConfig = (
           ["typeof " + "window"]: JSON.stringify("object")
         }),
       rewriteBabelRuntimeHelpers(),
+      // @ts-ignore
       json({
-        // @ts-ignore
         namedExports: false
       }),
       type === "umd" &&
