@@ -33,11 +33,6 @@ async function watchPackage(pkg: Package, aliases: Aliases) {
   watcher.on("event", event => {
     // https://github.com/rollup/rollup/blob/aed954e4e6e8beabd47268916ff0955fbb20682d/bin/src/run/watch.ts#L71-L115
     switch (event.code) {
-      case "FATAL": {
-        reject(event.error);
-        break;
-      }
-
       case "ERROR": {
         reject(event.error);
         break;
