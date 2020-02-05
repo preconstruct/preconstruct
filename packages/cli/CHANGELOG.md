@@ -1,5 +1,13 @@
 # preconstruct
 
+## 1.1.5
+
+### Patch Changes
+
+- [`5acf0ea`](https://github.com/preconstruct/preconstruct/commit/5acf0eac374ac8c462ac60b7bd16fdbdbe528fe8) [#252](https://github.com/preconstruct/preconstruct/pull/252) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Upgrade Rollup and related packages
+
+* [`a238788`](https://github.com/preconstruct/preconstruct/commit/a2387881924425d614c256a521527417d641e011) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Fix source option not being written
+
 ## 1.1.4
 
 ### Patch Changes
