@@ -40,8 +40,10 @@ async function fixEntrypoint(entrypoint: Entrypoint) {
   if (entrypoint.umdMain !== null && !isUmdNameSpecified(entrypoint)) {
     let umdName = await promptInput(inputs.getUmdName, entrypoint);
     entrypoint.umdName = umdName;
-    await entrypoint.save();
     hasBeenModified = true;
+  }
+  if (hasBeenModified) {
+    await entrypoint.save();
   }
   return hasBeenModified;
 }
