@@ -5,7 +5,7 @@
   "scripts": {
     "build": "yarn preconstruct build",
     "test": "jest",
-    "preconstruct": "node ./build/node_modules/.bin/preconstruct",
+    "preconstruct": "node ./build/node_modules/preconstruct/bin",
     "postinstall": "manypkg check && cd build && yarn && cd .. && yarn preconstruct dev",
     "changeset": "changeset",
     "release": "yarn build && changeset publish",
