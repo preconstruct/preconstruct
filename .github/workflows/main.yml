@@ -9,7 +9,15 @@ on:
 jobs:
   test:
     name: Tests
-    runs-on: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        build: [linux, windows]
+        include:
+          - build: linux
+            os: ubuntu-latest
+          - build: windows
+            os: windows-latest
     steps:
       - uses: actions/checkout@master
 
@@ -38,7 +46,15 @@ jobs:
           CODECOV_TOKEN: dc4ed93e-11a9-421e-b141-8a2f11913593
   typescript:
     name: TypeScript
-    runs-on: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        build: [linux, windows]
+        include:
+          - build: linux
+            os: ubuntu-latest
+          - build: windows
+            os: windows-latest
     steps:
       - uses: actions/checkout@master
 
@@ -62,7 +78,15 @@ jobs:
         run: yarn tsc
   eslint:
     name: ESLint
-    runs-on: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        build: [linux, windows]
+        include:
+          - build: linux
+            os: ubuntu-latest
+          - build: windows
+            os: windows-latest
     steps:
       - uses: actions/checkout@master
 
