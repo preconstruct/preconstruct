@@ -1,4 +1,4 @@
-import path from "path";
+import path from "upath";
 import { FatalError } from "../../errors";
 import { Plugin, OutputChunk, OutputAsset } from "rollup";
 import { Package } from "../../package";

@@ -1,4 +1,4 @@
-import path from "path";
+import path from "upath";
 import chalk from "chalk";
 import * as fs from "fs-extra";
 import packlist from "npm-packlist";

@@ -1,5 +1,5 @@
 import * as fs from "fs-extra";
-import nodePath from "path";
+import nodePath from "upath";
 import detectIndent from "detect-indent";
 import parseJson from "parse-json";
 import { PKG_JSON_CONFIG_FIELD } from "./constants";

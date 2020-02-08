@@ -1,4 +1,4 @@
-import nodePath from "path";
+import nodePath from "upath";
 import { validateEntrypoint } from "./validate";
 import { Item } from "./item";
 import { validatePackage } from "./validate-package";

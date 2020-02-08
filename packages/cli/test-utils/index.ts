@@ -1,4 +1,4 @@
-import path from "path";
+import path from "upath";
 import * as fs from "fs-extra";
 import globby from "globby";
 import fixturez from "fixturez";

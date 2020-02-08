@@ -1,5 +1,5 @@
 import fixturez from "fixturez";
-import path from "path";
+import path from "upath";
 import validate from "../validate";
 import { logMock, modifyPkg, getPkg, install } from "../../test-utils";
 import { FatalError } from "../errors";

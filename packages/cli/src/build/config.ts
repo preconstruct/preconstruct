@@ -4,7 +4,7 @@ import { OutputOptions, RollupOptions } from "rollup";
 import { Aliases } from "./aliases";
 import { PKG_JSON_CONFIG_FIELD } from "../constants";
 import { limit, doPromptInput } from "../prompt";
-import path from "path";
+import path from "upath";
 import resolveFrom from "resolve-from";
 import { Project } from "../project";
 

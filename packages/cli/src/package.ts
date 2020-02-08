@@ -1,7 +1,7 @@
 // based on https://github.com/jamiebuilds/std-pkg but reading fewer things, adding setters and reading the file
 import globby from "globby";
 import * as fs from "fs-extra";
-import nodePath from "path";
+import nodePath from "upath";
 import { Item } from "./item";
 import { FatalError } from "./errors";
 import { Entrypoint } from "./entrypoint";

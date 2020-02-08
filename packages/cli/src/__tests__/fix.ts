@@ -1,6 +1,6 @@
 import fixturez from "fixturez";
 import fix from "../fix";
-import path from "path";
+import path from "upath";
 import { confirms as _confirms, errors, inputs } from "../messages";
 import {
   getPkg,

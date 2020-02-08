@@ -1,5 +1,5 @@
 import { Project } from "../project";
-import path from "path";
+import path from "upath";
 
 export type Aliases = {
   [key: string]: string;

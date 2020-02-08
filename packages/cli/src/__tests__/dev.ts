@@ -1,6 +1,6 @@
 import fixturez from "fixturez";
 import spawn from "spawndamnit";
-import path from "path";
+import path from "upath";
 import * as fs from "fs-extra";
 import { install } from "../../test-utils";
 import dev from "../dev";

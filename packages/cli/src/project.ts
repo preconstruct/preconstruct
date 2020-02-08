@@ -1,4 +1,4 @@
-import nodePath from "path";
+import nodePath from "upath";
 import { promptInput } from "./prompt";
 import globby from "globby";
 import * as fs from "fs-extra";

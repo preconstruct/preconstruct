@@ -2,7 +2,7 @@ import { Project } from "../project";
 import { Package } from "../package";
 import { watch } from "rollup";
 import chalk from "chalk";
-import path from "path";
+import path from "upath";
 import ms from "ms";
 import * as fs from "fs-extra";
 import { getRollupConfigs } from "./config";

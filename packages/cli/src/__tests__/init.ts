@@ -1,5 +1,5 @@
 import fixturez from "fixturez";
-import path from "path";
+import path from "upath";
 import init from "../init";
 import { confirms as _confirms, errors } from "../messages";
 import {

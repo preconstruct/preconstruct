@@ -1,6 +1,6 @@
 import resolveFrom from "resolve-from";
 import * as fs from "fs-extra";
-import path from "path";
+import path from "upath";
 import { FatalError } from "../../errors";
 // @ts-ignore
 import { createLanguageServiceHostClass } from "./language-service-host";

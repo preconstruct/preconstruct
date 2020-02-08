@@ -1,6 +1,6 @@
 import { Package } from "../package";
 import { Project } from "../project";
-import path from "path";
+import path from "upath";
 import { rollup, OutputChunk } from "rollup";
 import { Aliases, getAliases } from "./aliases";
 import * as logger from "../logger";

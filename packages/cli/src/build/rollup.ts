@@ -5,7 +5,7 @@ import cjs from "@rollup/plugin-commonjs";
 import replace from "@rollup/plugin-replace";
 import resolveFrom from "resolve-from";
 import chalk from "chalk";
-import path from "path";
+import path from "upath";
 import builtInModules from "builtin-modules";
 import { Package } from "../package";
 import { StrictEntrypoint } from "../entrypoint";

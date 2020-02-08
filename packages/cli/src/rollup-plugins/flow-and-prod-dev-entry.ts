@@ -1,4 +1,4 @@
-import path from "path";
+import path from "upath";
 import { Plugin } from "rollup";
 import { getDevPath, getProdPath } from "../build/utils";
 import { flowTemplate } from "../utils";

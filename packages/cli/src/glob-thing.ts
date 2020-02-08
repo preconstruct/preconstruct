@@ -2,7 +2,7 @@ import globby from "globby";
 import parseGlob from "parse-glob";
 import micromatch from "micromatch";
 import * as fs from "fs-extra";
-import path from "path";
+import path from "upath";
 
 export async function getUselessGlobsThatArentReallyGlobs(
   globs: string[],

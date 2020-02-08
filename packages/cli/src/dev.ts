@@ -3,7 +3,7 @@ import { success, info } from "./logger";
 import { tsTemplate, flowTemplate } from "./utils";
 import * as babel from "@babel/core";
 import * as fs from "fs-extra";
-import path from "path";
+import path from "upath";
 import { StrictEntrypoint } from "./entrypoint";
 
 let tsExtensionPattern = /tsx?$/;
