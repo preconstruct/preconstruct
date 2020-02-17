@@ -1,5 +1,11 @@
 # preconstruct
 
+## 1.1.6
+
+### Patch Changes
+
+- [`5808f26`](https://github.com/preconstruct/preconstruct/commit/5808f267079155f0a1e3553ceea18272c9010fd3) [#258](https://github.com/preconstruct/preconstruct/pull/258) Thanks [@Andarist](https://github.com/Andarist)! - Fixed issue with temporarily created files (during validation) not being cleaned up correctly on validation error.
+
 ## 1.1.5
 
 ### Patch Changes
