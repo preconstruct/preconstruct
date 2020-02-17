@@ -9,6 +9,16 @@ import { promptConfirm } from "./prompt";
 import { validateIncludedFiles } from "./validate-included-files";
 import { FatalError } from "./errors";
 
+const allSettled = (promises: Promise<any>[]) =>
+  Promise.all(
+    promises.map(promise =>
+      promise.then(
+        value => ({ status: "fulfilled" as const, value }),
+        reason => ({ status: "rejected" as const, reason })
+      )
+    )
+  );
+
 export class Project extends Item {
   get configPackages(): Array<string> {
     if (this._config.packages == null) {
@@ -117,7 +127,15 @@ export class Project extends Item {
       return this._packages();
     }
 
-    await Promise.all(packages.map(pkg => validateIncludedFiles(pkg)));
+    const errored = (await allSettled(
+      packages.map(pkg => validateIncludedFiles(pkg))
+    )).find(result => result.status === "rejected");
+
+    if (errored) {
+      // TS can't refine type based on .find predicate
+      throw (errored as any).reason;
+    }
+
     return packages;
   }
 }
