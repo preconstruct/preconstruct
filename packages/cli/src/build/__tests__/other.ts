@@ -122,3 +122,11 @@ test("batches build errors", async () => {
     🎁  @errors/package-two "something" is imported by "src/index.js" but the package is not specified in dependencies or peerDependencies]
   `);
 });
+
+test("builds package using eval", async () => {
+  let tmpPath = f.copy("eval");
+
+  await build(tmpPath);
+
+  await snapshotDirectory(tmpPath, { files: "all" });
+});
