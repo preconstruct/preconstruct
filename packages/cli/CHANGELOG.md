@@ -1,5 +1,11 @@
 # preconstruct
 
+## 1.1.7
+
+### Patch Changes
+
+- [`924ba9c`](https://github.com/preconstruct/preconstruct/commit/924ba9c2086d9ddf3a2aaf6db66247d53b6a453b) [#261](https://github.com/preconstruct/preconstruct/pull/261) Thanks [@Andarist](https://github.com/Andarist)! - Allow to build projects including usage of eval.
+
 ## 1.1.6
 
 ### Patch Changes
