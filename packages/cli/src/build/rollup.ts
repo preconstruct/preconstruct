@@ -93,6 +93,7 @@ export let getRollupConfig = (
       }
       switch (warning.code) {
         case "EMPTY_BUNDLE":
+        case "EVAL":
         case "CIRCULAR_DEPENDENCY":
         case "UNUSED_EXTERNAL_IMPORT": {
           break;
