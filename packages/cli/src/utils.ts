@@ -49,13 +49,13 @@ export function getValidObjectFieldContentForBuildType(
 
 export function flowTemplate(hasDefaultExport: boolean, relativePath: string) {
   return `// @flow
-export * from "${relativePath}";${
-    hasDefaultExport ? `\nexport { default } from "${relativePath}";` : ""
+export * from ${relativePath};${
+    hasDefaultExport ? `\nexport { default } from ${relativePath};` : ""
   }\n`;
 }
 
 export function tsTemplate(hasDefaultExport: boolean, relativePath: string) {
-  return `export * from "${relativePath}";${
-    hasDefaultExport ? `\nexport { default } from "${relativePath}";` : ""
+  return `export * from ${relativePath};${
+    hasDefaultExport ? `\nexport { default } from ${relativePath};` : ""
   }\n`;
 }

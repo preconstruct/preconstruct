@@ -68,7 +68,9 @@ async function writeTypeSystemFile(
       cjsDistPath + ".flow",
       flowTemplate(
         false,
-        path.relative(path.dirname(cjsDistPath), entrypoint.source)
+        JSON.stringify(
+          path.relative(path.dirname(cjsDistPath), entrypoint.source)
+        )
       )
     );
   }
@@ -110,9 +112,11 @@ async function writeTypeSystemFile(
 ` +
         tsTemplate(
           hasDefaultExport,
-          path
-            .relative(path.dirname(cjsDistPath), entrypoint.source)
-            .replace(/\.tsx?$/, "")
+          JSON.stringify(
+            path
+              .relative(path.dirname(cjsDistPath), entrypoint.source)
+              .replace(/\.tsx?$/, "")
+          )
         )
     );
   }

@@ -93,7 +93,7 @@ export default function flowAndNodeDevProdEntry(
           if (flowMode !== false) {
             let flowFileSource = flowTemplate(
               flowMode === "all",
-              relativeToSource
+              JSON.stringify(relativeToSource)
             );
             let flowFileName = mainFieldPath + ".flow";
             this.emitFile({
