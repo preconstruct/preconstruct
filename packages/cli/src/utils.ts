@@ -48,14 +48,16 @@ export function getValidObjectFieldContentForBuildType(
 }
 
 export function flowTemplate(hasDefaultExport: boolean, relativePath: string) {
+  const escapedPath = JSON.stringify(relativePath);
   return `// @flow
-export * from ${relativePath};${
-    hasDefaultExport ? `\nexport { default } from ${relativePath};` : ""
+export * from ${escapedPath};${
+    hasDefaultExport ? `\nexport { default } from ${escapedPath};` : ""
   }\n`;
 }
 
 export function tsTemplate(hasDefaultExport: boolean, relativePath: string) {
-  return `export * from ${relativePath};${
-    hasDefaultExport ? `\nexport { default } from ${relativePath};` : ""
+  const escapedPath = JSON.stringify(relativePath);
+  return `export * from ${escapedPath};${
+    hasDefaultExport ? `\nexport { default } from ${escapedPath};` : ""
   }\n`;
 }
