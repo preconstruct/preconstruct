@@ -1,5 +1,13 @@
 # preconstruct
 
+## 1.1.8
+
+### Patch Changes
+
+- [`3292d97`](https://github.com/preconstruct/preconstruct/commit/3292d9793f2408fd46245e10b3c81309b9466a77) [#264](https://github.com/preconstruct/preconstruct/pull/264) Thanks [@NateRadebaugh](https://github.com/NateRadebaugh)! - Fix type import file paths when running `preconstruct dev` to point to properly escaped paths.
+
+* [`e34148d`](https://github.com/preconstruct/preconstruct/commit/e34148de28fbc3a368ee52ac70f67b88d8ac3520) [#266](https://github.com/preconstruct/preconstruct/pull/266) Thanks [@NateRadebaugh](https://github.com/NateRadebaugh)! - Normalize paths for declarations to fix TypeScript builds on Windows
+
 ## 1.1.7
 
 ### Patch Changes
