@@ -4,6 +4,7 @@ import { Plugin, OutputChunk, OutputAsset } from "rollup";
 import { Package } from "../../package";
 import { createDeclarationCreator } from "./create-generator";
 import { tsTemplate } from "../../utils";
+import normalizePath from "normalize-path";
 
 let isTsPath = (source: string) => /\.tsx?/.test(source);
 
@@ -24,7 +25,7 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
       await Promise.all(
         [...deps].map(async dep => {
           let { name, content } = await creator.getDeclarationFile(dep);
-          srcFilenameToDtsFilenameMap.set(dep, name);
+          srcFilenameToDtsFilenameMap.set(normalizePath(dep), name);
           this.emitFile({
             type: "asset",
             fileName: path.relative(opts.dir!, name),
@@ -46,7 +47,9 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
 
         let file = _file as OutputChunk;
 
-        let dtsFilename = srcFilenameToDtsFilenameMap.get(facadeModuleId);
+        let dtsFilename = srcFilenameToDtsFilenameMap.get(
+          normalizePath(facadeModuleId)
+        );
 
         if (!dtsFilename) {
           throw new FatalError(
