@@ -37,6 +37,7 @@
     "meow": "^5.0.0",
     "micromatch": "^4.0.2",
     "ms": "^2.1.2",
+    "normalize-path": "^3.0.0",
     "npm-packlist": "^2.0.2",
     "p-limit": "^2.2.1",
     "parse-glob": "^3.0.4",
