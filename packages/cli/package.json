@@ -15,7 +15,7 @@
   "license": "MIT",
   "dependencies": {
     "@babel/code-frame": "^7.5.5",
-    "@babel/core": "^7.7.7",
+    "@babel/core": "^7.9.0",
     "@babel/runtime": "^7.7.7",
     "@preconstruct/hook": "^0.1.0",
     "@rollup/plugin-alias": "^3.0.1",
