@@ -1,4 +1,4 @@
-import { SomeType } from "./another-thing";
+import type { SomeType } from "./another-thing";
 export * from "./one-more-thing";
 import * as path from "path";
 

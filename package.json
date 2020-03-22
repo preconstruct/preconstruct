@@ -20,7 +20,7 @@
   ],
   "private": true,
   "resolutions": {
-    "**/@babel/parser": "^7.7.7"
+    "**/@babel/parser": "^7.9.2"
   },
   "dependencies": {
     "@babel/cli": "^7.7.7",
