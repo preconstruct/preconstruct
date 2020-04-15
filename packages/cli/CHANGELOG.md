@@ -1,5 +1,11 @@
 # preconstruct
 
+## 1.1.9
+
+### Patch Changes
+
+- [`e2a8e9f`](https://github.com/preconstruct/preconstruct/commit/e2a8e9fdabf25e87fdaf398aa9863a47a3e68712) [#272](https://github.com/preconstruct/preconstruct/pull/272) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Fix TypeScript declaration generation with internal repo type dependencies
+
 ## 1.1.8
 
 ### Patch Changes
