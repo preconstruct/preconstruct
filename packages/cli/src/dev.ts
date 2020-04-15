@@ -43,6 +43,58 @@ async function getTypeSystem(
   return [null, content];
 }
 
+export async function writeDevTSFile(
+  entrypoint: StrictEntrypoint,
+  entrypointSourceContent: string
+) {
+  let ast = (await babel.parseAsync(entrypointSourceContent, {
+    filename: entrypoint.source,
+    sourceType: "module",
+    cwd: entrypoint.package.project.directory
+  }))! as babel.types.File;
+
+  let hasDefaultExport = false;
+
+  for (let statement of ast.program.body) {
+    if (
+      statement.type === "ExportDefaultDeclaration" ||
+      (statement.type === "ExportNamedDeclaration" &&
+        statement.specifiers.some(
+          specifier =>
+            specifier.type === "ExportSpecifier" &&
+            specifier.exported.name === "default"
+        ))
+    ) {
+      hasDefaultExport = true;
+      break;
+    }
+  }
+  let cjsDistPath = path
+    .join(entrypoint.directory, entrypoint.main)
+    .replace(/\.js$/, "");
+
+  await fs.writeFile(
+    cjsDistPath + ".d.ts",
+    `// are you seeing an error that a default export doesn't exist but your source file has a default export?
+// you should run \`yarn\` or \`yarn preconstruct dev\` if preconstruct dev isn't in your postinstall hook
+
+// curious why you need to?
+// this file exists so that you can import from the entrypoint normally
+// except that it points to your source file and you don't need to run build constantly
+// which means we need to re-export all of the modules from your source file
+// and since export * doesn't include default exports, we need to read your source file
+// to check for a default export and re-export it if it exists
+// it's not ideal, but it works pretty well ¯\\_(ツ)_/¯
+` +
+      tsTemplate(
+        hasDefaultExport,
+        path
+          .relative(path.dirname(cjsDistPath), entrypoint.source)
+          .replace(/\.tsx?$/, "")
+      )
+  );
+}
+
 async function writeTypeSystemFile(
   typeSystemPromise: Promise<[null | "flow" | "typescript", string]>,
   entrypoint: StrictEntrypoint
@@ -73,48 +125,7 @@ async function writeTypeSystemFile(
     );
   }
   if (typeSystem === "typescript") {
-    let ast = (await babel.parseAsync(content, {
-      filename: entrypoint.source,
-      sourceType: "module",
-      cwd: entrypoint.package.project.directory
-    }))! as babel.types.File;
-
-    let hasDefaultExport = false;
-
-    for (let statement of ast.program.body) {
-      if (
-        statement.type === "ExportDefaultDeclaration" ||
-        (statement.type === "ExportNamedDeclaration" &&
-          statement.specifiers.some(
-            specifier =>
-              specifier.type === "ExportSpecifier" &&
-              specifier.exported.name === "default"
-          ))
-      ) {
-        hasDefaultExport = true;
-        break;
-      }
-    }
-    await fs.writeFile(
-      cjsDistPath + ".ts",
-      `// are you seeing an error that a default export doesn't exist but your source file has a default export?
-// you should run \`yarn\` or \`yarn preconstruct dev\` if preconstruct dev isn't in your postinstall hook
-
-// curious why you need to?
-// this file exists so that you can import from the entrypoint normally
-// except that it points to your source file and you don't need to run build constantly
-// which means we need to re-export all of the modules from your source file
-// and since export * doesn't include default exports, we need to read your source file
-// to check for a default export and re-export it if it exists
-// it's not ideal, but it works pretty well ¯\\_(ツ)_/¯
-` +
-        tsTemplate(
-          hasDefaultExport,
-          path
-            .relative(path.dirname(cjsDistPath), entrypoint.source)
-            .replace(/\.tsx?$/, "")
-        )
-    );
+    await writeDevTSFile(entrypoint, content);
   }
 }
 

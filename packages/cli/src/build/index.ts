@@ -1,7 +1,7 @@
 import { Package } from "../package";
 import { Project } from "../project";
 import path from "path";
-import { rollup, OutputChunk } from "rollup";
+import { rollup } from "rollup";
 import { Aliases, getAliases } from "./aliases";
 import * as logger from "../logger";
 import * as fs from "fs-extra";
@@ -14,22 +14,34 @@ import {
 import { getRollupConfigs } from "./config";
 import { createWorker, destroyWorker } from "../worker-client";
 import { hasherPromise } from "../rollup-plugins/babel";
+import { isTsPath } from "../rollup-plugins/typescript-declarations";
+import { writeDevTSFile } from "../dev";
 
 async function buildPackage(pkg: Package, aliases: Aliases) {
   let configs = getRollupConfigs(pkg, aliases);
-  await Promise.all([
-    fs.remove(path.join(pkg.directory, "dist")),
-    ...pkg.entrypoints.map(entrypoint => {
-      return fs.remove(path.join(entrypoint.directory, "dist"));
-    })
-  ]);
 
-  await Promise.all(
+  let outputs = await Promise.all(
     configs.map(async ({ config, outputs }) => {
       let bundle = await rollup(config);
-      await Promise.all(
+      return Promise.all(
         outputs.map(outputConfig => {
-          return bundle.write(outputConfig);
+          return bundle.generate(outputConfig);
+        })
+      );
+    })
+  );
+  await Promise.all(
+    outputs.map(x => {
+      return Promise.all(
+        x.map(bundle => {
+          return Promise.all(
+            bundle.output.map(output => {
+              return fs.outputFile(
+                path.join(pkg.directory, output.fileName),
+                output.type === "asset" ? output.source : output.code
+              );
+            })
+          );
         })
       );
     })
@@ -70,6 +82,29 @@ export default async function build(directory: string) {
 
     let aliases = getAliases(project);
     let errors: FatalError[] = [];
+    await Promise.all(
+      project.packages.map(async pkg => {
+        await Promise.all([
+          fs.remove(path.join(pkg.directory, "dist")),
+          ...pkg.entrypoints.map(entrypoint => {
+            return fs.remove(path.join(entrypoint.directory, "dist"));
+          })
+        ]);
+
+        await Promise.all(
+          pkg.entrypoints.map(async entrypoint => {
+            if (isTsPath(entrypoint.source)) {
+              await fs.mkdir(path.join(entrypoint.directory, "dist"));
+              await writeDevTSFile(
+                entrypoint.strict(),
+                await fs.readFile(entrypoint.source, "utf8")
+              );
+            }
+          })
+        );
+      })
+    );
+
     await Promise.all(
       project.packages.map(async pkg => {
         try {

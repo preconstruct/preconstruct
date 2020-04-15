@@ -1,4 +1,5 @@
 import path from "path";
+import fs from "fs-extra";
 import { FatalError } from "../../errors";
 import { Plugin, OutputChunk, OutputAsset } from "rollup";
 import { Package } from "../../package";
@@ -6,7 +7,7 @@ import { createDeclarationCreator } from "./create-generator";
 import { tsTemplate } from "../../utils";
 import normalizePath from "normalize-path";
 
-let isTsPath = (source: string) => /\.tsx?/.test(source);
+export let isTsPath = (source: string) => /\.tsx?/.test(source);
 
 export default function typescriptDeclarations(pkg: Package): Plugin {
   if (!pkg.entrypoints.some(({ source }) => isTsPath(source))) {
@@ -14,7 +15,6 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
   }
   return {
     name: "typescript-declarations",
-
     // eslint-disable-next-line no-unused-vars
     async generateBundle(opts, bundle, something) {
       let creator = await createDeclarationCreator(pkg.directory, pkg.name);
