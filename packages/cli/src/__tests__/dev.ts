@@ -148,9 +148,6 @@ test("typescript", async () => {
   await dev(tmpPath);
 
   expect(
-    await fs.readFile(
-      path.join(tmpPath, "dist", "typescript.cjs.js.ts"),
-      "utf8"
-    )
+    await fs.readFile(path.join(tmpPath, "dist", "typescript.cjs.d.ts"), "utf8")
   ).toMatchSnapshot();
 });
