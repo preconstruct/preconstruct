@@ -73,7 +73,7 @@ export async function writeDevTSFile(
     .join(entrypoint.directory, entrypoint.main)
     .replace(/\.js$/, "");
 
-  await fs.writeFile(
+  await fs.outputFile(
     cjsDistPath + ".d.ts",
     `// are you seeing an error that a default export doesn't exist but your source file has a default export?
 // you should run \`yarn\` or \`yarn preconstruct dev\` if preconstruct dev isn't in your postinstall hook
