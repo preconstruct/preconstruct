@@ -1,7 +1,7 @@
 import { Package } from "../package";
 import { Project } from "../project";
 import path from "path";
-import { rollup } from "rollup";
+import { rollup, OutputAsset, OutputChunk, OutputOptions } from "rollup";
 import { Aliases, getAliases } from "./aliases";
 import * as logger from "../logger";
 import * as fs from "fs-extra";
@@ -17,6 +17,47 @@ import { hasherPromise } from "../rollup-plugins/babel";
 import { isTsPath } from "../rollup-plugins/typescript-declarations";
 import { writeDevTSFile } from "../dev";
 
+// https://github.com/rollup/rollup/blob/28ffcf4c4a2ab4323091f63944b2a609b7bcd701/src/utils/sourceMappingURL.ts
+// this looks ridiculous, but it prevents sourcemap tooling from mistaking
+// this for an actual sourceMappingURL
+let SOURCEMAPPING_URL = "sourceMa";
+SOURCEMAPPING_URL += "ppingURL";
+
+// https://github.com/rollup/rollup/blob/28ffcf4c4a2ab4323091f63944b2a609b7bcd701/src/rollup/rollup.ts#L333-L356
+function writeOutputFile(
+  outputFile: OutputAsset | OutputChunk,
+  outputOptions: OutputOptions
+): Promise<unknown> {
+  const fileName = path.resolve(
+    outputOptions.dir || path.dirname(outputOptions.file!),
+    outputFile.fileName
+  );
+  let writeSourceMapPromise: Promise<void> | undefined;
+  let source: string | Uint8Array;
+  if (outputFile.type === "asset") {
+    source = outputFile.source;
+  } else {
+    source = outputFile.code;
+    if (outputOptions.sourcemap && outputFile.map) {
+      let url: string;
+      if (outputOptions.sourcemap === "inline") {
+        url = outputFile.map.toUrl();
+      } else {
+        url = `${path.basename(outputFile.fileName)}.map`;
+        writeSourceMapPromise = fs.outputFile(
+          `${fileName}.map`,
+          outputFile.map.toString()
+        );
+      }
+      if (outputOptions.sourcemap !== "hidden") {
+        source += `//# ${SOURCEMAPPING_URL}=${url}\n`;
+      }
+    }
+  }
+
+  return Promise.all([fs.outputFile(fileName, source), writeSourceMapPromise]);
+}
+
 async function buildPackage(pkg: Package, aliases: Aliases) {
   let configs = getRollupConfigs(pkg, aliases);
 
@@ -24,8 +65,11 @@ async function buildPackage(pkg: Package, aliases: Aliases) {
     configs.map(async ({ config, outputs }) => {
       let bundle = await rollup(config);
       return Promise.all(
-        outputs.map(outputConfig => {
-          return bundle.generate(outputConfig);
+        outputs.map(async outputConfig => {
+          return {
+            output: (await bundle.generate(outputConfig)).output,
+            outputConfig
+          };
         })
       );
     })
@@ -36,10 +80,7 @@ async function buildPackage(pkg: Package, aliases: Aliases) {
         x.map(bundle => {
           return Promise.all(
             bundle.output.map(output => {
-              return fs.outputFile(
-                path.join(pkg.directory, output.fileName),
-                output.type === "asset" ? output.source : output.code
-              );
+              return writeOutputFile(output, bundle.outputConfig);
             })
           );
         })
