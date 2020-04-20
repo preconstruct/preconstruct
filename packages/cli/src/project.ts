@@ -20,6 +20,12 @@ const allSettled = (promises: Promise<any>[]) =>
   );
 
 export class Project extends Item {
+  get experimentalFlags() {
+    let config = this._config.___experimentalFlags_WILL_CHANGE_IN_PATCH || {};
+    return {
+      newEntrypoints: !!config.newEntrypoints
+    };
+  }
   get configPackages(): Array<string> {
     if (this._config.packages == null) {
       return ["."];
@@ -94,9 +100,7 @@ export class Project extends Item {
     let packages = await Promise.all(
       filenames.map(async x => {
         try {
-          let pkg = await Package.create(x);
-          pkg.project = this;
-          return pkg;
+          return await Package.create(x, this);
         } catch (err) {
           if (
             err.code === "ENOENT" &&
