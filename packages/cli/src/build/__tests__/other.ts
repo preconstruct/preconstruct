@@ -36,6 +36,15 @@ test("typescript", async () => {
   await snapshotDirectory(tmpPath, { files: "all" });
 });
 
+test("typescript with forced dts emit", async () => {
+  let tmpPath = f.copy("typescript-force-dts-emit");
+
+  await install(tmpPath);
+  await build(tmpPath);
+
+  await snapshotDirectory(tmpPath, { files: "all" });
+});
+
 test("package resolvable but not in deps", async () => {
   let tmpPath = f.copy("package-resolvable-but-not-in-deps");
   await install(tmpPath);

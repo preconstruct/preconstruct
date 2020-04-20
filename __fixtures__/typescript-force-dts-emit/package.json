@@ -1,0 +1,19 @@
+{
+  "name": "typescript-force-dts-emit",
+  "version": "1.0.0",
+  "main": "dist/typescript-force-dts-emit.cjs.js",
+  "module": "dist/typescript-force-dts-emit.esm.js",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "@babel/runtime": "^7.8.7",
+    "@reduxjs/toolkit": "^1.3.5"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.9.0",
+    "@babel/preset-typescript": "^7.9.0",
+    "@types/node": "^12.7.1",
+    "@types/webpack-env": "^1.15.1",
+    "typescript": "^3.8.3"
+  }
+}
