@@ -42,7 +42,7 @@ test("typescript with forced dts emit", async () => {
   await install(tmpPath);
   await build(tmpPath);
 
-  await snapshotDirectory(tmpPath, { files: "all" });
+  await snapshotDirectory(tmpPath, { files: "all", filterPath: (fp) => fp.startsWith('dist/') });
 });
 
 test("package resolvable but not in deps", async () => {

@@ -171,7 +171,7 @@ export async function createDeclarationCreator(
           content: await fs.readFile(filename, "utf8")
         };
       }
-      let output = service.getEmitOutput(filename, true);
+      let output = service.getEmitOutput(filename, true, true);
       return {
         name: output.outputFiles[0].name.replace(
           dirname,
