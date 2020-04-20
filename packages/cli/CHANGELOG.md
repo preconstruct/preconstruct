@@ -1,5 +1,11 @@
 # preconstruct
 
+## 1.1.10
+
+### Patch Changes
+
+- [`6698d62`](https://github.com/preconstruct/preconstruct/commit/6698d62a9dbda34aeff705e8bcbd9c69ec107bcc) [#275](https://github.com/preconstruct/preconstruct/pull/275) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Add experimental new entrypoints feature flag (note that this should not be used and will break in patch versions)
+
 ## 1.1.9
 
 ### Patch Changes
