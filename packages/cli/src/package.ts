@@ -61,7 +61,6 @@ export class Package extends Item {
           if (directory.endsWith(nodePath.sep + "index")) {
             directory = nodePath.dirname(directory);
           }
-          console.log(directory);
           let filename = nodePath.join(directory, "package.json");
 
           let contents = null;
