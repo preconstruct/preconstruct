@@ -1,5 +1,11 @@
 # preconstruct
 
+## 1.1.11
+
+### Patch Changes
+
+- [`1833512`](https://github.com/preconstruct/preconstruct/commit/1833512c454bc7312a0ee2b79016248be13d5665) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Remove a console.log
+
 ## 1.1.10
 
 ### Patch Changes
