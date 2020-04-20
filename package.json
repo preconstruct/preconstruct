@@ -64,7 +64,7 @@
     "jest-junit": "^9.0.0",
     "normalize-path": "^3.0.0",
     "prettier": "^1.18.2",
-    "typescript": "^3.6.4",
+    "typescript": "^3.8.3",
     "v8-profiler-next": "^1.1.1"
   },
   "jest": {
