@@ -122,6 +122,22 @@ export class Entrypoint extends Item {
   }
 
   get configSource(): string {
+    if (this.package.project.experimentalFlags.newEntrypoints) {
+      if (this._config.source !== undefined) {
+        throw new FatalError(
+          "The source option is not allowed with the newEntrypoints experimental flag",
+          this.name
+        );
+      }
+      return nodePath.relative(
+        this.directory,
+        nodePath.join(
+          this.package.directory,
+          "src",
+          nodePath.relative(this.package.directory, this.directory)
+        )
+      );
+    }
     if (
       this._config.source != null &&
       typeof this._config.source !== "string"
