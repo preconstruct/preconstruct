@@ -32,7 +32,7 @@ export function createPromptConfirmLoader(
         }
         let { answers } = await enquirer.prompt([
           {
-            type: "multiselect",
+            type: "multiselect" as const,
             name: "answers",
             message,
             choices: pkgs.map(pkg => ({ name: pkg.name, initial: true })),

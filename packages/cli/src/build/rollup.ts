@@ -177,7 +177,7 @@ export let getRollupConfig = (
             indent_level: 2
           }
         })
-    ].filter(Boolean)
+    ].filter((x: Plugin | false): x is Plugin => !!x)
   };
 
   return config;
