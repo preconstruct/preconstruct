@@ -332,6 +332,115 @@ exports[`should lazily get globals: src/index.js 1`] = `
 "
 `;
 
+exports[`typescript with forced dts emit: dist/declarations/src/create-store.d.ts 1`] = `
+"import { Action } from '@reduxjs/toolkit';
+import { ThunkAction } from 'redux-thunk';
+import { RootState } from './root-reducer';
+export declare type AppThunk = ThunkAction<void, RootState, unknown, Action<string>>;
+export declare function createStore(): import(\\"@reduxjs/toolkit\\").EnhancedStore<{
+    readonly [$CombinedState]?: undefined;
+}, import(\\"redux\\").AnyAction, [import(\\"redux-thunk\\").ThunkMiddleware<{
+    readonly [$CombinedState]?: undefined;
+}, import(\\"redux\\").AnyAction, null> | import(\\"redux-thunk\\").ThunkMiddleware<{
+    readonly [$CombinedState]?: undefined;
+}, import(\\"redux\\").AnyAction, undefined>]>;
+"
+`;
+
+exports[`typescript with forced dts emit: dist/declarations/src/index.d.ts 1`] = `
+"export { createStore } from './create-store';
+export type { AppThunk } from './create-store';
+export type { RootState } from './root-reducer';
+"
+`;
+
+exports[`typescript with forced dts emit: dist/declarations/src/root-reducer.d.ts 1`] = `
+"export declare const rootReducer: import(\\"redux\\").Reducer<{
+    readonly [$CombinedState]?: undefined;
+}, import(\\"redux\\").AnyAction>;
+export declare type RootState = ReturnType<typeof rootReducer>;
+"
+`;
+
+exports[`typescript with forced dts emit: dist/typescript-force-dts-emit.cjs.d.ts 1`] = `
+"export * from \\"./declarations/src/index\\";
+"
+`;
+
+exports[`typescript with forced dts emit: dist/typescript-force-dts-emit.cjs.dev.js 1`] = `
+"'use strict';
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+var toolkit = require('@reduxjs/toolkit');
+
+// @ts-ignore (installed during test)
+const rootReducer = toolkit.combineReducers({
+  /* blah blah blah */
+});
+
+// @ts-ignore (installed during test)
+function createStore() {
+  return toolkit.configureStore({
+    reducer: rootReducer
+  });
+}
+
+exports.createStore = createStore;
+"
+`;
+
+exports[`typescript with forced dts emit: dist/typescript-force-dts-emit.cjs.js 1`] = `
+"'use strict';
+
+if (process.env.NODE_ENV === \\"production\\") {
+  module.exports = require(\\"./typescript-force-dts-emit.cjs.prod.js\\");
+} else {
+  module.exports = require(\\"./typescript-force-dts-emit.cjs.dev.js\\");
+}
+"
+`;
+
+exports[`typescript with forced dts emit: dist/typescript-force-dts-emit.cjs.prod.js 1`] = `
+"\\"use strict\\";
+
+Object.defineProperty(exports, \\"__esModule\\", {
+  value: !0
+});
+
+var toolkit = require(\\"@reduxjs/toolkit\\");
+
+const rootReducer = toolkit.combineReducers({});
+
+function createStore() {
+  return toolkit.configureStore({
+    reducer: rootReducer
+  });
+}
+
+exports.createStore = createStore;
+"
+`;
+
+exports[`typescript with forced dts emit: dist/typescript-force-dts-emit.esm.js 1`] = `
+"import { combineReducers, configureStore } from '@reduxjs/toolkit';
+
+// @ts-ignore (installed during test)
+const rootReducer = combineReducers({
+  /* blah blah blah */
+});
+
+// @ts-ignore (installed during test)
+function createStore() {
+  return configureStore({
+    reducer: rootReducer
+  });
+}
+
+export { createStore };
+"
+`;
+
 exports[`typescript: dist/declarations/src/another-thing.d.ts 1`] = `
 "export declare type SomeType = string;
 "

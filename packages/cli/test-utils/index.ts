@@ -177,10 +177,12 @@ export async function snapshotDirectory(
   tmpPath: string,
   {
     files = "js",
+    filterPath = x => true,
     transformPath = x => x,
     transformContent = x => x
   }: {
     files?: "all" | "js";
+    filterPath?: (path: string) => boolean;
     transformPath?: (path: string, contents: string) => string;
     transformContent?: (content: string) => string;
   } = {}
@@ -193,7 +195,7 @@ export async function snapshotDirectory(
   );
 
   await Promise.all(
-    paths.map(async x => {
+    paths.filter(fp => filterPath(fp)).map(async x => {
       let content = transformContent(
         await fs.readFile(path.join(tmpPath, x), "utf-8")
       );
