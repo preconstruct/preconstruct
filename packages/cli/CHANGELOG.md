@@ -1,5 +1,11 @@
 # preconstruct
 
+## 1.1.12
+
+### Patch Changes
+
+- [`5562440`](https://github.com/preconstruct/preconstruct/commit/55624404d6e47f328a7e652b05f90ac5962c55ef) [#278](https://github.com/preconstruct/preconstruct/pull/278) Thanks [@evocateur](https://github.com/evocateur)! - Force emit when generating declaration files
+
 ## 1.1.11
 
 ### Patch Changes
