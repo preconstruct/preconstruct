@@ -1,5 +1,11 @@
 # preconstruct
 
+## 1.1.13
+
+### Patch Changes
+
+- [`8e5c29d`](https://github.com/preconstruct/preconstruct/commit/8e5c29ddf0db57c3299c6c463754b8a4c6fddad7) [#281](https://github.com/preconstruct/preconstruct/pull/281) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Exclude package directories without package.jsons rather than prompting to delete them, this aligns with the behaviour of package managers.
+
 ## 1.1.12
 
 ### Patch Changes
