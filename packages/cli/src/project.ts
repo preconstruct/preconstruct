@@ -94,46 +94,27 @@ export class Project extends Item {
       expandDirectories: false
     });
 
-    let dirsWithoutPkgJson: string[] = [];
-    let lastErr;
+    let packages: Package[] = [];
 
-    let packages = await Promise.all(
+    await Promise.all(
       filenames.map(async x => {
         try {
-          return await Package.create(x, this);
+          packages.push(await Package.create(x, this));
         } catch (err) {
           if (
             err.code === "ENOENT" &&
             err.path === nodePath.join(x, "package.json")
           ) {
-            lastErr = err;
-            dirsWithoutPkgJson.push(x);
-            return (undefined as any) as Package;
+            return;
           }
           throw err;
         }
       })
     );
-    if (dirsWithoutPkgJson.length) {
-      error(
-        "there are some package directories that do not have package.jsons\nthis is often caused by switching branches.\n\n" +
-          dirsWithoutPkgJson.join("\n") +
-          "\n"
-      );
-      if (
-        !(await promptConfirm(
-          "would you like preconstruct to delete these directories automatically?"
-        ))
-      ) {
-        throw lastErr;
-      }
-      await Promise.all(dirsWithoutPkgJson.map(dir => fs.remove(dir)));
-      return this._packages();
-    }
 
-    const errored = (await allSettled(
-      packages.map(pkg => validateIncludedFiles(pkg))
-    )).find(result => result.status === "rejected");
+    const errored = (
+      await allSettled(packages.map(pkg => validateIncludedFiles(pkg)))
+    ).find(result => result.status === "rejected");
 
     if (errored) {
       // TS can't refine type based on .find predicate
