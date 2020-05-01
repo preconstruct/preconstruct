@@ -23,7 +23,8 @@ export class Project extends Item {
   get experimentalFlags() {
     let config = this._config.___experimentalFlags_WILL_CHANGE_IN_PATCH || {};
     return {
-      newEntrypoints: !!config.newEntrypoints
+      newEntrypoints: !!config.newEntrypoints,
+      useSourceInsteadOfGeneratingTSDeclarations: !!config.useSourceInsteadOfGeneratingTSDeclarations
     };
   }
   get configPackages(): Array<string> {
