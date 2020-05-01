@@ -1,5 +1,11 @@
 # preconstruct
 
+## 1.1.14
+
+### Patch Changes
+
+- [`0b1c19c`](https://github.com/preconstruct/preconstruct/commit/0b1c19c6af34fc639cb2a4fd6001b3d88b4506cf) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Add experimental `useSourceInsteadOfGeneratingTSDeclarations` flag. This flag should not be used and is intended to be a workaround for some TypeScript declaration bugs.
+
 ## 1.1.13
 
 ### Patch Changes
