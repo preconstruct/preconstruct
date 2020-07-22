@@ -144,8 +144,10 @@ export default async function dev(projectDir: string) {
           let entrypoint = _entrypoint.strict();
           let typeSystemPromise = getTypeSystem(entrypoint);
 
-          await fs.remove(path.join(entrypoint.directory, "dist"));
-          await fs.ensureDir(path.join(entrypoint.directory, "dist"));
+          let distDirectory = path.join(entrypoint.directory, "dist");
+
+          await fs.remove(distDirectory);
+          await fs.ensureDir(distDirectory);
 
           let promises = [
             writeTypeSystemFile(typeSystemPromise, entrypoint),
@@ -160,13 +162,22 @@ export default async function dev(projectDir: string) {
 // this means that you don't have to set up @babel/register or anything like that
 // but you can still require this module and it'll be compiled
 
+const path = require("path");
+
 // this bit of code imports the require hook and registers it
 let unregister = require(${JSON.stringify(
-                require.resolve("@preconstruct/hook")
-              )}).___internalHook(${JSON.stringify(project.directory)});
+                path.relative(
+                  distDirectory,
+                  require.resolve("@preconstruct/hook")
+                )
+              )}).___internalHook(path.resolve(__dirname, ${JSON.stringify(
+                path.relative(distDirectory, project.directory)
+              )}));
 
 // this re-exports the source file
-module.exports = require(${JSON.stringify(entrypoint.source)});
+module.exports = require(${JSON.stringify(
+                path.relative(distDirectory, entrypoint.source)
+              )});
 
 // this unregisters the require hook so that any modules required after this one
 // aren't compiled with the require hook in case you have some other require hook
@@ -179,7 +190,9 @@ unregister();
             promises.push(
               fs.writeFile(
                 path.join(entrypoint.directory, entrypoint.module),
-                cjsOnlyReexportTemplate(entrypoint.source)
+                cjsOnlyReexportTemplate(
+                  path.relative(distDirectory, entrypoint.source)
+                )
               )
             );
           }
@@ -189,7 +202,9 @@ unregister();
               promises.push(
                 fs.writeFile(
                   path.join(entrypoint.directory, browserField[key]),
-                  cjsOnlyReexportTemplate(entrypoint.source)
+                  cjsOnlyReexportTemplate(
+                    path.relative(distDirectory, entrypoint.source)
+                  )
                 )
               );
             }

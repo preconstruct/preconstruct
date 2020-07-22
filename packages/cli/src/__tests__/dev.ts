@@ -49,12 +49,15 @@ test("all the build types", async () => {
   ]);
 
   expect(
-    (await fs.readFile(
-      path.join(distPath, "all-the-build-types.cjs.js"),
-      "utf-8"
-    ))
-      .replace(/require\("[^"]+"\)/g, "thisWasARequireCall()")
-      .replace(/___internalHook\("[^"]+"\)/, "thisWasA___internalHookCall()")
+    (
+      await fs.readFile(
+        path.join(distPath, "all-the-build-types.cjs.js"),
+        "utf-8"
+      )
+    ).replace(
+      path.relative(tmpPath, require.resolve("@preconstruct/hook")),
+      "RELATIVE_PATH_TO_PRECONSTRUCT_HOOK"
+    )
   ).toMatchSnapshot();
 
   let shouldBeCjsThingsToSource = [
@@ -81,7 +84,7 @@ test("all the build types", async () => {
 // run preconstruct dev again which wouldn't be ideal
 // this solution could change but for now, it's working
 
-module.exports = require("${path.join(tmpPath, "src", "index.js")}")
+module.exports = require("../src/index.js")
 `);
     })
   );
