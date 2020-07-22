@@ -1,5 +1,11 @@
 # preconstruct
 
+## 1.1.15
+
+### Patch Changes
+
+- [`eeb0077`](https://github.com/preconstruct/preconstruct/commit/eeb007701cae285e36003f5d1c673504e045c5ef) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Use relative paths in `preconstruct dev` files
+
 ## 1.1.14
 
 ### Patch Changes
