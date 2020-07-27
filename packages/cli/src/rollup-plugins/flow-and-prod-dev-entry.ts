@@ -20,8 +20,14 @@ export default function flowAndNodeDevProdEntry(
       return null;
     },
     async resolveId(source, importer) {
-      let resolved = await this.resolve(source, importer!, {
-        skipSelf: true
+      if (importer === undefined) {
+        throw new FatalError(
+          `Tried to import ${source} without importer`,
+          pkg.name
+        );
+      }
+      let resolved = await this.resolve(source, importer, {
+        skipSelf: true,
       });
       if (resolved === null) {
         if (!source.startsWith(".")) {
@@ -99,7 +105,7 @@ export default function flowAndNodeDevProdEntry(
             this.emitFile({
               type: "asset",
               fileName: flowFileName,
-              source: flowFileSource
+              source: flowFileSource,
             });
           }
         }
@@ -117,9 +123,9 @@ if (${
         this.emitFile({
           type: "asset",
           fileName: mainFieldPath,
-          source: mainEntrySource
+          source: mainEntrySource,
         });
       }
-    }
+    },
   };
 }
