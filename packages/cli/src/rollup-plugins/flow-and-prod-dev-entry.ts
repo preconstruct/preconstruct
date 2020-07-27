@@ -6,6 +6,7 @@ import { Package } from "../package";
 import { FatalError } from "../errors";
 
 import * as fs from "fs-extra";
+import normalizePath from "normalize-path";
 
 export default function flowAndNodeDevProdEntry(
   pkg: Package,
@@ -93,7 +94,7 @@ export default function flowAndNodeDevProdEntry(
           if (flowMode !== false) {
             let flowFileSource = flowTemplate(
               flowMode === "all",
-              relativeToSource
+              normalizePath(relativeToSource)
             );
             let flowFileName = mainFieldPath + ".flow";
             this.emitFile({
