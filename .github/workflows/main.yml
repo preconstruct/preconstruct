@@ -8,8 +8,14 @@ on:
 
 jobs:
   test:
-    name: Tests
-    runs-on: ubuntu-latest
+    name: "Tests on ${{matrix.platform}}"
+    strategy:
+      fail-fast: true
+      matrix:
+        platform:
+          - ubuntu-latest
+          - windows-latest
+    runs-on: ${{matrix.platform}}
     steps:
       - uses: actions/checkout@master
 
@@ -19,7 +25,7 @@ jobs:
           node-version: 10.x
 
       - name: Cache Dependencies
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: node_modules
           key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
