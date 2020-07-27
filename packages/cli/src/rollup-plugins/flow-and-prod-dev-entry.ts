@@ -54,9 +54,8 @@ export default function flowAndNodeDevProdEntry(
       }
       warnings.push(
         new FatalError(
-          `all relative imports in a package should only import modules inside of their package directory but "${path.relative(
-            pkg.directory,
-            importer!
+          `all relative imports in a package should only import modules inside of their package directory but "${normalizePath(
+            path.relative(pkg.directory, importer!)
           )}" is importing "${source}"`,
           pkg.name
         )
