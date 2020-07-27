@@ -132,14 +132,12 @@ export class Entrypoint extends Item {
           this.name
         );
       }
-      return normalizePath(
-        nodePath.relative(
-          this.directory,
-          nodePath.join(
-            this.package.directory,
-            "src",
-            nodePath.relative(this.package.directory, this.directory)
-          )
+      return nodePath.relative(
+        this.directory,
+        nodePath.join(
+          this.package.directory,
+          "src",
+          nodePath.relative(this.package.directory, this.directory)
         )
       );
     }
@@ -159,11 +157,9 @@ export class Entrypoint extends Item {
   }
 
   get source(): string {
-    return normalizePath(
-      resolve.sync(nodePath.join(this.directory, this.configSource), {
-        extensions: EXTENSIONS,
-      })
-    );
+    return resolve.sync(nodePath.join(this.directory, this.configSource), {
+      extensions: EXTENSIONS,
+    });
   }
   get umdName(): null | string {
     if (

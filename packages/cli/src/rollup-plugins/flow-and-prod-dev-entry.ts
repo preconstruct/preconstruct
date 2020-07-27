@@ -20,13 +20,7 @@ export default function flowAndNodeDevProdEntry(
       return null;
     },
     async resolveId(source, importer) {
-      if (importer === undefined) {
-        throw new FatalError(
-          `Tried to import ${source} without importer`,
-          pkg.name
-        );
-      }
-      let resolved = await this.resolve(source, importer, {
+      let resolved = await this.resolve(source, importer!, {
         skipSelf: true,
       });
       if (resolved === null) {

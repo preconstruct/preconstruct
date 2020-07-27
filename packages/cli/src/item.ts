@@ -20,7 +20,7 @@ export class Item {
     this._stringifiedSavedJson = JSON.stringify(this.json, null, 2);
     this._contents = contents;
     this.path = filePath;
-    this.directory = normalizePath(nodePath.dirname(filePath));
+    this.directory = nodePath.dirname(filePath);
     this._config = this.json[PKG_JSON_CONFIG_FIELD] || {};
     if (itemsByPath[this.path] === undefined) {
       itemsByPath[this.path] = new Set();
