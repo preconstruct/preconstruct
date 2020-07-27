@@ -2,6 +2,7 @@ import * as fs from "fs-extra";
 import path from "path";
 import type { SourceFile } from "ts-morph";
 import resolveFrom from "resolve-from";
+import { FatalError } from "../../errors";
 
 type TSM = typeof import("ts-morph");
 
@@ -51,11 +52,12 @@ export async function createDeclarationCreatorWithTSMorph(
 }> {
   let tsm: TSM;
   try {
-    tsm = require(resolveFrom(dirname, "typescript"));
+    tsm = require(resolveFrom(dirname, "ts-morph"));
   } catch (err) {
     if (err.code === "MODULE_NOT_FOUND") {
-      throw new Error(
-        "an entrypoint source file ends with the .ts or .tsx extension and the experimental `useTSMorphForDeclaration` but the ts-morph module could not be resolved from the project directory, please install it."
+      throw new FatalError(
+        "an entrypoint source file ends with the .ts or .tsx extension and the experimental `useTSMorphToGenerateTSDeclarations` flag is on but the ts-morph module could not be resolved from the project directory, please install it.",
+        pkgName
       );
     }
     throw err;
@@ -76,8 +78,9 @@ export async function createDeclarationCreatorWithTSMorph(
   }
   let configFileName = tsm.ts.findConfigFile(dirname, tsm.ts.sys.fileExists);
   if (!configFileName) {
-    throw new Error(
-      "an entrypoint source file ends with the .ts extension but no TypeScript config exists, please create one."
+    throw new FatalError(
+      "an entrypoint source file ends with the .ts or .tsx extension but no TypeScript config exists, please create one.",
+      pkgName
     );
   }
   let project = getProject(tsm)(configFileName);

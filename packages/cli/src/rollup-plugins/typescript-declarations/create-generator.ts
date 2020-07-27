@@ -9,11 +9,11 @@ type Typescript = typeof import("typescript");
 
 let unsafeRequire = require;
 
-let weakMemoize = function<Arg extends object, Return>(
+let weakMemoize = function <Arg extends object, Return>(
   func: (arg: Arg) => Return
 ): (arg: Arg) => Return {
   let cache: WeakMap<Arg, Return> = new WeakMap();
-  return arg => {
+  return (arg) => {
     if (cache.has(arg)) {
       return cache.get(arg)!;
     }
@@ -77,8 +77,9 @@ export async function createDeclarationCreator(
     typescript = unsafeRequire(resolveFrom(dirname, "typescript"));
   } catch (err) {
     if (err.code === "MODULE_NOT_FOUND") {
-      throw new Error(
-        "an entrypoint source file ends with the .ts or .tsx extension but the typescript module could not be resolved from the project directory, please install it."
+      throw new FatalError(
+        "an entrypoint source file ends with the .ts or .tsx extension but the typescript module could not be resolved from the project directory, please install it.",
+        pkgName
       );
     }
     throw err;
@@ -88,14 +89,15 @@ export async function createDeclarationCreator(
     typescript.sys.fileExists
   );
   if (!configFileName) {
-    throw new Error(
-      "an entrypoint source file ends with the .ts extension but no TypeScript config exists, please create one."
+    throw new FatalError(
+      "an entrypoint source file ends with the .ts or tsx extension but no TypeScript config exists, please create one.",
+      pkgName
     );
   }
   let { service, options } = await getService(typescript)(configFileName);
   let moduleResolutionCache = typescript.createModuleResolutionCache(
     dirname,
-    x => x,
+    (x) => x,
     options
   );
 
@@ -107,7 +109,7 @@ export async function createDeclarationCreator(
           "This is an internal error, please open an issue if you see this: program not found"
         );
       }
-      let resolvedEntrypointPaths = entrypoints.map(x => {
+      let resolvedEntrypointPaths = entrypoints.map((x) => {
         let { resolvedModule } = typescript.resolveModuleName(
           path.join(path.dirname(x), path.basename(x, path.extname(x))),
           dirname,
@@ -168,7 +170,7 @@ export async function createDeclarationCreator(
             dirname,
             path.join(dirname, "dist", "declarations")
           ),
-          content: await fs.readFile(filename, "utf8")
+          content: await fs.readFile(filename, "utf8"),
         };
       }
       let output = service.getEmitOutput(filename, true, true);
@@ -177,8 +179,8 @@ export async function createDeclarationCreator(
           dirname,
           path.join(dirname, "dist", "declarations")
         ),
-        content: output.outputFiles[0].text
+        content: output.outputFiles[0].text,
       };
-    }
+    },
   };
 }
