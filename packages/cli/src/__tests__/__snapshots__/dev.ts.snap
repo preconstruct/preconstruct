@@ -13,7 +13,7 @@ exports[`all the build types 1`] = `
 const path = require(\\"path\\");
 
 // this bit of code imports the require hook and registers it
-let unregister = require(\\"../RELATIVE_PATH_TO_PRECONSTRUCT_HOOK\\").___internalHook(path.resolve(__dirname, \\"..\\"));
+let unregister = require(\\"RELATIVE_PATH_TO_PRECONSTRUCT_HOOK\\").___internalHook(path.resolve(__dirname, \\"..\\"));
 
 // this re-exports the source file
 module.exports = require(\\"../src/index.js\\");

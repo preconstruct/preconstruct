@@ -57,7 +57,10 @@ test("all the build types", async () => {
       )
     ).replace(
       normalizePath(
-        path.relative(tmpPath, require.resolve("@preconstruct/hook"))
+        path.relative(
+          path.join(tmpPath, "dist"),
+          require.resolve("@preconstruct/hook")
+        )
       ),
       "RELATIVE_PATH_TO_PRECONSTRUCT_HOOK"
     )
