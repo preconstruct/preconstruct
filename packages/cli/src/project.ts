@@ -11,10 +11,10 @@ import { FatalError } from "./errors";
 
 const allSettled = (promises: Promise<any>[]) =>
   Promise.all(
-    promises.map(promise =>
+    promises.map((promise) =>
       promise.then(
-        value => ({ status: "fulfilled" as const, value }),
-        reason => ({ status: "rejected" as const, reason })
+        (value) => ({ status: "fulfilled" as const, value }),
+        (reason) => ({ status: "rejected" as const, reason })
       )
     )
   );
@@ -24,7 +24,8 @@ export class Project extends Item {
     let config = this._config.___experimentalFlags_WILL_CHANGE_IN_PATCH || {};
     return {
       newEntrypoints: !!config.newEntrypoints,
-      useSourceInsteadOfGeneratingTSDeclarations: !!config.useSourceInsteadOfGeneratingTSDeclarations
+      useSourceInsteadOfGeneratingTSDeclarations: !!config.useSourceInsteadOfGeneratingTSDeclarations,
+      useTSMorphToGenerateTSDeclarations: !!config.useTSMorphToGenerateTSDeclarations,
     };
   }
   get configPackages(): Array<string> {
@@ -33,7 +34,7 @@ export class Project extends Item {
     }
     if (
       Array.isArray(this._config.packages) &&
-      this._config.packages.every(x => typeof x === "string")
+      this._config.packages.every((x) => typeof x === "string")
     ) {
       return this._config.packages;
     }
@@ -92,13 +93,13 @@ export class Project extends Item {
       cwd: this.directory,
       onlyDirectories: true,
       absolute: true,
-      expandDirectories: false
+      expandDirectories: false,
     });
 
     let packages: Package[] = [];
 
     await Promise.all(
-      filenames.map(async x => {
+      filenames.map(async (x) => {
         try {
           packages.push(await Package.create(x, this));
         } catch (err) {
@@ -114,8 +115,8 @@ export class Project extends Item {
     );
 
     const errored = (
-      await allSettled(packages.map(pkg => validateIncludedFiles(pkg)))
-    ).find(result => result.status === "rejected");
+      await allSettled(packages.map((pkg) => validateIncludedFiles(pkg)))
+    ).find((result) => result.status === "rejected");
 
     if (errored) {
       // TS can't refine type based on .find predicate

@@ -55,5 +55,8 @@
       "cli",
       "worker"
     ]
+  },
+  "devDependencies": {
+    "ts-morph": "^7.1.3"
   }
 }
