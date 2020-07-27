@@ -4,6 +4,7 @@ import path from "path";
 import * as fs from "fs-extra";
 import { install } from "../../test-utils";
 import dev from "../dev";
+import normalizePath from "normalize-path";
 
 const f = fixturez(__dirname);
 
@@ -55,7 +56,9 @@ test("all the build types", async () => {
         "utf-8"
       )
     ).replace(
-      path.relative(tmpPath, require.resolve("@preconstruct/hook")),
+      normalizePath(
+        path.relative(tmpPath, require.resolve("@preconstruct/hook"))
+      ),
       "RELATIVE_PATH_TO_PRECONSTRUCT_HOOK"
     )
   ).toMatchSnapshot();
