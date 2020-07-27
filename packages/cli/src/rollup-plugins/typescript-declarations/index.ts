@@ -6,6 +6,7 @@ import { Package } from "../../package";
 import { createDeclarationCreator } from "./create-generator";
 import { tsTemplate } from "../../utils";
 import normalizePath from "normalize-path";
+import { createDeclarationCreatorWithTSMorph } from "./create-generator-ts-morph";
 
 export let isTsPath = (source: string) => /\.tsx?/.test(source);
 
@@ -20,19 +21,22 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
     name: "typescript-declarations",
     // eslint-disable-next-line no-unused-vars
     async generateBundle(opts, bundle, something) {
-      let creator = await createDeclarationCreator(pkg.directory, pkg.name);
+      let creator = await (pkg.project.experimentalFlags
+        .useTSMorphToGenerateTSDeclarations
+        ? createDeclarationCreatorWithTSMorph
+        : createDeclarationCreator)(pkg.directory, pkg.name);
 
       let srcFilenameToDtsFilenameMap = new Map<string, string>();
 
-      let deps = creator.getDeps(pkg.entrypoints.map(x => x.source));
+      let deps = creator.getDeps(pkg.entrypoints.map((x) => x.source));
       await Promise.all(
-        [...deps].map(async dep => {
+        [...deps].map(async (dep) => {
           let { name, content } = await creator.getDeclarationFile(dep);
           srcFilenameToDtsFilenameMap.set(normalizePath(dep), name);
           this.emitFile({
             type: "asset",
             fileName: path.relative(opts.dir!, name),
-            source: content
+            source: content,
           });
         })
       );
@@ -77,9 +81,9 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
         this.emitFile({
           type: "asset",
           fileName: tsFileName,
-          source: tsFileSource
+          source: tsFileSource,
         });
       }
-    }
+    },
   };
 }
