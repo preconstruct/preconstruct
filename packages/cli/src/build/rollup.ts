@@ -20,6 +20,7 @@ import babel from "../rollup-plugins/babel";
 import terser from "../rollup-plugins/terser";
 import { getNameForDist } from "../utils";
 import { EXTENSIONS } from "../constants";
+import normalizePath from "normalize-path";
 
 // this makes sure nested imports of external packages are external
 const makeExternalPredicate = (externalArr: string[]) => {
@@ -52,7 +53,7 @@ export let getRollupConfig = (
 
   let rollupAliases: Record<string, string> = {};
 
-  Object.keys(aliases).forEach(key => {
+  Object.keys(aliases).forEach((key) => {
     try {
       rollupAliases[key] = resolveFrom(pkg.directory, aliases[key]);
     } catch (err) {
@@ -64,7 +65,7 @@ export let getRollupConfig = (
 
   let input: Record<string, string> = {};
 
-  entrypoints.forEach(entrypoint => {
+  entrypoints.forEach((entrypoint) => {
     input[
       path.relative(
         pkg.directory,
@@ -78,7 +79,7 @@ export let getRollupConfig = (
   const config: RollupOptions = {
     input,
     external: makeExternalPredicate(external),
-    onwarn: warning => {
+    onwarn: (warning) => {
       if (typeof warning === "string") {
         warnings.push(
           new FatalError(
@@ -102,9 +103,8 @@ export let getRollupConfig = (
           if (!warning.source!.startsWith(".")) {
             warnings.push(
               new FatalError(
-                `"${warning.source}" is imported by "${path.relative(
-                  pkg.directory,
-                  warning.importer!
+                `"${warning.source}" is imported by "${normalizePath(
+                  path.relative(pkg.directory, warning.importer!)
                 )}" but the package is not specified in dependencies or peerDependencies`,
                 pkg.name
               )
@@ -131,42 +131,42 @@ export let getRollupConfig = (
           if (warnings.length) {
             throw new BatchError(warnings);
           }
-        }
+        },
       } as Plugin,
       type === "node-prod" && flowAndNodeDevProdEntry(pkg, warnings),
       type === "node-prod" && typescriptDeclarations(pkg),
       babel({
         cwd: pkg.project.directory,
-        extensions: EXTENSIONS
+        extensions: EXTENSIONS,
       }),
       type === "umd" &&
         cjs({
-          include: ["**/node_modules/**", "node_modules/**"]
+          include: ["**/node_modules/**", "node_modules/**"],
         }),
       (type === "browser" || type === "umd") &&
         replace({
           ["typeof " + "document"]: JSON.stringify("object"),
-          ["typeof " + "window"]: JSON.stringify("object")
+          ["typeof " + "window"]: JSON.stringify("object"),
         }),
       rewriteBabelRuntimeHelpers(),
       // @ts-ignore
       json({
-        namedExports: false
+        namedExports: false,
       }),
       type === "umd" &&
         alias({
-          entries: rollupAliases
+          entries: rollupAliases,
         }),
       resolve({
         extensions: EXTENSIONS,
         customResolveOptions: {
-          moduleDirectory: type === "umd" ? "node_modules" : []
-        }
+          moduleDirectory: type === "umd" ? "node_modules" : [],
+        },
       }),
       (type === "umd" || type === "node-prod") &&
         replace({
           // tricking static analysis is fun...
-          ["process" + ".env.NODE_ENV"]: '"production"'
+          ["process" + ".env.NODE_ENV"]: '"production"',
         }),
       type === "umd" && terser(),
       type === "node-prod" &&
@@ -174,10 +174,10 @@ export let getRollupConfig = (
           mangle: false,
           output: {
             beautify: true,
-            indent_level: 2
-          }
-        })
-    ].filter((x: Plugin | false): x is Plugin => !!x)
+            indent_level: 2,
+          },
+        }),
+    ].filter((x: Plugin | false): x is Plugin => !!x),
   };
 
   return config;
