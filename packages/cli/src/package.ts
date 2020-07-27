@@ -9,12 +9,13 @@ import jsonParse from "parse-json";
 
 import {
   getValidObjectFieldContentForBuildType,
-  getValidStringFieldContentForBuildType
+  getValidStringFieldContentForBuildType,
 } from "./utils";
 import { errors, confirms } from "./messages";
 import { Project } from "./project";
 import { getUselessGlobsThatArentReallyGlobs } from "./glob-thing";
 import detectIndent from "detect-indent";
+import normalizePath from "normalize-path";
 
 export class Package extends Item {
   project!: Project;
@@ -27,7 +28,7 @@ export class Package extends Item {
     }
     if (
       Array.isArray(this._config.entrypoints) &&
-      this._config.entrypoints.every(x => typeof x === "string")
+      this._config.entrypoints.every((x) => typeof x === "string")
     ) {
       return this._config.entrypoints;
     }
@@ -48,10 +49,10 @@ export class Package extends Item {
         cwd: nodePath.join(pkg.directory, "src"),
         onlyFiles: true,
         absolute: true,
-        expandDirectories: false
+        expandDirectories: false,
       });
       pkg.entrypoints = await Promise.all(
-        entrypoints.map(async sourceFile => {
+        entrypoints.map(async (sourceFile) => {
           let directory = nodePath.join(
             pkg.directory,
             sourceFile
@@ -75,12 +76,12 @@ export class Package extends Item {
 
           return { filename, contents, hasAccepted: false };
         })
-      ).then(async descriptors => {
+      ).then(async (descriptors) => {
         let getPlainEntrypointContent = () => {
           let plainEntrypointObj: {
             [key: string]: string | Record<string, string>;
           } = {
-            main: getValidStringFieldContentForBuildType("main", pkg.name)
+            main: getValidStringFieldContentForBuildType("main", pkg.name),
           };
           for (let descriptor of descriptors) {
             if (descriptor.contents !== null) {
@@ -117,18 +118,22 @@ export class Package extends Item {
               if (!hasAccepted) {
                 let shouldCreateEntrypointPkgJson = await confirms.createEntrypointPkgJson(
                   {
-                    name: nodePath.join(
-                      pkg.name,
-                      nodePath.relative(pkg.directory, directory)
-                    )
+                    name: normalizePath(
+                      nodePath.join(
+                        pkg.name,
+                        nodePath.relative(pkg.directory, directory)
+                      )
+                    ),
                   }
                 );
                 if (!shouldCreateEntrypointPkgJson) {
                   throw new FatalError(
                     errors.noEntrypointPkgJson,
-                    nodePath.join(
-                      pkg.name,
-                      nodePath.relative(pkg.directory, directory)
+                    normalizePath(
+                      nodePath.join(
+                        pkg.name,
+                        nodePath.relative(pkg.directory, directory)
+                      )
                     )
                   );
                 }
@@ -145,10 +150,10 @@ export class Package extends Item {
         cwd: pkg.directory,
         onlyDirectories: true,
         absolute: true,
-        expandDirectories: false
+        expandDirectories: false,
       });
       pkg.entrypoints = await Promise.all(
-        entrypointDirectories.map(async directory => {
+        entrypointDirectories.map(async (directory) => {
           let filename = nodePath.join(directory, "package.json");
 
           let contents = null;
@@ -163,12 +168,12 @@ export class Package extends Item {
 
           return { filename, contents, hasAccepted: false };
         })
-      ).then(async descriptors => {
+      ).then(async (descriptors) => {
         let getPlainEntrypointContent = () => {
           let plainEntrypointObj: {
             [key: string]: string | Record<string, string>;
           } = {
-            main: getValidStringFieldContentForBuildType("main", pkg.name)
+            main: getValidStringFieldContentForBuildType("main", pkg.name),
           };
           for (let descriptor of descriptors) {
             if (descriptor.contents !== null) {
@@ -204,15 +209,17 @@ export class Package extends Item {
           pkg.directory
         );
 
-        if (globErrors.some(x => x !== undefined)) {
+        if (globErrors.some((x) => x !== undefined)) {
           await Promise.all(
             globErrors.map(async (globError, index) => {
               if (globError !== undefined) {
                 let shouldCreateEntrypoint = await confirms.createEntrypoint({
-                  name: nodePath.join(
-                    pkg.name,
-                    nodePath.relative(pkg.directory, globError)
-                  )
+                  name: normalizePath(
+                    nodePath.join(
+                      pkg.name,
+                      nodePath.relative(pkg.directory, globError)
+                    )
+                  ),
                 });
                 if (shouldCreateEntrypoint) {
                   descriptors.push({
@@ -222,7 +229,7 @@ export class Package extends Item {
                       globError,
                       "package.json"
                     ),
-                    hasAccepted: true
+                    hasAccepted: true,
                   });
                   await fs.mkdirp(globError);
                 } else {
@@ -243,18 +250,22 @@ export class Package extends Item {
               if (!hasAccepted) {
                 let shouldCreateEntrypointPkgJson = await confirms.createEntrypointPkgJson(
                   {
-                    name: nodePath.join(
-                      pkg.name,
-                      nodePath.relative(pkg.directory, directory)
-                    )
+                    name: normalizePath(
+                      nodePath.join(
+                        pkg.name,
+                        nodePath.relative(pkg.directory, directory)
+                      )
+                    ),
                   }
                 );
                 if (!shouldCreateEntrypointPkgJson) {
                   throw new FatalError(
                     errors.noEntrypointPkgJson,
-                    nodePath.join(
-                      pkg.name,
-                      nodePath.relative(pkg.directory, directory)
+                    normalizePath(
+                      nodePath.join(
+                        pkg.name,
+                        nodePath.relative(pkg.directory, directory)
+                      )
                     )
                   );
                 }
@@ -272,7 +283,7 @@ export class Package extends Item {
   }
 
   setFieldOnEntrypoints(field: "main" | "browser" | "module" | "umdMain") {
-    this.entrypoints.forEach(entrypoint => {
+    this.entrypoints.forEach((entrypoint) => {
       switch (field) {
         case "main": {
           entrypoint.main = getValidStringFieldContentForBuildType(

@@ -4,6 +4,7 @@ import { tsTemplate, flowTemplate } from "./utils";
 import * as babel from "@babel/core";
 import * as fs from "fs-extra";
 import path from "path";
+import normalizePath from "normalize-path";
 import { StrictEntrypoint } from "./entrypoint";
 
 let tsExtensionPattern = /tsx?$/;
@@ -50,7 +51,7 @@ export async function writeDevTSFile(
   let ast = (await babel.parseAsync(entrypointSourceContent, {
     filename: entrypoint.source,
     sourceType: "module",
-    cwd: entrypoint.package.project.directory
+    cwd: entrypoint.package.project.directory,
   }))! as babel.types.File;
 
   let hasDefaultExport = false;
@@ -60,7 +61,7 @@ export async function writeDevTSFile(
       statement.type === "ExportDefaultDeclaration" ||
       (statement.type === "ExportNamedDeclaration" &&
         statement.specifiers.some(
-          specifier =>
+          (specifier) =>
             specifier.type === "ExportSpecifier" &&
             specifier.exported.name === "default"
         ))
@@ -88,9 +89,11 @@ export async function writeDevTSFile(
 ` +
       tsTemplate(
         hasDefaultExport,
-        path
-          .relative(path.dirname(cjsDistPath), entrypoint.source)
-          .replace(/\.tsx?$/, "")
+        normalizePath(
+          path
+            .relative(path.dirname(cjsDistPath), entrypoint.source)
+            .replace(/\.tsx?$/, "")
+        )
       )
   );
 }
@@ -120,7 +123,9 @@ async function writeTypeSystemFile(
       cjsDistPath + ".flow",
       flowTemplate(
         false,
-        path.relative(path.dirname(cjsDistPath), entrypoint.source)
+        normalizePath(
+          path.relative(path.dirname(cjsDistPath), entrypoint.source)
+        )
       )
     );
   }
@@ -132,15 +137,15 @@ async function writeTypeSystemFile(
 export default async function dev(projectDir: string) {
   let project: Project = await Project.create(projectDir);
   project.packages.forEach(({ entrypoints }) =>
-    entrypoints.forEach(x => x.strict())
+    entrypoints.forEach((x) => x.strict())
   );
   info("project is valid!");
 
   let promises: Promise<unknown>[] = [];
   await Promise.all(
-    project.packages.map(pkg => {
+    project.packages.map((pkg) => {
       return Promise.all(
-        pkg.entrypoints.map(async _entrypoint => {
+        pkg.entrypoints.map(async (_entrypoint) => {
           let entrypoint = _entrypoint.strict();
           let typeSystemPromise = getTypeSystem(entrypoint);
 
@@ -166,17 +171,19 @@ const path = require("path");
 
 // this bit of code imports the require hook and registers it
 let unregister = require(${JSON.stringify(
-                path.relative(
-                  distDirectory,
-                  require.resolve("@preconstruct/hook")
+                normalizePath(
+                  path.relative(
+                    distDirectory,
+                    require.resolve("@preconstruct/hook")
+                  )
                 )
               )}).___internalHook(path.resolve(__dirname, ${JSON.stringify(
-                path.relative(distDirectory, project.directory)
+                normalizePath(path.relative(distDirectory, project.directory))
               )}));
 
 // this re-exports the source file
 module.exports = require(${JSON.stringify(
-                path.relative(distDirectory, entrypoint.source)
+                normalizePath(path.relative(distDirectory, entrypoint.source))
               )});
 
 // this unregisters the require hook so that any modules required after this one
@@ -184,14 +191,14 @@ module.exports = require(${JSON.stringify(
 // or something that should be used on other modules
 unregister();
 `
-            )
+            ),
           ];
           if (entrypoint.module) {
             promises.push(
               fs.writeFile(
                 path.join(entrypoint.directory, entrypoint.module),
                 cjsOnlyReexportTemplate(
-                  path.relative(distDirectory, entrypoint.source)
+                  normalizePath(path.relative(distDirectory, entrypoint.source))
                 )
               )
             );
@@ -203,7 +210,9 @@ unregister();
                 fs.writeFile(
                   path.join(entrypoint.directory, browserField[key]),
                   cjsOnlyReexportTemplate(
-                    path.relative(distDirectory, entrypoint.source)
+                    normalizePath(
+                      path.relative(distDirectory, entrypoint.source)
+                    )
                   )
                 )
               );

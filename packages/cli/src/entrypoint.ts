@@ -6,6 +6,7 @@ import resolve from "resolve";
 import { EXTENSIONS } from "./constants";
 import { Package } from "./package";
 import { FatalError } from "./errors";
+import normalizePath from "normalize-path";
 
 let fields = [
   "version",
@@ -13,7 +14,7 @@ let fields = [
   "main",
   "module",
   "umd:main",
-  "browser"
+  "browser",
 ];
 
 function setFieldInOrder(
@@ -28,7 +29,7 @@ function setFieldInOrder(
   let idealField = fields
     .slice(0, fieldIndex)
     .reverse()
-    .find(key => {
+    .find((key) => {
       return key in obj;
     });
 
@@ -58,9 +59,11 @@ export class Entrypoint extends Item {
   }
 
   get name(): string {
-    return nodePath.join(
-      this.package.name,
-      nodePath.relative(this.package.directory, this.directory)
+    return normalizePath(
+      nodePath.join(
+        this.package.name,
+        nodePath.relative(this.package.directory, this.directory)
+      )
     );
   }
 
@@ -129,12 +132,14 @@ export class Entrypoint extends Item {
           this.name
         );
       }
-      return nodePath.relative(
-        this.directory,
-        nodePath.join(
-          this.package.directory,
-          "src",
-          nodePath.relative(this.package.directory, this.directory)
+      return normalizePath(
+        nodePath.relative(
+          this.directory,
+          nodePath.join(
+            this.package.directory,
+            "src",
+            nodePath.relative(this.package.directory, this.directory)
+          )
         )
       );
     }
@@ -154,9 +159,11 @@ export class Entrypoint extends Item {
   }
 
   get source(): string {
-    return resolve.sync(nodePath.join(this.directory, this.configSource), {
-      extensions: EXTENSIONS
-    });
+    return normalizePath(
+      resolve.sync(nodePath.join(this.directory, this.configSource), {
+        extensions: EXTENSIONS,
+      })
+    );
   }
   get umdName(): null | string {
     if (
