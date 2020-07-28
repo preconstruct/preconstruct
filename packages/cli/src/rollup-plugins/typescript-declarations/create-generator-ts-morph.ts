@@ -99,7 +99,15 @@ export async function createDeclarationCreatorWithTSMorph(
         let sourceFile = project.getSourceFileOrThrow(sourceFilePath);
         allDeps.add(sourceFilePath);
         let sourceFiles = sourceFile.getReferencedSourceFiles();
-        queue.push(...sourceFiles.map((x) => x.getFilePath()));
+        queue.push(
+          ...sourceFiles
+            .map((x) => x.getFilePath())
+            .filter((filepath) => {
+              return (
+                filepath.includes(dirname) && !dirname.includes("node_modules")
+              );
+            })
+        );
       }
 
       return allDeps;
