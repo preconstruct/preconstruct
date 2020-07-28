@@ -1,5 +1,11 @@
 # preconstruct
 
+## 1.1.17
+
+### Patch Changes
+
+- [`933d831`](https://github.com/preconstruct/preconstruct/commit/933d83165ff021a704904759b6e7004159c3322a) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Fix the ts-morph declaration generator generating files outside of the package's directory
+
 ## 1.1.16
 
 ### Patch Changes
