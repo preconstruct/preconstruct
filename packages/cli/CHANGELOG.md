@@ -1,5 +1,11 @@
 # preconstruct
 
+## 1.1.16
+
+### Patch Changes
+
+- [`3c5743a`](https://github.com/preconstruct/preconstruct/commit/3c5743a86005e261671452c9bdf4b985d3a90ee3) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Add experimental `useTSMorphToGenerateTSDeclarations` flag
+
 ## 1.1.15
 
 ### Patch Changes
