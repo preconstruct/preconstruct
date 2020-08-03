@@ -13,7 +13,7 @@ let fields = [
   "main",
   "module",
   "umd:main",
-  "browser"
+  "browser",
 ];
 
 function setFieldInOrder(
@@ -28,7 +28,7 @@ function setFieldInOrder(
   let idealField = fields
     .slice(0, fieldIndex)
     .reverse()
-    .find(key => {
+    .find((key) => {
       return key in obj;
     });
 
@@ -152,11 +152,17 @@ export class Entrypoint extends Item {
     }
     return this._config.source;
   }
-
+  _sourceCached?: string;
   get source(): string {
-    return resolve.sync(nodePath.join(this.directory, this.configSource), {
-      extensions: EXTENSIONS
-    });
+    if (this._sourceCached === undefined) {
+      this._sourceCached = resolve.sync(
+        nodePath.join(this.directory, this.configSource),
+        {
+          extensions: EXTENSIONS,
+        }
+      );
+    }
+    return this._sourceCached;
   }
   get umdName(): null | string {
     if (
@@ -190,6 +196,10 @@ export class Entrypoint extends Item {
       );
     }
     return this._strict;
+  }
+  updater(json: Object) {
+    super.updater(json);
+    this._sourceCached = undefined;
   }
 }
 
