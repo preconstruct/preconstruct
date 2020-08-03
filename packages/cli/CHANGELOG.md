@@ -1,5 +1,13 @@
 # preconstruct
 
+## 1.1.18
+
+### Patch Changes
+
+- [`68fdeeb`](https://github.com/preconstruct/preconstruct/commit/68fdeebd8160a6aca9aedea027fb5f06e2e86323) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Cache source module resolution
+
+* [`e3a5c0c`](https://github.com/preconstruct/preconstruct/commit/e3a5c0c86011b439fef65a750b0e0acbc07c65de) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Skip parsing modules with Babel to determine if they have default exports or not if we're sure they don't based on a regex when running `preconstruct dev`
+
 ## 1.1.17
 
 ### Patch Changes
