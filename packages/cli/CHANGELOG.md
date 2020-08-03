@@ -1,5 +1,11 @@
 # preconstruct
 
+## 1.1.19
+
+### Patch Changes
+
+- [`cae339b`](https://github.com/preconstruct/preconstruct/commit/cae339b721ee0cd857e84f6454208e265be3cdc0) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Fix `newEntrypoints` experimental flag on Windows
+
 ## 1.1.18
 
 ### Patch Changes
