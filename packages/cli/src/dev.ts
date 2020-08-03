@@ -43,14 +43,22 @@ async function getTypeSystem(
   return [null, content];
 }
 
-export async function writeDevTSFile(
+async function entrypointHasDefaultExport(
   entrypoint: StrictEntrypoint,
-  entrypointSourceContent: string
+  content: string
 ) {
-  let ast = (await babel.parseAsync(entrypointSourceContent, {
+  // this regex won't tell us that a module definitely has a default export
+  // if it doesn't match though, it will tell us that the module
+  // definitely _doesn't_ have a default export
+  // we want to do this because a Babel parse is very expensive
+  // so we want to avoid doing it unless we absolutely have to
+  if (!/(export\s*{[^}]*default|export\s+default)/.test(content)) {
+    return false;
+  }
+  let ast = (await babel.parseAsync(content, {
     filename: entrypoint.source,
     sourceType: "module",
-    cwd: entrypoint.package.project.directory
+    cwd: entrypoint.package.project.directory,
   }))! as babel.types.File;
 
   let hasDefaultExport = false;
@@ -60,7 +68,7 @@ export async function writeDevTSFile(
       statement.type === "ExportDefaultDeclaration" ||
       (statement.type === "ExportNamedDeclaration" &&
         statement.specifiers.some(
-          specifier =>
+          (specifier) =>
             specifier.type === "ExportSpecifier" &&
             specifier.exported.name === "default"
         ))
@@ -69,6 +77,17 @@ export async function writeDevTSFile(
       break;
     }
   }
+  return hasDefaultExport;
+}
+
+export async function writeDevTSFile(
+  entrypoint: StrictEntrypoint,
+  entrypointSourceContent: string
+) {
+  let hasDefaultExport = await entrypointHasDefaultExport(
+    entrypoint,
+    entrypointSourceContent
+  );
   let cjsDistPath = path
     .join(entrypoint.directory, entrypoint.main)
     .replace(/\.js$/, "");
@@ -132,15 +151,15 @@ async function writeTypeSystemFile(
 export default async function dev(projectDir: string) {
   let project: Project = await Project.create(projectDir);
   project.packages.forEach(({ entrypoints }) =>
-    entrypoints.forEach(x => x.strict())
+    entrypoints.forEach((x) => x.strict())
   );
   info("project is valid!");
 
   let promises: Promise<unknown>[] = [];
   await Promise.all(
-    project.packages.map(pkg => {
+    project.packages.map((pkg) => {
       return Promise.all(
-        pkg.entrypoints.map(async _entrypoint => {
+        pkg.entrypoints.map(async (_entrypoint) => {
           let entrypoint = _entrypoint.strict();
           let typeSystemPromise = getTypeSystem(entrypoint);
 
@@ -184,7 +203,7 @@ module.exports = require(${JSON.stringify(
 // or something that should be used on other modules
 unregister();
 `
-            )
+            ),
           ];
           if (entrypoint.module) {
             promises.push(
