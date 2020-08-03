@@ -54,11 +54,11 @@ export class Package extends Item {
         entrypoints.map(async sourceFile => {
           let directory = nodePath.join(
             pkg.directory,
-            sourceFile
+            nodePath.resolve(sourceFile)
               .replace(nodePath.join(pkg.directory, "src"), "")
               .replace(/\.[tj]sx?$/, "")
           );
-          if (directory.endsWith(nodePath.sep + "index")) {
+          if (nodePath.basename(directory) === 'index') {
             directory = nodePath.dirname(directory);
           }
           let filename = nodePath.join(directory, "package.json");
