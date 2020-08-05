@@ -1,5 +1,11 @@
 # preconstruct
 
+## 1.1.20
+
+### Patch Changes
+
+- [`a723556`](https://github.com/preconstruct/preconstruct/commit/a7235569dd4055125bb7a099c1bf4d7dba8dc1ba) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Fix prompt for creating entrypoint package.jsons showing every entrypoint as the package name when using `newEntrypoints` experimental flag
+
 ## 1.1.19
 
 ### Patch Changes
