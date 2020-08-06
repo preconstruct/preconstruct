@@ -52,7 +52,9 @@ async function entrypointHasDefaultExport(
   // definitely _doesn't_ have a default export
   // we want to do this because a Babel parse is very expensive
   // so we want to avoid doing it unless we absolutely have to
-  if (!/(export\s*{[^}]*default|export\s+default)/.test(content)) {
+  if (
+    !/(export\s*{[^}]*default|export\s+(|\*\s+as\s+)default\s)/.test(content)
+  ) {
     return false;
   }
   let ast = (await babel.parseAsync(content, {
@@ -61,23 +63,22 @@ async function entrypointHasDefaultExport(
     cwd: entrypoint.package.project.directory,
   }))! as babel.types.File;
 
-  let hasDefaultExport = false;
-
   for (let statement of ast.program.body) {
     if (
       statement.type === "ExportDefaultDeclaration" ||
       (statement.type === "ExportNamedDeclaration" &&
         statement.specifiers.some(
           (specifier) =>
-            specifier.type === "ExportSpecifier" &&
+            (specifier.type === "ExportDefaultSpecifier" ||
+              specifier.type === "ExportNamespaceSpecifier" ||
+              specifier.type === "ExportSpecifier") &&
             specifier.exported.name === "default"
         ))
     ) {
-      hasDefaultExport = true;
-      break;
+      return true;
     }
   }
-  return hasDefaultExport;
+  return false;
 }
 
 export async function writeDevTSFile(
