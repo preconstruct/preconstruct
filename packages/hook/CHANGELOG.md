@@ -1,5 +1,11 @@
 # @preconstruct/hook
 
+## 0.2.0
+
+### Minor Changes
+
+- [`b8d1906`](https://github.com/preconstruct/preconstruct/commit/b8d19066e6fa520f153497ee403d6dcd76c8edec) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Only compile files within the package directory in the require hook for `preconstruct dev`
+
 ## 0.1.0
 
 ### Minor Changes

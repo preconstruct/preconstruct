@@ -1,5 +1,16 @@
 # preconstruct
 
+## 1.1.21
+
+### Patch Changes
+
+- [`286d8fb`](https://github.com/preconstruct/preconstruct/commit/286d8fbfbe251b6c8c4f876a3dddb6ce0ecdaed9) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Make check for default exports more reliable for preconstruct dev's `.d.ts` redirect file generation
+
+* [`b8d1906`](https://github.com/preconstruct/preconstruct/commit/b8d19066e6fa520f153497ee403d6dcd76c8edec) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Only compile files within the package directory in the require hook for `preconstruct dev`
+
+* Updated dependencies [[`b8d1906`](https://github.com/preconstruct/preconstruct/commit/b8d19066e6fa520f153497ee403d6dcd76c8edec)]:
+  - @preconstruct/hook@0.2.0
+
 ## 1.1.20
 
 ### Patch Changes
