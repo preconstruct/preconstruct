@@ -34,7 +34,7 @@ export function getValidObjectFieldContentForBuildType(
   switch (type) {
     case "browser": {
       let obj = {
-        [`./dist/${safeName}.cjs.js`]: `./dist/${safeName}.browser.cjs.js`
+        [`./dist/${safeName}.cjs.js`]: `./dist/${safeName}.browser.cjs.js`,
       };
       if (hasModuleBuild) {
         obj[`./dist/${safeName}.esm.js`] = `./dist/${safeName}.browser.esm.js`;

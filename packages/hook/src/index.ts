@@ -5,7 +5,7 @@ import sourceMapSupport from "source-map-support";
 let EXTENSIONS = [".js", ".jsx", ".ts", ".tsx"];
 
 let babelPlugins = [
-  require.resolve("@babel/plugin-transform-modules-commonjs")
+  require.resolve("@babel/plugin-transform-modules-commonjs"),
 ];
 
 export let ___internalHook = (cwd: string) => {
@@ -26,12 +26,12 @@ export let ___internalHook = (cwd: string) => {
           if (map !== undefined) {
             return {
               url: source,
-              map
+              map,
             };
           } else {
             return null;
           }
-        }
+        },
       });
       needsToInstallSourceMapSupport = false;
     }
@@ -41,7 +41,7 @@ export let ___internalHook = (cwd: string) => {
         plugins: babelPlugins,
         filename,
         sourceMaps: "both",
-        cwd
+        cwd,
       })!;
       sourceMaps[filename] = output.map;
       return output.code!;
@@ -51,6 +51,7 @@ export let ___internalHook = (cwd: string) => {
   }
 
   return addHook(compileHook, {
-    exts: EXTENSIONS
+    exts: EXTENSIONS,
+    matcher: (filepath) => filepath.includes(cwd),
   });
 };
