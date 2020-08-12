@@ -8,7 +8,7 @@ let babelPlugins = [
   require.resolve("@babel/plugin-transform-modules-commonjs"),
 ];
 
-export let ___internalHook = (cwd: string) => {
+export let ___internalHook = (cwd: string, pkgDir: string) => {
   let compiling = false;
   let sourceMaps: Record<string, any> = {};
   let needsToInstallSourceMapSupport = true;
@@ -52,6 +52,6 @@ export let ___internalHook = (cwd: string) => {
 
   return addHook(compileHook, {
     exts: EXTENSIONS,
-    matcher: (filepath) => filepath.includes(cwd),
+    matcher: (filepath) => filepath.includes(pkgDir),
   });
 };

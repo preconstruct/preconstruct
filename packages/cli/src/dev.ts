@@ -192,6 +192,8 @@ let unregister = require(${JSON.stringify(
                 )
               )}).___internalHook(path.resolve(__dirname, ${JSON.stringify(
                 path.relative(distDirectory, project.directory)
+              )}), path.resolve(__dirname, ${JSON.stringify(
+                path.relative(distDirectory, pkg.directory)
               )}));
 
 // this re-exports the source file
