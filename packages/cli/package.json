@@ -1,6 +1,6 @@
 {
   "name": "@preconstruct/cli",
-  "version": "1.1.21",
+  "version": "1.1.22",
   "description": "Dev and build your code painlessly in monorepos",
   "files": [
     "bin.js",
@@ -17,7 +17,7 @@
     "@babel/code-frame": "^7.5.5",
     "@babel/core": "^7.7.7",
     "@babel/runtime": "^7.7.7",
-    "@preconstruct/hook": "^0.2.0",
+    "@preconstruct/hook": "^0.3.0",
     "@rollup/plugin-alias": "^3.0.1",
     "@rollup/plugin-commonjs": "^11.0.2",
     "@rollup/plugin-json": "^4.0.2",

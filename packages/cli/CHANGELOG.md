@@ -1,5 +1,14 @@
 # preconstruct
 
+## 1.1.22
+
+### Patch Changes
+
+- [`5ad1c73`](https://github.com/preconstruct/preconstruct/commit/5ad1c73c3615ac1742b7beb8abb15680be5ad0e4) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Correctly only compile files within the package directory in the require hook for `preconstruct dev`
+
+- Updated dependencies [[`5ad1c73`](https://github.com/preconstruct/preconstruct/commit/5ad1c73c3615ac1742b7beb8abb15680be5ad0e4)]:
+  - @preconstruct/hook@0.3.0
+
 ## 1.1.21
 
 ### Patch Changes
