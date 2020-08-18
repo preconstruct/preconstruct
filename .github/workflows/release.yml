@@ -44,3 +44,5 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.PRECONSTRUCT_RELEASE_BOT_GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          GITHUB_USERNAME: preconstruct-release-bot
+          GITHUB_EMAIL: 52642337+preconstruct-release-bot@users.noreply.github.com
