@@ -2,4 +2,4 @@
 "@preconstruct/cli": patch
 ---
 
-test changeset
+test changeset 2
