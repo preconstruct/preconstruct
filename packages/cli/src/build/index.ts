@@ -9,7 +9,7 @@ import {
   FatalError,
   UnexpectedBuildError,
   ScopelessError,
-  BatchError
+  BatchError,
 } from "../errors";
 import { getRollupConfigs } from "./config";
 import { createWorker, destroyWorker } from "../worker-client";
@@ -65,21 +65,21 @@ async function buildPackage(pkg: Package, aliases: Aliases) {
     configs.map(async ({ config, outputs }) => {
       let bundle = await rollup(config);
       return Promise.all(
-        outputs.map(async outputConfig => {
+        outputs.map(async (outputConfig) => {
           return {
             output: (await bundle.generate(outputConfig)).output,
-            outputConfig
+            outputConfig,
           };
         })
       );
     })
   );
   await Promise.all(
-    outputs.map(x => {
+    outputs.map((x) => {
       return Promise.all(
-        x.map(bundle => {
+        x.map((bundle) => {
           return Promise.all(
-            bundle.output.map(output => {
+            bundle.output.map((output) => {
               return writeOutputFile(output, bundle.outputConfig);
             })
           );
@@ -124,16 +124,18 @@ export default async function build(directory: string) {
     let aliases = getAliases(project);
     let errors: FatalError[] = [];
     await Promise.all(
-      project.packages.map(async pkg => {
+      project.packages.map(async (pkg) => {
         await Promise.all([
           fs.remove(path.join(pkg.directory, "dist")),
-          ...pkg.entrypoints.map(entrypoint => {
-            return fs.remove(path.join(entrypoint.directory, "dist"));
-          })
+          ...pkg.entrypoints
+            .filter((entrypoint) => entrypoint.name !== pkg.name)
+            .map((entrypoint) => {
+              return fs.remove(path.join(entrypoint.directory, "dist"));
+            }),
         ]);
 
         await Promise.all(
-          pkg.entrypoints.map(async entrypoint => {
+          pkg.entrypoints.map(async (entrypoint) => {
             if (isTsPath(entrypoint.source)) {
               await fs.mkdir(path.join(entrypoint.directory, "dist"));
               await writeDevTSFile(
@@ -147,7 +149,7 @@ export default async function build(directory: string) {
     );
 
     await Promise.all(
-      project.packages.map(async pkg => {
+      project.packages.map(async (pkg) => {
         try {
           await retryableBuild(pkg, aliases);
         } catch (err) {
