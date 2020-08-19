@@ -1,5 +1,11 @@
 # preconstruct
 
+## 1.1.23
+
+### Patch Changes
+
+- [`d56018d`](https://github.com/preconstruct/preconstruct/commit/d56018d6793d7298912bf2e4dc9fd92c981e7e9f) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Skip double removing of package dist directory to attempt to fix EINVAL errors on build
+
 ## 1.1.22
 
 ### Patch Changes
