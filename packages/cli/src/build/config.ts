@@ -6,6 +6,7 @@ import { PKG_JSON_CONFIG_FIELD } from "../constants";
 import { limit, doPromptInput } from "../prompt";
 import path from "path";
 import resolveFrom from "resolve-from";
+import * as logger from "../logger";
 import { Project } from "../project";
 
 function getGlobal(project: Project, name: string) {
@@ -59,19 +60,31 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
     outputs: OutputOptions[];
   }> = [];
 
-  let strictEntrypoints = pkg.entrypoints.map(x => x.strict());
+  let strictEntrypoints = pkg.entrypoints.map((x) => x.strict());
 
   let hasModuleField = strictEntrypoints[0].module !== null;
-
   configs.push({
-    config: getRollupConfig(pkg, strictEntrypoints, aliases, "node-dev"),
+    config: getRollupConfig(
+      pkg,
+      strictEntrypoints,
+      aliases,
+      "node-dev",
+      pkg.project.experimentalFlags.logCompiledFiles
+        ? (filename) => {
+            logger.info(
+              "compiled " +
+                filename.replace(pkg.project.directory + path.sep, "")
+            );
+          }
+        : () => {}
+    ),
     outputs: [
       {
         format: "cjs" as const,
         entryFileNames: "[name].cjs.dev.js",
         chunkFileNames: "dist/[name]-[hash].cjs.dev.js",
         dir: pkg.directory,
-        exports: "named" as const
+        exports: "named" as const,
       },
       ...(hasModuleField
         ? [
@@ -79,24 +92,30 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
               format: "es" as const,
               entryFileNames: "[name].esm.js",
               chunkFileNames: "dist/[name]-[hash].esm.js",
-              dir: pkg.directory
-            }
+              dir: pkg.directory,
+            },
           ]
-        : [])
-    ]
+        : []),
+    ],
   });
 
   configs.push({
-    config: getRollupConfig(pkg, strictEntrypoints, aliases, "node-prod"),
+    config: getRollupConfig(
+      pkg,
+      strictEntrypoints,
+      aliases,
+      "node-prod",
+      () => {}
+    ),
     outputs: [
       {
         format: "cjs",
         entryFileNames: "[name].cjs.prod.js",
         chunkFileNames: "dist/[name]-[hash].cjs.prod.js",
         dir: pkg.directory,
-        exports: "named"
-      }
-    ]
+        exports: "named",
+      },
+    ],
   });
 
   // umd builds are a bit special
@@ -104,10 +123,10 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
   // this is just like dependencies, they're bundled into the umd build
   if (strictEntrypoints[0].umdMain !== null)
     pkg.entrypoints
-      .map(x => x.strict())
-      .forEach(entrypoint => {
+      .map((x) => x.strict())
+      .forEach((entrypoint) => {
         configs.push({
-          config: getRollupConfig(pkg, [entrypoint], aliases, "umd"),
+          config: getRollupConfig(pkg, [entrypoint], aliases, "umd", () => {}),
           outputs: [
             {
               format: "umd" as const,
@@ -120,9 +139,9 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
                   return name;
                 }
                 return getGlobal(pkg.project, name);
-              }
-            }
-          ]
+              },
+            },
+          ],
         });
       });
 
@@ -130,14 +149,20 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
 
   if (hasBrowserField) {
     configs.push({
-      config: getRollupConfig(pkg, strictEntrypoints, aliases, "browser"),
+      config: getRollupConfig(
+        pkg,
+        strictEntrypoints,
+        aliases,
+        "browser",
+        () => {}
+      ),
       outputs: [
         {
           format: "cjs" as const,
           entryFileNames: "[name].browser.cjs.js",
           chunkFileNames: "dist/[name]-[hash].browser.cjs.js",
           dir: pkg.directory,
-          exports: "named" as const
+          exports: "named" as const,
         },
         ...(hasModuleField
           ? [
@@ -145,11 +170,11 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
                 format: "es" as const,
                 entryFileNames: "[name].browser.esm.js",
                 chunkFileNames: "dist/[name]-[hash].browser.esm.js",
-                dir: pkg.directory
-              }
+                dir: pkg.directory,
+              },
             ]
-          : [])
-      ]
+          : []),
+      ],
     });
   }
 

@@ -36,7 +36,8 @@ export let getRollupConfig = (
   pkg: Package,
   entrypoints: Array<StrictEntrypoint>,
   aliases: Aliases,
-  type: RollupConfigType
+  type: RollupConfigType,
+  reportTransformedFile: (filename: string) => void
 ): RollupOptions => {
   let external = [];
   if (pkg.json.peerDependencies) {
@@ -52,7 +53,7 @@ export let getRollupConfig = (
 
   let rollupAliases: Record<string, string> = {};
 
-  Object.keys(aliases).forEach(key => {
+  Object.keys(aliases).forEach((key) => {
     try {
       rollupAliases[key] = resolveFrom(pkg.directory, aliases[key]);
     } catch (err) {
@@ -64,7 +65,7 @@ export let getRollupConfig = (
 
   let input: Record<string, string> = {};
 
-  entrypoints.forEach(entrypoint => {
+  entrypoints.forEach((entrypoint) => {
     input[
       path.relative(
         pkg.directory,
@@ -78,7 +79,7 @@ export let getRollupConfig = (
   const config: RollupOptions = {
     input,
     external: makeExternalPredicate(external),
-    onwarn: warning => {
+    onwarn: (warning) => {
       if (typeof warning === "string") {
         warnings.push(
           new FatalError(
@@ -131,42 +132,42 @@ export let getRollupConfig = (
           if (warnings.length) {
             throw new BatchError(warnings);
           }
-        }
+        },
       } as Plugin,
       type === "node-prod" && flowAndNodeDevProdEntry(pkg, warnings),
       type === "node-prod" && typescriptDeclarations(pkg),
       babel({
         cwd: pkg.project.directory,
-        extensions: EXTENSIONS
+        reportTransformedFile,
       }),
       type === "umd" &&
         cjs({
-          include: ["**/node_modules/**", "node_modules/**"]
+          include: ["**/node_modules/**", "node_modules/**"],
         }),
       (type === "browser" || type === "umd") &&
         replace({
           ["typeof " + "document"]: JSON.stringify("object"),
-          ["typeof " + "window"]: JSON.stringify("object")
+          ["typeof " + "window"]: JSON.stringify("object"),
         }),
       rewriteBabelRuntimeHelpers(),
       // @ts-ignore
       json({
-        namedExports: false
+        namedExports: false,
       }),
       type === "umd" &&
         alias({
-          entries: rollupAliases
+          entries: rollupAliases,
         }),
       resolve({
         extensions: EXTENSIONS,
         customResolveOptions: {
-          moduleDirectory: type === "umd" ? "node_modules" : []
-        }
+          moduleDirectory: type === "umd" ? "node_modules" : [],
+        },
       }),
       (type === "umd" || type === "node-prod") &&
         replace({
           // tricking static analysis is fun...
-          ["process" + ".env.NODE_ENV"]: '"production"'
+          ["process" + ".env.NODE_ENV"]: '"production"',
         }),
       type === "umd" && terser(),
       type === "node-prod" &&
@@ -174,10 +175,10 @@ export let getRollupConfig = (
           mangle: false,
           output: {
             beautify: true,
-            indent_level: 2
-          }
-        })
-    ].filter((x: Plugin | false): x is Plugin => !!x)
+            indent_level: 2,
+          },
+        }),
+    ].filter((x: Plugin | false): x is Plugin => !!x),
   };
 
   return config;

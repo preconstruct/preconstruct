@@ -26,6 +26,7 @@ export class Project extends Item {
       newEntrypoints: !!config.newEntrypoints,
       useSourceInsteadOfGeneratingTSDeclarations: !!config.useSourceInsteadOfGeneratingTSDeclarations,
       useTSMorphToGenerateTSDeclarations: !!config.useTSMorphToGenerateTSDeclarations,
+      logCompiledFiles: !!config.logCompiledFiles,
     };
   }
   get configPackages(): Array<string> {
