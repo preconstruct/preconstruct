@@ -18,6 +18,10 @@ export let hasherPromise = initHasher().then(({ h64 }: any) => {
   hasher = h64;
 });
 
+let extensionRegex = /\.[tj]sx?$/;
+
+let fakeRollupModuleRegex = /\0/;
+
 let rollupPluginBabel = ({
   cwd,
   reportTransformedFile,
@@ -29,7 +33,12 @@ let rollupPluginBabel = ({
     name: "babel",
     // @ts-ignore
     transform(code, filename) {
-      if (typeof filename !== "string" || /\0/.test(filename)) {
+      if (
+        typeof filename !== "string" ||
+        fakeRollupModuleRegex.test(filename) ||
+        !extensionRegex.test(filename) ||
+        filename.includes("node_modules")
+      ) {
         return Promise.resolve(null);
       }
       let hash = hasher(filename);
@@ -45,6 +54,7 @@ let rollupPluginBabel = ({
           supportsStaticESM: true,
           supportsDynamicImport: true,
         },
+        sourceMaps: true,
         cwd,
         filename,
       });
