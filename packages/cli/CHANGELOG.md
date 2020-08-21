@@ -1,5 +1,11 @@
 # preconstruct
 
+## 1.1.24
+
+### Patch Changes
+
+- [`6727d9b`](https://github.com/preconstruct/preconstruct/commit/6727d9b0eb504a64072ddb710af570ecb7ac28c6) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Add `logCompiledFiles` experimental flag for logging when files are compiled with Babel
+
 ## 1.1.23
 
 ### Patch Changes
