@@ -1,5 +1,11 @@
 # preconstruct
 
+## 1.1.25
+
+### Patch Changes
+
+- [`6b3f95e`](https://github.com/preconstruct/preconstruct/commit/6b3f95e2db4704722dc5d3c9ade64fb2d3a76965) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Fix bug in reading of TS config resulting in wrong type definitions being generated in some cases. This should remove the need for the experimental `useTSMorphToGenerateTSDeclarations` and `useSourceInsteadOfGeneratingTSDeclarations` flags.
+
 ## 1.1.24
 
 ### Patch Changes
