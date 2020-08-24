@@ -41,7 +41,7 @@ let getService = weakMemoize((typescript: Typescript) =>
     );
 
     let thing = typescript.parseJsonConfigFileContent(
-      result,
+      result.config,
       typescript.sys,
       process.cwd(),
       undefined,
@@ -131,7 +131,7 @@ export async function createDeclarationCreator(
           let sourceFile = program!.getSourceFile(dep);
           if (!sourceFile) {
             throw new FatalError(
-              `Could not generate type declarations because ${dep} does not exist or is not a TypeScript file`,
+              `Could not generate type declarations because ${dep} is not in a TypeScript project. Make sure this file is included in your tsconfig.`,
               pkgName
             );
           }
