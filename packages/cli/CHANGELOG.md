@@ -1,5 +1,11 @@
 # preconstruct
 
+## 1.1.26
+
+### Patch Changes
+
+- [`99090cb`](https://github.com/preconstruct/preconstruct/commit/99090cbf61fa080ed53857d7d1247bbf275a6b1b) [#312](https://github.com/preconstruct/preconstruct/pull/312) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Upgrade dependencies
+
 ## 1.1.25
 
 ### Patch Changes
