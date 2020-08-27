@@ -3,7 +3,7 @@ import { minify } from "terser";
 
 export function transformBabel(code: string, options: any) {
   options = JSON.parse(options);
-  return babel.transformAsync(code, options).then(res => {
+  return babel.transformAsync(code, options).then((res) => {
     let { code, map } = res!;
     return { code, map };
   });
@@ -11,13 +11,5 @@ export function transformBabel(code: string, options: any) {
 
 export function transformTerser(code: string, optionsString: string) {
   const options = JSON.parse(optionsString);
-  const result = minify(code, options);
-  if (result.error) {
-    return Promise.reject(result.error);
-  } else {
-    return Promise.resolve({
-      code: result.code!,
-      map: result.map as any
-    });
-  }
+  return minify(code, options) as Promise<{ code: string; map: any }>;
 }

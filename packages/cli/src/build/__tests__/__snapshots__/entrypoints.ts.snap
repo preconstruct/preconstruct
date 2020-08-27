@@ -204,9 +204,9 @@ exports[`two entrypoints where one requires the other entrypoint: multiply/dist/
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-var importingAnotherEntrypoint = require('../../dist/importing-another-entrypoint.cjs.dev.js');
+var dist_importingAnotherEntrypoint = require('../../dist/importing-another-entrypoint.cjs.dev.js');
 
-let multiply = (a, b) => importingAnotherEntrypoint.identity(a * b);
+let multiply = (a, b) => dist_importingAnotherEntrypoint.identity(a * b);
 
 exports.multiply = multiply;
 "
@@ -230,9 +230,9 @@ Object.defineProperty(exports, \\"__esModule\\", {
   value: !0
 });
 
-var importingAnotherEntrypoint = require(\\"../../dist/importing-another-entrypoint.cjs.prod.js\\");
+var dist_importingAnotherEntrypoint = require(\\"../../dist/importing-another-entrypoint.cjs.prod.js\\");
 
-let multiply = (a, b) => importingAnotherEntrypoint.identity(a * b);
+let multiply = (a, b) => dist_importingAnotherEntrypoint.identity(a * b);
 
 exports.multiply = multiply;
 "

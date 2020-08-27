@@ -85,6 +85,7 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
         chunkFileNames: "dist/[name]-[hash].cjs.dev.js",
         dir: pkg.directory,
         exports: "named" as const,
+        interop: "auto",
       },
       ...(hasModuleField
         ? [
@@ -114,6 +115,7 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
         chunkFileNames: "dist/[name]-[hash].cjs.prod.js",
         dir: pkg.directory,
         exports: "named",
+        interop: "auto",
       },
     ],
   });
@@ -134,6 +136,7 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
               entryFileNames: "[name].umd.min.js",
               name: entrypoint.umdName!,
               dir: pkg.directory,
+              interop: "auto",
               globals: (name: string) => {
                 if (name === entrypoint.umdName!) {
                   return name;
@@ -163,6 +166,7 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
           chunkFileNames: "dist/[name]-[hash].browser.cjs.js",
           dir: pkg.directory,
           exports: "named" as const,
+          interop: "auto",
         },
         ...(hasModuleField
           ? [

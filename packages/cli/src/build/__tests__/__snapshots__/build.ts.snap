@@ -453,12 +453,12 @@ require(\\"@some-scope/package-one-umd-with-dep\\");
 `;
 
 exports[`monorepo umd with dep on other module: package-four-umd-with-dep.umd.min.js 1`] = `
-"!function(e,t){\\"object\\"==typeof exports&&\\"undefined\\"!=typeof module?t(require(\\"react\\")):\\"function\\"==typeof define&&define.amd?define([\\"react\\"],t):t((e=e||self).React)}(this,(function(e){\\"use strict\\";e.createElement(\\"div\\",null)}));
+"!function(e,t){\\"object\\"==typeof exports&&\\"undefined\\"!=typeof module?t(require(\\"react\\")):\\"function\\"==typeof define&&define.amd?define([\\"react\\"],t):t((e=\\"undefined\\"!=typeof globalThis?globalThis:e||self).React)}(this,(function(e){\\"use strict\\";e.createElement(\\"div\\",null)}));
 //# sourceMappingURL=package-four-umd-with-dep.umd.min.js.map
 "
 `;
 
-exports[`monorepo umd with dep on other module: package-four-umd-with-dep.umd.min.js.map 1`] = `"{\\"version\\":3,\\"file\\":\\"package-four-umd-with-dep.umd.min.js\\",\\"sources\\":[\\"../../package-one/src/index.js\\"],\\"sourcesContent\\":[\\"import { createElement } from \\\\\\"react\\\\\\";\\\\n\\\\ncreateElement(\\\\\\"div\\\\\\", null);\\\\n\\"],\\"names\\":[],\\"mappings\\":\\"uNAEc,MAAO\\"}"`;
+exports[`monorepo umd with dep on other module: package-four-umd-with-dep.umd.min.js.map 1`] = `"{\\"version\\":3,\\"file\\":\\"package-four-umd-with-dep.umd.min.js\\",\\"sources\\":[\\"../../package-one/src/index.js\\"],\\"sourcesContent\\":[\\"import { createElement } from \\\\\\"react\\\\\\";\\\\n\\\\ncreateElement(\\\\\\"div\\\\\\", null);\\\\n\\"],\\"names\\":[],\\"mappings\\":\\"iQAEc,MAAO\\"}"`;
 
 exports[`monorepo umd with dep on other module: package-one-umd-with-dep.cjs.dev.js 1`] = `
 "'use strict';
@@ -490,12 +490,12 @@ react.createElement(\\"div\\", null);
 `;
 
 exports[`monorepo umd with dep on other module: package-one-umd-with-dep.umd.min.js 1`] = `
-"!function(e,t){\\"object\\"==typeof exports&&\\"undefined\\"!=typeof module?t(require(\\"react\\")):\\"function\\"==typeof define&&define.amd?define([\\"react\\"],t):t((e=e||self).React)}(this,(function(e){\\"use strict\\";e.createElement(\\"div\\",null)}));
+"!function(e,t){\\"object\\"==typeof exports&&\\"undefined\\"!=typeof module?t(require(\\"react\\")):\\"function\\"==typeof define&&define.amd?define([\\"react\\"],t):t((e=\\"undefined\\"!=typeof globalThis?globalThis:e||self).React)}(this,(function(e){\\"use strict\\";e.createElement(\\"div\\",null)}));
 //# sourceMappingURL=package-one-umd-with-dep.umd.min.js.map
 "
 `;
 
-exports[`monorepo umd with dep on other module: package-one-umd-with-dep.umd.min.js.map 1`] = `"{\\"version\\":3,\\"file\\":\\"package-one-umd-with-dep.umd.min.js\\",\\"sources\\":[\\"../src/index.js\\"],\\"sourcesContent\\":[\\"import { createElement } from \\\\\\"react\\\\\\";\\\\n\\\\ncreateElement(\\\\\\"div\\\\\\", null);\\\\n\\"],\\"names\\":[],\\"mappings\\":\\"uNAEc,MAAO\\"}"`;
+exports[`monorepo umd with dep on other module: package-one-umd-with-dep.umd.min.js.map 1`] = `"{\\"version\\":3,\\"file\\":\\"package-one-umd-with-dep.umd.min.js\\",\\"sources\\":[\\"../src/index.js\\"],\\"sourcesContent\\":[\\"import { createElement } from \\\\\\"react\\\\\\";\\\\n\\\\ncreateElement(\\\\\\"div\\\\\\", null);\\\\n\\"],\\"names\\":[],\\"mappings\\":\\"iQAEc,MAAO\\"}"`;
 
 exports[`monorepo umd with dep on other module: package-three-umd-with-dep.cjs.dev.js 1`] = `
 "'use strict';
@@ -561,12 +561,12 @@ react.createElement(\\"h1\\", null);
 `;
 
 exports[`monorepo umd with dep on other module: package-two-umd-with-dep.umd.min.js 1`] = `
-"!function(e,t){\\"object\\"==typeof exports&&\\"undefined\\"!=typeof module?t(require(\\"react\\")):\\"function\\"==typeof define&&define.amd?define([\\"react\\"],t):t((e=e||self).React)}(this,(function(e){\\"use strict\\";e.createElement(\\"h1\\",null)}));
+"!function(e,t){\\"object\\"==typeof exports&&\\"undefined\\"!=typeof module?t(require(\\"react\\")):\\"function\\"==typeof define&&define.amd?define([\\"react\\"],t):t((e=\\"undefined\\"!=typeof globalThis?globalThis:e||self).React)}(this,(function(e){\\"use strict\\";e.createElement(\\"h1\\",null)}));
 //# sourceMappingURL=package-two-umd-with-dep.umd.min.js.map
 "
 `;
 
-exports[`monorepo umd with dep on other module: package-two-umd-with-dep.umd.min.js.map 1`] = `"{\\"version\\":3,\\"file\\":\\"package-two-umd-with-dep.umd.min.js\\",\\"sources\\":[\\"../src/index.js\\"],\\"sourcesContent\\":[\\"import { createElement } from \\\\\\"react\\\\\\";\\\\n\\\\ncreateElement(\\\\\\"h1\\\\\\", null);\\\\n\\"],\\"names\\":[],\\"mappings\\":\\"uNAEc,KAAM\\"}"`;
+exports[`monorepo umd with dep on other module: package-two-umd-with-dep.umd.min.js.map 1`] = `"{\\"version\\":3,\\"file\\":\\"package-two-umd-with-dep.umd.min.js\\",\\"sources\\":[\\"../src/index.js\\"],\\"sourcesContent\\":[\\"import { createElement } from \\\\\\"react\\\\\\";\\\\n\\\\ncreateElement(\\\\\\"h1\\\\\\", null);\\\\n\\"],\\"names\\":[],\\"mappings\\":\\"iQAEc,KAAM\\"}"`;
 
 exports[`monorepo: package-one.cjs.dev.js 1`] = `
 "'use strict';
@@ -758,9 +758,9 @@ react.createElement(\\"div\\", null);
 `;
 
 exports[`umd with dep on other module: umd-with-dep.umd.min.js 1`] = `
-"!function(e,t){\\"object\\"==typeof exports&&\\"undefined\\"!=typeof module?t(require(\\"react\\")):\\"function\\"==typeof define&&define.amd?define([\\"react\\"],t):t((e=e||self).React)}(this,(function(e){\\"use strict\\";e.createElement(\\"div\\",null)}));
+"!function(e,t){\\"object\\"==typeof exports&&\\"undefined\\"!=typeof module?t(require(\\"react\\")):\\"function\\"==typeof define&&define.amd?define([\\"react\\"],t):t((e=\\"undefined\\"!=typeof globalThis?globalThis:e||self).React)}(this,(function(e){\\"use strict\\";e.createElement(\\"div\\",null)}));
 //# sourceMappingURL=umd-with-dep.umd.min.js.map
 "
 `;
 
-exports[`umd with dep on other module: umd-with-dep.umd.min.js.map 1`] = `"{\\"version\\":3,\\"file\\":\\"umd-with-dep.umd.min.js\\",\\"sources\\":[\\"../src/index.js\\"],\\"sourcesContent\\":[\\"import { createElement } from \\\\\\"react\\\\\\";\\\\n\\\\ncreateElement(\\\\\\"div\\\\\\", null);\\\\n\\"],\\"names\\":[],\\"mappings\\":\\"uNAEc,MAAO\\"}"`;
+exports[`umd with dep on other module: umd-with-dep.umd.min.js.map 1`] = `"{\\"version\\":3,\\"file\\":\\"umd-with-dep.umd.min.js\\",\\"sources\\":[\\"../src/index.js\\"],\\"sourcesContent\\":[\\"import { createElement } from \\\\\\"react\\\\\\";\\\\n\\\\ncreateElement(\\\\\\"div\\\\\\", null);\\\\n\\"],\\"names\\":[],\\"mappings\\":\\"iQAEc,MAAO\\"}"`;
