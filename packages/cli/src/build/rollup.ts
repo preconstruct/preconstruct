@@ -169,11 +169,12 @@ export let getRollupConfig = (
           // tricking static analysis is fun...
           ["process" + ".env.NODE_ENV"]: '"production"',
         }),
-      type === "umd" && terser(),
+      type === "umd" && terser({ sourceMap: true }),
       type === "node-prod" &&
         terser({
+          sourceMap: false,
           mangle: false,
-          output: {
+          format: {
             beautify: true,
             indent_level: 2,
           },

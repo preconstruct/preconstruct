@@ -3,20 +3,21 @@ import * as fs from "fs-extra";
 import globby from "globby";
 import fixturez from "fixturez";
 import spawn from "spawndamnit";
-// @ts-ignore
 import initHasher from "xxhash-wasm";
 // @ts-ignore
 import profiler from "v8-profiler-next";
+import chalk from "chalk";
 
 let f = fixturez(__dirname);
 
-require("chalk").enabled = false;
+chalk.level = 0;
+
 console.error = jest.fn();
 console.log = jest.fn();
 
 export let logMock = {
   log: (console.log as any) as jest.MockInstance<void, any>,
-  error: (console.error as any) as jest.MockInstance<void, any>
+  error: (console.error as any) as jest.MockInstance<void, any>,
 };
 
 afterEach(() => {
@@ -44,11 +45,11 @@ export function profile(name: string) {
   return () => {
     let profile = profiler.stopProfiling();
 
-    new Promise<void>(resolve =>
+    new Promise<void>((resolve) =>
       profile
         .export()
         .pipe(fs.createWriteStream(name + ".cpuprofile"))
-        .on("finish", function() {
+        .on("finish", function () {
           profile.delete();
           resolve();
         })
@@ -96,7 +97,7 @@ export let createPackageCheckTestCreator = (
       let tmpPath = f.copy("template-simple-package");
       let things = Object.keys(entrypoints);
       await Promise.all(
-        things.map(async entrypointPath => {
+        things.map(async (entrypointPath) => {
           let content = entrypoints[entrypointPath];
           let filepath = path.join(tmpPath, entrypointPath, "package.json");
           await fs.ensureFile(filepath);
@@ -111,7 +112,7 @@ export let createPackageCheckTestCreator = (
           let newThings: Record<string, any> = {};
 
           await Promise.all(
-            things.map(async entrypointPath => {
+            things.map(async (entrypointPath) => {
               newThings[entrypointPath] = JSON.parse(
                 await fs.readFile(
                   path.join(tmpPath, entrypointPath, "package.json"),
@@ -147,7 +148,7 @@ export async function snapshotDistFiles(tmpPath: string) {
   }
 
   await Promise.all(
-    distFiles.map(async x => {
+    distFiles.map(async (x) => {
       expect(
         await fs.readFile(path.join(distPath, x), "utf-8")
       ).toMatchSnapshot(x);
@@ -169,7 +170,7 @@ export let stripHashes = async (chunkName: string) => {
       return content.replace(new RegExp(`${chunkName}-[^\\.]+`, "g"), () => {
         return "chunk-some-hash";
       });
-    }
+    },
   };
 };
 
@@ -177,9 +178,9 @@ export async function snapshotDirectory(
   tmpPath: string,
   {
     files = "js",
-    filterPath = x => true,
-    transformPath = x => x,
-    transformContent = x => x
+    filterPath = (x) => true,
+    transformPath = (x) => x,
+    transformContent = (x) => x,
   }: {
     files?: "all" | "js";
     filterPath?: (path: string) => boolean;
@@ -190,20 +191,22 @@ export async function snapshotDirectory(
   let paths = await globby(
     [`**/${files === "js" ? "*.js" : "*"}`, "!node_modules/**", "!yarn.lock"],
     {
-      cwd: tmpPath
+      cwd: tmpPath,
     }
   );
 
   await Promise.all(
-    paths.filter(fp => filterPath(fp)).map(async x => {
-      let content = transformContent(
-        await fs.readFile(path.join(tmpPath, x), "utf-8")
-      );
-      if (x.endsWith(".json") && !x.endsWith("tsconfig.json")) {
-        content = JSON.parse(content);
-      }
-      expect(content).toMatchSnapshot(transformPath(x, content));
-    })
+    paths
+      .filter((fp) => filterPath(fp))
+      .map(async (x) => {
+        let content = transformContent(
+          await fs.readFile(path.join(tmpPath, x), "utf-8")
+        );
+        if (x.endsWith(".json") && !x.endsWith("tsconfig.json")) {
+          content = JSON.parse(content);
+        }
+        expect(content).toMatchSnapshot(transformPath(x, content));
+      })
   );
 }
 

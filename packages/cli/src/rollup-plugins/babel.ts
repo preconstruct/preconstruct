@@ -1,7 +1,6 @@
 import * as babel from "@babel/core";
 import { getWorker } from "../worker-client";
 import { Plugin } from "rollup";
-// @ts-ignore
 import initHasher from "xxhash-wasm";
 import QuickLRU from "quick-lru";
 

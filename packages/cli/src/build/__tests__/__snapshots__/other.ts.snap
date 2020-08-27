@@ -322,7 +322,7 @@ exports.default = index;
 `;
 
 exports[`should lazily get globals: dist/umd-unused-peer-dep.umd.min.js 1`] = `
-"!function(e,t){\\"object\\"==typeof exports&&\\"undefined\\"!=typeof module?module.exports=t():\\"function\\"==typeof define&&define.amd?define(t):(e=e||self).validPackage=t()}(this,(function(){\\"use strict\\";return\\"something\\"}));
+"!function(e,n){\\"object\\"==typeof exports&&\\"undefined\\"!=typeof module?module.exports=n():\\"function\\"==typeof define&&define.amd?define(n):(e=\\"undefined\\"!=typeof globalThis?globalThis:e||self).validPackage=n()}(this,(function(){\\"use strict\\";return\\"something\\"}));
 //# sourceMappingURL=umd-unused-peer-dep.umd.min.js.map
 "
 `;
@@ -476,11 +476,34 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 var path = require('path');
 
+function _interopNamespace(e) {
+	if (e && e.__esModule) { return e; } else {
+		var n = Object.create(null);
+		if (e) {
+			Object.keys(e).forEach(function (k) {
+				if (k !== 'default') {
+					var d = Object.getOwnPropertyDescriptor(e, k);
+					Object.defineProperty(n, k, d.get ? d : {
+						enumerable: true,
+						get: function () {
+							return e[k];
+						}
+					});
+				}
+			});
+		}
+		n['default'] = e;
+		return Object.freeze(n);
+	}
+}
+
+var path__namespace = /*#__PURE__*/_interopNamespace(path);
+
 let obj = {};
 
 let thing = \\"something\\";
 
-exports.path = path;
+exports.path = path__namespace;
 exports.default = thing;
 exports.obj = obj;
 "
@@ -506,9 +529,27 @@ Object.defineProperty(exports, \\"__esModule\\", {
 
 var path = require(\\"path\\");
 
+function _interopNamespace(e) {
+  if (e && e.__esModule) return e;
+  var n = Object.create(null);
+  return e && Object.keys(e).forEach((function(k) {
+    if (\\"default\\" !== k) {
+      var d = Object.getOwnPropertyDescriptor(e, k);
+      Object.defineProperty(n, k, d.get ? d : {
+        enumerable: !0,
+        get: function() {
+          return e[k];
+        }
+      });
+    }
+  })), n.default = e, Object.freeze(n);
+}
+
+var path__namespace = _interopNamespace(path);
+
 let obj = {}, thing = \\"something\\";
 
-exports.path = path, exports.default = thing, exports.obj = obj;
+exports.path = path__namespace, exports.default = thing, exports.obj = obj;
 "
 `;
 
@@ -644,12 +685,14 @@ exports[`using external @babel/runtime helpers: dist/external-babel-runtime.cjs.
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
+var _classCallCheck = require('@babel/runtime/helpers/classCallCheck');
 
-var _classCallCheck = _interopDefault(require('@babel/runtime/helpers/classCallCheck'));
+function _interopDefault (e) { return e && e.__esModule ? e : { 'default': e }; }
+
+var _classCallCheck__default = /*#__PURE__*/_interopDefault(_classCallCheck);
 
 var Foo = function Foo() {
-  _classCallCheck(this, Foo);
+  _classCallCheck__default['default'](this, Foo);
 };
 
 exports.default = Foo;
@@ -670,16 +713,20 @@ if (process.env.NODE_ENV === \\"production\\") {
 exports[`using external @babel/runtime helpers: dist/external-babel-runtime.cjs.prod.js 1`] = `
 "\\"use strict\\";
 
-function _interopDefault(ex) {
-  return ex && \\"object\\" == typeof ex && \\"default\\" in ex ? ex.default : ex;
-}
-
 Object.defineProperty(exports, \\"__esModule\\", {
   value: !0
 });
 
-var _classCallCheck = _interopDefault(require(\\"@babel/runtime/helpers/classCallCheck\\")), Foo = function Foo() {
-  _classCallCheck(this, Foo);
+var _classCallCheck = require(\\"@babel/runtime/helpers/classCallCheck\\");
+
+function _interopDefault(e) {
+  return e && e.__esModule ? e : {
+    default: e
+  };
+}
+
+var _classCallCheck__default = _interopDefault(_classCallCheck), Foo = function Foo() {
+  _classCallCheck__default.default(this, Foo);
 };
 
 exports.default = Foo;

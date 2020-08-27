@@ -3,24 +3,16 @@
 import { codeFrameColumns } from "@babel/code-frame";
 import { getWorker } from "../worker-client";
 import { Plugin } from "rollup";
+import { MinifyOptions } from "terser";
 
-export default function terser(userOptions: any = {}): Plugin {
-  if (userOptions.sourceMap != null) {
-    throw Error("sourceMap option is removed, use sourcemap instead");
-  }
-
+export default function terser(options: MinifyOptions): Plugin {
   return {
     name: "terser",
     renderChunk(code, chunk, outputOptions) {
       const normalizedOptions = {
-        ...userOptions,
-        sourceMap: userOptions.sourcemap !== false,
-        module: outputOptions.format === "es" || outputOptions.format === "esm"
+        ...options,
+        module: outputOptions.format === "es",
       };
-
-      if (normalizedOptions.hasOwnProperty("sourcemap")) {
-        delete normalizedOptions["sourcemap"];
-      }
 
       const result = getWorker()
         .transformTerser(code, JSON.stringify(normalizedOptions))
@@ -33,6 +25,6 @@ export default function terser(userOptions: any = {}): Plugin {
         });
 
       return result;
-    }
+    },
   };
 }
