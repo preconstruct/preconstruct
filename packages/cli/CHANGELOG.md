@@ -1,5 +1,13 @@
 # preconstruct
 
+## 1.1.27
+
+### Patch Changes
+
+- [`f4e9954`](https://github.com/preconstruct/preconstruct/commit/f4e9954fec700dd8467100d555df573be3be6e19) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Stop memoizing creation of TS programs for declaration generation when the tsconfig is in the package directory to allow garbage collection and prevent out of memory errors (Note that having a tsconfig per package will still be slower than having one at the root of the project since TS will be doing unnecessary repeated work)
+
+* [`8aaec07`](https://github.com/preconstruct/preconstruct/commit/8aaec072ce6c89acddac0e79109a81fd34f6ebfa) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Correctly cache entrypoint source file resolution
+
 ## 1.1.26
 
 ### Patch Changes
