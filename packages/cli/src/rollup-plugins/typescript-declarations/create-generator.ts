@@ -4,6 +4,7 @@ import path from "path";
 import { FatalError } from "../../errors";
 // @ts-ignore
 import { createLanguageServiceHostClass } from "./language-service-host";
+import normalizePath from "normalize-path";
 
 type Typescript = typeof import("typescript");
 
@@ -32,34 +33,41 @@ function memoize<V>(fn: (arg: string) => V): (arg: string) => V {
   };
 }
 
+async function nonMemoizedGetService(
+  typescript: Typescript,
+  configFileName: string
+) {
+  let configFileContents = await fs.readFile(configFileName, "utf8");
+  const result = typescript.parseConfigFileTextToJson(
+    configFileName,
+    configFileContents
+  );
+
+  let thing = typescript.parseJsonConfigFileContent(
+    result.config,
+    typescript.sys,
+    process.cwd(),
+    undefined,
+    configFileName
+  );
+  thing.options.declaration = true;
+  thing.options.noEmit = false;
+
+  let LanguageServiceHostClass = createLanguageServiceHostClass(typescript);
+
+  let servicesHost = new LanguageServiceHostClass(thing, []);
+
+  let service = typescript.createLanguageService(
+    servicesHost,
+    typescript.createDocumentRegistry()
+  );
+  servicesHost.setLanguageService(service);
+  return { service, options: thing.options };
+}
+
 let getService = weakMemoize((typescript: Typescript) =>
   memoize(async (configFileName: string) => {
-    let configFileContents = await fs.readFile(configFileName, "utf8");
-    const result = typescript.parseConfigFileTextToJson(
-      configFileName,
-      configFileContents
-    );
-
-    let thing = typescript.parseJsonConfigFileContent(
-      result.config,
-      typescript.sys,
-      process.cwd(),
-      undefined,
-      configFileName
-    );
-    thing.options.declaration = true;
-    thing.options.noEmit = false;
-
-    let LanguageServiceHostClass = createLanguageServiceHostClass(typescript);
-
-    let servicesHost = new LanguageServiceHostClass(thing, []);
-
-    let service = typescript.createLanguageService(
-      servicesHost,
-      typescript.createDocumentRegistry()
-    );
-    servicesHost.setLanguageService(service);
-    return { service, options: thing.options };
+    return nonMemoizedGetService(typescript, configFileName);
   })
 );
 
@@ -94,7 +102,15 @@ export async function createDeclarationCreator(
       pkgName
     );
   }
-  let { service, options } = await getService(typescript)(configFileName);
+  // if the tsconfig is inside the package directory, let's not memoize getting the ts service
+  // since it'll only ever be used once
+  // and if we keep it, we could run out of memory for large projects
+  // if the tsconfig _isn't_ in the package directory though, it's probably fine to memoize it
+  // since it should just be a root level tsconfig
+  let { service, options } = await (normalizePath(configFileName) ===
+  normalizePath(path.join(dirname, "tsconfig.json"))
+    ? nonMemoizedGetService(typescript, configFileName)
+    : getService(typescript)(configFileName));
   let moduleResolutionCache = typescript.createModuleResolutionCache(
     dirname,
     (x) => x,
