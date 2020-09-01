@@ -52,9 +52,15 @@ function setFieldInOrder(
 export class Entrypoint extends Item {
   package: Package;
 
-  constructor(filePath: string, contents: string, pkg: Package) {
+  constructor(
+    filePath: string,
+    contents: string,
+    pkg: Package,
+    resolvedSourcePath?: string
+  ) {
     super(filePath, contents);
     this.package = pkg;
+    this._sourceCached = resolvedSourcePath;
   }
 
   get name(): string {
@@ -161,6 +167,9 @@ export class Entrypoint extends Item {
           extensions: EXTENSIONS,
         }
       );
+      if (this._strict) {
+        this._strict._sourceCached = this._sourceCached;
+      }
     }
     return this._sourceCached;
   }
@@ -192,7 +201,8 @@ export class Entrypoint extends Item {
       this._strict = new StrictEntrypoint(
         this.path,
         this._contents,
-        this.package
+        this.package,
+        this._sourceCached
       );
     }
     return this._strict;
