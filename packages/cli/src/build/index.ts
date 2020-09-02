@@ -139,7 +139,7 @@ export default async function build(directory: string) {
             if (isTsPath(entrypoint.source)) {
               await fs.mkdir(path.join(entrypoint.directory, "dist"));
               await writeDevTSFile(
-                entrypoint.strict(),
+                entrypoint,
                 await fs.readFile(entrypoint.source, "utf8")
               );
             }

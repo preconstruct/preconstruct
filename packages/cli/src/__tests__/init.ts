@@ -6,8 +6,9 @@ import {
   logMock,
   modifyPkg,
   getPkg,
-  createPackageCheckTestCreator
+  createPackageCheckTestCreator,
 } from "../../test-utils";
+import { setFieldInOrder } from "../utils";
 
 const f = fixturez(__dirname);
 
@@ -211,7 +212,7 @@ test("fix browser", async () => {
 
   confirms.fixBrowserField.mockReturnValue(Promise.resolve(true));
 
-  await modifyPkg(tmpPath, pkg => {
+  await modifyPkg(tmpPath, (pkg) => {
     pkg.browser = "invalid.js";
   });
 
@@ -241,25 +242,25 @@ let basicThreeEntrypoints = {
   "": {
     name: "something",
     preconstruct: {
-      entrypoints: [".", "one", "two"]
-    }
+      entrypoints: [".", "one", "two"],
+    },
   },
   one: {
     preconstruct: {
-      source: "../src"
-    }
+      source: "../src",
+    },
   },
   two: {
     preconstruct: {
-      source: "../src"
-    }
-  }
+      source: "../src",
+    },
+  },
 };
 
 testInit(
   "three entrypoints, no main, only add main",
   basicThreeEntrypoints,
-  async run => {
+  async (run) => {
     confirms.writeMainField.mockReturnValue(Promise.resolve(true));
     confirms.writeModuleField.mockReturnValue(Promise.resolve(false));
 
@@ -298,7 +299,7 @@ testInit(
 testInit(
   "three entrypoints, no main, add main and module",
   basicThreeEntrypoints,
-  async run => {
+  async (run) => {
     confirms.writeMainField.mockReturnValue(Promise.resolve(true));
     confirms.writeModuleField.mockReturnValue(Promise.resolve(true));
 
@@ -341,9 +342,9 @@ testInit(
   "three entrypoints, no main, add main and fix browser",
   {
     ...basicThreeEntrypoints,
-    "": { ...basicThreeEntrypoints[""], browser: "" }
+    "": { ...basicThreeEntrypoints[""], browser: "" },
   },
-  async run => {
+  async (run) => {
     confirms.writeMainField.mockReturnValue(Promise.resolve(true));
     confirms.writeModuleField.mockReturnValue(Promise.resolve(false));
     confirms.fixBrowserField.mockReturnValue(Promise.resolve(true));

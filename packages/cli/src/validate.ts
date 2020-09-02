@@ -2,10 +2,7 @@ import { Project } from "./project";
 import { Entrypoint } from "./entrypoint";
 import { errors, successes, infos } from "./messages";
 import { FatalError, FixableError } from "./errors";
-import {
-  getValidObjectFieldContentForBuildType,
-  getValidStringFieldContentForBuildType
-} from "./utils";
+import { validFields } from "./utils";
 import * as logger from "./logger";
 import equal from "fast-deep-equal";
 import { validatePackage } from "./validate-package";
@@ -35,40 +32,21 @@ export function validateEntrypointSource(entrypoint: Entrypoint) {
 
 export const isFieldValid = {
   main(entrypoint: Entrypoint) {
-    return (
-      entrypoint.main ===
-      getValidStringFieldContentForBuildType("main", entrypoint.package.name)
-    );
+    return entrypoint.json.main === validFields.main(entrypoint);
   },
   module(entrypoint: Entrypoint) {
-    return (
-      entrypoint.module ===
-      getValidStringFieldContentForBuildType("module", entrypoint.package.name)
-    );
+    return entrypoint.json.module === validFields.module(entrypoint);
   },
-  umdMain(entrypoint: Entrypoint) {
-    return (
-      entrypoint.umdMain ===
-      getValidStringFieldContentForBuildType(
-        "umd:main",
-        entrypoint.package.name
-      )
-    );
+  "umd:main"(entrypoint: Entrypoint) {
+    return entrypoint.json["umd:main"] === validFields["umd:main"](entrypoint);
   },
   browser(entrypoint: Entrypoint): boolean {
-    return equal(
-      entrypoint.browser,
-      getValidObjectFieldContentForBuildType(
-        "browser",
-        entrypoint.package.name,
-        entrypoint.module !== null
-      )
-    );
-  }
+    return equal(entrypoint.json.browser, validFields.browser(entrypoint));
+  },
 };
 
 export function isUmdNameSpecified(entrypoint: Entrypoint) {
-  return typeof entrypoint._config.umdName === "string";
+  return typeof entrypoint.json.preconstruct.umdName === "string";
 }
 
 export function validateEntrypoint(entrypoint: Entrypoint, log: boolean) {
@@ -82,7 +60,7 @@ export function validateEntrypoint(entrypoint: Entrypoint, log: boolean) {
   if (log) {
     logger.info(infos.validMainField, entrypoint.name);
   }
-  if (entrypoint.module !== null) {
+  if (entrypoint.json.module !== undefined) {
     if (isFieldValid.module(entrypoint)) {
       if (log) {
         logger.info(infos.validModuleField, entrypoint.name);
@@ -91,8 +69,8 @@ export function validateEntrypoint(entrypoint: Entrypoint, log: boolean) {
       throw new FixableError(errors.invalidModuleField, entrypoint.name);
     }
   }
-  if (entrypoint.umdMain !== null) {
-    if (isFieldValid.umdMain(entrypoint)) {
+  if (entrypoint.json["umd:main"] !== undefined) {
+    if (isFieldValid["umd:main"](entrypoint)) {
       if (isUmdNameSpecified(entrypoint)) {
         if (log) {
           logger.info(infos.validUmdMainField, entrypoint.name);
@@ -104,14 +82,23 @@ export function validateEntrypoint(entrypoint: Entrypoint, log: boolean) {
       throw new FixableError(errors.invalidUmdMainField, entrypoint.name);
     }
   }
-  if (entrypoint.browser !== null) {
+  if (entrypoint.json.browser !== undefined) {
     if (
-      typeof entrypoint.browser === "string" ||
+      typeof entrypoint.json.browser === "string" ||
       !isFieldValid.browser(entrypoint)
     ) {
       throw new FixableError(errors.invalidBrowserField, entrypoint.name);
     } else if (log) {
       logger.info(infos.validBrowserField, entrypoint.name);
+    }
+  }
+}
+
+export function validateProject(project: Project) {
+  for (let pkg of project.packages) {
+    validatePackage(pkg);
+    for (let entrypoint of pkg.entrypoints) {
+      validateEntrypoint(entrypoint, false);
     }
   }
 }

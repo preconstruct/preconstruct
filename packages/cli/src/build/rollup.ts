@@ -8,7 +8,7 @@ import chalk from "chalk";
 import path from "path";
 import builtInModules from "builtin-modules";
 import { Package } from "../package";
-import { StrictEntrypoint } from "../entrypoint";
+import { Entrypoint } from "../entrypoint";
 import { RollupOptions, Plugin } from "rollup";
 import { Aliases } from "./aliases";
 import { FatalError, BatchError } from "../errors";
@@ -34,7 +34,7 @@ export type RollupConfigType = "umd" | "browser" | "node-dev" | "node-prod";
 
 export let getRollupConfig = (
   pkg: Package,
-  entrypoints: Array<StrictEntrypoint>,
+  entrypoints: Array<Entrypoint>,
   aliases: Aliases,
   type: RollupConfigType,
   reportTransformedFile: (filename: string) => void
