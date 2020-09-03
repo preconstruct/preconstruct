@@ -89,7 +89,7 @@ test("invalid browser", async () => {
     await validate(tmpPath);
   } catch (e) {
     expect(e).toBeInstanceOf(FatalError);
-    expect(e.message).toBe(errors.invalidBrowserField);
+    expect(e.message).toBe(errors.invalidField("browser"));
   }
 });
 

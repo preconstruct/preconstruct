@@ -1,13 +1,12 @@
 import { PKG_JSON_CONFIG_FIELD } from "./constants";
 
+type Field = "main" | "module" | "browser" | "umd:main";
+
 export let errors = {
   noSource: (source: string) =>
     `no source file was provided, please create a file at ${source} or specify a custom source file with the ${PKG_JSON_CONFIG_FIELD} source option`,
   deniedWriteMainField: "changing the main field is required to build",
-  invalidModuleField: "module field is invalid",
-  invalidMainField: "main field is invalid",
-  invalidUmdMainField: "umd:main field is invalid",
-  invalidBrowserField: "browser field is invalid",
+  invalidField: (field: Field) => `${field} field is invalid`,
   umdNameNotSpecified: `the umd:main field is specified but a umdName option is not specified. please add it to the ${PKG_JSON_CONFIG_FIELD} field in your package.json`,
   noEntrypointPkgJson: "There is a missing package.json for an entrypoint",
   noEntrypoints:
@@ -46,11 +45,8 @@ export let inputs = {
 };
 
 export let infos = {
-  validMainField: "main field is valid",
-  validModuleField: "module field is valid",
-  validUmdMainField: "umd:main field is valid",
+  validField: (field: Field) => `${field} field is valid`,
   validEntrypoint: "a valid entry point exists.",
-  validBrowserField: "browser field is valid",
   validPackageEntrypoints: "package entrypoints are valid",
 };
 

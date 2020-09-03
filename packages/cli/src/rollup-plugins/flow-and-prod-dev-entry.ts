@@ -11,6 +11,10 @@ export default function flowAndNodeDevProdEntry(
   pkg: Package,
   warnings: FatalError[]
 ): Plugin {
+  let directorySourceFilesMustBeIn = pkg.project.experimentalFlags
+    .newEntrypoints
+    ? path.resolve(pkg.directory, "src")
+    : pkg.directory;
   return {
     name: "flow-and-prod-dev-entry",
     load(id) {
@@ -46,7 +50,7 @@ export default function flowAndNodeDevProdEntry(
 
       if (
         resolved.id.startsWith("\0") ||
-        resolved.id.startsWith(pkg.directory)
+        resolved.id.startsWith(directorySourceFilesMustBeIn)
       ) {
         return resolved;
       }

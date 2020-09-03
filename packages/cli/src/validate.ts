@@ -54,42 +54,18 @@ export function validateEntrypoint(entrypoint: Entrypoint, log: boolean) {
   if (log) {
     logger.info(infos.validEntrypoint, entrypoint.name);
   }
-  if (!isFieldValid.main(entrypoint)) {
-    throw new FixableError(errors.invalidMainField, entrypoint.name);
-  }
-  if (log) {
-    logger.info(infos.validMainField, entrypoint.name);
-  }
-  if (entrypoint.json.module !== undefined) {
-    if (isFieldValid.module(entrypoint)) {
-      if (log) {
-        logger.info(infos.validModuleField, entrypoint.name);
-      }
-    } else {
-      throw new FixableError(errors.invalidModuleField, entrypoint.name);
+  for (const field of ["main", "module", "umd:main", "browser"] as const) {
+    if (field !== "main" && entrypoint.json[field] === undefined) {
+      continue;
     }
-  }
-  if (entrypoint.json["umd:main"] !== undefined) {
-    if (isFieldValid["umd:main"](entrypoint)) {
-      if (isUmdNameSpecified(entrypoint)) {
-        if (log) {
-          logger.info(infos.validUmdMainField, entrypoint.name);
-        }
-      } else {
-        throw new FixableError(errors.umdNameNotSpecified, entrypoint.name);
-      }
-    } else {
-      throw new FixableError(errors.invalidUmdMainField, entrypoint.name);
+    if (!isFieldValid[field](entrypoint)) {
+      throw new FixableError(errors.invalidField(field), entrypoint.name);
     }
-  }
-  if (entrypoint.json.browser !== undefined) {
-    if (
-      typeof entrypoint.json.browser === "string" ||
-      !isFieldValid.browser(entrypoint)
-    ) {
-      throw new FixableError(errors.invalidBrowserField, entrypoint.name);
-    } else if (log) {
-      logger.info(infos.validBrowserField, entrypoint.name);
+    if (field === "umd:main" && !isUmdNameSpecified(entrypoint)) {
+      throw new FixableError(errors.umdNameNotSpecified, entrypoint.name);
+    }
+    if (log) {
+      logger.info(infos.validField(field), entrypoint.name);
     }
   }
 }

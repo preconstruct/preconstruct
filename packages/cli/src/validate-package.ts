@@ -4,13 +4,6 @@ import chalk from "chalk";
 import { errors } from "./messages";
 import { Package } from "./package";
 
-let camelToPkgJsonField = {
-  main: "main",
-  module: "module",
-  umdMain: "umd:main",
-  browser: "browser",
-};
-
 let keys: <Obj>(obj: Obj) => (keyof Obj)[] = Object.keys;
 
 export async function fixPackage(pkg: Package) {

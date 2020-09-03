@@ -15,7 +15,7 @@ async function doInit(pkg: Package) {
     validateEntrypointSource(entrypoint);
   });
   if (pkg.entrypoints.every((entrypoint) => isFieldValid.main(entrypoint))) {
-    info(infos.validMainField, pkg.name);
+    info(infos.validField("main"), pkg.name);
   } else {
     let canWriteMainField = await confirms.writeMainField(pkg);
     if (!canWriteMainField) {
@@ -35,10 +35,10 @@ async function doInit(pkg: Package) {
     if (canWriteModuleField) {
       pkg.setFieldOnEntrypoints("module");
     } else if (!allEntrypointsAreMissingAModuleField) {
-      throw new FixableError(errors.invalidModuleField, pkg.name);
+      throw new FixableError(errors.invalidField("module"), pkg.name);
     }
   } else {
-    info(infos.validModuleField, pkg.name);
+    info(infos.validField("module"), pkg.name);
   }
 
   let someEntrypointsHaveAMaybeInvalidUmdBuild = pkg.entrypoints.some(
@@ -62,7 +62,7 @@ async function doInit(pkg: Package) {
         entrypoint.json.preconstruct.umdName = umdName;
       }
     } else {
-      throw new FixableError(errors.invalidUmdMainField, pkg.name);
+      throw new FixableError(errors.invalidField("umd:main"), pkg.name);
     }
   }
 
@@ -81,7 +81,7 @@ async function doInit(pkg: Package) {
     if (shouldFixBrowserField) {
       pkg.setFieldOnEntrypoints("browser");
     } else {
-      throw new FixableError(errors.invalidBrowserField, pkg.name);
+      throw new FixableError(errors.invalidField("browser"), pkg.name);
     }
   }
 
