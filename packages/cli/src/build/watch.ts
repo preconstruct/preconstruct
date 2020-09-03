@@ -18,7 +18,7 @@ function relativePath(id: string) {
 async function watchPackage(pkg: Package, aliases: Aliases) {
   const _configs = getRollupConfigs(pkg, aliases);
   await fs.remove(path.join(pkg.directory, "dist"));
-  let configs = _configs.map(config => {
+  let configs = _configs.map((config) => {
     return { ...config.config, output: config.outputs };
   });
   const watcher = watch(configs);
@@ -27,10 +27,10 @@ async function watchPackage(pkg: Package, aliases: Aliases) {
     reject = _reject;
   });
   let startResolve: (value?: unknown) => void;
-  let startPromise = new Promise(resolve => {
+  let startPromise = new Promise((resolve) => {
     startResolve = resolve;
   });
-  watcher.on("event", event => {
+  watcher.on("event", (event) => {
     // https://github.com/rollup/rollup/blob/aed954e4e6e8beabd47268916ff0955fbb20682d/bin/src/run/watch.ts#L71-L115
     switch (event.code) {
       case "ERROR": {
@@ -111,7 +111,7 @@ export default async function build(directory: string) {
   let aliases = getAliases(project);
   let startCount = 0;
   await Promise.all(
-    project.packages.map(pkg =>
+    project.packages.map((pkg) =>
       retryableWatch(
         pkg,
         aliases,

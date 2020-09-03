@@ -4,7 +4,7 @@ import fixturez from "fixturez";
 import {
   snapshotDistFiles,
   install,
-  snapshotDirectory
+  snapshotDirectory,
 } from "../../../test-utils";
 import spawn from "spawndamnit";
 

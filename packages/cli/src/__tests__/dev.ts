@@ -21,14 +21,14 @@ test("dev command works in node", async () => {
 
   // i would require it but i don't want jest to do magical things
   let { code, stdout, stderr } = await spawn("node", [
-    path.join(tmpPath, "packages", "package-one")
+    path.join(tmpPath, "packages", "package-one"),
   ]);
   expect(code).toBe(0);
   expect(stdout.toString().split("\n")).toEqual([
     "message from package two",
     "message from package one",
     "message from package two but logged by package one",
-    ""
+    "",
   ]);
   expect(stderr.toString()).toBe("");
 });
@@ -45,7 +45,7 @@ test("all the build types", async () => {
     "all-the-build-types.browser.cjs.js",
     "all-the-build-types.browser.esm.js",
     "all-the-build-types.cjs.js",
-    "all-the-build-types.esm.js"
+    "all-the-build-types.esm.js",
   ]);
 
   expect(
@@ -63,11 +63,11 @@ test("all the build types", async () => {
   let shouldBeCjsThingsToSource = [
     "all-the-build-types.esm.js",
     "all-the-build-types.browser.cjs.js",
-    "all-the-build-types.browser.esm.js"
+    "all-the-build-types.browser.esm.js",
   ];
 
   await Promise.all(
-    shouldBeCjsThingsToSource.map(async filename => {
+    shouldBeCjsThingsToSource.map(async (filename) => {
       let content = await fs.readFile(path.join(distPath, filename), "utf8");
 
       expect(content).toBe(`// 👋 hey!!
@@ -104,10 +104,7 @@ test("source maps work", async () => {
   expect(stdout.toString()).toBe("");
   expect(
     // this is easier than using a stack trace parser
-    stderr
-      .toString()
-      .trim()
-      .split("\n")[0]
+    stderr.toString().trim().split("\n")[0]
   ).toEqual(
     // the important thing we're checking is that it's mapping to line 5
     expect.stringMatching(/uses-babel-and-throws-error\/src\/index\.js:5$/)

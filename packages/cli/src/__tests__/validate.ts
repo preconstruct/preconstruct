@@ -81,7 +81,7 @@ Array [
 test("invalid browser", async () => {
   let tmpPath = f.copy("no-module");
 
-  await modifyPkg(tmpPath, pkg => {
+  await modifyPkg(tmpPath, (pkg) => {
     pkg.browser = "invalid.js";
   });
 
@@ -96,10 +96,10 @@ test("invalid browser", async () => {
 test("valid browser", async () => {
   let tmpPath = f.copy("valid-package");
 
-  await modifyPkg(tmpPath, pkg => {
+  await modifyPkg(tmpPath, (pkg) => {
     pkg.browser = {
       ["./dist/valid-package.cjs.js"]: "./dist/valid-package.browser.cjs.js",
-      ["./dist/valid-package.esm.js"]: "./dist/valid-package.browser.esm.js"
+      ["./dist/valid-package.esm.js"]: "./dist/valid-package.browser.esm.js",
     };
   });
 

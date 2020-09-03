@@ -6,7 +6,7 @@ import {
   getPkg,
   modifyPkg,
   logMock,
-  createPackageCheckTestCreator
+  createPackageCheckTestCreator,
 } from "../../test-utils";
 import { promptInput as _promptInput } from "../prompt";
 import fs from "fs-extra";
@@ -38,7 +38,7 @@ test("only main", async () => {
   let tmpPath = f.copy("no-module");
   confirms.writeMainField.mockReturnValue(Promise.resolve(true));
   let origJson = await getPkg(tmpPath);
-  await modifyPkg(tmpPath, json => {
+  await modifyPkg(tmpPath, (json) => {
     json.main = "bad";
   });
 
@@ -50,7 +50,7 @@ test("only main", async () => {
 test("set main and module field", async () => {
   let tmpPath = f.copy("basic-package");
 
-  await modifyPkg(tmpPath, json => {
+  await modifyPkg(tmpPath, (json) => {
     json.module = "bad.js";
   });
 
@@ -74,7 +74,7 @@ test("monorepo", async () => {
   let tmpPath = f.copy("monorepo");
 
   for (let name of ["package-one", "package-two"]) {
-    await modifyPkg(path.join(tmpPath, "packages", name), pkg => {
+    await modifyPkg(path.join(tmpPath, "packages", name), (pkg) => {
       pkg.module = "bad.js";
     });
   }
@@ -145,7 +145,7 @@ test("invalid fields", async () => {
 test("fix browser", async () => {
   let tmpPath = f.copy("valid-package");
 
-  await modifyPkg(tmpPath, pkg => {
+  await modifyPkg(tmpPath, (pkg) => {
     pkg.browser = "bad.js";
   });
 
@@ -190,10 +190,10 @@ testFix(
     "": {
       name: "something",
       main: "dist/something.cjs.js",
-      "umd:main": "will be fixed"
-    }
+      "umd:main": "will be fixed",
+    },
   },
-  async run => {
+  async (run) => {
     promptInput.mockImplementation(async (message, item) => {
       expect(message).toBe(inputs.getUmdName);
       expect(item.name).toBe("something");
@@ -228,7 +228,7 @@ test("create entrypoint", async () => {
     "export let x = 1"
   );
 
-  confirms.createEntrypoint.mockImplementation(async x => {
+  confirms.createEntrypoint.mockImplementation(async (x) => {
     if (x.name === "valid-package/another") {
       debugger;
       return true;
@@ -253,7 +253,7 @@ test("create entrypoint", async () => {
     throw new Error("unexpected call");
   });
 
-  await modifyPkg(tmpPath, pkg => {
+  await modifyPkg(tmpPath, (pkg) => {
     pkg.preconstruct.entrypoints = [".", "another"];
   });
   await fix(tmpPath);

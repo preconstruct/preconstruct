@@ -21,7 +21,7 @@ export default function flowAndNodeDevProdEntry(
     },
     async resolveId(source, importer) {
       let resolved = await this.resolve(source, importer!, {
-        skipSelf: true
+        skipSelf: true,
       });
       if (resolved === null) {
         if (!source.startsWith(".")) {
@@ -99,7 +99,7 @@ export default function flowAndNodeDevProdEntry(
             this.emitFile({
               type: "asset",
               fileName: flowFileName,
-              source: flowFileSource
+              source: flowFileSource,
             });
           }
         }
@@ -117,9 +117,9 @@ if (${
         this.emitFile({
           type: "asset",
           fileName: mainFieldPath,
-          source: mainEntrySource
+          source: mainEntrySource,
         });
       }
-    }
+    },
   };
 }

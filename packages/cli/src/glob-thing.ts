@@ -9,7 +9,7 @@ export async function getUselessGlobsThatArentReallyGlobs(
   cwd: string
 ) {
   return Promise.all(
-    globs.map(async glob => {
+    globs.map(async (glob) => {
       let parsedGlobResult = parseGlob(glob);
       if (!parsedGlobResult.is.glob) {
         let result = micromatch([glob], globs);

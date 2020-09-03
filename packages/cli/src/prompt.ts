@@ -14,7 +14,7 @@ type NamedThing = { readonly name: string };
 export function createPromptConfirmLoader(
   message: string
 ): (pkg: NamedThing) => Promise<boolean> {
-  let loader = new DataLoader<NamedThing, boolean>(pkgs =>
+  let loader = new DataLoader<NamedThing, boolean>((pkgs) =>
     limit(() =>
       (async () => {
         if (pkgs.length === 1) {
@@ -25,8 +25,8 @@ export function createPromptConfirmLoader(
               message,
               // @ts-ignore
               prefix: prefix + " " + pkgs[0].name,
-              initial: true
-            }
+              initial: true,
+            },
           ]);
           return [confirm];
         }
@@ -35,12 +35,12 @@ export function createPromptConfirmLoader(
             type: "multiselect" as const,
             name: "answers",
             message,
-            choices: pkgs.map(pkg => ({ name: pkg.name, initial: true })),
+            choices: pkgs.map((pkg) => ({ name: pkg.name, initial: true })),
             // @ts-ignore
-            prefix
-          }
+            prefix,
+          },
         ]);
-        return pkgs.map(pkg => {
+        return pkgs.map((pkg) => {
           return answers.includes(pkg.name);
         });
       })()
@@ -58,8 +58,8 @@ export let promptConfirm = async (message: string): Promise<boolean> => {
       message,
       // @ts-ignore
       prefix: prefix,
-      initial: true
-    }
+      initial: true,
+    },
   ]);
   return confirm;
 };
@@ -76,8 +76,8 @@ export let doPromptInput = async (
       message,
       // @ts-ignore
       prefix: prefix + " " + pkg.name,
-      initial: defaultAnswer
-    }
+      initial: defaultAnswer,
+    },
   ]);
   return input;
 };

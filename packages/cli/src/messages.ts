@@ -11,7 +11,7 @@ export let errors = {
   umdNameNotSpecified: `the umd:main field is specified but a umdName option is not specified. please add it to the ${PKG_JSON_CONFIG_FIELD} field in your package.json`,
   noEntrypointPkgJson: "There is a missing package.json for an entrypoint",
   noEntrypoints:
-    "packages must have at least one entrypoint, this package has no entrypoints"
+    "packages must have at least one entrypoint, this package has no entrypoints",
 };
 
 import { createPromptConfirmLoader } from "./prompt";
@@ -37,12 +37,12 @@ export let confirms = {
   ),
   createEntrypoint: createPromptConfirmLoader(
     "This glob does not match anything, would you like to create an entrypoint for it?"
-  )
+  ),
 };
 
 export let inputs = {
   getUmdName: "what should the name used for UMD bundles be?",
-  getSource: "what should the source file for this entrypoint be?"
+  getSource: "what should the source file for this entrypoint be?",
 };
 
 export let infos = {
@@ -51,10 +51,10 @@ export let infos = {
   validUmdMainField: "umd:main field is valid",
   validEntrypoint: "a valid entry point exists.",
   validBrowserField: "browser field is valid",
-  validPackageEntrypoints: "package entrypoints are valid"
+  validPackageEntrypoints: "package entrypoints are valid",
 };
 
 export let successes = {
   validProject: "project is valid!",
-  startedWatching: "started watching!"
+  startedWatching: "started watching!",
 };
