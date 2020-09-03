@@ -16,6 +16,7 @@ import { createWorker, destroyWorker } from "../worker-client";
 import { hasherPromise } from "../rollup-plugins/babel";
 import { isTsPath } from "../rollup-plugins/typescript-declarations";
 import { writeDevTSFile } from "../dev";
+import { validateProject } from "../validate";
 
 // https://github.com/rollup/rollup/blob/28ffcf4c4a2ab4323091f63944b2a609b7bcd701/src/utils/sourceMappingURL.ts
 // this looks ridiculous, but it prevents sourcemap tooling from mistaking
@@ -118,6 +119,8 @@ export default async function build(directory: string) {
     createWorker();
     await hasherPromise;
     let project = await Project.create(directory);
+
+    validateProject(project);
 
     logger.info("building bundles!");
 

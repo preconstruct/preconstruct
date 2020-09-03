@@ -10,6 +10,7 @@ import { Aliases, getAliases } from "./aliases";
 import { success, info } from "../logger";
 import { successes } from "../messages";
 import { createWorker } from "../worker-client";
+import { validateProject } from "../validate";
 
 function relativePath(id: string) {
   return path.relative(process.cwd(), id);
@@ -106,8 +107,7 @@ async function retryableWatch(
 export default async function build(directory: string) {
   createWorker();
   let project = await Project.create(directory);
-  // do more stuff with checking whether the repo is using yarn workspaces or bolt
-
+  validateProject(project);
   let aliases = getAliases(project);
   let startCount = 0;
   await Promise.all(
