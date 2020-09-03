@@ -301,7 +301,4 @@ export class Package extends Item<{
     }
     return this.json.name;
   }
-  set name(name: string) {
-    this.json.name = name;
-  }
 }

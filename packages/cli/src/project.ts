@@ -76,9 +76,7 @@ export class Project extends Item<{
     }
     return this.json.name;
   }
-  set name(name: string) {
-    this.json.name = name;
-  }
+
   packages!: Array<Package>;
 
   async _packages(): Promise<Array<Package>> {
