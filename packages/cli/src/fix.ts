@@ -23,7 +23,7 @@ async function fixEntrypoint(entrypoint: Entrypoint) {
           val !== "src/index.ts" &&
           val !== "src/index.tsx"
         ) {
-          entrypoint._config.source = val;
+          entrypoint.json.preconstruct.source = val;
           hasBeenModified = true;
         } else {
           logger.info(
@@ -37,9 +37,12 @@ async function fixEntrypoint(entrypoint: Entrypoint) {
   }
   validateEntrypointSource(entrypoint);
 
-  if (entrypoint.umdMain !== null && !isUmdNameSpecified(entrypoint)) {
+  if (
+    entrypoint.json["umd:main"] !== undefined &&
+    !isUmdNameSpecified(entrypoint)
+  ) {
     let umdName = await promptInput(inputs.getUmdName, entrypoint);
-    entrypoint.umdName = umdName;
+    entrypoint.json.preconstruct.umdName = umdName;
     hasBeenModified = true;
   }
   if (hasBeenModified) {
@@ -51,15 +54,17 @@ async function fixEntrypoint(entrypoint: Entrypoint) {
 export default async function fix(directory: string) {
   let { packages } = await Project.create(directory);
 
-  let didModify = (await Promise.all(
-    packages.map(async pkg => {
-      let didModifyInPkgFix = await fixPackage(pkg);
-      let didModifyInEntrypointsFix = (await Promise.all(
-        pkg.entrypoints.map(fixEntrypoint)
-      )).some(x => x);
-      return didModifyInPkgFix || didModifyInEntrypointsFix;
-    })
-  )).some(x => x);
+  let didModify = (
+    await Promise.all(
+      packages.map(async (pkg) => {
+        let didModifyInPkgFix = await fixPackage(pkg);
+        let didModifyInEntrypointsFix = (
+          await Promise.all(pkg.entrypoints.map(fixEntrypoint))
+        ).some((x) => x);
+        return didModifyInPkgFix || didModifyInEntrypointsFix;
+      })
+    )
+  ).some((x) => x);
 
   logger.success(didModify ? "fixed project!" : "project already valid!");
 }

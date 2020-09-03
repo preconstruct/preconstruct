@@ -5,7 +5,7 @@ import {
   initBasic,
   getPkg,
   snapshotDistFiles,
-  install
+  install,
 } from "../../../test-utils";
 import { doPromptInput as _doPromptInput } from "../../prompt";
 import { confirms as _confirms } from "../../messages";
@@ -90,7 +90,7 @@ test("umd with dep on other module", async () => {
 
   await install(tmpPath);
 
-  doPromptInput.mockImplementation(async question => {
+  doPromptInput.mockImplementation(async (question) => {
     if (question === `What should the umdName of react be?`) {
       return "React";
     }
@@ -127,7 +127,7 @@ Object {
 test("monorepo umd with dep on other module", async () => {
   let tmpPath = f.copy("monorepo-umd-with-dep");
   let asked = false;
-  doPromptInput.mockImplementation(async question => {
+  doPromptInput.mockImplementation(async (question) => {
     if (asked) {
       throw new Error("only one prompt should happen: " + question);
     }

@@ -8,7 +8,7 @@ import { FatalError } from "./errors";
 export async function validateIncludedFiles(pkg: Package) {
   try {
     await Promise.all(
-      pkg.entrypoints.map(async entrypoint => {
+      pkg.entrypoints.map(async (entrypoint) => {
         let filename = path.join(
           entrypoint.directory,
           "dist",
@@ -25,12 +25,12 @@ export async function validateIncludedFiles(pkg: Package) {
     // checks on Windows. This value will have a forward slash (dist/preconstruct-test-file), whereas the value
     // of distFilePath below will have a backslash (dist\preconstruct-test-file). Obviously these two won't match,
     // so the distfile check will fail.
-    result = result.map(p => path.normalize(p));
+    result = result.map((p) => path.normalize(p));
 
     // check that we're including the package.json and main file
     // TODO: add Flow and TS check and if they're ignored, don't write them
     let messages: string[] = [];
-    pkg.entrypoints.forEach(entrypoint => {
+    pkg.entrypoints.forEach((entrypoint) => {
       let pkgJsonPath = path.relative(
         pkg.directory,
         path.resolve(entrypoint.directory, "package.json")
@@ -61,7 +61,7 @@ export async function validateIncludedFiles(pkg: Package) {
     }
   } finally {
     await Promise.all(
-      pkg.entrypoints.map(entrypoint =>
+      pkg.entrypoints.map((entrypoint) =>
         fs.remove(
           path.join(entrypoint.directory, "dist", "preconstruct-test-file")
         )

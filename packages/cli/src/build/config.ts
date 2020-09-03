@@ -10,8 +10,11 @@ import * as logger from "../logger";
 import { Project } from "../project";
 
 function getGlobal(project: Project, name: string) {
-  if (project._config.globals !== undefined && project._config.globals[name]) {
-    return project._config.globals[name];
+  if (
+    project.json.preconstruct.globals !== undefined &&
+    project.json.preconstruct.globals[name]
+  ) {
+    return project.json.preconstruct.globals[name];
   } else {
     try {
       let pkgJson = require(resolveFrom(
@@ -34,8 +37,8 @@ function getGlobal(project: Project, name: string) {
       (async () => {
         // if while we were waiting, that global was added, return
         if (
-          project._config.globals !== undefined &&
-          project._config.globals[name]
+          project.json.preconstruct.globals !== undefined &&
+          project.json.preconstruct.globals[name]
         ) {
           return;
         }
@@ -43,10 +46,10 @@ function getGlobal(project: Project, name: string) {
           `What should the umdName of ${name} be?`,
           project
         );
-        if (!project._config.globals) {
-          project._config.globals = {};
+        if (!project.json.preconstruct.globals) {
+          project.json.preconstruct.globals = {};
         }
-        project._config.globals[name] = response;
+        project.json.preconstruct.globals[name] = response;
 
         await project.save();
       })()
@@ -60,13 +63,11 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
     outputs: OutputOptions[];
   }> = [];
 
-  let strictEntrypoints = pkg.entrypoints.map((x) => x.strict());
-
-  let hasModuleField = strictEntrypoints[0].module !== null;
+  let hasModuleField = pkg.entrypoints[0].json.module !== undefined;
   configs.push({
     config: getRollupConfig(
       pkg,
-      strictEntrypoints,
+      pkg.entrypoints,
       aliases,
       "node-dev",
       pkg.project.experimentalFlags.logCompiledFiles
@@ -103,7 +104,7 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
   configs.push({
     config: getRollupConfig(
       pkg,
-      strictEntrypoints,
+      pkg.entrypoints,
       aliases,
       "node-prod",
       () => {}
@@ -123,38 +124,36 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
   // umd builds are a bit special
   // we don't guarantee that shared modules are shared across umd builds
   // this is just like dependencies, they're bundled into the umd build
-  if (strictEntrypoints[0].umdMain !== null)
-    pkg.entrypoints
-      .map((x) => x.strict())
-      .forEach((entrypoint) => {
-        configs.push({
-          config: getRollupConfig(pkg, [entrypoint], aliases, "umd", () => {}),
-          outputs: [
-            {
-              format: "umd" as const,
-              sourcemap: true,
-              entryFileNames: "[name].umd.min.js",
-              name: entrypoint.umdName!,
-              dir: pkg.directory,
-              interop: "auto",
-              globals: (name: string) => {
-                if (name === entrypoint.umdName!) {
-                  return name;
-                }
-                return getGlobal(pkg.project, name);
-              },
+  if (pkg.entrypoints[0].json["umd:main"] !== undefined)
+    pkg.entrypoints.forEach((entrypoint) => {
+      configs.push({
+        config: getRollupConfig(pkg, [entrypoint], aliases, "umd", () => {}),
+        outputs: [
+          {
+            format: "umd" as const,
+            sourcemap: true,
+            entryFileNames: "[name].umd.min.js",
+            name: entrypoint.json.preconstruct.umdName as string,
+            dir: pkg.directory,
+            interop: "auto",
+            globals: (name: string) => {
+              if (name === (entrypoint.json.preconstruct.umdName as string)) {
+                return name;
+              }
+              return getGlobal(pkg.project, name);
             },
-          ],
-        });
+          },
+        ],
       });
+    });
 
-  let hasBrowserField = strictEntrypoints[0].browser !== null;
+  let hasBrowserField = pkg.entrypoints[0].json.browser !== undefined;
 
   if (hasBrowserField) {
     configs.push({
       config: getRollupConfig(
         pkg,
-        strictEntrypoints,
+        pkg.entrypoints,
         aliases,
         "browser",
         () => {}

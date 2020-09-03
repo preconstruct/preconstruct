@@ -7,29 +7,38 @@ import { FatalError } from "./errors";
 import { Entrypoint } from "./entrypoint";
 import jsonParse from "parse-json";
 
-import {
-  getValidObjectFieldContentForBuildType,
-  getValidStringFieldContentForBuildType,
-} from "./utils";
 import { errors, confirms } from "./messages";
 import { Project } from "./project";
 import { getUselessGlobsThatArentReallyGlobs } from "./glob-thing";
 import detectIndent from "detect-indent";
+import {
+  validFields,
+  validFieldsFromPkgName,
+  setFieldInOrder,
+  JSONValue,
+} from "./utils";
 
-export class Package extends Item {
+export class Package extends Item<{
+  name?: JSONValue;
+  preconstruct: {
+    entrypoints?: JSONValue;
+  };
+  dependencies?: Record<string, string>;
+  peerDependencies?: Record<string, string>;
+}> {
   project!: Project;
   entrypoints!: Array<Entrypoint>;
   get configEntrypoints(): Array<string> {
-    if (this._config.entrypoints == null) {
+    if (this.json.preconstruct.entrypoints === undefined) {
       return this.project.experimentalFlags.newEntrypoints
         ? ["index.{js,jsx,ts,tsx}"]
         : ["."];
     }
     if (
-      Array.isArray(this._config.entrypoints) &&
-      this._config.entrypoints.every((x) => typeof x === "string")
+      Array.isArray(this.json.preconstruct.entrypoints) &&
+      this.json.preconstruct.entrypoints.every((x) => typeof x === "string")
     ) {
-      return this._config.entrypoints;
+      return this.json.preconstruct.entrypoints as string[];
     }
 
     throw new FatalError(
@@ -64,7 +73,7 @@ export class Package extends Item {
           }
           let filename = nodePath.join(directory, "package.json");
 
-          let contents = null;
+          let contents: string | undefined = undefined;
 
           try {
             contents = await fs.readFile(filename, "utf-8");
@@ -81,21 +90,20 @@ export class Package extends Item {
           let plainEntrypointObj: {
             [key: string]: string | Record<string, string>;
           } = {
-            main: getValidStringFieldContentForBuildType("main", pkg.name),
+            main: validFieldsFromPkgName.main(pkg.name),
           };
           for (let descriptor of descriptors) {
-            if (descriptor.contents !== null) {
+            if (descriptor.contents !== undefined) {
               let parsed = jsonParse(descriptor.contents, descriptor.filename);
               for (let field of ["module", "umd:main"] as const) {
                 if (parsed[field] !== undefined) {
-                  plainEntrypointObj[
-                    field
-                  ] = getValidStringFieldContentForBuildType(field, pkg.name);
+                  plainEntrypointObj[field] = validFieldsFromPkgName[field](
+                    pkg.name
+                  );
                 }
               }
               if (parsed.browser !== undefined) {
-                plainEntrypointObj.browser = getValidObjectFieldContentForBuildType(
-                  "browser",
+                plainEntrypointObj.browser = validFieldsFromPkgName.browser(
                   pkg.name,
                   plainEntrypointObj.module !== undefined
                 );
@@ -115,7 +123,7 @@ export class Package extends Item {
         return Promise.all(
           descriptors.map(
             async ({ filename, directory, contents, hasAccepted }) => {
-              if (contents === null || hasAccepted) {
+              if (contents === undefined || hasAccepted) {
                 if (!hasAccepted) {
                   let shouldCreateEntrypointPkgJson = await confirms.createEntrypointPkgJson(
                     {
@@ -154,7 +162,7 @@ export class Package extends Item {
         entrypointDirectories.map(async (directory) => {
           let filename = nodePath.join(directory, "package.json");
 
-          let contents = null;
+          let contents: undefined | string;
 
           try {
             contents = await fs.readFile(filename, "utf-8");
@@ -171,21 +179,20 @@ export class Package extends Item {
           let plainEntrypointObj: {
             [key: string]: string | Record<string, string>;
           } = {
-            main: getValidStringFieldContentForBuildType("main", pkg.name),
+            main: validFieldsFromPkgName.main(pkg.name),
           };
           for (let descriptor of descriptors) {
-            if (descriptor.contents !== null) {
+            if (descriptor.contents !== undefined) {
               let parsed = jsonParse(descriptor.contents, descriptor.filename);
               for (let field of ["module", "umd:main"] as const) {
                 if (parsed[field] !== undefined) {
-                  plainEntrypointObj[
-                    field
-                  ] = getValidStringFieldContentForBuildType(field, pkg.name);
+                  plainEntrypointObj[field] = validFieldsFromPkgName[field](
+                    pkg.name
+                  );
                 }
               }
               if (parsed.browser !== undefined) {
-                plainEntrypointObj.browser = getValidObjectFieldContentForBuildType(
-                  "browser",
+                plainEntrypointObj.browser = validFieldsFromPkgName.browser(
                   pkg.name,
                   plainEntrypointObj.module !== undefined
                 );
@@ -219,7 +226,7 @@ export class Package extends Item {
                 });
                 if (shouldCreateEntrypoint) {
                   descriptors.push({
-                    contents: null,
+                    contents: undefined,
                     filename: nodePath.resolve(
                       pkg.directory,
                       globError,
@@ -229,20 +236,21 @@ export class Package extends Item {
                   });
                   await fs.mkdirp(globError);
                 } else {
-                  delete pkg._config.entrypoints[index];
+                  (pkg.json.preconstruct.entrypoints as any[])[
+                    index
+                  ] = undefined;
                 }
               }
             })
           );
-          pkg._config.entrypoints = pkg._config.entrypoints.filter(
-            (x: string | undefined) => x
-          );
+          pkg.json.preconstruct.entrypoints = (pkg.json.preconstruct
+            .entrypoints as string[]).filter((x: string | undefined) => x);
           await pkg.save();
         }
 
         return Promise.all(
           descriptors.map(async ({ filename, contents, hasAccepted }) => {
-            if (contents === null || hasAccepted) {
+            if (contents === undefined || hasAccepted) {
               if (!hasAccepted) {
                 let shouldCreateEntrypointPkgJson = await confirms.createEntrypointPkgJson(
                   {
@@ -274,39 +282,13 @@ export class Package extends Item {
     return pkg;
   }
 
-  setFieldOnEntrypoints(field: "main" | "browser" | "module" | "umdMain") {
+  setFieldOnEntrypoints(field: "main" | "browser" | "module" | "umd:main") {
     this.entrypoints.forEach((entrypoint) => {
-      switch (field) {
-        case "main": {
-          entrypoint.main = getValidStringFieldContentForBuildType(
-            "main",
-            this.name
-          );
-          break;
-        }
-        case "module": {
-          entrypoint.module = getValidStringFieldContentForBuildType(
-            "module",
-            this.name
-          );
-          break;
-        }
-        case "browser": {
-          entrypoint.browser = getValidObjectFieldContentForBuildType(
-            "browser",
-            this.name,
-            entrypoint.module !== null
-          );
-          break;
-        }
-        case "umdMain": {
-          entrypoint.umdMain = getValidStringFieldContentForBuildType(
-            "umd:main",
-            this.name
-          );
-          break;
-        }
-      }
+      entrypoint.json = setFieldInOrder(
+        entrypoint.json,
+        field,
+        validFields[field](entrypoint)
+      );
     });
   }
 
@@ -318,8 +300,5 @@ export class Package extends Item {
       );
     }
     return this.json.name;
-  }
-  set name(name: string) {
-    this.json.name = name;
   }
 }

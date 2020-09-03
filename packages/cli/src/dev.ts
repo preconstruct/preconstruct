@@ -1,10 +1,11 @@
 import { Project } from "./project";
 import { success, info } from "./logger";
-import { tsTemplate, flowTemplate } from "./utils";
+import { tsTemplate, flowTemplate, validFields } from "./utils";
 import * as babel from "@babel/core";
 import * as fs from "fs-extra";
 import path from "path";
-import { StrictEntrypoint } from "./entrypoint";
+import { Entrypoint } from "./entrypoint";
+import { validateProject } from "./validate";
 
 let tsExtensionPattern = /tsx?$/;
 
@@ -28,8 +29,8 @@ module.exports = require(${JSON.stringify(pathToSource)})
 }
 
 async function getTypeSystem(
-  entrypoint: StrictEntrypoint
-): Promise<[null | "flow" | "typescript", string]> {
+  entrypoint: Entrypoint
+): Promise<[undefined | "flow" | "typescript", string]> {
   let content = await fs.readFile(entrypoint.source, "utf8");
 
   if (tsExtensionPattern.test(entrypoint.source)) {
@@ -40,11 +41,11 @@ async function getTypeSystem(
   if (content.includes("@flow")) {
     return ["flow", content];
   }
-  return [null, content];
+  return [undefined, content];
 }
 
 async function entrypointHasDefaultExport(
-  entrypoint: StrictEntrypoint,
+  entrypoint: Entrypoint,
   content: string
 ) {
   // this regex won't tell us that a module definitely has a default export
@@ -82,7 +83,7 @@ async function entrypointHasDefaultExport(
 }
 
 export async function writeDevTSFile(
-  entrypoint: StrictEntrypoint,
+  entrypoint: Entrypoint,
   entrypointSourceContent: string
 ) {
   let hasDefaultExport = await entrypointHasDefaultExport(
@@ -90,7 +91,7 @@ export async function writeDevTSFile(
     entrypointSourceContent
   );
   let cjsDistPath = path
-    .join(entrypoint.directory, entrypoint.main)
+    .join(entrypoint.directory, validFields.main(entrypoint))
     .replace(/\.js$/, "");
 
   await fs.outputFile(
@@ -116,12 +117,15 @@ export async function writeDevTSFile(
 }
 
 async function writeTypeSystemFile(
-  typeSystemPromise: Promise<[null | "flow" | "typescript", string]>,
-  entrypoint: StrictEntrypoint
+  typeSystemPromise: Promise<[undefined | "flow" | "typescript", string]>,
+  entrypoint: Entrypoint
 ) {
   let [typeSystem, content] = await typeSystemPromise;
-  if (typeSystem === null) return;
-  let cjsDistPath = path.join(entrypoint.directory, entrypoint.main);
+  if (typeSystem === undefined) return;
+  let cjsDistPath = path.join(
+    entrypoint.directory,
+    validFields.main(entrypoint)
+  );
 
   if (typeSystem === "flow") {
     // so...
@@ -150,18 +154,15 @@ async function writeTypeSystemFile(
 }
 
 export default async function dev(projectDir: string) {
-  let project: Project = await Project.create(projectDir);
-  project.packages.forEach(({ entrypoints }) =>
-    entrypoints.forEach((x) => x.strict())
-  );
+  let project = await Project.create(projectDir);
+  validateProject(project);
   info("project is valid!");
 
   let promises: Promise<unknown>[] = [];
   await Promise.all(
     project.packages.map((pkg) => {
       return Promise.all(
-        pkg.entrypoints.map(async (_entrypoint) => {
-          let entrypoint = _entrypoint.strict();
+        pkg.entrypoints.map(async (entrypoint) => {
           let typeSystemPromise = getTypeSystem(entrypoint);
 
           let distDirectory = path.join(entrypoint.directory, "dist");
@@ -172,7 +173,7 @@ export default async function dev(projectDir: string) {
           let promises = [
             writeTypeSystemFile(typeSystemPromise, entrypoint),
             fs.writeFile(
-              path.join(entrypoint.directory, entrypoint.main),
+              path.join(entrypoint.directory, validFields.main(entrypoint)),
               `"use strict";
 // this file might look strange and you might be wondering what it's for
 // it's lets you import your source files by importing this entrypoint
@@ -208,18 +209,18 @@ unregister();
 `
             ),
           ];
-          if (entrypoint.module) {
+          if (entrypoint.json.module) {
             promises.push(
               fs.writeFile(
-                path.join(entrypoint.directory, entrypoint.module),
+                path.join(entrypoint.directory, validFields.module(entrypoint)),
                 cjsOnlyReexportTemplate(
                   path.relative(distDirectory, entrypoint.source)
                 )
               )
             );
           }
-          let browserField = entrypoint.browser;
-          if (browserField) {
+          if (entrypoint.json.browser) {
+            let browserField = validFields.browser(entrypoint);
             for (let key of Object.keys(browserField)) {
               promises.push(
                 fs.writeFile(

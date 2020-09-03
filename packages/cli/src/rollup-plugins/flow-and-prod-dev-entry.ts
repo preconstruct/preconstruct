@@ -21,26 +21,25 @@ export default function flowAndNodeDevProdEntry(
     },
     async resolveId(source, importer) {
       let resolved = await this.resolve(source, importer!, {
-        skipSelf: true
+        skipSelf: true,
       });
       if (resolved === null) {
         if (!source.startsWith(".")) {
           warnings.push(
             new FatalError(
-              `"${source}" is imported by "${path.relative(
-                pkg.directory,
-                importer!
-              )}" but the package is not specified in dependencies or peerDependencies`,
+              `"${source}" is imported ${
+                importer
+                  ? `by "${path.relative(pkg.directory, importer!)}"`
+                  : ""
+              } but the package is not specified in dependencies or peerDependencies`,
               pkg.name
             )
           );
           return "could-not-resolve";
         }
         throw new FatalError(
-          `Could not resolve ${source} from ${path.relative(
-            pkg.directory,
-            importer!
-          )}`,
+          `Could not resolve ${source} ` +
+            (importer ? `from ${path.relative(pkg.directory, importer)}` : ""),
           pkg.name
         );
       }
@@ -53,10 +52,11 @@ export default function flowAndNodeDevProdEntry(
       }
       warnings.push(
         new FatalError(
-          `all relative imports in a package should only import modules inside of their package directory but "${path.relative(
-            pkg.directory,
-            importer!
-          )}" is importing "${source}"`,
+          `all relative imports in a package should only import modules inside of their package directory but ${
+            importer
+              ? `"${path.relative(pkg.directory, importer)}"`
+              : "a module"
+          } is importing "${source}"`,
           pkg.name
         )
       );
@@ -99,7 +99,7 @@ export default function flowAndNodeDevProdEntry(
             this.emitFile({
               type: "asset",
               fileName: flowFileName,
-              source: flowFileSource
+              source: flowFileSource,
             });
           }
         }
@@ -117,9 +117,9 @@ if (${
         this.emitFile({
           type: "asset",
           fileName: mainFieldPath,
-          source: mainEntrySource
+          source: mainEntrySource,
         });
       }
-    }
+    },
   };
 }

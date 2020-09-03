@@ -5,7 +5,7 @@ import {
   snapshotDistFiles,
   snapshotDirectory,
   install,
-  stripHashes
+  stripHashes,
 } from "../../../test-utils";
 
 const f = fixturez(__dirname);

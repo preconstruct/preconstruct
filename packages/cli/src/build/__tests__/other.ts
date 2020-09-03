@@ -42,7 +42,10 @@ test("typescript with forced dts emit", async () => {
   await install(tmpPath);
   await build(tmpPath);
 
-  await snapshotDirectory(tmpPath, { files: "all", filterPath: (fp) => fp.startsWith('dist/') });
+  await snapshotDirectory(tmpPath, {
+    files: "all",
+    filterPath: (fp) => fp.startsWith("dist/"),
+  });
 });
 
 test("package resolvable but not in deps", async () => {
@@ -105,7 +108,7 @@ test("should lazily get globals", async () => {
       `this should never be called: ${JSON.stringify({
         question,
         name,
-        thing
+        thing,
       })}`
     );
   });

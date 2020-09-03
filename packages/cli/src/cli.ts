@@ -11,7 +11,7 @@ import {
   FixableError,
   UnexpectedBuildError,
   ScopelessError,
-  BatchError
+  BatchError,
 } from "./errors";
 
 // tricking static analysis is fun
@@ -35,7 +35,7 @@ Commands
 );
 
 let errors = {
-  commandNotFound: "Command not found"
+  commandNotFound: "Command not found",
 };
 
 class CommandNotFoundError extends Error {}
@@ -74,7 +74,7 @@ class CommandNotFoundError extends Error {}
   } else {
     throw new CommandNotFoundError();
   }
-})().catch(err => {
+})().catch((err) => {
   if (err instanceof FixableError) {
     error(err.message, err.scope);
     info(
