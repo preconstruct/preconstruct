@@ -1,9 +1,12 @@
 import path from "path";
 import build from "../";
 import fixturez from "fixturez";
-import * as fs from "fs-extra";
-import { snapshotDistFiles, snapshotDirectory } from "../../../test-utils";
-import globby from "globby";
+import {
+  snapshotDistFiles,
+  snapshotDirectory,
+  testdir,
+  getDist,
+} from "../../../test-utils";
 
 const f = fixturez(__dirname);
 
@@ -30,26 +33,6 @@ test("typescript thing", async () => {
   await snapshotDirectory(path.join(tmpPath, "dist"), { files: "all" });
 });
 
-async function testdir(dir: { [key: string]: string }) {
-  const temp = f.temp();
-  await Promise.all(
-    Object.keys(dir).map((filename) => {
-      fs.outputFile(path.join(temp, filename), dir[filename]);
-    })
-  );
-  return temp;
-}
-
-async function getDist(dir: string) {
-  const files = await globby(["dist/**/*"], { cwd: dir });
-  const filesObj: Record<string, string> = {};
-  await Promise.all(
-    files.map(async (filename) => {
-      filesObj[filename] = await fs.readFile(path.join(dir, filename), "utf8");
-    })
-  );
-}
-
 test("process.env.NODE_ENV reassignment", async () => {
   const dir = await testdir({
     "package.json": JSON.stringify({
@@ -59,5 +42,25 @@ test("process.env.NODE_ENV reassignment", async () => {
     "src/index.js": "process.env.NODE_ENV = 'development'",
   });
   await build(dir);
-  expect(await getDist(dir)).toMatchInlineSnapshot();
+  expect(await getDist(dir)).toMatchInlineSnapshot(`
+      dist/test.cjs.dev.js -------------
+      'use strict';
+      
+      process.env.NODE_ENV = 'development';
+      
+      dist/test.cjs.js -------------
+      'use strict';
+      
+      if (process.env.NODE_ENV === "production") {
+        module.exports = require("./test.cjs.prod.js");
+      } else {
+        module.exports = require("./test.cjs.dev.js");
+      }
+      
+      dist/test.cjs.prod.js -------------
+      "use strict";
+      
+      process.env.NODE_ENV = "development";
+      
+  `);
 });

@@ -213,3 +213,45 @@ export async function snapshotDirectory(
 export async function install(tmpPath: string) {
   await spawn("yarn", ["install"], { cwd: tmpPath });
 }
+
+export async function testdir(dir: { [key: string]: string }) {
+  const temp = f.temp();
+  await Promise.all(
+    Object.keys(dir).map(async (filename) => {
+      await fs.outputFile(path.join(temp, filename), dir[filename]);
+    })
+  );
+  return temp;
+}
+
+expect.addSnapshotSerializer({
+  print(val, serialize, indent) {
+    return Object.keys(val)
+      .map((filename) => {
+        return `${filename} -------------\n${val[filename]}`;
+      })
+      .join("\n");
+  },
+  test(val) {
+    return val && val[dirPrintingSymbol];
+  },
+});
+
+const dirPrintingSymbol = Symbol("dir printing symbol");
+
+export async function getDist(dir: string) {
+  const files = await globby(["dist/**/*"], { cwd: dir });
+  const filesObj: Record<string, string> = {
+    [dirPrintingSymbol]: true,
+  };
+  await Promise.all(
+    files.map(async (filename) => {
+      filesObj[filename] = await fs.readFile(path.join(dir, filename), "utf8");
+    })
+  );
+  let newObj: Record<string, string> = { [dirPrintingSymbol]: true };
+  files.sort().forEach((filename) => {
+    newObj[filename] = filesObj[filename];
+  });
+  return newObj;
+}
