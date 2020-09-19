@@ -1,6 +1,8 @@
 import Worker from "jest-worker";
 
-let shouldUseWorker = process.env.DISABLE_PRECONSTRUCT_WORKER !== "true";
+let shouldUseWorker =
+  process.env.DISABLE_PRECONSTRUCT_WORKER !== "true" &&
+  process.env.NODE_ENV !== "test";
 
 let worker: (Worker & typeof import("./worker")) | void;
 

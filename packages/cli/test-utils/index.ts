@@ -5,7 +5,7 @@ import fixturez from "fixturez";
 import spawn from "spawndamnit";
 import initHasher from "xxhash-wasm";
 // @ts-ignore
-import profiler from "v8-profiler-next";
+// import profiler from "v8-profiler-next";
 import chalk from "chalk";
 
 let f = fixturez(__dirname);
@@ -39,23 +39,23 @@ export async function initBasic(directory: string) {
   mockedConfirms.writeModuleField.mockReset();
 }
 
-export function profile(name: string) {
-  profiler.startProfiling(name, true);
+// export function profile(name: string) {
+//   profiler.startProfiling(name, true);
 
-  return () => {
-    let profile = profiler.stopProfiling();
+//   return () => {
+//     let profile = profiler.stopProfiling();
 
-    new Promise<void>((resolve) =>
-      profile
-        .export()
-        .pipe(fs.createWriteStream(name + ".cpuprofile"))
-        .on("finish", function () {
-          profile.delete();
-          resolve();
-        })
-    );
-  };
-}
+//     new Promise<void>((resolve) =>
+//       profile
+//         .export()
+//         .pipe(fs.createWriteStream(name + ".cpuprofile"))
+//         .on("finish", function () {
+//           profile.delete();
+//           resolve();
+//         })
+//     );
+//   };
+// }
 
 function getPkgPath(tmpPath: string) {
   return path.join(tmpPath, "package.json");
@@ -212,4 +212,46 @@ export async function snapshotDirectory(
 
 export async function install(tmpPath: string) {
   await spawn("yarn", ["install"], { cwd: tmpPath });
+}
+
+export async function testdir(dir: { [key: string]: string }) {
+  const temp = f.temp();
+  await Promise.all(
+    Object.keys(dir).map(async (filename) => {
+      await fs.outputFile(path.join(temp, filename), dir[filename]);
+    })
+  );
+  return temp;
+}
+
+expect.addSnapshotSerializer({
+  print(val, serialize, indent) {
+    return Object.keys(val)
+      .map((filename) => {
+        return `${filename} -------------\n${val[filename]}`;
+      })
+      .join("\n");
+  },
+  test(val) {
+    return val && val[dirPrintingSymbol];
+  },
+});
+
+const dirPrintingSymbol = Symbol("dir printing symbol");
+
+export async function getDist(dir: string) {
+  const files = await globby(["dist/**/*"], { cwd: dir });
+  const filesObj: Record<string, string> = {
+    [dirPrintingSymbol]: true,
+  };
+  await Promise.all(
+    files.map(async (filename) => {
+      filesObj[filename] = await fs.readFile(path.join(dir, filename), "utf8");
+    })
+  );
+  let newObj: Record<string, string> = { [dirPrintingSymbol]: true };
+  files.sort().forEach((filename) => {
+    newObj[filename] = filesObj[filename];
+  });
+  return newObj;
 }
