@@ -164,12 +164,15 @@ export let getRollupConfig = (
           moduleDirectory: type === "umd" ? "node_modules" : [],
         },
       }),
-      (type === "umd" || type === "node-prod") &&
-        replace({
-          // tricking static analysis is fun...
-          ["process" + ".env.NODE_ENV"]: '"production"',
+      type === "umd" &&
+        terser({
+          sourceMap: true,
+          compress: {
+            global_defs: {
+              "process.env.NODE_ENV": "production",
+            },
+          },
         }),
-      type === "umd" && terser({ sourceMap: true }),
       type === "node-prod" &&
         terser({
           sourceMap: false,
@@ -177,6 +180,11 @@ export let getRollupConfig = (
           format: {
             beautify: true,
             indent_level: 2,
+          },
+          compress: {
+            global_defs: {
+              "process.env.NODE_ENV": "production",
+            },
           },
         }),
     ].filter((x: Plugin | false): x is Plugin => !!x),

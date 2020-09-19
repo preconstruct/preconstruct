@@ -5,7 +5,7 @@ import fixturez from "fixturez";
 import spawn from "spawndamnit";
 import initHasher from "xxhash-wasm";
 // @ts-ignore
-import profiler from "v8-profiler-next";
+// import profiler from "v8-profiler-next";
 import chalk from "chalk";
 
 let f = fixturez(__dirname);
@@ -39,23 +39,23 @@ export async function initBasic(directory: string) {
   mockedConfirms.writeModuleField.mockReset();
 }
 
-export function profile(name: string) {
-  profiler.startProfiling(name, true);
+// export function profile(name: string) {
+//   profiler.startProfiling(name, true);
 
-  return () => {
-    let profile = profiler.stopProfiling();
+//   return () => {
+//     let profile = profiler.stopProfiling();
 
-    new Promise<void>((resolve) =>
-      profile
-        .export()
-        .pipe(fs.createWriteStream(name + ".cpuprofile"))
-        .on("finish", function () {
-          profile.delete();
-          resolve();
-        })
-    );
-  };
-}
+//     new Promise<void>((resolve) =>
+//       profile
+//         .export()
+//         .pipe(fs.createWriteStream(name + ".cpuprofile"))
+//         .on("finish", function () {
+//           profile.delete();
+//           resolve();
+//         })
+//     );
+//   };
+// }
 
 function getPkgPath(tmpPath: string) {
   return path.join(tmpPath, "package.json");
