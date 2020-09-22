@@ -29,6 +29,7 @@ export class Project extends Item<{
       useSourceInsteadOfGeneratingTSDeclarations?: JSONValue;
       useTSMorphToGenerateTSDeclarations?: JSONValue;
       logCompiledFiles?: JSONValue;
+      nodeESM?: JSONValue;
     };
   };
 }> {
@@ -40,6 +41,7 @@ export class Project extends Item<{
       useSourceInsteadOfGeneratingTSDeclarations: !!config.useSourceInsteadOfGeneratingTSDeclarations,
       useTSMorphToGenerateTSDeclarations: !!config.useTSMorphToGenerateTSDeclarations,
       logCompiledFiles: !!config.logCompiledFiles,
+      nodeESM: !!config.nodeESM,
     };
   }
   get configPackages(): Array<string> {

@@ -1,4 +1,5 @@
 import { Entrypoint } from "./entrypoint";
+import { Package } from "./package";
 
 export function getNameForDist(name: string): string {
   return name.replace(/.*\//, "");
@@ -75,6 +76,18 @@ export const validFieldsFromPkgName = {
 };
 
 export const validFields = {
+  exports(pkg: Package) {
+    let exportsField: Record<
+      string,
+      { module?: string; import: string; require: string }
+    > = {};
+    pkg.entrypoints.forEach((entrypoint) => {
+      exportsField[entrypoint.name.replace(pkg.name, ".")] = {
+        import: "",
+      };
+    });
+    return exportsField;
+  },
   main(entrypoint: Entrypoint) {
     return validFieldsFromPkgName.main(entrypoint.package.name);
   },

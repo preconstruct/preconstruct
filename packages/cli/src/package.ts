@@ -23,6 +23,7 @@ export class Package extends Item<{
   preconstruct: {
     entrypoints?: JSONValue;
   };
+  exports?: JSONValue;
   dependencies?: Record<string, string>;
   peerDependencies?: Record<string, string>;
 }> {

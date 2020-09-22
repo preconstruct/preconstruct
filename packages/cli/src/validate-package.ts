@@ -34,6 +34,11 @@ export function validatePackage(pkg: Package) {
     throw new FatalError(errors.noEntrypoints, pkg.name);
   }
 
+  if (pkg.project.experimentalFlags.nodeESM) {
+    // using JSON.stringify(...) !== JSON.stringify(...) rather than fast-deep-equals bc order is important
+    if (JSON.stringify(pkg.json.exports) !== JSON.stringify()) {
+    }
+  }
   let fields = {
     // main is intentionally not here, since it's always required
     // it will be validated in validateEntrypoint and the case
