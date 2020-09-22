@@ -169,7 +169,7 @@ export let getRollupConfig = (
           sourceMap: true,
           compress: {
             global_defs: {
-              "process.env.NODE_ENV": "production",
+              ["process.env" + ".NODE_ENV"]: "production",
             },
           },
         }),
@@ -183,7 +183,7 @@ export let getRollupConfig = (
           },
           compress: {
             global_defs: {
-              "process.env.NODE_ENV": "production",
+              ["process.env" + ".NODE_ENV"]: "production",
             },
           },
         }),
