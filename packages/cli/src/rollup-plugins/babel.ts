@@ -3,6 +3,7 @@ import { getWorker } from "../worker-client";
 import { Plugin } from "rollup";
 import initHasher from "xxhash-wasm";
 import QuickLRU from "quick-lru";
+import { HELPERS } from "../constants";
 
 const lru = new QuickLRU<
   string,
@@ -30,15 +31,29 @@ let rollupPluginBabel = ({
 }): Plugin => {
   return {
     name: "babel",
+    resolveId(id) {
+      if (id !== HELPERS) {
+        return null;
+      }
+      return id;
+    },
+
+    load(id) {
+      if (id !== HELPERS) {
+        return null;
+      }
+      return (babel as any).buildExternalHelpers(null, "module");
+    },
     // @ts-ignore
     transform(code, filename) {
       if (
+        filename === HELPERS ||
         typeof filename !== "string" ||
         fakeRollupModuleRegex.test(filename) ||
         !extensionRegex.test(filename) ||
         filename.includes("node_modules")
       ) {
-        return Promise.resolve(null);
+        return null;
       }
       let hash = hasher(filename);
       if (lru.has(hash)) {
@@ -47,18 +62,8 @@ let rollupPluginBabel = ({
           return cachedResult.promise;
         }
       }
-      let options = JSON.stringify({
-        caller: {
-          name: "rollup-plugin-babel",
-          supportsStaticESM: true,
-          supportsDynamicImport: true,
-        },
-        sourceMaps: true,
-        cwd,
-        filename,
-      });
       let promise = getWorker()
-        .transformBabel(code, options)
+        .transformBabel(code, cwd, filename)
         .then((x) => {
           reportTransformedFile(filename);
           return x;
