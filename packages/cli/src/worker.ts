@@ -48,7 +48,6 @@ export async function transformBabel(
   if (!config) {
     return null;
   }
-  debugger;
   return babel
     .transformAsync(code, {
       ...config.options,
