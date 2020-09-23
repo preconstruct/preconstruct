@@ -4,7 +4,6 @@ import resolve from "resolve";
 import { EXTENSIONS } from "./constants";
 import { Package } from "./package";
 import { FatalError } from "./errors";
-import parseJson from "parse-json";
 import { JSONValue } from "./utils";
 
 export class Entrypoint extends Item<{

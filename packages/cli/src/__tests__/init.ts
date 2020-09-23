@@ -8,7 +8,6 @@ import {
   getPkg,
   createPackageCheckTestCreator,
 } from "../../test-utils";
-import { setFieldInOrder } from "../utils";
 
 const f = fixturez(__dirname);
 

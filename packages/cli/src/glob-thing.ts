@@ -1,4 +1,3 @@
-import globby from "globby";
 import parseGlob from "parse-glob";
 import micromatch from "micromatch";
 import * as fs from "fs-extra";
