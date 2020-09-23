@@ -4,11 +4,15 @@ import globby from "globby";
 import fixturez from "fixturez";
 import spawn from "spawndamnit";
 import initHasher from "xxhash-wasm";
-// @ts-ignore
+import outdent from "outdent";
 // import profiler from "v8-profiler-next";
 import chalk from "chalk";
 
 let f = fixturez(__dirname);
+
+export const js = outdent;
+export const ts = outdent;
+export const tsx = outdent;
 
 chalk.level = 0;
 

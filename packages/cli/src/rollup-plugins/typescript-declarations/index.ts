@@ -1,5 +1,4 @@
 import path from "path";
-import fs from "fs-extra";
 import { FatalError } from "../../errors";
 import { Plugin, OutputChunk, OutputAsset } from "rollup";
 import { Package } from "../../package";

@@ -2,7 +2,6 @@ import * as fs from "fs-extra";
 import nodePath from "path";
 import detectIndent from "detect-indent";
 import parseJson from "parse-json";
-import { PKG_JSON_CONFIG_FIELD } from "./constants";
 import { JSONValue } from "./utils";
 
 let itemsByPath: { [key: string]: Set<Item> } = {};
