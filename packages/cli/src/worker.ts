@@ -1,11 +1,9 @@
 import { HELPERS } from "./constants";
 import { lazyRequire } from "lazy-require.macro";
+// @ts-ignore
+import { addNamed } from "@babel/helper-module-imports";
 
 function importHelperPlugin(babel: typeof import("@babel/core")) {
-  const { addNamed } = lazyRequire<
-    // @ts-ignore
-    typeof import("@babel/helper-module-imports")
-  >();
   return {
     pre(file: any) {
       const cachedHelpers: Record<string, babel.types.Identifier> = {};
