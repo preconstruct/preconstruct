@@ -1,10 +1,7 @@
 import { HELPERS } from "./constants";
 import { lazyRequire } from "lazy-require.macro";
-type LoadPartialConfigAsync = (
-  options: babel.TransformOptions
-) => Promise<Readonly<babel.PartialConfig> | null>;
 
-function importHelperPlugin() {
+function importHelperPlugin(babel: typeof import("@babel/core")) {
   const { addNamed } = lazyRequire<
     // @ts-ignore
     typeof import("@babel/helper-module-imports")
@@ -12,13 +9,18 @@ function importHelperPlugin() {
   return {
     pre(file: any) {
       const cachedHelpers: Record<string, babel.types.Identifier> = {};
+      const previousHelperGenerator = file.get("helperGenerator");
       file.set("helperGenerator", (name: string) => {
+        if (previousHelperGenerator) {
+          const helperFromPrev = previousHelperGenerator(name);
+          if (helperFromPrev != null) return helperFromPrev;
+        }
         if (!file.availableHelper(name)) {
           return null;
         }
 
         if (cachedHelpers[name]) {
-          return cachedHelpers[name];
+          return babel.types.identifier(cachedHelpers[name].name);
         }
 
         return (cachedHelpers[name] = addNamed(file.path, name, HELPERS));
@@ -26,34 +28,25 @@ function importHelperPlugin() {
     },
   };
 }
+
 export async function transformBabel(
   code: string,
   cwd: string,
   filename: string
 ) {
   const babel = lazyRequire<typeof import("@babel/core")>();
-  const config = await (
-    ((babel as any).loadPartialConfigAsync as LoadPartialConfigAsync) ||
-    babel.loadPartialConfig
-  )({
-    caller: {
-      name: "rollup-plugin-babel",
-      supportsStaticESM: true,
-      supportsDynamicImport: true,
-    },
-    sourceMaps: true,
-    cwd,
-    filename,
-  });
-  if (!config) {
-    return null;
-  }
+
   return babel
     .transformAsync(code, {
-      ...config.options,
-      // note that we're doing this whole thing because we want to add the plugin _before_ user's plugins
-      // so that if they're using @babel/plugin-transform-runtime(which they should be), it'll work
-      plugins: [importHelperPlugin, ...(config.options.plugins || [])],
+      caller: {
+        name: "rollup-plugin-babel",
+        supportsStaticESM: true,
+        supportsDynamicImport: true,
+      },
+      sourceMaps: true,
+      cwd,
+      filename,
+      plugins: [importHelperPlugin],
     })
     .then((res) => {
       let { code, map } = res!;
