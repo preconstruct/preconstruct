@@ -244,7 +244,11 @@ expect.addSnapshotSerializer({
 const dirPrintingSymbol = Symbol("dir printing symbol");
 
 export async function getDist(dir: string) {
-  const files = await globby(["dist/**/*"], { cwd: dir });
+  return getFiles(dir, ["dist/**/*"]);
+}
+
+export async function getFiles(dir: string, globs: string[]) {
+  const files = await globby(globs, { cwd: dir });
   const filesObj: Record<string, string> = {
     [dirPrintingSymbol]: true,
   };

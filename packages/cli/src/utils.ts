@@ -82,8 +82,15 @@ export const validFields = {
       { module?: string; import: string; require: string }
     > = {};
     pkg.entrypoints.forEach((entrypoint) => {
-      exportsField[entrypoint.name.replace(pkg.name, ".")] = {
-        import: "",
+      const urlRelativeToEntrypoint = entrypoint.name.replace(pkg.name, ".");
+      exportsField[urlRelativeToEntrypoint] = {
+        module: entrypoint.json.module
+          ? `${urlRelativeToEntrypoint}/${validFields.module(entrypoint)}`
+          : undefined,
+        import: `${urlRelativeToEntrypoint}/dist/${getNameForDist(
+          pkg.name
+        )}.mjs`,
+        require: `${urlRelativeToEntrypoint}/${validFields.main(entrypoint)}`,
       };
     });
     return exportsField;
@@ -118,6 +125,18 @@ export function tsTemplate(hasDefaultExport: boolean, relativePath: string) {
   return `export * from ${escapedPath};${
     hasDefaultExport ? `\nexport { default } from ${escapedPath};` : ""
   }\n`;
+}
+
+export function mjsWrapperTemplate(
+  exportNames: string[],
+  relativePath: string
+) {
+  const escapedPath = JSON.stringify(relativePath);
+  let moduleStr = `import ___preconstruct_module_namespace from ${escapedPath};\n`;
+  for (const exportName of exportNames) {
+    moduleStr += exportName === "default" ? "" : "";
+  }
+  return moduleStr;
 }
 
 export type JSONValue =

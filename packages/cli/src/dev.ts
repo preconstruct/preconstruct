@@ -1,6 +1,6 @@
 import { Project } from "./project";
 import { success, info } from "./logger";
-import { tsTemplate, flowTemplate, validFields } from "./utils";
+import { tsTemplate, flowTemplate, validFields, getNameForDist } from "./utils";
 import * as babel from "@babel/core";
 import * as fs from "fs-extra";
 import path from "path";
@@ -27,69 +27,94 @@ function cjsOnlyReexportTemplate(pathToSource: string) {
 module.exports = require(${JSON.stringify(pathToSource)})
 `;
 }
+type TypeSystemPromise = Promise<{
+  system: "typescript" | "flow" | undefined;
+  hasDefaultExport: () => Promise<{
+    hasDefaultExport: boolean;
+    ast: () => Promise<babel.types.File>;
+  }>;
+}>;
 
-async function getTypeSystem(
-  entrypoint: Entrypoint
-): Promise<[undefined | "flow" | "typescript", string]> {
+async function getTypeSystem(entrypoint: Entrypoint): TypeSystemPromise {
   let content = await fs.readFile(entrypoint.source, "utf8");
-
+  let hasDefaultExport = await entrypointHasDefaultExport(entrypoint, content);
   if (tsExtensionPattern.test(entrypoint.source)) {
-    return ["typescript", content];
+    return {
+      system: "typescript",
+      hasDefaultExport,
+    };
   }
   // TODO: maybe we should write the flow symlink even if there isn't an @flow
   // comment so that if someone adds an @flow comment they don't have to run preconstruct dev again
   if (content.includes("@flow")) {
-    return ["flow", content];
+    return {
+      system: "flow",
+      hasDefaultExport,
+    };
   }
-  return [undefined, content];
+  return {
+    system: undefined,
+    hasDefaultExport,
+  };
 }
 
-async function entrypointHasDefaultExport(
-  entrypoint: Entrypoint,
-  content: string
-) {
-  // this regex won't tell us that a module definitely has a default export
-  // if it doesn't match though, it will tell us that the module
-  // definitely _doesn't_ have a default export
-  // we want to do this because a Babel parse is very expensive
-  // so we want to avoid doing it unless we absolutely have to
-  if (
-    !/(export\s*{[^}]*default|export\s+(|\*\s+as\s+)default\s)/.test(content)
-  ) {
-    return false;
-  }
-  let ast = (await babel.parseAsync(content, {
-    filename: entrypoint.source,
-    sourceType: "module",
-    cwd: entrypoint.package.project.directory,
-  }))! as babel.types.File;
-
-  for (let statement of ast.program.body) {
+function entrypointHasDefaultExport(entrypoint: Entrypoint, content: string) {
+  let getHasDefaultExport = async () => {
+    let _ast: babel.types.File;
+    let getAST = async () => {
+      if (!_ast) {
+        _ast = (await babel.parseAsync(content, {
+          filename: entrypoint.source,
+          sourceType: "module",
+          cwd: entrypoint.package.project.directory,
+        }))! as babel.types.File;
+      }
+      return _ast;
+    };
+    // this regex won't tell us that a module definitely has a default export
+    // if it doesn't match though, it will tell us that the module
+    // definitely _doesn't_ have a default export
+    // we want to do this because a Babel parse is very expensive
+    // so we want to avoid doing it unless we absolutely have to
     if (
-      statement.type === "ExportDefaultDeclaration" ||
-      (statement.type === "ExportNamedDeclaration" &&
-        statement.specifiers.some(
-          (specifier) =>
-            (specifier.type === "ExportDefaultSpecifier" ||
-              specifier.type === "ExportNamespaceSpecifier" ||
-              specifier.type === "ExportSpecifier") &&
-            specifier.exported.name === "default"
-        ))
+      !/(export\s*{[^}]*default|export\s+(|\*\s+as\s+)default\s)/.test(content)
     ) {
-      return true;
+      return { hasDefaultExport: false, ast: getAST };
     }
-  }
-  return false;
+
+    for (let statement of (await getAST()).program.body) {
+      if (
+        statement.type === "ExportDefaultDeclaration" ||
+        (statement.type === "ExportNamedDeclaration" &&
+          statement.specifiers.some(
+            (specifier) =>
+              (specifier.type === "ExportDefaultSpecifier" ||
+                specifier.type === "ExportNamespaceSpecifier" ||
+                specifier.type === "ExportSpecifier") &&
+              specifier.exported.name === "default"
+          ))
+      ) {
+        return { hasDefaultExport: true, ast: getAST };
+      }
+    }
+    return { hasDefaultExport: false, ast: getAST };
+  };
+  let promise: Promise<{
+    hasDefaultExport: boolean;
+    ast: () => Promise<babel.types.File>;
+  }>;
+  return () => {
+    if (promise === undefined) {
+      promise = getHasDefaultExport();
+    }
+    return promise;
+  };
 }
 
 export async function writeDevTSFile(
   entrypoint: Entrypoint,
-  entrypointSourceContent: string
+  hasDefaultExport: boolean
 ) {
-  let hasDefaultExport = await entrypointHasDefaultExport(
-    entrypoint,
-    entrypointSourceContent
-  );
   let cjsDistPath = path
     .join(entrypoint.directory, validFields.main(entrypoint))
     .replace(/\.js$/, "");
@@ -117,17 +142,17 @@ export async function writeDevTSFile(
 }
 
 async function writeTypeSystemFile(
-  typeSystemPromise: Promise<[undefined | "flow" | "typescript", string]>,
+  typeSystemPromise: TypeSystemPromise,
   entrypoint: Entrypoint
 ) {
-  let [typeSystem, content] = await typeSystemPromise;
-  if (typeSystem === undefined) return;
+  let { hasDefaultExport, system } = await typeSystemPromise;
+  if (system === undefined) return;
   let cjsDistPath = path.join(
     entrypoint.directory,
     validFields.main(entrypoint)
   );
 
-  if (typeSystem === "flow") {
+  if (system === "flow") {
     // so...
     // you might have noticed that this passes
     // hasExportDefault=false
@@ -148,8 +173,8 @@ async function writeTypeSystemFile(
       )
     );
   }
-  if (typeSystem === "typescript") {
-    await writeDevTSFile(entrypoint, content);
+  if (system === "typescript") {
+    await writeDevTSFile(entrypoint, await hasDefaultExport());
   }
 }
 
@@ -231,6 +256,27 @@ unregister();
                 )
               );
             }
+          }
+
+          if (pkg.project.experimentalFlags.nodeESM) {
+            promises.push(
+              typeSystemPromise
+                .then(({ hasDefaultExport }) => {
+                  return hasDefaultExport();
+                })
+                .then((hasDefaultExport) => {
+                  return fs.writeFile(
+                    path.join(
+                      entrypoint.directory,
+                      `dist/${getNameForDist(pkg.name)}.mjs`
+                    ),
+                    tsTemplate(
+                      hasDefaultExport,
+                      `./${path.basename(validFields.main(entrypoint))}`
+                    )
+                  );
+                })
+            );
           }
 
           return Promise.all(promises);

@@ -7,6 +7,8 @@ import {
   modifyPkg,
   logMock,
   createPackageCheckTestCreator,
+  testdir,
+  getFiles,
 } from "../../test-utils";
 import { promptInput as _promptInput } from "../prompt";
 import fs from "fs-extra";
@@ -295,3 +297,62 @@ test("create entrypoint", async () => {
     }
   `);
 });
+
+test("node esm", async () => {
+  let dir = await testdir({
+    "package.json": JSON.stringify({
+      main: " ",
+      module: " ",
+      name: "test",
+      preconstruct: {
+        entrypoints: [".", "other"],
+        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+          nodeESM: true,
+        },
+      },
+    }),
+    "other/package.json": JSON.stringify({
+      main: " ",
+      preconstruct: {
+        source: "../src/other",
+      },
+    }),
+    "src/index.js": "export let something = true",
+    "src/other.js": "export let something = true",
+  });
+  await fix(dir);
+  expect(await getFiles(dir, ["package.json", "other/package.json"]))
+    .toMatchInlineSnapshot(`
+    other/package.json -------------
+    {"main":" ","preconstruct":{"source":"../src/other"}}
+    package.json -------------
+    {
+      "main": "dist/test.cjs.js",
+      "module": "dist/test.esm.js",
+      "name": "test",
+      "preconstruct": {
+        "___experimentalFlags_WILL_CHANGE_IN_PATCH": {
+          "nodeESM": true
+        }
+      },
+      "exports": {
+        ".": {
+          "module": "./dist/test.esm.js",
+          "import": "./dist/test.mjs",
+          "require": "./dist/test.cjs.js"
+        }
+      }
+    }
+
+  `);
+});
+
+// test("node esm with wrong order", async () => {
+//   let dir = await testdir({
+//     "package.json": JSON.stringify({
+//       name: "test",
+//     }),
+//   });
+//   await fix();
+//   expect();
+// });

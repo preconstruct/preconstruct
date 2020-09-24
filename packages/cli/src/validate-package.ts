@@ -3,6 +3,7 @@ import resolveFrom from "resolve-from";
 import chalk from "chalk";
 import { errors } from "./messages";
 import { Package } from "./package";
+import { validFields } from "./utils";
 
 let keys: <Obj>(obj: Obj) => (keyof Obj)[] = Object.keys;
 
@@ -10,6 +11,17 @@ export async function fixPackage(pkg: Package) {
   if (pkg.entrypoints.length === 0) {
     throw new FatalError(errors.noEntrypoints, pkg.name);
   }
+
+  let modifiedPkg = false;
+
+  if (pkg.project.experimentalFlags.nodeESM) {
+    const valid = validFields.exports(pkg);
+    if (JSON.stringify(pkg.json.exports) !== JSON.stringify(valid)) {
+      pkg.json.exports = valid;
+      modifiedPkg = await pkg.save();
+    }
+  }
+
   let fields = {
     main: true,
     module: pkg.entrypoints.some((x) => x.json.module !== undefined),
@@ -22,8 +34,9 @@ export async function fixPackage(pkg: Package) {
     .forEach((field) => {
       pkg.setFieldOnEntrypoints(field);
     });
-  return (await Promise.all(pkg.entrypoints.map((x) => x.save()))).some(
-    (x) => x
+  return (
+    (await Promise.all(pkg.entrypoints.map((x) => x.save()))).some((x) => x) ||
+    modifiedPkg
   );
 }
 
@@ -36,7 +49,9 @@ export function validatePackage(pkg: Package) {
 
   if (pkg.project.experimentalFlags.nodeESM) {
     // using JSON.stringify(...) !== JSON.stringify(...) rather than fast-deep-equals bc order is important
-    if (JSON.stringify(pkg.json.exports) !== JSON.stringify()) {
+    const valid = validFields.exports(pkg);
+    if (JSON.stringify(pkg.json.exports) !== JSON.stringify(valid)) {
+      throw new FixableError("exports field is incorrect", pkg.name);
     }
   }
   let fields = {

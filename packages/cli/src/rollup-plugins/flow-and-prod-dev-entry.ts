@@ -6,6 +6,7 @@ import { Package } from "../package";
 import { FatalError } from "../errors";
 
 import * as fs from "fs-extra";
+import { tsTemplate } from "../../dist/declarations/src/utils";
 
 export default function flowAndNodeDevProdEntry(
   pkg: Package,
@@ -123,6 +124,16 @@ if (${
           fileName: mainFieldPath,
           source: mainEntrySource,
         });
+        if (pkg.project.experimentalFlags.nodeESM) {
+          this.emitFile({
+            type: "asset",
+            fileName: file.fileName.replace(/\.cjs\.prod\.js$/, ".mjs"),
+            source: tsTemplate(
+              file.exports.includes("default"),
+              `./${path.basename(mainFieldPath)}`
+            ),
+          });
+        }
       }
     },
   };

@@ -9,6 +9,7 @@ import {
   isFieldValid,
   isUmdNameSpecified,
 } from "./validate";
+import { validFields } from "./utils";
 
 async function doInit(pkg: Package) {
   pkg.entrypoints.forEach((entrypoint) => {
@@ -21,6 +22,14 @@ async function doInit(pkg: Package) {
     if (!canWriteMainField) {
       throw new FatalError(errors.deniedWriteMainField, pkg.name);
     }
+    if (pkg.project.experimentalFlags.nodeESM) {
+      const valid = validFields.exports(pkg);
+      if (JSON.stringify(pkg.json.exports) !== JSON.stringify(valid)) {
+        pkg.json.exports = valid;
+        await pkg.save();
+      }
+    }
+
     pkg.setFieldOnEntrypoints("main");
   }
 
