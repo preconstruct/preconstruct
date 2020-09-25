@@ -3,6 +3,8 @@ import { PKG_JSON_CONFIG_FIELD } from "./constants";
 type Field = "main" | "module" | "browser" | "umd:main";
 
 export let errors = {
+  noExportStarFromExternalWhenUsingNodeESM:
+    'using "export * from" is not allowed with external modules when using the experimental nodeESM flag',
   noSource: (source: string) =>
     `no source file was provided, please create a file at ${source} or specify a custom source file with the ${PKG_JSON_CONFIG_FIELD} source option`,
   deniedWriteMainField: "changing the main field is required to build",

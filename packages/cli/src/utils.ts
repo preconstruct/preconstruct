@@ -128,13 +128,16 @@ export function tsTemplate(hasDefaultExport: boolean, relativePath: string) {
 }
 
 export function mjsWrapperTemplate(
-  exportNames: string[],
+  exportNames: Iterable<string>,
   relativePath: string
 ) {
   const escapedPath = JSON.stringify(relativePath);
   let moduleStr = `import ___preconstruct_module_namespace from ${escapedPath};\n`;
   for (const exportName of exportNames) {
-    moduleStr += exportName === "default" ? "" : "";
+    moduleStr +=
+      exportName === "default"
+        ? "export default ___preconstruct_module_namespace;\n"
+        : `export var ${exportName} = ___preconstruct_module_namespace.${exportName};\n`;
   }
   return moduleStr;
 }

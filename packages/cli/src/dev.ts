@@ -1,11 +1,20 @@
 import { Project } from "./project";
 import { success, info } from "./logger";
-import { tsTemplate, flowTemplate, validFields, getNameForDist } from "./utils";
+import {
+  tsTemplate,
+  flowTemplate,
+  validFields,
+  getNameForDist,
+  mjsWrapperTemplate,
+} from "./utils";
 import * as babel from "@babel/core";
 import * as fs from "fs-extra";
 import path from "path";
 import { Entrypoint } from "./entrypoint";
 import { validateProject } from "./validate";
+import { FatalError } from "./errors";
+import resolve from "resolve";
+import { errors } from "./messages";
 
 let tsExtensionPattern = /tsx?$/;
 
@@ -174,8 +183,38 @@ async function writeTypeSystemFile(
     );
   }
   if (system === "typescript") {
-    await writeDevTSFile(entrypoint, await hasDefaultExport());
+    await writeDevTSFile(
+      entrypoint,
+      (await hasDefaultExport()).hasDefaultExport
+    );
   }
+}
+
+function promiseThing<Result>(): Promise<Result> & {
+  resolve(result: Result): void;
+  reject(error: any): void;
+} {
+  let resolve;
+  let reject;
+  let promise: any = new Promise((_resolve, _reject) => {
+    resolve = _resolve;
+    reject = _reject;
+  });
+  promise.resolve = resolve;
+  promise.reject = reject;
+  return promise;
+}
+function waitUntilDoneTimes(n: number): Promise<void> & { add: () => void } {
+  let current = 0;
+  let promise = Object.assign(promiseThing<void>(), {
+    add() {
+      current += 1;
+      if (current === n) {
+        promise.resolve();
+      }
+    },
+  });
+  return promise;
 }
 
 export default async function dev(projectDir: string) {
@@ -184,14 +223,23 @@ export default async function dev(projectDir: string) {
   info("project is valid!");
 
   let promises: Promise<unknown>[] = [];
+  const nodeESMIsEnabled = project.experimentalFlags.nodeESM;
   await Promise.all(
     project.packages.map((pkg) => {
+      const depGraph: DepGraph = {};
+      const depGraphFinishedPromise = waitUntilDoneTimes(
+        pkg.entrypoints.length
+      );
       return Promise.all(
         pkg.entrypoints.map(async (entrypoint) => {
           let typeSystemPromise = getTypeSystem(entrypoint);
-
           let distDirectory = path.join(entrypoint.directory, "dist");
-
+          if (nodeESMIsEnabled) {
+            depGraph[entrypoint.source] = {
+              exportNames: new Set(),
+              exportStarDeps: new Set(),
+            };
+          }
           await fs.remove(distDirectory);
           await fs.ensureDir(distDirectory);
 
@@ -258,20 +306,34 @@ unregister();
             }
           }
 
-          if (pkg.project.experimentalFlags.nodeESM) {
+          if (nodeESMIsEnabled) {
             promises.push(
               typeSystemPromise
                 .then(({ hasDefaultExport }) => {
                   return hasDefaultExport();
                 })
-                .then((hasDefaultExport) => {
+                .then(({ ast }) => ast())
+                .then(async (ast) => {
+                  await resolveDependency(
+                    entrypoint.source,
+                    ast,
+                    project.directory,
+                    depGraph,
+                    depGraph[entrypoint.source]
+                  );
+                  depGraphFinishedPromise.add();
+                  await depGraphFinishedPromise;
+                  const exportNames = resolveExportNamesForModuleInGraph(
+                    depGraph,
+                    entrypoint.source
+                  );
                   return fs.writeFile(
                     path.join(
                       entrypoint.directory,
                       `dist/${getNameForDist(pkg.name)}.mjs`
                     ),
-                    tsTemplate(
-                      hasDefaultExport,
+                    mjsWrapperTemplate(
+                      exportNames,
                       `./${path.basename(validFields.main(entrypoint))}`
                     )
                   );
@@ -288,4 +350,80 @@ unregister();
   await Promise.all(promises);
 
   success("created links!");
+}
+
+type Dep = { exportStarDeps: Set<string>; exportNames: Set<string> };
+
+type DepGraph = Record<string, Dep>;
+
+function resolveExportNamesForModuleInGraph(
+  depGraph: DepGraph,
+  filename: string
+) {
+  let modulesVisited = new Set<string>();
+  let exportedNames = new Set<string>();
+  let queue = [filename];
+  while (queue.length) {
+    const currentFilename = queue.shift()!;
+    if (modulesVisited.has(currentFilename)) {
+      continue;
+    }
+    modulesVisited.add(currentFilename);
+
+    const currentMod = depGraph[currentFilename];
+    for (const exportName of currentMod.exportNames) {
+      exportedNames.add(exportName);
+    }
+    queue.push(...currentMod.exportStarDeps);
+  }
+  return exportedNames;
+}
+
+async function resolveDependency(
+  filename: string,
+  ast: babel.types.File,
+  cwd: string,
+  depGraph: DepGraph,
+  mod: Dep
+) {
+  await Promise.all(
+    ast.program.body.map(async (statement) => {
+      if (statement.type === "ExportDefaultDeclaration") {
+        mod.exportNames.add("default");
+      }
+      if (statement.type === "ExportNamedDeclaration") {
+        for (const specifier of statement.specifiers) {
+          mod.exportNames.add(specifier.exported.name);
+        }
+      }
+      if (statement.type === "ExportAllDeclaration") {
+        if (/\.\.?\//.test(statement.source.value)) {
+          const depFilename = resolve.sync(statement.source.value, {
+            basedir: path.dirname(filename),
+            preserveSymlinks: false,
+          });
+          mod.exportStarDeps.add(depFilename);
+          if (depGraph[depFilename] !== undefined) return;
+          const dep: Dep = {
+            exportNames: new Set(),
+            exportStarDeps: new Set(),
+          };
+          const file = (await babel.parseAsync(
+            await fs.readFile(depFilename, "utf8"),
+            {
+              filename: depFilename,
+              sourceType: "module",
+              cwd,
+            }
+          ))! as babel.types.File;
+          await resolveDependency(depFilename, file, cwd, depGraph, dep);
+        } else {
+          throw new FatalError(
+            errors.noExportStarFromExternalWhenUsingNodeESM,
+            path.relative(cwd, filename)
+          );
+        }
+      }
+    })
+  );
 }
