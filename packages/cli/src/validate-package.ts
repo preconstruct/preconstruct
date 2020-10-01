@@ -51,7 +51,13 @@ export function validatePackage(pkg: Package) {
     // using JSON.stringify(...) !== JSON.stringify(...) rather than fast-deep-equals bc order is important
     const valid = validFields.exports(pkg);
     if (JSON.stringify(pkg.json.exports) !== JSON.stringify(valid)) {
-      throw new FixableError("exports field is incorrect", pkg.name);
+      console.log(valid);
+      throw new FixableError(
+        "exports field is incorrect" +
+          JSON.stringify(pkg.json.exports) +
+          JSON.stringify(valid),
+        pkg.name
+      );
     }
   }
   let fields = {

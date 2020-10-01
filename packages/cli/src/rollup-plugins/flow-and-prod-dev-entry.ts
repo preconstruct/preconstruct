@@ -1,12 +1,11 @@
 import path from "path";
 import { Plugin } from "rollup";
 import { getDevPath, getProdPath } from "../build/utils";
-import { flowTemplate } from "../utils";
+import { flowTemplate, tsTemplate } from "../utils";
 import { Package } from "../package";
 import { FatalError } from "../errors";
 
 import * as fs from "fs-extra";
-import { tsTemplate } from "../../dist/declarations/src/utils";
 
 export default function flowAndNodeDevProdEntry(
   pkg: Package,

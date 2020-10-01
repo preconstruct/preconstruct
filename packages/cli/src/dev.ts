@@ -15,6 +15,7 @@ import { validateProject } from "./validate";
 import { FatalError } from "./errors";
 import resolve from "resolve";
 import { errors } from "./messages";
+import { stat } from "fs";
 
 let tsExtensionPattern = /tsx?$/;
 
@@ -46,7 +47,7 @@ type TypeSystemPromise = Promise<{
 
 async function getTypeSystem(entrypoint: Entrypoint): TypeSystemPromise {
   let content = await fs.readFile(entrypoint.source, "utf8");
-  let hasDefaultExport = await entrypointHasDefaultExport(entrypoint, content);
+  let hasDefaultExport = entrypointHasDefaultExport(entrypoint, content);
   if (tsExtensionPattern.test(entrypoint.source)) {
     return {
       system: "typescript",
@@ -327,6 +328,7 @@ unregister();
                     depGraph,
                     entrypoint.source
                   );
+                  debugger;
                   return fs.writeFile(
                     path.join(
                       entrypoint.directory,
@@ -369,7 +371,6 @@ function resolveExportNamesForModuleInGraph(
       continue;
     }
     modulesVisited.add(currentFilename);
-
     const currentMod = depGraph[currentFilename];
     for (const exportName of currentMod.exportNames) {
       exportedNames.add(exportName);
@@ -379,6 +380,7 @@ function resolveExportNamesForModuleInGraph(
   return exportedNames;
 }
 
+// note that we're not being smart about not exporting types because they won't really cause problems
 async function resolveDependency(
   filename: string,
   ast: babel.types.File,
@@ -391,13 +393,24 @@ async function resolveDependency(
       if (statement.type === "ExportDefaultDeclaration") {
         mod.exportNames.add("default");
       }
-      if (statement.type === "ExportNamedDeclaration") {
+
+      if (
+        statement.type === "ExportNamedDeclaration" &&
+        statement.exportKind === "value"
+      ) {
         for (const specifier of statement.specifiers) {
           mod.exportNames.add(specifier.exported.name);
         }
+        if (statement.declaration) {
+          for (const exportName of Object.keys(
+            babel.types.getOuterBindingIdentifiers(statement.declaration)
+          )) {
+            mod.exportNames.add(exportName);
+          }
+        }
       }
       if (statement.type === "ExportAllDeclaration") {
-        if (/\.\.?\//.test(statement.source.value)) {
+        if (/^\.\.?\/?/.test(statement.source.value)) {
           const depFilename = resolve.sync(statement.source.value, {
             basedir: path.dirname(filename),
             preserveSymlinks: false,
@@ -408,6 +421,7 @@ async function resolveDependency(
             exportNames: new Set(),
             exportStarDeps: new Set(),
           };
+          depGraph[depFilename] = dep;
           const file = (await babel.parseAsync(
             await fs.readFile(depFilename, "utf8"),
             {
