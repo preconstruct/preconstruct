@@ -1,5 +1,13 @@
 # preconstruct
 
+## 1.1.28
+
+### Patch Changes
+
+- [`86d8d3d`](https://github.com/preconstruct/preconstruct/commit/86d8d3d76ba6fc7966dc392de904040f72bd9f3d) [#322](https://github.com/preconstruct/preconstruct/pull/322) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Deduplicate Babel helpers when not using @babel/plugin-transform-runtime(note that we still recommend using @babel/plugin-transform-runtime, this is just stopping the duplication if you choose not to use it)
+
+* [`2d62357`](https://github.com/preconstruct/preconstruct/commit/2d6235707318cc9faae8d544058068d34d0bddab) [#320](https://github.com/preconstruct/preconstruct/pull/320) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Fix process.env.NODE_ENV reassignment throwing a syntax error
+
 ## 1.1.27
 
 ### Patch Changes
