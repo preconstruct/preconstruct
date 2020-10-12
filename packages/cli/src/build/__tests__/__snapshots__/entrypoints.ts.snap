@@ -84,9 +84,15 @@ export { multiply };
 "
 `;
 
-exports[`multiple entrypoints: src/multiply.js 1`] = `"export let multiply = (a, b) => a * b;"`;
+exports[`multiple entrypoints: src/multiply.js 1`] = `
+"export let multiply = (a, b) => a * b;
+"
+`;
 
-exports[`multiple entrypoints: src/sum.js 1`] = `"export let sum = (a, b) => a + b;"`;
+exports[`multiple entrypoints: src/sum.js 1`] = `
+"export let sum = (a, b) => a + b;
+"
+`;
 
 exports[`two entrypoints where one requires the other entrypoint: dist/importing-another-entrypoint.cjs.dev.js 1`] = `
 "'use strict';
@@ -163,7 +169,7 @@ exports.multiply = multiply;
 `;
 
 exports[`two entrypoints where one requires the other entrypoint: src/identity.js 1`] = `
-"export let identity = x => x;
+"export let identity = (x) => x;
 "
 `;
 
@@ -300,7 +306,7 @@ export { multiply };
 `;
 
 exports[`two entrypoints with a common dependency: src/identity.js 1`] = `
-"export let identity = x => x;
+"export let identity = (x) => x;
 "
 `;
 

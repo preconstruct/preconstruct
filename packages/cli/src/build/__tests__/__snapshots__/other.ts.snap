@@ -333,9 +333,9 @@ exports[`should lazily get globals: src/index.js 1`] = `
 `;
 
 exports[`typescript with forced dts emit: dist/declarations/src/create-store.d.ts 1`] = `
-"import { Action } from '@reduxjs/toolkit';
-import { ThunkAction } from 'redux-thunk';
-import { RootState } from './root-reducer';
+"import { Action } from \\"@reduxjs/toolkit\\";
+import { ThunkAction } from \\"redux-thunk\\";
+import { RootState } from \\"./root-reducer\\";
 export declare type AppThunk = ThunkAction<void, RootState, unknown, Action<string>>;
 export declare function createStore(): import(\\"@reduxjs/toolkit\\").EnhancedStore<{
     readonly [$CombinedState]?: undefined;
@@ -348,9 +348,9 @@ export declare function createStore(): import(\\"@reduxjs/toolkit\\").EnhancedSt
 `;
 
 exports[`typescript with forced dts emit: dist/declarations/src/index.d.ts 1`] = `
-"export { createStore } from './create-store';
-export type { AppThunk } from './create-store';
-export type { RootState } from './root-reducer';
+"export { createStore } from \\"./create-store\\";
+export type { AppThunk } from \\"./create-store\\";
+export type { RootState } from \\"./root-reducer\\";
 "
 `;
 
