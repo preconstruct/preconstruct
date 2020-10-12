@@ -1,5 +1,11 @@
 # preconstruct
 
+## 1.1.29
+
+### Patch Changes
+
+- [`77b6d2f`](https://github.com/preconstruct/preconstruct/commit/77b6d2f3c2d82827c1270e03a48585967f4be8db) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Fix dist directory not being published in previous release
+
 ## 1.1.28
 
 ### Patch Changes
