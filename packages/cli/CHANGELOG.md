@@ -1,5 +1,15 @@
 # preconstruct
 
+## 1.1.28
+
+### Patch Changes
+
+- [`86d8d3d`](https://github.com/preconstruct/preconstruct/commit/86d8d3d76ba6fc7966dc392de904040f72bd9f3d) [#322](https://github.com/preconstruct/preconstruct/pull/322) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Deduplicate Babel helpers when not using @babel/plugin-transform-runtime(note that we still recommend using @babel/plugin-transform-runtime, this is just stopping the duplication if you choose not to use it)
+
+* [`3b3cacb`](https://github.com/preconstruct/preconstruct/commit/3b3cacbb33ddef7cf782c5b596c7b5d866ac8ede) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Disable usage of worker processes when running on CI to improve performance(Emotion's preconstruct build on CircleCI went from ~2 minutes to ~10 seconds when disabling the worker)
+
+- [`2d62357`](https://github.com/preconstruct/preconstruct/commit/2d6235707318cc9faae8d544058068d34d0bddab) [#320](https://github.com/preconstruct/preconstruct/pull/320) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Fix process.env.NODE_ENV reassignment throwing a syntax error
+
 ## 1.1.27
 
 ### Patch Changes
