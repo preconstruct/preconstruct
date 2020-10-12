@@ -6,7 +6,8 @@
     "bin.js",
     "cli",
     "worker",
-    "!**/*.d.ts"
+    "!**/*.d.ts",
+    "dist"
   ],
   "bin": {
     "preconstruct": "./bin.js"
