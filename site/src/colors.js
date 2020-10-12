@@ -6,5 +6,5 @@ export default {
   gray: "#eef6f9",
   blue: "#117fd0",
   pink: "#fdeaf4",
-  active: "#7e45ff"
+  active: "#7e45ff",
 };

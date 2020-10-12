@@ -10,7 +10,8 @@
     "changeset": "changeset",
     "release": "yarn build && changeset publish",
     "start:site": "cd site && yarn start",
-    "build:site": "cd site && yarn build"
+    "build:site": "cd site && yarn build",
+    "lint": "eslint . --ext tsx,ts,js"
   },
   "repository": "https://github.com/preconstruct/preconstruct",
   "license": "MIT",
@@ -56,7 +57,7 @@
     "codecov": "^3.6.1",
     "eslint": "^6.6.0",
     "eslint-plugin-import": "^2.18.2",
-    "eslint-plugin-prettier": "^3.1.1",
+    "eslint-plugin-prettier": "^3.1.4",
     "eslint-plugin-react": "^7.16.0",
     "fixturez": "^1.1.0",
     "jest": "^24.9.0",

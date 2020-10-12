@@ -1,1 +1,1 @@
-export let identity = x => x;
+export let identity = (x) => x;

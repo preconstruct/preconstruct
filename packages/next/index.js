@@ -4,7 +4,7 @@ module.exports = (nextConfig = {}) => {
   nextConfig.webpack = (webpackConfig, options) => {
     let hasFoundRule = false;
     options.defaultLoaders.babel.options.rootMode = "upward-optional";
-    webpackConfig.module.rules.forEach(rule => {
+    webpackConfig.module.rules.forEach((rule) => {
       if (
         rule.use === options.defaultLoaders.babel ||
         (Array.isArray(rule.use) &&
