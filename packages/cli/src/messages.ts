@@ -1,4 +1,6 @@
 import { PKG_JSON_CONFIG_FIELD } from "./constants";
+import { createPromptConfirmLoader } from "./prompt";
+import chalk from "chalk";
 
 type Field = "main" | "module" | "browser" | "umd:main";
 
@@ -6,14 +8,19 @@ export let errors = {
   noSource: (source: string) =>
     `no source file was provided, please create a file at ${source} or specify a custom source file with the ${PKG_JSON_CONFIG_FIELD} source option`,
   deniedWriteMainField: "changing the main field is required to build",
-  invalidField: (field: Field) => `${field} field is invalid`,
+  invalidField: (field: Field, found: unknown, expected: unknown) =>
+    `${field} field ${
+      found === undefined
+        ? chalk.red("was not found")
+        : `is invalid, found \`${chalk.red(JSON.stringify(found))}\``
+    }, expected \`${chalk.green(JSON.stringify(expected))}\``,
   umdNameNotSpecified: `the umd:main field is specified but a umdName option is not specified. please add it to the ${PKG_JSON_CONFIG_FIELD} field in your package.json`,
   noEntrypointPkgJson: "There is a missing package.json for an entrypoint",
   noEntrypoints:
     "packages must have at least one entrypoint, this package has no entrypoints",
+  fieldMustExistInAllEntrypointsIfExistsDeclinedFixDuringInit: (field: Field) =>
+    `all entrypoints in a package must have the same fields and one entrypoint in this package has a ${field} field but you've declined the fix`,
 };
-
-import { createPromptConfirmLoader } from "./prompt";
 
 export let confirms = {
   writeMainField: createPromptConfirmLoader(

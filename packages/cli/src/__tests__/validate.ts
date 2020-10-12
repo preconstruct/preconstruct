@@ -1,7 +1,14 @@
 import fixturez from "fixturez";
 import path from "path";
 import validate from "../validate";
-import { logMock, modifyPkg, getPkg, install } from "../../test-utils";
+import {
+  logMock,
+  modifyPkg,
+  getPkg,
+  install,
+  testdir,
+  js,
+} from "../../test-utils";
 import { FatalError } from "../errors";
 import { errors, confirms as _confirms } from "../messages";
 
@@ -20,27 +27,27 @@ test("reports correct result on valid package", async () => {
 
   await validate(tmpPath);
   expect(logMock.log.mock.calls).toMatchInlineSnapshot(`
-Array [
-  Array [
-    "🎁 info valid-package a valid entry point exists.",
-  ],
-  Array [
-    "🎁 info valid-package main field is valid",
-  ],
-  Array [
-    "🎁 info valid-package module field is valid",
-  ],
-  Array [
-    "🎁 info valid-package umd:main field is valid",
-  ],
-  Array [
-    "🎁 info valid-package package entrypoints are valid",
-  ],
-  Array [
-    "🎁 success project is valid!",
-  ],
-]
-`);
+    Array [
+      Array [
+        "🎁 info valid-package a valid entry point exists.",
+      ],
+      Array [
+        "🎁 info valid-package main field is valid",
+      ],
+      Array [
+        "🎁 info valid-package module field is valid",
+      ],
+      Array [
+        "🎁 info valid-package umd:main field is valid",
+      ],
+      Array [
+        "🎁 info valid-package package entrypoints are valid",
+      ],
+      Array [
+        "🎁 success project is valid!",
+      ],
+    ]
+  `);
 });
 
 test("no main field", async () => {
@@ -49,7 +56,9 @@ test("no main field", async () => {
   try {
     await validate(tmpPath);
   } catch (e) {
-    expect(e).toMatchInlineSnapshot(`[Error: main field is invalid]`);
+    expect(e).toMatchInlineSnapshot(
+      `[Error: main field was not found, expected \`"dist/no-main-field.cjs.js"\`]`
+    );
     return;
   }
 
@@ -61,21 +70,21 @@ test("no module", async () => {
 
   await validate(tmpPath);
   expect(logMock.log.mock.calls).toMatchInlineSnapshot(`
-Array [
-  Array [
-    "🎁 info no-module a valid entry point exists.",
-  ],
-  Array [
-    "🎁 info no-module main field is valid",
-  ],
-  Array [
-    "🎁 info no-module package entrypoints are valid",
-  ],
-  Array [
-    "🎁 success project is valid!",
-  ],
-]
-`);
+    Array [
+      Array [
+        "🎁 info no-module a valid entry point exists.",
+      ],
+      Array [
+        "🎁 info no-module main field is valid",
+      ],
+      Array [
+        "🎁 info no-module package entrypoints are valid",
+      ],
+      Array [
+        "🎁 success project is valid!",
+      ],
+    ]
+  `);
 });
 
 test("invalid browser", async () => {
@@ -89,7 +98,11 @@ test("invalid browser", async () => {
     await validate(tmpPath);
   } catch (e) {
     expect(e).toBeInstanceOf(FatalError);
-    expect(e.message).toBe(errors.invalidField("browser"));
+    expect(e.message).toBe(
+      errors.invalidField("browser", "invalid.js", {
+        "./dist/no-module.cjs.js": "./dist/no-module.browser.cjs.js",
+      })
+    );
   }
 });
 
@@ -105,30 +118,30 @@ test("valid browser", async () => {
 
   await validate(tmpPath);
   expect(logMock.log.mock.calls).toMatchInlineSnapshot(`
-Array [
-  Array [
-    "🎁 info valid-package a valid entry point exists.",
-  ],
-  Array [
-    "🎁 info valid-package main field is valid",
-  ],
-  Array [
-    "🎁 info valid-package module field is valid",
-  ],
-  Array [
-    "🎁 info valid-package umd:main field is valid",
-  ],
-  Array [
-    "🎁 info valid-package browser field is valid",
-  ],
-  Array [
-    "🎁 info valid-package package entrypoints are valid",
-  ],
-  Array [
-    "🎁 success project is valid!",
-  ],
-]
-`);
+    Array [
+      Array [
+        "🎁 info valid-package a valid entry point exists.",
+      ],
+      Array [
+        "🎁 info valid-package main field is valid",
+      ],
+      Array [
+        "🎁 info valid-package module field is valid",
+      ],
+      Array [
+        "🎁 info valid-package umd:main field is valid",
+      ],
+      Array [
+        "🎁 info valid-package browser field is valid",
+      ],
+      Array [
+        "🎁 info valid-package package entrypoints are valid",
+      ],
+      Array [
+        "🎁 success project is valid!",
+      ],
+    ]
+  `);
 });
 
 test("monorepo single package", async () => {
@@ -136,21 +149,21 @@ test("monorepo single package", async () => {
 
   await validate(tmpPath);
   expect(logMock.log.mock.calls).toMatchInlineSnapshot(`
-Array [
-  Array [
-    "🎁 info @some-scope/package-two-single-package a valid entry point exists.",
-  ],
-  Array [
-    "🎁 info @some-scope/package-two-single-package main field is valid",
-  ],
-  Array [
-    "🎁 info @some-scope/package-two-single-package package entrypoints are valid",
-  ],
-  Array [
-    "🎁 success project is valid!",
-  ],
-]
-`);
+    Array [
+      Array [
+        "🎁 info @some-scope/package-two-single-package a valid entry point exists.",
+      ],
+      Array [
+        "🎁 info @some-scope/package-two-single-package main field is valid",
+      ],
+      Array [
+        "🎁 info @some-scope/package-two-single-package package entrypoints are valid",
+      ],
+      Array [
+        "🎁 success project is valid!",
+      ],
+    ]
+  `);
 });
 
 test("one-entrypoint-with-browser-field-one-without", async () => {
@@ -173,11 +186,11 @@ test("create package.json for an entrypoint", async () => {
   expect(confirms.createEntrypointPkgJson).toBeCalledTimes(1);
 
   expect(await getPkg(path.join(tmpPath, "other"))).toMatchInlineSnapshot(`
-Object {
-  "main": "dist/entrypoint-pkg-json-missing.cjs.js",
-  "module": "dist/entrypoint-pkg-json-missing.esm.js",
-}
-`);
+    Object {
+      "main": "dist/entrypoint-pkg-json-missing.cjs.js",
+      "module": "dist/entrypoint-pkg-json-missing.esm.js",
+    }
+  `);
 });
 
 test("monorepo umd with dep on other module incorrect peerDeps", async () => {
@@ -226,4 +239,28 @@ test("entrypoint not included in package", async () => {
     return;
   }
   expect(true).toBe(false);
+});
+
+test("root dist directory not included in package without entrypoint at root", async () => {
+  let tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "pkg-a",
+      files: ["other"],
+      preconstruct: {
+        entrypoints: ["other.js"],
+        ___experimentalFlags_WILL_CHANGE_IN_PATCH: { newEntrypoints: true },
+      },
+    }),
+    "other/package.json": JSON.stringify({
+      main: "dist/pkg-a.cjs.js",
+    }),
+    "src/other.js": js`
+                      export let x = true;
+                    `,
+  });
+
+  await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(`
+          [Error: the dist directory in the root of the package isn't included in the published files for this package, please add it to the files field in the package's package.json.
+          though this package does not have an entrypoint at the root of the package, preconstruct will write common chunks to the root dist directory so it must be included.]
+        `);
 });

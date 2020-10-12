@@ -59,7 +59,14 @@ export function validateEntrypoint(entrypoint: Entrypoint, log: boolean) {
       continue;
     }
     if (!isFieldValid[field](entrypoint)) {
-      throw new FixableError(errors.invalidField(field), entrypoint.name);
+      throw new FixableError(
+        errors.invalidField(
+          field,
+          entrypoint.json[field],
+          validFields[field](entrypoint)
+        ),
+        entrypoint.name
+      );
     }
     if (field === "umd:main" && !isUmdNameSpecified(entrypoint)) {
       throw new FixableError(errors.umdNameNotSpecified, entrypoint.name);

@@ -35,7 +35,12 @@ async function doInit(pkg: Package) {
     if (canWriteModuleField) {
       pkg.setFieldOnEntrypoints("module");
     } else if (!allEntrypointsAreMissingAModuleField) {
-      throw new FixableError(errors.invalidField("module"), pkg.name);
+      throw new FixableError(
+        errors.fieldMustExistInAllEntrypointsIfExistsDeclinedFixDuringInit(
+          "module"
+        ),
+        pkg.name
+      );
     }
   } else {
     info(infos.validField("module"), pkg.name);
@@ -62,7 +67,12 @@ async function doInit(pkg: Package) {
         entrypoint.json.preconstruct.umdName = umdName;
       }
     } else {
-      throw new FixableError(errors.invalidField("umd:main"), pkg.name);
+      throw new FixableError(
+        errors.fieldMustExistInAllEntrypointsIfExistsDeclinedFixDuringInit(
+          "umd:main"
+        ),
+        pkg.name
+      );
     }
   }
 
@@ -81,7 +91,12 @@ async function doInit(pkg: Package) {
     if (shouldFixBrowserField) {
       pkg.setFieldOnEntrypoints("browser");
     } else {
-      throw new FixableError(errors.invalidField("browser"), pkg.name);
+      throw new FixableError(
+        errors.fieldMustExistInAllEntrypointsIfExistsDeclinedFixDuringInit(
+          "browser"
+        ),
+        pkg.name
+      );
     }
   }
 
