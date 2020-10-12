@@ -18,8 +18,10 @@ export function createPromptConfirmLoader(
     limit(() =>
       (async () => {
         if (pkgs.length === 1) {
+          // @ts-ignore
           let { confirm } = await enquirer.prompt([
             {
+              // @ts-ignore
               type: "confirm",
               name: "confirm",
               message,
@@ -30,6 +32,7 @@ export function createPromptConfirmLoader(
           ]);
           return [confirm];
         }
+        // @ts-ignore
         let { answers } = await enquirer.prompt([
           {
             type: "multiselect" as const,
@@ -51,8 +54,10 @@ export function createPromptConfirmLoader(
 }
 
 export let promptConfirm = async (message: string): Promise<boolean> => {
+  // @ts-ignore
   let { confirm } = await enquirer.prompt([
     {
+      // @ts-ignore
       type: "confirm",
       name: "confirm",
       message,
@@ -69,8 +74,10 @@ export let doPromptInput = async (
   pkg: { name: string },
   defaultAnswer?: string
 ): Promise<string> => {
+  // @ts-ignore
   let { input } = await enquirer.prompt([
     {
+      // @ts-ignore
       type: "input",
       name: "input",
       message,

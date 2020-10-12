@@ -7,7 +7,7 @@ import { JSONValue } from "./utils";
 let itemsByPath: { [key: string]: Set<Item> } = {};
 
 type BaseConfig = Record<string, JSONValue | undefined> & {
-  preconstruct: JSONValue;
+  preconstruct?: JSONValue;
 };
 
 export class Item<JSONData extends BaseConfig = BaseConfig> {
