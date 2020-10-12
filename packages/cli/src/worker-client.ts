@@ -1,8 +1,11 @@
 import Worker from "jest-worker";
+// @ts-ignore
+import isCI from "is-ci";
 
 let shouldUseWorker =
   process.env.DISABLE_PRECONSTRUCT_WORKER !== "true" &&
-  process.env.NODE_ENV !== "test";
+  process.env.NODE_ENV !== "test" &&
+  !isCI;
 
 let worker: (Worker & typeof import("./worker")) | void;
 

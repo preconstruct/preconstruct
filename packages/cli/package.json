@@ -32,6 +32,7 @@
     "fast-deep-equal": "^2.0.1",
     "fs-extra": "^9.0.1",
     "globby": "^11.0.1",
+    "is-ci": "^2.0.0",
     "jest-worker": "^26.3.0",
     "meow": "^7.1.0",
     "micromatch": "^4.0.2",
