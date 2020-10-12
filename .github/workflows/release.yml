@@ -38,11 +38,9 @@ jobs:
         run: yarn
 
       - name: "Create Pull Request or Publish to npm"
-        uses: jacobwgillespie/action@cb74fcab428e6325459f9e65d12480590bef3dec
+        uses: changesets/action@master
         with:
           publish: yarn release --otp=1
         env:
-          GITHUB_TOKEN: ${{ secrets.PRECONSTRUCT_RELEASE_BOT_GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          GITHUB_USERNAME: preconstruct-release-bot
-          GITHUB_EMAIL: 52642337+preconstruct-release-bot@users.noreply.github.com
