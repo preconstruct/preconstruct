@@ -168,13 +168,9 @@ test("monorepo single package", async () => {
 
 test("one-entrypoint-with-browser-field-one-without", async () => {
   let tmpPath = f.copy("one-entrypoint-with-browser-field-one-without");
-  try {
-    await validate(tmpPath);
-  } catch (e) {
-    expect(e).toMatchInlineSnapshot(
-      `[Error: one-entrypoint-with-browser-field-one-without has a browser build but one-entrypoint-with-browser-field-one-without/multiply does not have a browser build. Entrypoints in a package must either all have a particular build type or all not have a particular build type.]`
-    );
-  }
+  await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
+    `[Error: one-entrypoint-with-browser-field-one-without/multiply has a browser build but one-entrypoint-with-browser-field-one-without does not have a browser build. Entrypoints in a package must either all have a particular build type or all not have a particular build type.]`
+  );
 });
 
 test("create package.json for an entrypoint", async () => {

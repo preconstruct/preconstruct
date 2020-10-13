@@ -47,13 +47,13 @@ export function validatePackage(pkg: Package) {
     keys(fields).forEach((field) => {
       if (entrypoint.json[field] && !fields[field]) {
         throw new FixableError(
-          `${pkg.entrypoints[0].name} has a ${field} build but ${entrypoint.name} does not have a ${field} build. Entrypoints in a package must either all have a particular build type or all not have a particular build type.`,
+          `${entrypoint.name} has a ${field} build but ${pkg.entrypoints[0].name} does not have a ${field} build. Entrypoints in a package must either all have a particular build type or all not have a particular build type.`,
           pkg.name
         );
       }
       if (!entrypoint.json[field] && fields[field]) {
         throw new FixableError(
-          `${entrypoint.name} has a ${field} build but ${pkg.entrypoints[0].name} does not have a ${field} build. Entrypoints in a package must either all have a particular build type or all not have a particular build type.`,
+          `${pkg.entrypoints[0].name} has a ${field} build but ${entrypoint.name} does not have a ${field} build. Entrypoints in a package must either all have a particular build type or all not have a particular build type.`,
           pkg.name
         );
       }
