@@ -159,7 +159,7 @@ test("multiple entrypoints", async () => {
 
     exports.sum = sum;
 
-    dist/multiple-entrypoints.cjs.js -------------
+    dist/multiple-entrypoints.cjs.js, multiply/dist/multiple-entrypoints.cjs.js -------------
     'use strict';
 
     if (process.env.NODE_ENV === "production") {
@@ -192,15 +192,6 @@ test("multiple entrypoints", async () => {
     let multiply = (a, b) => a * b;
 
     exports.multiply = multiply;
-
-    multiply/dist/multiple-entrypoints.cjs.js -------------
-    'use strict';
-
-    if (process.env.NODE_ENV === "production") {
-      module.exports = require("./multiple-entrypoints.cjs.prod.js");
-    } else {
-      module.exports = require("./multiple-entrypoints.cjs.dev.js");
-    }
 
     multiply/dist/multiple-entrypoints.cjs.prod.js -------------
     "use strict";

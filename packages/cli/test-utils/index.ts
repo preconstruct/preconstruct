@@ -229,10 +229,17 @@ export async function testdir(dir: { [key: string]: string }) {
 }
 
 expect.addSnapshotSerializer({
-  print(val, serialize, indent) {
-    return Object.keys(val)
-      .map((filename) => {
-        return `${filename} -------------\n${val[filename]}`;
+  print(val: Record<string, string>, serialize, indent) {
+    const contentsByFilename: Record<string, string[]> = {};
+    Object.entries(val).forEach(([filename, contents]) => {
+      if (contentsByFilename[contents] === undefined) {
+        contentsByFilename[contents] = [];
+      }
+      contentsByFilename[contents].push(filename);
+    });
+    return Object.entries(contentsByFilename)
+      .map(([contents, filenames]) => {
+        return `${filenames.join(", ")} -------------\n${contents}`;
       })
       .join("\n");
   },
@@ -263,3 +270,11 @@ export async function getFiles(dir: string, glob: string[] = ["**"]) {
   });
   return newObj;
 }
+
+export const basicPkgJson = (options?: { module?: boolean }) => {
+  return JSON.stringify({
+    name: "pkg",
+    main: "dist/pkg.cjs.js",
+    module: options?.module ? "dist/pkg.esm.js" : undefined,
+  });
+};

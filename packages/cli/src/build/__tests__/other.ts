@@ -6,6 +6,7 @@ import {
   testdir,
   js,
   getDist,
+  basicPkgJson,
 } from "../../../test-utils";
 import { doPromptInput } from "../../prompt";
 
@@ -258,9 +259,48 @@ test("batches build errors", async () => {
 });
 
 test("builds package using eval", async () => {
-  let tmpPath = f.copy("eval");
+  let dir = await testdir({
+    "package.json": basicPkgJson(),
+    "src/index.js": js`
+                      export default function compute(arg) {
+                        return eval(arg);
+                      }
+                    `,
+  });
 
-  await build(tmpPath);
+  await build(dir);
 
-  await snapshotDirectory(tmpPath, { files: "all" });
+  expect(await getDist(dir)).toMatchInlineSnapshot(`
+    dist/pkg.cjs.dev.js -------------
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    function compute(arg) {
+      return eval(arg);
+    }
+
+    exports.default = compute;
+
+    dist/pkg.cjs.js -------------
+    'use strict';
+
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./pkg.cjs.prod.js");
+    } else {
+      module.exports = require("./pkg.cjs.dev.js");
+    }
+
+    dist/pkg.cjs.prod.js -------------
+    "use strict";
+
+    function compute(arg) {
+      return eval(arg);
+    }
+
+    Object.defineProperty(exports, "__esModule", {
+      value: !0
+    }), exports.default = compute;
+
+  `);
 });

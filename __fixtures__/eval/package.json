@@ -1,7 +1,0 @@
-{
-  "name": "eval",
-  "version": "1.0.0",
-  "main": "dist/eval.cjs.js",
-  "license": "MIT",
-  "private": true
-}

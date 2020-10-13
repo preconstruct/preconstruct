@@ -98,60 +98,6 @@ export default thing;
 "
 `;
 
-exports[`builds package using eval: dist/eval.cjs.dev.js 1`] = `
-"'use strict';
-
-Object.defineProperty(exports, '__esModule', { value: true });
-
-function compute(arg) {
-  return eval(arg);
-}
-
-exports.default = compute;
-"
-`;
-
-exports[`builds package using eval: dist/eval.cjs.js 1`] = `
-"'use strict';
-
-if (process.env.NODE_ENV === \\"production\\") {
-  module.exports = require(\\"./eval.cjs.prod.js\\");
-} else {
-  module.exports = require(\\"./eval.cjs.dev.js\\");
-}
-"
-`;
-
-exports[`builds package using eval: dist/eval.cjs.prod.js 1`] = `
-"\\"use strict\\";
-
-function compute(arg) {
-  return eval(arg);
-}
-
-Object.defineProperty(exports, \\"__esModule\\", {
-  value: !0
-}), exports.default = compute;
-"
-`;
-
-exports[`builds package using eval: package.json 1`] = `
-Object {
-  "license": "MIT",
-  "main": "dist/eval.cjs.js",
-  "name": "eval",
-  "private": true,
-  "version": "1.0.0",
-}
-`;
-
-exports[`builds package using eval: src/index.js 1`] = `
-"export default function compute(arg) {
-  return eval(arg);
-}
-"
-`;
-
 exports[`should lazily get globals: dist/umd-unused-peer-dep.cjs.dev.js 1`] = `
 "'use strict';
 
