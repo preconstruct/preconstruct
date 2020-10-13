@@ -1,5 +1,4 @@
 import build from "../";
-import fixturez from "fixturez";
 import path from "path";
 import {
   snapshotDirectory,
@@ -9,8 +8,6 @@ import {
   js,
   getFiles,
 } from "../../../test-utils";
-
-const f = fixturez(__dirname);
 
 jest.setTimeout(10000);
 

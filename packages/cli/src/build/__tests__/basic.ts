@@ -8,7 +8,6 @@ import {
   getDist,
   tsx,
   ts,
-  js,
   repoNodeModules,
 } from "../../../test-utils";
 
