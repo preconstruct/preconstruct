@@ -1,8 +1,0 @@
-{
-  "name": "imports-outside-pkg-dir",
-  "preconstruct": {
-    "packages": [
-      "pkg-a"
-    ]
-  }
-}

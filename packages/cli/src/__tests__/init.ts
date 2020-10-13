@@ -7,6 +7,8 @@ import {
   modifyPkg,
   getPkg,
   createPackageCheckTestCreator,
+  js,
+  testdir,
 } from "../../test-utils";
 
 const f = fixturez(__dirname);
@@ -90,7 +92,21 @@ test("set main and module field", async () => {
 });
 
 test("scoped package", async () => {
-  let tmpPath = f.copy("scoped");
+  let tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "@some-scope/some-package",
+      version: "1.0.0",
+      main: "index.js",
+      license: "MIT",
+      private: true,
+    }),
+
+    "src/index.js": js`
+                      // @flow
+                      
+                      export default "something";
+                    `,
+  });
 
   confirms.writeMainField.mockReturnValue(Promise.resolve(true));
   confirms.writeModuleField.mockReturnValue(Promise.resolve(true));

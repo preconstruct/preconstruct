@@ -243,7 +243,47 @@ test("two entrypoints, one module, one not", async () => {
 });
 
 test("two entrypoints with a common dependency", async () => {
-  let tmpPath = f.copy("common-dependency-two-entrypoints");
+  let tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "common-dependency-two-entrypoints",
+      main: "dist/common-dependency-two-entrypoints.cjs.js",
+      module: "dist/common-dependency-two-entrypoints.esm.js",
+
+      preconstruct: {
+        source: "src/sum",
+        entrypoints: [".", "multiply"],
+      },
+    }),
+
+    "multiply/package.json": JSON.stringify({
+      main: "dist/common-dependency-two-entrypoints.cjs.js",
+      module: "dist/common-dependency-two-entrypoints.esm.js",
+
+      preconstruct: {
+        source: "../src/multiply.js",
+      },
+    }),
+
+    "src/identity.js": js`
+                         export let identity = (x) => x;
+                       `,
+
+    "src/multiply.js": js`
+                         import { identity } from "./identity";
+                         
+                         export let multiply = (a, b) => identity(a * b);
+                         
+                         export { identity };
+                       `,
+
+    "src/sum.js": js`
+                    import { identity } from "./identity";
+                    
+                    export let sum = (a, b) => identity(a + b);
+                    
+                    export { identity };
+                  `,
+  });
 
   await build(tmpPath);
 
@@ -255,7 +295,35 @@ test("two entrypoints with a common dependency", async () => {
 });
 
 test("two entrypoints where one requires the other entrypoint", async () => {
-  let tmpPath = f.copy("importing-another-entrypoint");
+  let tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "importing-another-entrypoint",
+      main: "dist/importing-another-entrypoint.cjs.js",
+
+      preconstruct: {
+        source: "src/identity",
+        entrypoints: [".", "multiply"],
+      },
+    }),
+
+    "multiply/package.json": JSON.stringify({
+      main: "dist/importing-another-entrypoint.cjs.js",
+
+      preconstruct: {
+        source: "../src/multiply.js",
+      },
+    }),
+
+    "src/identity.js": js`
+                         export let identity = (x) => x;
+                       `,
+
+    "src/multiply.js": js`
+                         import { identity } from "./identity";
+                         
+                         export let multiply = (a, b) => identity(a * b);
+                       `,
+  });
 
   await build(tmpPath);
 

@@ -1,4 +1,0 @@
-{
-  "name": "@imports-outside-pkg-dir/pkg-a",
-  "main": "dist/pkg-a.cjs.js"
-}

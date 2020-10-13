@@ -13,9 +13,46 @@ jest.mock("../prompt");
 jest.setTimeout(20000);
 
 test("dev command works in node", async () => {
-  let tmpPath = f.copy("valid-monorepo-that-logs-stuff");
+  let tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "valid-monorepo-that-logs-stuff",
+      main: "index.js",
 
-  await install(tmpPath);
+      preconstruct: {
+        packages: ["packages/*"],
+      },
+
+      workspaces: ["packages/*"],
+    }),
+    "node_modules/@my-cool-scope/package-two": {
+      kind: "symlink",
+      path: "packages/package-two",
+    },
+    "packages/package-one/package.json": JSON.stringify({
+      name: "@my-cool-scope/package-one",
+      main: "dist/package-one.cjs.js",
+    }),
+
+    "packages/package-two/package.json": JSON.stringify({
+      name: "@my-cool-scope/package-two",
+      main: "dist/package-two.cjs.js",
+      license: "MIT",
+      private: true,
+    }),
+
+    "packages/package-one/src/index.js": js`
+                                           import { message } from "@my-cool-scope/package-two";
+                                           
+                                           console.log("message from package one");
+                                           console.log(message);
+                                         `,
+
+    "packages/package-two/src/index.js": js`
+                                           console.log("message from package two");
+                                           
+                                           export let message = "message from package two but logged by package one";
+                                         `,
+  });
 
   await dev(tmpPath);
 
@@ -129,30 +166,98 @@ module.exports = require("../src/index.js")
 });
 
 test("source maps work", async () => {
-  let tmpPath = f.copy("uses-babel-and-throws-error");
+  let tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "uses-babel-and-throws-error",
+      main: "dist/uses-babel-and-throws-error.cjs.js",
+      module: "dist/uses-babel-and-throws-error.esm.js",
 
-  await install(tmpPath);
+      dependencies: {
+        "@babel/core": "^7.4.3",
+        "@babel/preset-env": "^7.4.3",
+        "@babel/runtime": "^7.4.3",
+      },
+    }),
+    ".babelrc": JSON.stringify({
+      presets: [require.resolve("@babel/preset-env")],
+    }),
+    "src/index.js": js`
+                      class Bar {}
+                      
+                      export class Foo extends Bar {}
+                      
+                      throw new Error("i'm thrown on line 5");
+                    `,
+  });
 
   await dev(tmpPath);
 
   // i would require it but i don't want jest to do magical things
-  let { code, stdout, stderr } = await spawn("node", [tmpPath]);
+  let { code, stdout, stderr } = await spawn("node", [tmpPath], {
+    env: {
+      PATH: process.env.PATH,
+    },
+  });
 
   expect(code).toBe(1);
   expect(stdout.toString()).toBe("");
   expect(
     // this is easier than using a stack trace parser
-    stderr.toString().trim().split("\n")[0]
+    stderr
+      .toString()
+      .replace(
+        `Browserslist: caniuse-lite is outdated. Please run:\nnpx browserslist@latest --update-db`,
+        ""
+      )
+      .trim()
+      .split("\n")[0]
   ).toEqual(
     // the important thing we're checking is that it's mapping to line 5
-    expect.stringMatching(/uses-babel-and-throws-error\/src\/index\.js:5$/)
+    expect.stringMatching(/\/src\/index\.js:5$/)
   );
 });
 
 test("flow", async () => {
-  let tmpPath = f.copy("flow-dev");
+  let tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "flow-dev",
+      main: "dist/flow-dev.cjs.js",
+      module: "dist/flow-dev.esm.js",
+      preconstruct: {
+        entrypoints: [".", "a", "b"],
+      },
+    }),
 
-  await install(tmpPath);
+    "a/package.json": JSON.stringify({
+      main: "dist/flow-dev.cjs.js",
+      module: "dist/flow-dev.esm.js",
+    }),
+
+    "b/package.json": JSON.stringify({
+      main: "dist/flow-dev.cjs.js",
+      module: "dist/flow-dev.esm.js",
+    }),
+
+    "src/index.js": js`
+                      // @flow
+                      
+                      export let something = true;
+                    `,
+
+    "a/src/index.js": js`
+                        // @flow
+                        
+                        export default "something";
+                      `,
+
+    "b/src/index.js": js`
+                        // @flow
+                        
+                        let something = true;
+                        
+                        export { something as default };
+                      `,
+  });
 
   await dev(tmpPath);
 

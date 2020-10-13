@@ -5,9 +5,9 @@ import {
   logMock,
   modifyPkg,
   getPkg,
-  install,
   testdir,
   js,
+  repoNodeModules,
 } from "../../test-utils";
 import { FatalError } from "../errors";
 import { errors, confirms as _confirms } from "../messages";
@@ -51,7 +51,19 @@ test("reports correct result on valid package", async () => {
 });
 
 test("no main field", async () => {
-  let tmpPath = f.find("no-main-field");
+  let tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "no-main-field",
+      license: "MIT",
+      private: true,
+    }),
+
+    "src/index.js": js`
+                      // @flow
+                      
+                      export default "something";
+                    `,
+  });
 
   try {
     await validate(tmpPath);
@@ -167,14 +179,75 @@ test("monorepo single package", async () => {
 });
 
 test("one-entrypoint-with-browser-field-one-without", async () => {
-  let tmpPath = f.copy("one-entrypoint-with-browser-field-one-without");
+  let tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "one-entrypoint-with-browser-field-one-without",
+      main: "dist/one-entrypoint-with-browser-field-one-without.cjs.js",
+      module: "dist/one-entrypoint-with-browser-field-one-without.esm.js",
+
+      preconstruct: {
+        source: "src/sum",
+        entrypoints: [".", "multiply"],
+      },
+    }),
+
+    "multiply/package.json": JSON.stringify({
+      main: "dist/one-entrypoint-with-browser-field-one-without.cjs.js",
+      module: "dist/one-entrypoint-with-browser-field-one-without.esm.js",
+
+      preconstruct: {
+        source: "../src/multiply.js",
+      },
+
+      browser: {
+        "./dist/one-entrypoint-with-browser-field-one-without.cjs.js":
+          "./dist/one-entrypoint-with-browser-field-one-without.browser.cjs.js",
+        "./dist/one-entrypoint-with-browser-field-one-without.esm.js":
+          "./dist/one-entrypoint-with-browser-field-one-without.browser.esm.js",
+      },
+    }),
+
+    "src/identity.js": js`
+                         export let identity = (x) => x;
+                       `,
+
+    "src/multiply.js": js`
+                         import { identity } from "./identity";
+                         
+                         export let multiply = (a, b) => identity(a * b);
+                       `,
+
+    "src/sum.js": js`
+                    import { identity } from "./identity";
+                    
+                    export let sum = (a, b) => identity(a + b);
+                  `,
+  });
   await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
     `[Error: one-entrypoint-with-browser-field-one-without/multiply has a browser build but one-entrypoint-with-browser-field-one-without does not have a browser build. Entrypoints in a package must either all have a particular build type or all not have a particular build type.]`
   );
 });
 
 test("create package.json for an entrypoint", async () => {
-  let tmpPath = f.copy("entrypoint-pkg-json-missing");
+  let tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "entrypoint-pkg-json-missing",
+      main: "dist/entrypoint-pkg-json-missing.cjs.js",
+      module: "dist/entrypoint-pkg-json-missing.esm.js",
+
+      preconstruct: {
+        entrypoints: [".", "other"],
+      },
+    }),
+
+    "src/index.js": js`
+                      export default "something";
+                    `,
+
+    "other/src/index.js": js`
+                            export default "something";
+                          `,
+  });
   confirms.createEntrypointPkgJson.mockReturnValue(Promise.resolve(true));
 
   await validate(tmpPath);
@@ -190,9 +263,116 @@ test("create package.json for an entrypoint", async () => {
 });
 
 test("monorepo umd with dep on other module incorrect peerDeps", async () => {
-  let tmpPath = f.copy("monorepo-umd-with-dep-incorrect-peerdeps");
+  let tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "monorepo-umd-with-dep-incorrect-peerdeps",
+      main: "index.js",
+      workspaces: ["packages/*"],
 
-  await install(tmpPath);
+      preconstruct: {
+        packages: ["packages/*"],
+
+        globals: {
+          react: "React",
+        },
+      },
+    }),
+    "node_modules/@some-scope-incorrect-peerdeps/package-one-umd-with-dep": {
+      kind: "symlink",
+      path: "packages/package-one",
+    },
+    "node_modules/react": {
+      kind: "symlink",
+      path: path.join(repoNodeModules, "react"),
+    },
+    "packages/package-four/package.json": JSON.stringify({
+      name: "@some-scope-incorrect-peerdeps/package-four-umd-with-dep",
+      main: "dist/package-four-umd-with-dep.cjs.js",
+      "umd:main": "dist/package-four-umd-with-dep.umd.min.js",
+
+      preconstruct: {
+        umdName: "packageFour",
+      },
+
+      dependencies: {
+        "@some-scope-incorrect-peerdeps/package-one-umd-with-dep": "1.0.0",
+      },
+    }),
+
+    "packages/package-one/package.json": JSON.stringify({
+      name: "@some-scope-incorrect-peerdeps/package-one-umd-with-dep",
+      main: "dist/package-one-umd-with-dep.cjs.js",
+      "umd:main": "dist/package-one-umd-with-dep.umd.min.js",
+
+      preconstruct: {
+        umdName: "packageOne",
+      },
+
+      peerDependencies: {
+        react: "^16.6.3",
+      },
+
+      devDependencies: {
+        react: "^16.6.3",
+      },
+    }),
+
+    "packages/package-three/package.json": JSON.stringify({
+      name: "@some-scope-incorrect-peerdeps/package-three-umd-with-dep",
+      main: "dist/package-three-umd-with-dep.cjs.js",
+      "umd:main": "dist/package-three-umd-with-dep.umd.min.js",
+
+      preconstruct: {
+        umdName: "packageThree",
+      },
+
+      peerDependencies: {
+        "@some-scope-incorrect-peerdeps/package-one-umd-with-dep": "1.0.0",
+      },
+
+      devDependencies: {
+        "@some-scope-incorrect-peerdeps/package-one-umd-with-dep": "1.0.0",
+      },
+    }),
+
+    "packages/package-two/package.json": JSON.stringify({
+      name: "@some-scope-incorrect-peerdeps/package-two-umd-with-dep",
+      main: "dist/package-two-umd-with-dep.cjs.js",
+      "umd:main": "dist/package-two-umd-with-dep.umd.min.js",
+
+      preconstruct: {
+        umdName: "packageTwo",
+      },
+
+      peerDependencies: {
+        react: "^16.6.3",
+      },
+
+      devDependencies: {
+        react: "^16.6.3",
+      },
+    }),
+
+    "packages/package-four/src/index.js": js`
+                                            import "@some-scope/package-one-umd-with-dep";
+                                          `,
+
+    "packages/package-one/src/index.js": js`
+                                           import { createElement } from "react";
+                                           
+                                           createElement("div", null);
+                                         `,
+
+    "packages/package-three/src/index.js": js`
+                                             import "@some-scope/package-one-umd-with-dep";
+                                           `,
+
+    "packages/package-two/src/index.js": js`
+                                           import { createElement } from "react";
+                                           
+                                           createElement("h1", null);
+                                         `,
+  });
 
   try {
     await validate(tmpPath);
@@ -206,9 +386,18 @@ test("monorepo umd with dep on other module incorrect peerDeps", async () => {
 });
 
 test("dist not included in package", async () => {
-  let tmpPath = f.copy("dist-not-included-in-pkg");
+  let tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "dist-not-included-in-pkg",
+      main: "dist/dist-not-included-in-pkg.cjs.js",
+      module: "dist/dist-not-included-in-pkg.esm.js",
+      files: ["src"],
+    }),
 
-  await install(tmpPath);
+    "src/index.js": js`
+                      export default "something";
+                    `,
+  });
 
   try {
     await validate(tmpPath);
@@ -222,9 +411,37 @@ test("dist not included in package", async () => {
 });
 
 test("entrypoint not included in package", async () => {
-  let tmpPath = f.copy("entrypoint-not-included-in-pkg");
+  let tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "entrypoint-not-included-in-pkg",
+      main: "dist/entrypoint-not-included-in-pkg.cjs.js",
+      module: "dist/entrypoint-not-included-in-pkg.esm.js",
 
-  await install(tmpPath);
+      preconstruct: {
+        source: "src/sum",
+        entrypoints: [".", "multiply"],
+      },
+
+      files: ["dist"],
+    }),
+
+    "multiply/package.json": JSON.stringify({
+      main: "dist/entrypoint-not-included-in-pkg.cjs.js",
+      module: "dist/entrypoint-not-included-in-pkg.esm.js",
+
+      preconstruct: {
+        source: "../src/multiply.js",
+      },
+    }),
+
+    "src/multiply.js": js`
+                         export let multiply = (a, b) => a * b;
+                       `,
+
+    "src/sum.js": js`
+                    export let sum = (a, b) => a + b;
+                  `,
+  });
 
   try {
     await validate(tmpPath);

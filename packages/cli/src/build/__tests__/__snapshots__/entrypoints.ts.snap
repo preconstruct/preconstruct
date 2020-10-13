@@ -74,16 +74,12 @@ exports.multiply = multiply;
 "
 `;
 
-exports[`two entrypoints where one requires the other entrypoint: src/identity.js 1`] = `
-"export let identity = (x) => x;
-"
-`;
+exports[`two entrypoints where one requires the other entrypoint: src/identity.js 1`] = `"export let identity = (x) => x;"`;
 
 exports[`two entrypoints where one requires the other entrypoint: src/multiply.js 1`] = `
 "import { identity } from \\"./identity\\";
 
-export let multiply = (a, b) => identity(a * b);
-"
+export let multiply = (a, b) => identity(a * b);"
 `;
 
 exports[`two entrypoints with a common dependency: dist/chunk-this-is-not-the-real-hash-28f593ad5eeb3fc3.esm.js 1`] = `
@@ -211,18 +207,14 @@ export { multiply };
 "
 `;
 
-exports[`two entrypoints with a common dependency: src/identity.js 1`] = `
-"export let identity = (x) => x;
-"
-`;
+exports[`two entrypoints with a common dependency: src/identity.js 1`] = `"export let identity = (x) => x;"`;
 
 exports[`two entrypoints with a common dependency: src/multiply.js 1`] = `
 "import { identity } from \\"./identity\\";
 
 export let multiply = (a, b) => identity(a * b);
 
-export { identity };
-"
+export { identity };"
 `;
 
 exports[`two entrypoints with a common dependency: src/sum.js 1`] = `
@@ -230,6 +222,5 @@ exports[`two entrypoints with a common dependency: src/sum.js 1`] = `
 
 export let sum = (a, b) => identity(a + b);
 
-export { identity };
-"
+export { identity };"
 `;

@@ -122,233 +122,6 @@ export { doSomething };
 "
 `;
 
-exports[`json: json-package.cjs.dev.js 1`] = `
-"'use strict';
-
-Object.defineProperty(exports, '__esModule', { value: true });
-
-var changesetsSchema = {
-	$schema: \\"http://json-schema.org/draft-07/schema#\\",
-	type: \\"object\\",
-	properties: {
-		$schema: {
-			type: \\"string\\",
-			\\"enum\\": [
-				\\"https://unpkg.com/@changesets/cli@1.0.0/schema.json\\"
-			],
-			description: \\"The schema to verify this document against.\\"
-		},
-		changelog: {
-			anyOf: [
-				{
-					type: \\"array\\",
-					items: [
-						{
-							type: \\"string\\",
-							title: \\"Changelog Generator Path\\"
-						},
-						{
-							title: \\"Changelog Generator Options\\"
-						}
-					],
-					minItems: 2
-				},
-				{
-					\\"enum\\": [
-						false
-					],
-					type: \\"boolean\\"
-				},
-				{
-					type: \\"string\\",
-					title: \\"Changelog Generator Path\\"
-				}
-			],
-			description: \\"The configuration for changelog generators.\\"
-		},
-		linked: {
-			type: \\"array\\",
-			items: {
-				type: \\"array\\",
-				items: {
-					type: \\"string\\"
-				}
-			},
-			description: \\"Packages that should be linked together so when they are being released, they will be released at the same version. If you've used Lerna to version packages before, this is very similar.\\"
-		},
-		commit: {
-			type: \\"boolean\\",
-			description: \\"Determines whether changesets should commit the results of the add and bump command\\"
-		},
-		access: {
-			\\"enum\\": [
-				\\"private\\",
-				\\"public\\"
-			],
-			type: \\"string\\",
-			description: \\"Determines whether changesets should publish packages to the registry publicly or privately\\"
-		}
-	},
-	required: [
-		\\"$schema\\"
-	]
-};
-
-let schema = changesetsSchema;
-
-exports.schema = schema;
-"
-`;
-
-exports[`json: json-package.cjs.js 1`] = `
-"'use strict';
-
-if (process.env.NODE_ENV === \\"production\\") {
-  module.exports = require(\\"./json-package.cjs.prod.js\\");
-} else {
-  module.exports = require(\\"./json-package.cjs.dev.js\\");
-}
-"
-`;
-
-exports[`json: json-package.cjs.prod.js 1`] = `
-"\\"use strict\\";
-
-Object.defineProperty(exports, \\"__esModule\\", {
-  value: !0
-});
-
-var changesetsSchema = {
-  $schema: \\"http://json-schema.org/draft-07/schema#\\",
-  type: \\"object\\",
-  properties: {
-    $schema: {
-      type: \\"string\\",
-      enum: [ \\"https://unpkg.com/@changesets/cli@1.0.0/schema.json\\" ],
-      description: \\"The schema to verify this document against.\\"
-    },
-    changelog: {
-      anyOf: [ {
-        type: \\"array\\",
-        items: [ {
-          type: \\"string\\",
-          title: \\"Changelog Generator Path\\"
-        }, {
-          title: \\"Changelog Generator Options\\"
-        } ],
-        minItems: 2
-      }, {
-        enum: [ !1 ],
-        type: \\"boolean\\"
-      }, {
-        type: \\"string\\",
-        title: \\"Changelog Generator Path\\"
-      } ],
-      description: \\"The configuration for changelog generators.\\"
-    },
-    linked: {
-      type: \\"array\\",
-      items: {
-        type: \\"array\\",
-        items: {
-          type: \\"string\\"
-        }
-      },
-      description: \\"Packages that should be linked together so when they are being released, they will be released at the same version. If you've used Lerna to version packages before, this is very similar.\\"
-    },
-    commit: {
-      type: \\"boolean\\",
-      description: \\"Determines whether changesets should commit the results of the add and bump command\\"
-    },
-    access: {
-      enum: [ \\"private\\", \\"public\\" ],
-      type: \\"string\\",
-      description: \\"Determines whether changesets should publish packages to the registry publicly or privately\\"
-    }
-  },
-  required: [ \\"$schema\\" ]
-};
-
-let schema = changesetsSchema;
-
-exports.schema = schema;
-"
-`;
-
-exports[`json: json-package.esm.js 1`] = `
-"var changesetsSchema = {
-	$schema: \\"http://json-schema.org/draft-07/schema#\\",
-	type: \\"object\\",
-	properties: {
-		$schema: {
-			type: \\"string\\",
-			\\"enum\\": [
-				\\"https://unpkg.com/@changesets/cli@1.0.0/schema.json\\"
-			],
-			description: \\"The schema to verify this document against.\\"
-		},
-		changelog: {
-			anyOf: [
-				{
-					type: \\"array\\",
-					items: [
-						{
-							type: \\"string\\",
-							title: \\"Changelog Generator Path\\"
-						},
-						{
-							title: \\"Changelog Generator Options\\"
-						}
-					],
-					minItems: 2
-				},
-				{
-					\\"enum\\": [
-						false
-					],
-					type: \\"boolean\\"
-				},
-				{
-					type: \\"string\\",
-					title: \\"Changelog Generator Path\\"
-				}
-			],
-			description: \\"The configuration for changelog generators.\\"
-		},
-		linked: {
-			type: \\"array\\",
-			items: {
-				type: \\"array\\",
-				items: {
-					type: \\"string\\"
-				}
-			},
-			description: \\"Packages that should be linked together so when they are being released, they will be released at the same version. If you've used Lerna to version packages before, this is very similar.\\"
-		},
-		commit: {
-			type: \\"boolean\\",
-			description: \\"Determines whether changesets should commit the results of the add and bump command\\"
-		},
-		access: {
-			\\"enum\\": [
-				\\"private\\",
-				\\"public\\"
-			],
-			type: \\"string\\",
-			description: \\"Determines whether changesets should publish packages to the registry publicly or privately\\"
-		}
-	},
-	required: [
-		\\"$schema\\"
-	]
-};
-
-let schema = changesetsSchema;
-
-export { schema };
-"
-`;
-
 exports[`monorepo single package: package-two-single-package.cjs.dev.js 1`] = `
 "'use strict';
 
@@ -423,7 +196,7 @@ exports[`monorepo umd with dep on other module: package-four-umd-with-dep.umd.mi
 "
 `;
 
-exports[`monorepo umd with dep on other module: package-four-umd-with-dep.umd.min.js.map 1`] = `"{\\"version\\":3,\\"file\\":\\"package-four-umd-with-dep.umd.min.js\\",\\"sources\\":[\\"../../package-one/src/index.js\\"],\\"sourcesContent\\":[\\"import { createElement } from \\\\\\"react\\\\\\";\\\\n\\\\ncreateElement(\\\\\\"div\\\\\\", null);\\\\n\\"],\\"names\\":[],\\"mappings\\":\\"iQAEc,MAAO\\"}"`;
+exports[`monorepo umd with dep on other module: package-four-umd-with-dep.umd.min.js.map 1`] = `"{\\"version\\":3,\\"file\\":\\"package-four-umd-with-dep.umd.min.js\\",\\"sources\\":[\\"../../package-one/src/index.js\\"],\\"sourcesContent\\":[\\"import { createElement } from \\\\\\"react\\\\\\";\\\\n\\\\ncreateElement(\\\\\\"div\\\\\\", null);\\"],\\"names\\":[],\\"mappings\\":\\"iQAEc,MAAO\\"}"`;
 
 exports[`monorepo umd with dep on other module: package-one-umd-with-dep.cjs.dev.js 1`] = `
 "'use strict';
@@ -460,7 +233,7 @@ exports[`monorepo umd with dep on other module: package-one-umd-with-dep.umd.min
 "
 `;
 
-exports[`monorepo umd with dep on other module: package-one-umd-with-dep.umd.min.js.map 1`] = `"{\\"version\\":3,\\"file\\":\\"package-one-umd-with-dep.umd.min.js\\",\\"sources\\":[\\"../src/index.js\\"],\\"sourcesContent\\":[\\"import { createElement } from \\\\\\"react\\\\\\";\\\\n\\\\ncreateElement(\\\\\\"div\\\\\\", null);\\\\n\\"],\\"names\\":[],\\"mappings\\":\\"iQAEc,MAAO\\"}"`;
+exports[`monorepo umd with dep on other module: package-one-umd-with-dep.umd.min.js.map 1`] = `"{\\"version\\":3,\\"file\\":\\"package-one-umd-with-dep.umd.min.js\\",\\"sources\\":[\\"../src/index.js\\"],\\"sourcesContent\\":[\\"import { createElement } from \\\\\\"react\\\\\\";\\\\n\\\\ncreateElement(\\\\\\"div\\\\\\", null);\\"],\\"names\\":[],\\"mappings\\":\\"iQAEc,MAAO\\"}"`;
 
 exports[`monorepo umd with dep on other module: package-three-umd-with-dep.cjs.dev.js 1`] = `
 "'use strict';
@@ -531,7 +304,7 @@ exports[`monorepo umd with dep on other module: package-two-umd-with-dep.umd.min
 "
 `;
 
-exports[`monorepo umd with dep on other module: package-two-umd-with-dep.umd.min.js.map 1`] = `"{\\"version\\":3,\\"file\\":\\"package-two-umd-with-dep.umd.min.js\\",\\"sources\\":[\\"../src/index.js\\"],\\"sourcesContent\\":[\\"import { createElement } from \\\\\\"react\\\\\\";\\\\n\\\\ncreateElement(\\\\\\"h1\\\\\\", null);\\\\n\\"],\\"names\\":[],\\"mappings\\":\\"iQAEc,KAAM\\"}"`;
+exports[`monorepo umd with dep on other module: package-two-umd-with-dep.umd.min.js.map 1`] = `"{\\"version\\":3,\\"file\\":\\"package-two-umd-with-dep.umd.min.js\\",\\"sources\\":[\\"../src/index.js\\"],\\"sourcesContent\\":[\\"import { createElement } from \\\\\\"react\\\\\\";\\\\n\\\\ncreateElement(\\\\\\"h1\\\\\\", null);\\"],\\"names\\":[],\\"mappings\\":\\"iQAEc,KAAM\\"}"`;
 
 exports[`monorepo: package-one.cjs.dev.js 1`] = `
 "'use strict';
@@ -728,4 +501,4 @@ exports[`umd with dep on other module: umd-with-dep.umd.min.js 1`] = `
 "
 `;
 
-exports[`umd with dep on other module: umd-with-dep.umd.min.js.map 1`] = `"{\\"version\\":3,\\"file\\":\\"umd-with-dep.umd.min.js\\",\\"sources\\":[\\"../src/index.js\\"],\\"sourcesContent\\":[\\"import { createElement } from \\\\\\"react\\\\\\";\\\\n\\\\ncreateElement(\\\\\\"div\\\\\\", null);\\\\n\\"],\\"names\\":[],\\"mappings\\":\\"iQAEc,MAAO\\"}"`;
+exports[`umd with dep on other module: umd-with-dep.umd.min.js.map 1`] = `"{\\"version\\":3,\\"file\\":\\"umd-with-dep.umd.min.js\\",\\"sources\\":[\\"../src/index.js\\"],\\"sourcesContent\\":[\\"import { createElement } from \\\\\\"react\\\\\\";\\\\n\\\\ncreateElement(\\\\\\"div\\\\\\", null);\\"],\\"names\\":[],\\"mappings\\":\\"iQAEc,MAAO\\"}"`;

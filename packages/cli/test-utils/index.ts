@@ -218,11 +218,29 @@ export async function install(tmpPath: string) {
   await spawn("yarn", ["install"], { cwd: tmpPath });
 }
 
-export async function testdir(dir: { [key: string]: string }) {
+export const repoNodeModules = path.resolve(
+  __dirname,
+  "..",
+  "..",
+  "..",
+  "node_modules"
+);
+
+export async function testdir(dir: {
+  [key: string]: string | { kind: "symlink"; path: string };
+}) {
   const temp = f.temp();
   await Promise.all(
     Object.keys(dir).map(async (filename) => {
-      await fs.outputFile(path.join(temp, filename), dir[filename]);
+      const output = dir[filename];
+      const fullPath = path.join(temp, filename);
+      if (typeof output === "string") {
+        await fs.outputFile(fullPath, dir[filename]);
+      } else {
+        const dir = path.dirname(fullPath);
+        await fs.ensureDir(dir);
+        await fs.symlink(path.resolve(temp, output.path), fullPath);
+      }
     })
   );
   return temp;

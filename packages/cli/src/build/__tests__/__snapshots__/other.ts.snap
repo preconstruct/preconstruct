@@ -75,11 +75,8 @@ Object {
   "browser": Object {
     "./dist/browser-no-module.cjs.js": "./dist/browser-no-module.browser.cjs.js",
   },
-  "license": "MIT",
   "main": "dist/browser-no-module.cjs.js",
   "name": "browser-no-module",
-  "private": true,
-  "version": "1.0.0",
 }
 `;
 
@@ -94,8 +91,7 @@ if (typeof document !== undefined) {
   thing += \\"other\\";
 }
 
-export default thing;
-"
+export default thing;"
 `;
 
 exports[`should lazily get globals: dist/umd-unused-peer-dep.cjs.dev.js 1`] = `
@@ -139,23 +135,14 @@ exports[`should lazily get globals: dist/umd-unused-peer-dep.umd.min.js 1`] = `
 "
 `;
 
-exports[`should lazily get globals: src/index.js 1`] = `
-"export default \\"something\\";
-"
-`;
+exports[`should lazily get globals: src/index.js 1`] = `"export default \\"something\\";"`;
 
 exports[`typescript with forced dts emit: dist/declarations/src/create-store.d.ts 1`] = `
 "import { Action } from \\"@reduxjs/toolkit\\";
 import { ThunkAction } from \\"redux-thunk\\";
 import { RootState } from \\"./root-reducer\\";
 export declare type AppThunk = ThunkAction<void, RootState, unknown, Action<string>>;
-export declare function createStore(): import(\\"@reduxjs/toolkit\\").EnhancedStore<{
-    readonly [$CombinedState]?: undefined;
-}, import(\\"redux\\").AnyAction, [import(\\"redux-thunk\\").ThunkMiddleware<{
-    readonly [$CombinedState]?: undefined;
-}, import(\\"redux\\").AnyAction, null> | import(\\"redux-thunk\\").ThunkMiddleware<{
-    readonly [$CombinedState]?: undefined;
-}, import(\\"redux\\").AnyAction, undefined>]>;
+export declare function createStore(): any;
 "
 `;
 
@@ -167,9 +154,7 @@ export type { RootState } from \\"./root-reducer\\";
 `;
 
 exports[`typescript with forced dts emit: dist/declarations/src/root-reducer.d.ts 1`] = `
-"export declare const rootReducer: import(\\"redux\\").Reducer<{
-    readonly [$CombinedState]?: undefined;
-}, import(\\"redux\\").AnyAction>;
+"export declare const rootReducer: any;
 export declare type RootState = ReturnType<typeof rootReducer>;
 "
 `;
@@ -187,7 +172,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 var toolkit = require('@reduxjs/toolkit');
 
 // @ts-ignore (installed during test)
-const rootReducer = toolkit.combineReducers({
+var rootReducer = toolkit.combineReducers({
   /* blah blah blah */
 });
 
@@ -220,9 +205,7 @@ Object.defineProperty(exports, \\"__esModule\\", {
   value: !0
 });
 
-var toolkit = require(\\"@reduxjs/toolkit\\");
-
-const rootReducer = toolkit.combineReducers({});
+var toolkit = require(\\"@reduxjs/toolkit\\"), rootReducer = toolkit.combineReducers({});
 
 function createStore() {
   return toolkit.configureStore({
@@ -238,7 +221,7 @@ exports[`typescript with forced dts emit: dist/typescript-force-dts-emit.esm.js 
 "import { combineReducers, configureStore } from '@reduxjs/toolkit';
 
 // @ts-ignore (installed during test)
-const rootReducer = combineReducers({
+var rootReducer = combineReducers({
   /* blah blah blah */
 });
 
@@ -559,21 +542,12 @@ export default Foo;
 exports[`using external @babel/runtime helpers: package.json 1`] = `
 Object {
   "dependencies": Object {
-    "@babel/core": "^7.4.3",
-    "@babel/plugin-transform-runtime": "^7.0.0",
-    "@babel/preset-env": "^7.0.0",
     "@babel/runtime": "^7.0.0",
   },
-  "license": "MIT",
   "main": "dist/external-babel-runtime.cjs.js",
   "module": "dist/external-babel-runtime.esm.js",
   "name": "external-babel-runtime",
-  "private": true,
-  "version": "1.0.0",
 }
 `;
 
-exports[`using external @babel/runtime helpers: src/index.js 1`] = `
-"export default class Foo {}
-"
-`;
+exports[`using external @babel/runtime helpers: src/index.js 1`] = `"export default class Foo {}"`;
