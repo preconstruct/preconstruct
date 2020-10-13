@@ -1,6 +1,12 @@
 import build from "../";
 import fixturez from "fixturez";
-import { snapshotDirectory, install } from "../../../test-utils";
+import {
+  snapshotDirectory,
+  install,
+  testdir,
+  js,
+  getDist,
+} from "../../../test-utils";
 import { doPromptInput } from "../../prompt";
 
 const f = fixturez(__dirname);
@@ -14,10 +20,126 @@ afterEach(() => {
 });
 
 test("browser", async () => {
-  let tmpPath = f.copy("browser");
+  let dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "browser",
+      main: "dist/browser.cjs.js",
+      module: "dist/browser.esm.js",
+      browser: {
+        "./dist/browser.cjs.js": "./dist/browser.browser.cjs.js",
+        "./dist/browser.esm.js": "./dist/browser.browser.esm.js",
+      },
+    }),
+    "src/index.js": js`
+                      let thing = "wow";
+                      
+                      if (typeof window !== "undefined") {
+                        thing = "something";
+                      }
+                      
+                      if (typeof document !== undefined) {
+                        thing += "other";
+                      }
+                      
+                      export default thing;
+                    `,
+  });
 
-  await build(tmpPath);
-  await snapshotDirectory(tmpPath, { files: "all" });
+  await build(dir);
+  expect(await getDist(dir)).toMatchInlineSnapshot(`
+    dist/browser.browser.cjs.js -------------
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    let thing = "wow";
+
+    {
+      thing = "something";
+    }
+
+    {
+      thing += "other";
+    }
+
+    var thing$1 = thing;
+
+    exports.default = thing$1;
+
+    dist/browser.browser.esm.js -------------
+    let thing = "wow";
+
+    {
+      thing = "something";
+    }
+
+    {
+      thing += "other";
+    }
+
+    var thing$1 = thing;
+
+    export default thing$1;
+
+    dist/browser.cjs.dev.js -------------
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    let thing = "wow";
+
+    if (typeof window !== "undefined") {
+      thing = "something";
+    }
+
+    if (typeof document !== undefined) {
+      thing += "other";
+    }
+
+    var thing$1 = thing;
+
+    exports.default = thing$1;
+
+    dist/browser.cjs.js -------------
+    'use strict';
+
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./browser.cjs.prod.js");
+    } else {
+      module.exports = require("./browser.cjs.dev.js");
+    }
+
+    dist/browser.cjs.prod.js -------------
+    "use strict";
+
+    Object.defineProperty(exports, "__esModule", {
+      value: !0
+    });
+
+    let thing = "wow";
+
+    "undefined" != typeof window && (thing = "something"), void 0 !== typeof document && (thing += "other");
+
+    var thing$1 = thing;
+
+    exports.default = thing$1;
+
+    dist/browser.esm.js -------------
+    let thing = "wow";
+
+    if (typeof window !== "undefined") {
+      thing = "something";
+    }
+
+    if (typeof document !== undefined) {
+      thing += "other";
+    }
+
+    var thing$1 = thing;
+
+    export default thing$1;
+
+  `);
 });
 
 test("browser no module", async () => {

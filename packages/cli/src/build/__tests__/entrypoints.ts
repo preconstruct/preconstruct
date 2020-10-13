@@ -125,10 +125,7 @@ test("multiple entrypoints", async () => {
   let dir = await testdir({
     "package.json": JSON.stringify({
       name: "multiple-entrypoints",
-      version: "1.0.0",
       main: "dist/multiple-entrypoints.cjs.js",
-      license: "MIT",
-      private: true,
       module: "dist/multiple-entrypoints.esm.js",
       preconstruct: {
         source: "src/sum",
@@ -228,10 +225,7 @@ test("two entrypoints, one module, one not", async () => {
   let dir = await testdir({
     "package.json": JSON.stringify({
       name: "two-entrypoints-one-module-one-not",
-      version: "1.0.0",
       main: "dist/two-entrypoints-one-module-one-not.cjs.js",
-      license: "MIT",
-      private: true,
       preconstruct: {
         source: "src/sum",
         entrypoints: [".", "multiply"],

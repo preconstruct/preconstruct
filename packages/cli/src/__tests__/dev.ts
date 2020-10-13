@@ -2,7 +2,7 @@ import fixturez from "fixturez";
 import spawn from "spawndamnit";
 import path from "path";
 import * as fs from "fs-extra";
-import { install } from "../../test-utils";
+import { install, js, testdir } from "../../test-utils";
 import dev from "../dev";
 
 const f = fixturez(__dirname);
@@ -36,7 +36,22 @@ test("dev command works in node", async () => {
 test("all the build types", async () => {
   // TODO: maybe actually require them
 
-  let tmpPath = f.copy("all-the-build-types");
+  let tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "all-the-build-types",
+      main: "dist/all-the-build-types.cjs.js",
+      module: "dist/all-the-build-types.esm.js",
+      browser: {
+        "./dist/all-the-build-types.cjs.js":
+          "./dist/all-the-build-types.browser.cjs.js",
+        "./dist/all-the-build-types.esm.js":
+          "./dist/all-the-build-types.browser.esm.js",
+      },
+    }),
+    "src/index.js": js`
+                      export default "some cool thing";
+                    `,
+  });
 
   await dev(tmpPath);
 
@@ -58,7 +73,30 @@ test("all the build types", async () => {
       path.relative(tmpPath, require.resolve("@preconstruct/hook")),
       "RELATIVE_PATH_TO_PRECONSTRUCT_HOOK"
     )
-  ).toMatchSnapshot();
+  ).toMatchInlineSnapshot(`
+    "\\"use strict\\";
+    // this file might look strange and you might be wondering what it's for
+    // it's lets you import your source files by importing this entrypoint
+    // as you would import it if it was built with preconstruct build
+    // this file is slightly different to some others though
+    // it has a require hook which compiles your code with Babel
+    // this means that you don't have to set up @babel/register or anything like that
+    // but you can still require this module and it'll be compiled
+
+    const path = require(\\"path\\");
+
+    // this bit of code imports the require hook and registers it
+    let unregister = require(\\"../RELATIVE_PATH_TO_PRECONSTRUCT_HOOK\\").___internalHook(path.resolve(__dirname, \\"..\\"), path.resolve(__dirname, \\"..\\"));
+
+    // this re-exports the source file
+    module.exports = require(\\"../src/index.js\\");
+
+    // this unregisters the require hook so that any modules required after this one
+    // aren't compiled with the require hook in case you have some other require hook
+    // or something that should be used on other modules
+    unregister();
+    "
+  `);
 
   let shouldBeCjsThingsToSource = [
     "all-the-build-types.esm.js",

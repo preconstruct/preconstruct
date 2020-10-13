@@ -1,40 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`clears dist folder: already-has-things-in-dist.cjs.dev.js 1`] = `
-"'use strict';
-
-Object.defineProperty(exports, '__esModule', { value: true });
-
-var index = \\"something\\";
-
-exports.default = index;
-"
-`;
-
-exports[`clears dist folder: already-has-things-in-dist.cjs.js 1`] = `
-"'use strict';
-
-if (process.env.NODE_ENV === \\"production\\") {
-  module.exports = require(\\"./already-has-things-in-dist.cjs.prod.js\\");
-} else {
-  module.exports = require(\\"./already-has-things-in-dist.cjs.dev.js\\");
-}
-"
-`;
-
-exports[`clears dist folder: already-has-things-in-dist.cjs.prod.js 1`] = `
-"\\"use strict\\";
-
-Object.defineProperty(exports, \\"__esModule\\", {
-  value: !0
-});
-
-var index = \\"something\\";
-
-exports.default = index;
-"
-`;
-
 exports[`flow: flow.cjs.dev.js 1`] = `
 "'use strict';
 

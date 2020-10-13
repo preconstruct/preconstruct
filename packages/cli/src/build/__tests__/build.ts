@@ -6,6 +6,9 @@ import {
   getPkg,
   snapshotDistFiles,
   install,
+  testdir,
+  js,
+  getDist,
 } from "../../../test-utils";
 import { doPromptInput as _doPromptInput } from "../../prompt";
 import { confirms as _confirms } from "../../messages";
@@ -47,11 +50,52 @@ test("no module", async () => {
 });
 
 test("clears dist folder", async () => {
-  let tmpPath = f.copy("already-has-things-in-dist");
+  let dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "already-has-things-in-dist",
+      main: "dist/already-has-things-in-dist.cjs.js",
+    }),
+    "src/index.js": js`
+                      export default "something";
+                    `,
+    "dist/something.js": js`
+                           throw new Error("why are you seeing this?");
+                         `,
+  });
 
-  await build(tmpPath);
+  await build(dir);
 
-  await snapshotDistFiles(tmpPath);
+  expect(await getDist(dir)).toMatchInlineSnapshot(`
+    dist/already-has-things-in-dist.cjs.dev.js -------------
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    var index = "something";
+
+    exports.default = index;
+
+    dist/already-has-things-in-dist.cjs.js -------------
+    'use strict';
+
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./already-has-things-in-dist.cjs.prod.js");
+    } else {
+      module.exports = require("./already-has-things-in-dist.cjs.dev.js");
+    }
+
+    dist/already-has-things-in-dist.cjs.prod.js -------------
+    "use strict";
+
+    Object.defineProperty(exports, "__esModule", {
+      value: !0
+    });
+
+    var index = "something";
+
+    exports.default = index;
+
+  `);
 });
 
 test("flow", async () => {
@@ -101,27 +145,27 @@ test("umd with dep on other module", async () => {
 
   await snapshotDistFiles(tmpPath);
   expect(await getPkg(tmpPath)).toMatchInlineSnapshot(`
-Object {
-  "devDependencies": Object {
-    "react": "^16.6.3",
-  },
-  "license": "MIT",
-  "main": "dist/umd-with-dep.cjs.js",
-  "name": "umd-with-dep",
-  "peerDependencies": Object {
-    "react": "^16.6.3",
-  },
-  "preconstruct": Object {
-    "globals": Object {
-      "react": "React",
-    },
-    "umdName": "umdWithDep",
-  },
-  "private": true,
-  "umd:main": "dist/umd-with-dep.umd.min.js",
-  "version": "1.0.0",
-}
-`);
+    Object {
+      "devDependencies": Object {
+        "react": "^16.6.3",
+      },
+      "license": "MIT",
+      "main": "dist/umd-with-dep.cjs.js",
+      "name": "umd-with-dep",
+      "peerDependencies": Object {
+        "react": "^16.6.3",
+      },
+      "preconstruct": Object {
+        "globals": Object {
+          "react": "React",
+        },
+        "umdName": "umdWithDep",
+      },
+      "private": true,
+      "umd:main": "dist/umd-with-dep.umd.min.js",
+      "version": "1.0.0",
+    }
+  `);
 });
 
 test("monorepo umd with dep on other module", async () => {
@@ -147,66 +191,66 @@ test("monorepo umd with dep on other module", async () => {
 
   expect(await getPkg(path.join(tmpPath, "packages", "package-one")))
     .toMatchInlineSnapshot(`
-Object {
-  "devDependencies": Object {
-    "react": "^16.6.3",
-  },
-  "license": "MIT",
-  "main": "dist/package-one-umd-with-dep.cjs.js",
-  "name": "@some-scope/package-one-umd-with-dep",
-  "peerDependencies": Object {
-    "react": "^16.6.3",
-  },
-  "preconstruct": Object {
-    "umdName": "packageOne",
-  },
-  "private": true,
-  "umd:main": "dist/package-one-umd-with-dep.umd.min.js",
-  "version": "1.0.0",
-}
-`);
+    Object {
+      "devDependencies": Object {
+        "react": "^16.6.3",
+      },
+      "license": "MIT",
+      "main": "dist/package-one-umd-with-dep.cjs.js",
+      "name": "@some-scope/package-one-umd-with-dep",
+      "peerDependencies": Object {
+        "react": "^16.6.3",
+      },
+      "preconstruct": Object {
+        "umdName": "packageOne",
+      },
+      "private": true,
+      "umd:main": "dist/package-one-umd-with-dep.umd.min.js",
+      "version": "1.0.0",
+    }
+  `);
 
   expect(await getPkg(path.join(tmpPath, "packages", "package-two")))
     .toMatchInlineSnapshot(`
-Object {
-  "devDependencies": Object {
-    "react": "^16.6.3",
-  },
-  "license": "MIT",
-  "main": "dist/package-two-umd-with-dep.cjs.js",
-  "name": "@some-scope/package-two-umd-with-dep",
-  "peerDependencies": Object {
-    "react": "^16.6.3",
-  },
-  "preconstruct": Object {
-    "umdName": "packageTwo",
-  },
-  "private": true,
-  "umd:main": "dist/package-two-umd-with-dep.umd.min.js",
-  "version": "1.0.0",
-}
-`);
+    Object {
+      "devDependencies": Object {
+        "react": "^16.6.3",
+      },
+      "license": "MIT",
+      "main": "dist/package-two-umd-with-dep.cjs.js",
+      "name": "@some-scope/package-two-umd-with-dep",
+      "peerDependencies": Object {
+        "react": "^16.6.3",
+      },
+      "preconstruct": Object {
+        "umdName": "packageTwo",
+      },
+      "private": true,
+      "umd:main": "dist/package-two-umd-with-dep.umd.min.js",
+      "version": "1.0.0",
+    }
+  `);
 
   expect(await getPkg(tmpPath)).toMatchInlineSnapshot(`
-Object {
-  "license": "MIT",
-  "main": "index.js",
-  "name": "monorepo-umd-with-dep",
-  "preconstruct": Object {
-    "globals": Object {
-      "react": "React",
-    },
-    "packages": Array [
-      "packages/*",
-    ],
-  },
-  "private": true,
-  "version": "1.0.0",
-  "workspaces": Array [
-    "packages/*",
-  ],
-}
-`);
+    Object {
+      "license": "MIT",
+      "main": "index.js",
+      "name": "monorepo-umd-with-dep",
+      "preconstruct": Object {
+        "globals": Object {
+          "react": "React",
+        },
+        "packages": Array [
+          "packages/*",
+        ],
+      },
+      "private": true,
+      "version": "1.0.0",
+      "workspaces": Array [
+        "packages/*",
+      ],
+    }
+  `);
 });
 
 test("monorepo single package", async () => {
