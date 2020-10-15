@@ -1,5 +1,11 @@
 # @preconstruct/hook
 
+## 0.4.0
+
+### Minor Changes
+
+- [`cfe7d95`](https://github.com/preconstruct/preconstruct/commit/cfe7d9537c0b08f9f127929d62fa97b24d4c31ae) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Add no-op file to `@preconstruct/hook` that will be imported by bundlers instead of the real require hook so that the `preconstruct dev` output will work in bundlers without a module build or bundler config changes(including for React Native's bundler, Metro)
+
 ## 0.3.0
 
 ### Minor Changes

@@ -1,5 +1,22 @@
 # preconstruct
 
+## 1.1.30
+
+### Patch Changes
+
+- [`47515cd`](https://github.com/preconstruct/preconstruct/commit/47515cd533d341c1138f108abc660061eb3486a3) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Validate that the root dist directory of a package is included in the published files since common chunks may be written to it
+
+* [`cfda1c6`](https://github.com/preconstruct/preconstruct/commit/cfda1c69e32aec01607e1f103bf4a9878cc5bd5b) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Fix the error message shown when an entrypoint in a package has a given build type and another doesn't
+
+- [`cfe7d95`](https://github.com/preconstruct/preconstruct/commit/cfe7d9537c0b08f9f127929d62fa97b24d4c31ae) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Add no-op file to `@preconstruct/hook` that will be imported by bundlers instead of the real require hook so that the `preconstruct dev` output will work in bundlers without a module build or bundler config changes(including for React Native's bundler, Metro)
+
+* [`9a64c4e`](https://github.com/preconstruct/preconstruct/commit/9a64c4e3b90887d69dbfaf408f4dd29497a241aa) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Cache Acorn parse step so that modules are only parsed a single time with Acorn rather than a number of times equal to the number of build types for a given package
+
+- [`47515cd`](https://github.com/preconstruct/preconstruct/commit/47515cd533d341c1138f108abc660061eb3486a3) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Improve error messages for invalid fields
+
+- Updated dependencies [[`cfe7d95`](https://github.com/preconstruct/preconstruct/commit/cfe7d9537c0b08f9f127929d62fa97b24d4c31ae)]:
+  - @preconstruct/hook@0.4.0
+
 ## 1.1.29
 
 ### Patch Changes
