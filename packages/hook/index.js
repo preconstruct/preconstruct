@@ -1,6 +1,7 @@
-import { addHook } from "pirates";
-import * as babel from "@babel/core";
-import sourceMapSupport from "source-map-support";
+const { addHook } = require("pirates");
+const babel = require("@babel/core");
+const sourceMapSupport = require("source-map-support");
+const path = require("path");
 
 let EXTENSIONS = [".js", ".jsx", ".ts", ".tsx"];
 
@@ -8,11 +9,13 @@ let babelPlugins = [
   require.resolve("@babel/plugin-transform-modules-commonjs"),
 ];
 
-export let ___internalHook = (cwd: string, pkgDir: string) => {
+exports.___internalHook = (distDir, relativeToRoot, relativeToPkgDir) => {
+  const cwd = path.resolve(distDir, relativeToRoot);
+  const pkgDir = path.resolve(distDir, relativeToPkgDir);
   let compiling = false;
-  let sourceMaps: Record<string, any> = {};
+  let sourceMaps = {};
   let needsToInstallSourceMapSupport = true;
-  function compileHook(code: string, filename: string) {
+  function compileHook(code, filename) {
     if (compiling) return code;
     // we do this lazily because jest has its own require implementation
     // which means preconstruct's require hook won't be run
@@ -42,9 +45,9 @@ export let ___internalHook = (cwd: string, pkgDir: string) => {
         filename,
         sourceMaps: "both",
         cwd,
-      })!;
+      });
       sourceMaps[filename] = output.map;
-      return output.code!;
+      return output.code;
     } finally {
       compiling = false;
     }

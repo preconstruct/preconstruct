@@ -81,7 +81,7 @@
     "packages": [
       "packages/*",
       "!packages/next",
-      "!packages/preconstruct"
+      "!packages/hook"
     ]
   }
 }

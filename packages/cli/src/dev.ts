@@ -183,29 +183,22 @@ export default async function dev(projectDir: string) {
 // this means that you don't have to set up @babel/register or anything like that
 // but you can still require this module and it'll be compiled
 
-const path = require("path");
-
 // this bit of code imports the require hook and registers it
-let unregister = require(${JSON.stringify(
+require(${JSON.stringify(
                 path.relative(
                   distDirectory,
-                  require.resolve("@preconstruct/hook")
+                  path.dirname(require.resolve("@preconstruct/hook"))
                 )
-              )}).___internalHook(path.resolve(__dirname, ${JSON.stringify(
+              )}).___internalHook(typeof __dirname === 'undefined' ? undefined : __dirname, ${JSON.stringify(
                 path.relative(distDirectory, project.directory)
-              )}), path.resolve(__dirname, ${JSON.stringify(
+              )}, ${JSON.stringify(
                 path.relative(distDirectory, pkg.directory)
-              )}));
+              )});
 
 // this re-exports the source file
 module.exports = require(${JSON.stringify(
                 path.relative(distDirectory, entrypoint.source)
               )});
-
-// this unregisters the require hook so that any modules required after this one
-// aren't compiled with the require hook in case you have some other require hook
-// or something that should be used on other modules
-unregister();
 `
             ),
           ];

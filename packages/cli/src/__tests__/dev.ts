@@ -120,18 +120,11 @@ test("all the build types", async () => {
     // this means that you don't have to set up @babel/register or anything like that
     // but you can still require this module and it'll be compiled
 
-    const path = require(\\"path\\");
-
     // this bit of code imports the require hook and registers it
-    let unregister = require(\\"../RELATIVE_PATH_TO_PRECONSTRUCT_HOOK\\").___internalHook(path.resolve(__dirname, \\"..\\"), path.resolve(__dirname, \\"..\\"));
+    require(\\"../../../../../../../../Users/mitchell/projects/preconstruct/packages/hook\\").___internalHook(typeof __dirname === 'undefined' ? undefined : __dirname, \\"..\\", \\"..\\");
 
     // this re-exports the source file
     module.exports = require(\\"../src/index.js\\");
-
-    // this unregisters the require hook so that any modules required after this one
-    // aren't compiled with the require hook in case you have some other require hook
-    // or something that should be used on other modules
-    unregister();
     "
   `);
 
