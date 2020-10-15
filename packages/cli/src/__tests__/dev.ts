@@ -107,7 +107,10 @@ test("all the build types", async () => {
         "utf-8"
       )
     ).replace(
-      path.relative(tmpPath, require.resolve("@preconstruct/hook")),
+      path.relative(
+        tmpPath,
+        path.dirname(require.resolve("@preconstruct/hook"))
+      ),
       "RELATIVE_PATH_TO_PRECONSTRUCT_HOOK"
     )
   ).toMatchInlineSnapshot(`
@@ -121,7 +124,7 @@ test("all the build types", async () => {
     // but you can still require this module and it'll be compiled
 
     // this bit of code imports the require hook and registers it
-    require(\\"../../../../../../../../Users/mitchell/projects/preconstruct/packages/hook\\").___internalHook(typeof __dirname === 'undefined' ? undefined : __dirname, \\"..\\", \\"..\\");
+    require(\\"../RELATIVE_PATH_TO_PRECONSTRUCT_HOOK\\").___internalHook(typeof __dirname === 'undefined' ? undefined : __dirname, \\"..\\", \\"..\\");
 
     // this re-exports the source file
     module.exports = require(\\"../src/index.js\\");
