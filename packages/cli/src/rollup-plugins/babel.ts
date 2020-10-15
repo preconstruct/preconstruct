@@ -1,13 +1,13 @@
 import * as babel from "@babel/core";
 import { getWorker } from "../worker-client";
-import { Plugin } from "rollup";
+import { AcornNode, Plugin } from "rollup";
 import initHasher from "xxhash-wasm";
 import QuickLRU from "quick-lru";
 import { HELPERS } from "../constants";
 
 const lru = new QuickLRU<
   string,
-  { code: string; promise: Promise<{ code: string; map: any }> }
+  { code: string; promise: Promise<{ code: string; map: any; ast: AcornNode }> }
 >({
   maxSize: 1000,
 });
@@ -59,14 +59,24 @@ let rollupPluginBabel = ({
       if (lru.has(hash)) {
         let cachedResult = lru.get(hash)!;
         if (code === cachedResult.code) {
-          return cachedResult.promise;
+          return cachedResult.promise.then((result) => {
+            return {
+              code: result.code,
+              map: result.map,
+              ast: JSON.parse(JSON.stringify(result.ast)),
+            };
+          });
         }
       }
       let promise = getWorker()
         .transformBabel(code, cwd, filename)
         .then((x) => {
           reportTransformedFile(filename);
-          return x;
+          return {
+            code: x.code,
+            ast: this.parse(x.code!, undefined),
+            map: x.map,
+          };
         });
       // @ts-ignore
       lru.set(hash, { code, promise });
