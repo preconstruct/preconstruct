@@ -3,7 +3,6 @@ import resolve from "@rollup/plugin-node-resolve";
 import alias from "@rollup/plugin-alias";
 import cjs from "@rollup/plugin-commonjs";
 import replace from "@rollup/plugin-replace";
-import resolveFrom from "resolve-from";
 import chalk from "chalk";
 import path from "path";
 import builtInModules from "builtin-modules";
@@ -50,18 +49,6 @@ export let getRollupConfig = (
   if (type === "node-dev" || type === "node-prod") {
     external.push(...builtInModules);
   }
-
-  let rollupAliases: Record<string, string> = {};
-
-  Object.keys(aliases).forEach((key) => {
-    try {
-      rollupAliases[key] = resolveFrom(pkg.directory, aliases[key]);
-    } catch (err) {
-      if (err.code !== "MODULE_NOT_FOUND") {
-        throw err;
-      }
-    }
-  });
 
   let input: Record<string, string> = {};
 
@@ -156,7 +143,7 @@ export let getRollupConfig = (
       }),
       type === "umd" &&
         alias({
-          entries: rollupAliases,
+          entries: aliases,
         }),
       resolve({
         extensions: EXTENSIONS,

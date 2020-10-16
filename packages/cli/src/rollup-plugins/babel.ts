@@ -22,6 +22,11 @@ let extensionRegex = /\.[tj]sx?$/;
 
 let fakeRollupModuleRegex = /\0/;
 
+let externalHelpersCache: {
+  ast: AcornNode;
+  code: string;
+};
+
 let rollupPluginBabel = ({
   cwd,
   reportTransformedFile,
@@ -42,7 +47,14 @@ let rollupPluginBabel = ({
       if (id !== HELPERS) {
         return null;
       }
-      return (babel as any).buildExternalHelpers(null, "module");
+      if (externalHelpersCache === undefined) {
+        let helpers = (babel as any).buildExternalHelpers(null, "module");
+        externalHelpersCache = {
+          ast: this.parse(helpers, undefined),
+          code: helpers,
+        };
+      }
+      return externalHelpersCache;
     },
     // @ts-ignore
     transform(code, filename) {
