@@ -1,9 +1,7 @@
 import * as babel from "@babel/core";
 import { getWorker } from "../worker-client";
 import { AcornNode, Plugin } from "rollup";
-import initHasher from "xxhash-wasm";
 import QuickLRU from "quick-lru";
-import { HELPERS } from "../constants";
 
 const lru = new QuickLRU<
   string,
@@ -12,20 +10,17 @@ const lru = new QuickLRU<
   maxSize: 1000,
 });
 
-let hasher: (str: string) => string;
-
-export let hasherPromise = initHasher().then(({ h64 }: any) => {
-  hasher = h64;
-});
-
 let extensionRegex = /\.[tj]sx?$/;
 
 let fakeRollupModuleRegex = /\0/;
 
-let externalHelpersCache: {
-  ast: AcornNode;
-  code: string;
-};
+let externalHelpersCache = new Map<
+  string,
+  {
+    ast: AcornNode;
+    code: string;
+  }
+>();
 
 let rollupPluginBabel = ({
   cwd,
@@ -37,29 +32,33 @@ let rollupPluginBabel = ({
   return {
     name: "babel",
     resolveId(id) {
-      if (id !== HELPERS) {
+      if (!id.startsWith("\0rollupPluginBabelHelpers/")) {
         return null;
       }
       return id;
     },
 
     load(id) {
-      if (id !== HELPERS) {
+      let helperName = id.replace(/\0rollupPluginBabelHelpers\//, "");
+      if (helperName === id) {
         return null;
       }
-      if (externalHelpersCache === undefined) {
-        let helpers = (babel as any).buildExternalHelpers(null, "module");
-        externalHelpersCache = {
+      let helpersSourceDescription = externalHelpersCache.get(helperName);
+      if (helpersSourceDescription === undefined) {
+        let helpers = (babel as any).buildExternalHelpers(
+          [helperName],
+          "module"
+        );
+        helpersSourceDescription = {
           ast: this.parse(helpers, undefined),
           code: helpers,
         };
+        externalHelpersCache.set(helperName, helpersSourceDescription);
       }
-      return externalHelpersCache;
+      return helpersSourceDescription;
     },
-    // @ts-ignore
     transform(code, filename) {
       if (
-        filename === HELPERS ||
         typeof filename !== "string" ||
         fakeRollupModuleRegex.test(filename) ||
         !extensionRegex.test(filename) ||
@@ -67,9 +66,8 @@ let rollupPluginBabel = ({
       ) {
         return null;
       }
-      let hash = hasher(filename);
-      if (lru.has(hash)) {
-        let cachedResult = lru.get(hash)!;
+      if (lru.has(filename)) {
+        let cachedResult = lru.get(filename)!;
         if (code === cachedResult.code) {
           return cachedResult.promise.then((result) => {
             return {
@@ -90,8 +88,7 @@ let rollupPluginBabel = ({
             map: x.map,
           };
         });
-      // @ts-ignore
-      lru.set(hash, { code, promise });
+      lru.set(filename, { code, promise });
       return promise;
     },
   };

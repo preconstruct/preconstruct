@@ -1,4 +1,3 @@
-import { HELPERS } from "./constants";
 import { lazyRequire } from "lazy-require.macro";
 // @ts-ignore
 import { addNamed } from "@babel/helper-module-imports";
@@ -21,7 +20,11 @@ function importHelperPlugin(babel: typeof import("@babel/core")) {
           return babel.types.identifier(cachedHelpers[name].name);
         }
 
-        return (cachedHelpers[name] = addNamed(file.path, name, HELPERS));
+        return (cachedHelpers[name] = addNamed(
+          file.path,
+          name,
+          `\0rollupPluginBabelHelpers/${name}`
+        ));
       });
     },
   };
@@ -47,8 +50,7 @@ export async function transformBabel(
       plugins: [importHelperPlugin],
     })
     .then((res) => {
-      let { code, map } = res!;
-      return { code, map };
+      return { code: res!.code!, map: res!.map };
     });
 }
 

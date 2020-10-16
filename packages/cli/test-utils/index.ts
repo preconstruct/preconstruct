@@ -3,8 +3,8 @@ import * as fs from "fs-extra";
 import globby from "globby";
 import fixturez from "fixturez";
 import spawn from "spawndamnit";
-import initHasher from "xxhash-wasm";
 import outdent from "outdent";
+import crypto from "crypto";
 // import profiler from "v8-profiler-next";
 import chalk from "chalk";
 
@@ -160,12 +160,14 @@ export async function snapshotDistFiles(tmpPath: string) {
   );
 }
 
-export let stripHashes = async (chunkName: string) => {
-  let { h64 } = await initHasher();
+function hash(content: string) {
+  return crypto.createHash("md5").update(content).digest("hex");
+}
 
+export let stripHashes = async (chunkName: string) => {
   let transformer = (pathname: string, content: string) => {
     return pathname.replace(new RegExp(`${chunkName}-[^\\.]+`, "g"), () => {
-      return `chunk-this-is-not-the-real-hash-${h64(content)}`;
+      return `chunk-this-is-not-the-real-hash-${hash(content)}`;
     });
   };
   return {
