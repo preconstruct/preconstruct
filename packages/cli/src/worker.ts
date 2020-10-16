@@ -1,6 +1,6 @@
 import { lazyRequire } from "lazy-require.macro";
 // @ts-ignore
-import { addNamed } from "@babel/helper-module-imports";
+import { addDefault } from "@babel/helper-module-imports";
 
 function importHelperPlugin(babel: typeof import("@babel/core")) {
   return {
@@ -20,9 +20,8 @@ function importHelperPlugin(babel: typeof import("@babel/core")) {
           return babel.types.identifier(cachedHelpers[name].name);
         }
 
-        return (cachedHelpers[name] = addNamed(
+        return (cachedHelpers[name] = addDefault(
           file.path,
-          name,
           `\0rollupPluginBabelHelpers/${name}`
         ));
       });

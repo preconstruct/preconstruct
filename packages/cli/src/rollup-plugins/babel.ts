@@ -1,7 +1,7 @@
-import * as babel from "@babel/core";
 import { getWorker } from "../worker-client";
 import { AcornNode, Plugin } from "rollup";
 import QuickLRU from "quick-lru";
+import resolveFrom from "resolve-from";
 
 const lru = new QuickLRU<
   string,
@@ -22,6 +22,18 @@ let externalHelpersCache = new Map<
   }
 >();
 
+const resolvedBabelCore = require.resolve("@babel/core");
+
+const babelHelpers: typeof import("@babel/helpers") = require(resolveFrom(
+  resolvedBabelCore,
+  "@babel/helpers"
+));
+
+const babelGenerator: typeof import("@babel/generator") = require(resolveFrom(
+  resolvedBabelCore,
+  "@babel/generator"
+));
+
 let rollupPluginBabel = ({
   cwd,
   reportTransformedFile,
@@ -31,8 +43,12 @@ let rollupPluginBabel = ({
 }): Plugin => {
   return {
     name: "babel",
-    resolveId(id) {
-      if (!id.startsWith("\0rollupPluginBabelHelpers/")) {
+    resolveId(id, parent) {
+      const currentIsBabelHelper = id.startsWith("\0rollupPluginBabelHelpers/");
+      if (!currentIsBabelHelper) {
+        if (parent && parent.startsWith("\0rollupPluginBabelHelpers/")) {
+          return `\0rollupPluginBabelHelpers/${id}`;
+        }
         return null;
       }
       return id;
@@ -45,10 +61,14 @@ let rollupPluginBabel = ({
       }
       let helpersSourceDescription = externalHelpersCache.get(helperName);
       if (helpersSourceDescription === undefined) {
-        let helpers = (babel as any).buildExternalHelpers(
-          [helperName],
-          "module"
-        );
+        let helpers = babelGenerator.default(
+          // @ts-ignore
+          {
+            type: "Program",
+            body: babelHelpers.get(helperName).nodes,
+          }
+        ).code;
+
         helpersSourceDescription = {
           ast: this.parse(helpers, undefined),
           code: helpers,
