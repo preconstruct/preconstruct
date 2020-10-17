@@ -9,6 +9,7 @@ import {
   tsx,
   ts,
   repoNodeModules,
+  js,
 } from "../../../test-utils";
 
 const f = fixturez(__dirname);
@@ -106,7 +107,12 @@ test("process.env.NODE_ENV reassignment", async () => {
       name: "test",
       main: "dist/test.cjs.js",
     }),
-    "src/index.js": "process.env.NODE_ENV = 'development'",
+    "src/index.js": js`
+                      process.env.NODE_ENV = "development";
+                      something.process.env.NODE_ENV = "development";
+                      console.log(process.env.NODE_ENV);
+                      console.log(something.process.env.NODE_ENV);
+                    `,
   });
   await build(dir);
   expect(await getDist(dir)).toMatchInlineSnapshot(`

@@ -19,6 +19,7 @@ import babel from "../rollup-plugins/babel";
 import terser from "../rollup-plugins/terser";
 import { getNameForDist } from "../utils";
 import { EXTENSIONS } from "../constants";
+import { inlineProcessEnvNodeEnv } from "../rollup-plugins/inline-process-env-node-env";
 
 // this makes sure nested imports of external packages are external
 const makeExternalPredicate = (externalArr: string[]) => {
@@ -159,20 +160,7 @@ export let getRollupConfig = (
             },
           },
         }),
-      type === "node-prod" &&
-        terser({
-          sourceMap: false,
-          mangle: false,
-          format: {
-            beautify: true,
-            indent_level: 2,
-          },
-          compress: {
-            global_defs: {
-              ["process.env" + ".NODE_ENV"]: "production",
-            },
-          },
-        }),
+      type === "node-prod" && inlineProcessEnvNodeEnv({ sourceMap: false }),
     ].filter((x: Plugin | false): x is Plugin => !!x),
   };
 
