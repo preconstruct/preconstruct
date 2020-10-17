@@ -137,7 +137,6 @@ export let getRollupConfig = (
           ["typeof " + "window"]: JSON.stringify("object"),
         }),
       rewriteBabelRuntimeHelpers(),
-      // @ts-ignore
       json({
         namedExports: false,
       }),

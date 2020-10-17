@@ -1,6 +1,6 @@
 import nodePath from "path";
 import { promptInput } from "./prompt";
-import globby from "globby";
+import fastGlob from "fast-glob";
 import * as fs from "fs-extra";
 import { Item } from "./item";
 import { Package } from "./package";
@@ -101,11 +101,10 @@ export class Project extends Item<{
       await this.save();
     }
 
-    let filenames = await globby(this.configPackages, {
+    let filenames = await fastGlob(this.configPackages, {
       cwd: this.directory,
       onlyDirectories: true,
       absolute: true,
-      expandDirectories: false,
     });
 
     let packages: Package[] = [];
