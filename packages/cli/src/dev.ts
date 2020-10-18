@@ -184,7 +184,7 @@ export default async function dev(projectDir: string) {
 // but you can still require this module and it'll be compiled
 
 // this bit of code imports the require hook and registers it
-require(${JSON.stringify(
+let unregister = require(${JSON.stringify(
                 path.relative(
                   distDirectory,
                   path.dirname(require.resolve("@preconstruct/hook"))
@@ -199,6 +199,8 @@ require(${JSON.stringify(
 module.exports = require(${JSON.stringify(
                 path.relative(distDirectory, entrypoint.source)
               )});
+
+unregister();
 `
             ),
           ];
