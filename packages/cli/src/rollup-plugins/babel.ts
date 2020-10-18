@@ -102,6 +102,7 @@ let rollupPluginBabel = ({
         .transformBabel(code, cwd, filename)
         .then((x) => {
           reportTransformedFile(filename);
+
           return {
             code: x.code,
             ast: this.parse(x.code!, undefined),
