@@ -17,7 +17,7 @@ import typescriptDeclarations from "../rollup-plugins/typescript-declarations";
 import json from "@rollup/plugin-json";
 import babel from "../rollup-plugins/babel";
 import terser from "../rollup-plugins/terser";
-import { getNameForDist } from "../utils";
+import { getNameForDistForEntrypoint } from "../utils";
 import { EXTENSIONS } from "../constants";
 
 // this makes sure nested imports of external packages are external
@@ -56,7 +56,11 @@ export let getRollupConfig = (
     input[
       path.relative(
         pkg.directory,
-        path.join(entrypoint.directory, "dist", getNameForDist(pkg.name))
+        path.join(
+          entrypoint.directory,
+          "dist",
+          getNameForDistForEntrypoint(entrypoint)
+        )
       )
     ] = entrypoint.source;
   });

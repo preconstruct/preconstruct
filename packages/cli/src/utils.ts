@@ -1,7 +1,8 @@
 import { Entrypoint } from "./entrypoint";
+import { Package } from "./package";
 
-export function getNameForDist(name: string): string {
-  return name.replace(/.*\//, "");
+export function getNameForDistForEntrypoint(entrypoint: Entrypoint): string {
+  return getDistName(entrypoint.package, entrypoint.name);
 }
 
 let fields = [
@@ -48,21 +49,28 @@ export function setFieldInOrder<
   return newObj as any;
 }
 
+function getDistName(pkg: Package, entrypointName: string): string {
+  if (pkg.project.experimentalFlags.newDistFilenames) {
+    return entrypointName.replace("@", "").replace(/\//g, "");
+  }
+  return pkg.name.replace(/.*\//, "");
+}
+
 export const validFieldsFromPkgName = {
-  main(pkgName: string) {
-    let safeName = getNameForDist(pkgName);
+  main(pkg: Package, entrypointName: string) {
+    let safeName = getDistName(pkg, entrypointName);
     return `dist/${safeName}.cjs.js`;
   },
-  module(pkgName: string) {
-    let safeName = getNameForDist(pkgName);
+  module(pkg: Package, entrypointName: string) {
+    let safeName = getDistName(pkg, entrypointName);
     return `dist/${safeName}.esm.js`;
   },
-  "umd:main"(pkgName: string) {
-    let safeName = getNameForDist(pkgName);
+  "umd:main"(pkg: Package, entrypointName: string) {
+    let safeName = getDistName(pkg, entrypointName);
     return `dist/${safeName}.umd.min.js`;
   },
-  browser(pkgName: string, hasModuleBuild: boolean) {
-    let safeName = getNameForDist(pkgName);
+  browser(pkg: Package, hasModuleBuild: boolean, entrypointName: string) {
+    let safeName = getDistName(pkg, entrypointName);
 
     let obj = {
       [`./dist/${safeName}.cjs.js`]: `./dist/${safeName}.browser.cjs.js`,
@@ -76,18 +84,22 @@ export const validFieldsFromPkgName = {
 
 export const validFields = {
   main(entrypoint: Entrypoint) {
-    return validFieldsFromPkgName.main(entrypoint.package.name);
+    return validFieldsFromPkgName.main(entrypoint.package, entrypoint.name);
   },
   module(entrypoint: Entrypoint) {
-    return validFieldsFromPkgName.module(entrypoint.package.name);
+    return validFieldsFromPkgName.module(entrypoint.package, entrypoint.name);
   },
   "umd:main"(entrypoint: Entrypoint) {
-    return validFieldsFromPkgName["umd:main"](entrypoint.package.name);
+    return validFieldsFromPkgName["umd:main"](
+      entrypoint.package,
+      entrypoint.name
+    );
   },
   browser(entrypoint: Entrypoint) {
     return validFieldsFromPkgName.browser(
-      entrypoint.package.name,
-      entrypoint.json.module !== undefined
+      entrypoint.package,
+      entrypoint.json.module !== undefined,
+      entrypoint.name
     );
   },
 };
