@@ -9,6 +9,7 @@ import {
   basicPkgJson,
   ts,
   repoNodeModules,
+  typescriptFixture,
 } from "../../../test-utils";
 import { doPromptInput } from "../../prompt";
 
@@ -177,9 +178,8 @@ test("browser no module", async () => {
 });
 
 test("typescript", async () => {
-  let tmpPath = f.copy("typescript");
+  let tmpPath = await testdir(typescriptFixture);
 
-  await install(tmpPath);
   await build(tmpPath);
 
   await snapshotDirectory(tmpPath, { files: "all" });
