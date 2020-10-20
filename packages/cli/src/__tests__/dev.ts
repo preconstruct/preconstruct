@@ -1,11 +1,8 @@
-import fixturez from "fixturez";
 import spawn from "spawndamnit";
 import path from "path";
 import * as fs from "fs-extra";
-import { install, js, testdir } from "../../test-utils";
+import { js, testdir, typescriptFixture } from "../../test-utils";
 import dev from "../dev";
-
-const f = fixturez(__dirname);
 
 jest.mock("../prompt");
 
@@ -282,9 +279,7 @@ test("flow", async () => {
 });
 
 test("typescript", async () => {
-  let tmpPath = f.copy("typescript");
-
-  await install(tmpPath);
+  let tmpPath = await testdir(typescriptFixture);
 
   await dev(tmpPath);
 

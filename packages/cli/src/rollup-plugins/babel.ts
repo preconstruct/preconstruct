@@ -90,10 +90,14 @@ let rollupPluginBabel = ({
         let cachedResult = lru.get(filename)!;
         if (code === cachedResult.code) {
           return cachedResult.promise.then((result) => {
+            const ast = JSON.parse(JSON.stringify(result.ast));
             return {
               code: result.code,
               map: result.map,
-              ast: JSON.parse(JSON.stringify(result.ast)),
+              ast,
+              meta: {
+                babel: { ast },
+              },
             };
           });
         }
@@ -102,10 +106,14 @@ let rollupPluginBabel = ({
         .transformBabel(code, cwd, filename)
         .then((x) => {
           reportTransformedFile(filename);
+          const ast = this.parse(x.code!, undefined);
           return {
             code: x.code,
             ast: this.parse(x.code!, undefined),
             map: x.map,
+            meta: {
+              babel: { ast },
+            },
           };
         });
       lru.set(filename, { code, promise });

@@ -31,6 +31,7 @@ export class Project extends Item<{
       useTSMorphToGenerateTSDeclarations?: JSONValue;
       logCompiledFiles?: JSONValue;
       newDistFilenames?: JSONValue;
+      newProcessEnvNodeEnvReplacementStrategyAndSkipTerserOnCJSProdBuild?: JSONValue;
     };
   };
 }> {
@@ -43,6 +44,7 @@ export class Project extends Item<{
       useSourceInsteadOfGeneratingTSDeclarations: !!config.useSourceInsteadOfGeneratingTSDeclarations,
       useTSMorphToGenerateTSDeclarations: !!config.useTSMorphToGenerateTSDeclarations,
       logCompiledFiles: !!config.logCompiledFiles,
+      newProcessEnvNodeEnvReplacementStrategyAndSkipTerserOnCJSProdBuild: !!config.newProcessEnvNodeEnvReplacementStrategyAndSkipTerserOnCJSProdBuild,
     };
   }
   get configPackages(): Array<string> {
