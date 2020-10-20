@@ -13,9 +13,10 @@ import { getUselessGlobsThatArentReallyGlobs } from "./glob-thing";
 import detectIndent from "detect-indent";
 import {
   validFields,
-  validFieldsFromPkgName,
+  validFieldsFromPkg,
   setFieldInOrder,
   JSONValue,
+  getEntrypointName,
 } from "./utils";
 
 export class Package extends Item<{
@@ -89,22 +90,27 @@ export class Package extends Item<{
           let plainEntrypointObj: {
             [key: string]: string | Record<string, string>;
           } = {
-            main: validFieldsFromPkgName.main(pkg.name),
+            main: validFieldsFromPkg.main(
+              pkg,
+              getEntrypointName(pkg, descriptor.directory)
+            ),
           };
           for (let descriptor of descriptors) {
             if (descriptor.contents !== undefined) {
               let parsed = jsonParse(descriptor.contents, descriptor.filename);
               for (let field of ["module", "umd:main"] as const) {
                 if (parsed[field] !== undefined) {
-                  plainEntrypointObj[field] = validFieldsFromPkgName[field](
-                    pkg.name
+                  plainEntrypointObj[field] = validFieldsFromPkg[field](
+                    pkg,
+                    getEntrypointName(pkg, descriptor.directory)
                   );
                 }
               }
               if (parsed.browser !== undefined) {
-                plainEntrypointObj.browser = validFieldsFromPkgName.browser(
-                  pkg.name,
-                  plainEntrypointObj.module !== undefined
+                plainEntrypointObj.browser = validFieldsFromPkg.browser(
+                  pkg,
+                  plainEntrypointObj.module !== undefined,
+                  getEntrypointName(pkg, descriptor.directory)
                 );
               }
             }
@@ -177,20 +183,20 @@ export class Package extends Item<{
           let plainEntrypointObj: {
             [key: string]: string | Record<string, string>;
           } = {
-            main: validFieldsFromPkgName.main(pkg.name),
+            main: validFieldsFromPkg.main(pkg.name, ""),
           };
           for (let descriptor of descriptors) {
             if (descriptor.contents !== undefined) {
               let parsed = jsonParse(descriptor.contents, descriptor.filename);
               for (let field of ["module", "umd:main"] as const) {
                 if (parsed[field] !== undefined) {
-                  plainEntrypointObj[field] = validFieldsFromPkgName[field](
+                  plainEntrypointObj[field] = validFieldsFromPkg[field](
                     pkg.name
                   );
                 }
               }
               if (parsed.browser !== undefined) {
-                plainEntrypointObj.browser = validFieldsFromPkgName.browser(
+                plainEntrypointObj.browser = validFieldsFromPkg.browser(
                   pkg.name,
                   plainEntrypointObj.module !== undefined
                 );

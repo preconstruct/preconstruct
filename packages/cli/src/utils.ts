@@ -1,5 +1,7 @@
+import normalizePath from "normalize-path";
 import { Entrypoint } from "./entrypoint";
 import { Package } from "./package";
+import * as nodePath from "path";
 
 export function getNameForDistForEntrypoint(entrypoint: Entrypoint): string {
   return getDistName(entrypoint.package, entrypoint.name);
@@ -49,14 +51,38 @@ export function setFieldInOrder<
   return newObj as any;
 }
 
+export function getEntrypointName(pkg: Package, entrypointDir: string) {
+  return normalizePath(
+    nodePath.join(
+      pkg.name,
+      nodePath.relative(
+        pkg.directory,
+        nodePath.resolve(pkg.directory, entrypointDir)
+      )
+    )
+  );
+}
+
 function getDistName(pkg: Package, entrypointName: string): string {
   if (pkg.project.experimentalFlags.newDistFilenames) {
+    if ("useOldDistFilenames" in pkg.project.json.preconstruct) {
+      if (
+        typeof pkg.project.json.preconstruct.useOldDistFilenames !== "boolean"
+      ) {
+        throw new Error(
+          `If useOldDistFilenames is defined in your Preconstruct config, it must be a boolean`
+        );
+      }
+      if (pkg.project.json.preconstruct.useOldDistFilenames) {
+        return pkg.name.replace(/.*\//, "");
+      }
+    }
     return entrypointName.replace("@", "").replace(/\//g, "");
   }
   return pkg.name.replace(/.*\//, "");
 }
 
-export const validFieldsFromPkgName = {
+export const validFieldsFromPkg = {
   main(pkg: Package, entrypointName: string) {
     let safeName = getDistName(pkg, entrypointName);
     return `dist/${safeName}.cjs.js`;
@@ -84,19 +110,16 @@ export const validFieldsFromPkgName = {
 
 export const validFields = {
   main(entrypoint: Entrypoint) {
-    return validFieldsFromPkgName.main(entrypoint.package, entrypoint.name);
+    return validFieldsFromPkg.main(entrypoint.package, entrypoint.name);
   },
   module(entrypoint: Entrypoint) {
-    return validFieldsFromPkgName.module(entrypoint.package, entrypoint.name);
+    return validFieldsFromPkg.module(entrypoint.package, entrypoint.name);
   },
   "umd:main"(entrypoint: Entrypoint) {
-    return validFieldsFromPkgName["umd:main"](
-      entrypoint.package,
-      entrypoint.name
-    );
+    return validFieldsFromPkg["umd:main"](entrypoint.package, entrypoint.name);
   },
   browser(entrypoint: Entrypoint) {
-    return validFieldsFromPkgName.browser(
+    return validFieldsFromPkg.browser(
       entrypoint.package,
       entrypoint.json.module !== undefined,
       entrypoint.name

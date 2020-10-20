@@ -24,6 +24,7 @@ export class Project extends Item<{
   preconstruct: {
     globals?: Record<string, string>;
     packages?: JSONValue;
+    useOldDistFilenames?: JSONValue;
     ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
       newEntrypoints?: JSONValue;
       useSourceInsteadOfGeneratingTSDeclarations?: JSONValue;
