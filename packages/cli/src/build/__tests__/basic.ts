@@ -109,32 +109,84 @@ test("process.env.NODE_ENV reassignment", async () => {
     }),
     "src/index.js": js`
                       process.env.NODE_ENV = "development";
-                      something.process.env.NODE_ENV = "development";
+                      something12.process.env.NODE_ENV = "development";
                       console.log(process.env.NODE_ENV);
                       console.log(something.process.env.NODE_ENV);
                     `,
   });
   await build(dir);
   expect(await getDist(dir)).toMatchInlineSnapshot(`
-      dist/test.cjs.dev.js -------------
-      'use strict';
-      
-      process.env.NODE_ENV = 'development';
-      
-      dist/test.cjs.js -------------
-      'use strict';
-      
-      if (process.env.NODE_ENV === "production") {
-        module.exports = require("./test.cjs.prod.js");
-      } else {
-        module.exports = require("./test.cjs.dev.js");
-      }
-      
-      dist/test.cjs.prod.js -------------
-      "use strict";
-      
-      process.env.NODE_ENV = "development";
-      
+    dist/test.cjs.dev.js -------------
+    'use strict';
+
+    process.env.NODE_ENV = "development";
+    something12.process.env.NODE_ENV = "development";
+    console.log(process.env.NODE_ENV);
+    console.log(something.process.env.NODE_ENV);
+
+    dist/test.cjs.js -------------
+    'use strict';
+
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./test.cjs.prod.js");
+    } else {
+      module.exports = require("./test.cjs.dev.js");
+    }
+
+    dist/test.cjs.prod.js -------------
+    "use strict";
+
+    process.env.NODE_ENV = "development", something12.process.env.NODE_ENV = "development", 
+    console.log("production"), console.log(something.process.env.NODE_ENV);
+
+  `);
+});
+
+test("process.env.NODE_ENV reassignment new approach", async () => {
+  const dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "test",
+      main: "dist/test.cjs.js",
+      preconstruct: {
+        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+          newProcessEnvNodeEnvReplacementStrategyAndSkipTerserOnCJSProdBuild: true,
+        },
+      },
+    }),
+    "src/index.js": js`
+                      process.env.NODE_ENV = "development";
+                      something12.process.env.NODE_ENV = "development";
+                      console.log(process.env.NODE_ENV);
+                      console.log(something.process.env.NODE_ENV);
+                    `,
+  });
+  await build(dir);
+  expect(await getDist(dir)).toMatchInlineSnapshot(`
+    dist/test.cjs.dev.js -------------
+    'use strict';
+
+    process.env.NODE_ENV = "development";
+    something12.process.env.NODE_ENV = "development";
+    console.log(process.env.NODE_ENV);
+    console.log(something.process.env.NODE_ENV);
+
+    dist/test.cjs.js -------------
+    'use strict';
+
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./test.cjs.prod.js");
+    } else {
+      module.exports = require("./test.cjs.dev.js");
+    }
+
+    dist/test.cjs.prod.js -------------
+    'use strict';
+
+    process.env.NODE_ENV = "development";
+    something12.process.env.NODE_ENV = "development";
+    console.log(        "production");
+    console.log(something.process.env.NODE_ENV);
+
   `);
 });
 

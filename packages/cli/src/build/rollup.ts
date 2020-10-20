@@ -160,8 +160,26 @@ export let getRollupConfig = (
             },
           },
         }),
-      type === "node-prod" && inlineProcessEnvNodeEnv({ sourceMap: false }),
-    ].filter((x: Plugin | false): x is Plugin => !!x),
+
+      type === "node-prod" &&
+        (pkg.project.experimentalFlags
+          .newProcessEnvNodeEnvReplacementStrategyAndSkipTerserOnCJSProdBuild
+          ? inlineProcessEnvNodeEnv({ sourceMap: false })
+          : terser({
+              sourceMap: false,
+              mangle: false,
+              format: {
+                beautify: true,
+                indent_level: 2,
+              },
+              compress: {
+                global_defs: {
+                  ["process.env" + ".NODE_ENV"]: "production",
+                },
+              },
+            })),
+      ,
+    ].filter((x): x is Plugin => !!x),
   };
 
   return config;

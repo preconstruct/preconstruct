@@ -14,7 +14,10 @@ export function inlineProcessEnvNodeEnv({
       if (code.includes("process.env" + ".NODE_ENV")) {
         let magicString = new MagicString(code);
         const modInfo = this.getModuleInfo(id);
-        const ast = modInfo && modInfo.ast ? modInfo.ast : this.parse(code);
+        const ast =
+          modInfo && modInfo.ast
+            ? JSON.parse(JSON.stringify(modInfo.ast))
+            : this.parse(code);
         walk(ast, {
           enter(n, p) {
             const parent = p as import("estree").Node;
@@ -30,18 +33,25 @@ export function inlineProcessEnvNodeEnv({
               node.object.property.name === "env" &&
               node.property.type === "Identifier" &&
               node.property.name === "NODE_ENV" &&
-              isReference(node, parent) &&
+              isReference(node as any, parent as any) &&
               parent.type !== "AssignmentExpression"
             ) {
-              magicString.overwrite(
-                (node as any).start,
-                (node as any).end,
-                JSON.stringify("production")
-              );
+              const start: number = (node as any).start;
+              const end: number = (node as any).end;
+              const len = end - start;
+              this.replace({
+                type: "Literal",
+                // @ts-ignore
+                start,
+                end,
+                value: "production",
+                raw: '"production"',
+              });
+              magicString.overwrite(start, end, '"production"'.padStart(len));
             }
           },
         });
-        let output: SourceDescription = { code: magicString.toString() };
+        let output: SourceDescription = { code: magicString.toString(), ast };
         if (sourceMap) {
           output.map = magicString.generateMap({ hires: true });
         }
