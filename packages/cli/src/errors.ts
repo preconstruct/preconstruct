@@ -14,7 +14,6 @@ export class BatchError extends Error {
     super(
       errors
         .map((x) => {
-          debugger;
           return format([x.message], "none", x.scope);
         })
         .join("\n")

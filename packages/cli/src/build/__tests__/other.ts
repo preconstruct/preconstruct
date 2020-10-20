@@ -1,5 +1,4 @@
 import build from "../";
-import fixturez from "fixturez";
 import {
   snapshotDirectory,
   install,
@@ -9,10 +8,9 @@ import {
   basicPkgJson,
   ts,
   repoNodeModules,
+  typescriptFixture,
 } from "../../../test-utils";
 import { doPromptInput } from "../../prompt";
-
-const f = fixturez(__dirname);
 
 jest.mock("../../prompt");
 
@@ -177,12 +175,11 @@ test("browser no module", async () => {
 });
 
 test("typescript", async () => {
-  let tmpPath = f.copy("typescript");
+  let dir = await testdir(typescriptFixture);
 
-  await install(tmpPath);
-  await build(tmpPath);
+  await build(dir);
 
-  expect(await getDist(tmpPath)).toMatchInlineSnapshot(`
+  expect(await getDist(dir)).toMatchInlineSnapshot(`
     dist/declarations/src/another-thing.d.ts -------------
     export declare type SomeType = string;
 
@@ -198,7 +195,6 @@ test("typescript", async () => {
     declare var obj: object;
 
     export { obj };
-
     dist/typescript.cjs.d.ts -------------
     export * from "./declarations/src/index";
     export { default } from "./declarations/src/index";
@@ -211,24 +207,23 @@ test("typescript", async () => {
     var path = require('path');
 
     function _interopNamespace(e) {
-    	if (e && e.__esModule) { return e; } else {
-    		var n = Object.create(null);
-    		if (e) {
-    			Object.keys(e).forEach(function (k) {
-    				if (k !== 'default') {
-    					var d = Object.getOwnPropertyDescriptor(e, k);
-    					Object.defineProperty(n, k, d.get ? d : {
-    						enumerable: true,
-    						get: function () {
-    							return e[k];
-    						}
-    					});
-    				}
-    			});
-    		}
-    		n['default'] = e;
-    		return Object.freeze(n);
+    	if (e && e.__esModule) return e;
+    	var n = Object.create(null);
+    	if (e) {
+    		Object.keys(e).forEach(function (k) {
+    			if (k !== 'default') {
+    				var d = Object.getOwnPropertyDescriptor(e, k);
+    				Object.defineProperty(n, k, d.get ? d : {
+    					enumerable: true,
+    					get: function () {
+    						return e[k];
+    					}
+    				});
+    			}
+    		});
     	}
+    	n['default'] = e;
+    	return Object.freeze(n);
     }
 
     var path__namespace = /*#__PURE__*/_interopNamespace(path);
