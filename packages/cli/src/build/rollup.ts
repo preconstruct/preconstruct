@@ -152,6 +152,10 @@ export let getRollupConfig = (
         },
       }),
       type === "umd" &&
+        pkg.project.experimentalFlags
+          .newProcessEnvNodeEnvReplacementStrategyAndSkipTerserOnCJSProdBuild &&
+        inlineProcessEnvNodeEnv({ sourceMap: true }),
+      type === "umd" &&
         terser({
           sourceMap: true,
           compress: pkg.project.experimentalFlags
@@ -163,11 +167,6 @@ export let getRollupConfig = (
                 },
               },
         }),
-      type === "umd" &&
-        pkg.project.experimentalFlags
-          .newProcessEnvNodeEnvReplacementStrategyAndSkipTerserOnCJSProdBuild &&
-        inlineProcessEnvNodeEnv({ sourceMap: true }),
-
       type === "node-prod" &&
         (pkg.project.experimentalFlags
           .newProcessEnvNodeEnvReplacementStrategyAndSkipTerserOnCJSProdBuild
