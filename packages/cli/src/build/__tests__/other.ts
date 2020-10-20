@@ -1,5 +1,4 @@
 import build from "../";
-import fixturez from "fixturez";
 import {
   snapshotDirectory,
   install,
@@ -12,8 +11,6 @@ import {
   typescriptFixture,
 } from "../../../test-utils";
 import { doPromptInput } from "../../prompt";
-
-const f = fixturez(__dirname);
 
 jest.mock("../../prompt");
 

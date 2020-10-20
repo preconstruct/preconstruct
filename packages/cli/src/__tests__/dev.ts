@@ -1,11 +1,8 @@
-import fixturez from "fixturez";
 import spawn from "spawndamnit";
 import path from "path";
 import * as fs from "fs-extra";
-import { install, js, testdir, typescriptFixture } from "../../test-utils";
+import { js, testdir, typescriptFixture } from "../../test-utils";
 import dev from "../dev";
-
-const f = fixturez(__dirname);
 
 jest.mock("../prompt");
 
