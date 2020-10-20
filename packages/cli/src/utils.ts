@@ -2,6 +2,7 @@ import normalizePath from "normalize-path";
 import { Entrypoint } from "./entrypoint";
 import { Package } from "./package";
 import * as nodePath from "path";
+import { FatalError } from "../dist/declarations/src/errors";
 
 export function getNameForDistForEntrypoint(entrypoint: Entrypoint): string {
   return getDistName(entrypoint.package, entrypoint.name);
@@ -63,40 +64,93 @@ export function getEntrypointName(pkg: Package, entrypointDir: string) {
   );
 }
 
-function getDistName(pkg: Package, entrypointName: string): string {
-  if (pkg.project.experimentalFlags.newDistFilenames) {
-    if ("useOldDistFilenames" in pkg.project.json.preconstruct) {
-      if (
-        typeof pkg.project.json.preconstruct.useOldDistFilenames !== "boolean"
-      ) {
-        throw new Error(
-          `If useOldDistFilenames is defined in your Preconstruct config, it must be a boolean`
-        );
-      }
-      if (pkg.project.json.preconstruct.useOldDistFilenames) {
-        return pkg.name.replace(/.*\//, "");
-      }
-    }
+type DistFilenameStrategy = "full" | "only-unscoped-package-name";
+
+function getDistNameWithStrategy(
+  pkg: Package,
+  entrypointName: string,
+  strategy: DistFilenameStrategy
+) {
+  if (strategy === "full") {
     return entrypointName.replace("@", "").replace(/\//g, "");
   }
   return pkg.name.replace(/.*\//, "");
 }
 
+function getDistName(
+  pkg: Package,
+  entrypointName: string,
+  forceStrategy?: DistFilenameStrategy
+): string {
+  if (forceStrategy) {
+    return getDistNameWithStrategy(pkg, entrypointName, forceStrategy);
+  }
+  if (pkg.project.experimentalFlags.newDistFilenames) {
+    if ("distFilenameStrategy" in pkg.project.json.preconstruct) {
+      if (
+        pkg.project.json.preconstruct.distFilenameStrategy !== "full" &&
+        pkg.project.json.preconstruct.distFilenameStrategy !==
+          "only-unscoped-package-name"
+      ) {
+        throw new FatalError(
+          `distFilenameStrategy is defined in your Preconstruct config as ${JSON.stringify(
+            pkg.project.json.preconstruct.distFilenameStrategy
+          )} but the only accepted values are "full" and "only-unscoped-package-name"`,
+          pkg.project.name
+        );
+      }
+      if (
+        pkg.project.json.preconstruct.distFilenameStrategy ===
+        "only-unscoped-package-name"
+      ) {
+        return getDistNameWithStrategy(
+          pkg,
+          entrypointName,
+          "only-unscoped-package-name"
+        );
+      }
+    }
+    return getDistNameWithStrategy(pkg, entrypointName, "full");
+  }
+  return getDistNameWithStrategy(
+    pkg,
+    entrypointName,
+    "only-unscoped-package-name"
+  );
+}
+
 export const validFieldsFromPkg = {
-  main(pkg: Package, entrypointName: string) {
-    let safeName = getDistName(pkg, entrypointName);
+  main(
+    pkg: Package,
+    entrypointName: string,
+    forceStrategy?: DistFilenameStrategy
+  ) {
+    let safeName = getDistName(pkg, entrypointName, forceStrategy);
     return `dist/${safeName}.cjs.js`;
   },
-  module(pkg: Package, entrypointName: string) {
-    let safeName = getDistName(pkg, entrypointName);
+  module(
+    pkg: Package,
+    entrypointName: string,
+    forceStrategy?: DistFilenameStrategy
+  ) {
+    let safeName = getDistName(pkg, entrypointName, forceStrategy);
     return `dist/${safeName}.esm.js`;
   },
-  "umd:main"(pkg: Package, entrypointName: string) {
-    let safeName = getDistName(pkg, entrypointName);
+  "umd:main"(
+    pkg: Package,
+    entrypointName: string,
+    forceStrategy?: DistFilenameStrategy
+  ) {
+    let safeName = getDistName(pkg, entrypointName, forceStrategy);
     return `dist/${safeName}.umd.min.js`;
   },
-  browser(pkg: Package, hasModuleBuild: boolean, entrypointName: string) {
-    let safeName = getDistName(pkg, entrypointName);
+  browser(
+    pkg: Package,
+    hasModuleBuild: boolean,
+    entrypointName: string,
+    forceStrategy?: DistFilenameStrategy
+  ) {
+    let safeName = getDistName(pkg, entrypointName, forceStrategy);
 
     let obj = {
       [`./dist/${safeName}.cjs.js`]: `./dist/${safeName}.browser.cjs.js`,
@@ -109,20 +163,33 @@ export const validFieldsFromPkg = {
 };
 
 export const validFields = {
-  main(entrypoint: Entrypoint) {
-    return validFieldsFromPkg.main(entrypoint.package, entrypoint.name);
+  main(entrypoint: Entrypoint, forceStrategy?: DistFilenameStrategy) {
+    return validFieldsFromPkg.main(
+      entrypoint.package,
+      entrypoint.name,
+      forceStrategy
+    );
   },
-  module(entrypoint: Entrypoint) {
-    return validFieldsFromPkg.module(entrypoint.package, entrypoint.name);
+  module(entrypoint: Entrypoint, forceStrategy?: DistFilenameStrategy) {
+    return validFieldsFromPkg.module(
+      entrypoint.package,
+      entrypoint.name,
+      forceStrategy
+    );
   },
-  "umd:main"(entrypoint: Entrypoint) {
-    return validFieldsFromPkg["umd:main"](entrypoint.package, entrypoint.name);
+  "umd:main"(entrypoint: Entrypoint, forceStrategy?: DistFilenameStrategy) {
+    return validFieldsFromPkg["umd:main"](
+      entrypoint.package,
+      entrypoint.name,
+      forceStrategy
+    );
   },
-  browser(entrypoint: Entrypoint) {
+  browser(entrypoint: Entrypoint, forceStrategy?: DistFilenameStrategy) {
     return validFieldsFromPkg.browser(
       entrypoint.package,
       entrypoint.json.module !== undefined,
-      entrypoint.name
+      entrypoint.name,
+      forceStrategy
     );
   },
 };
