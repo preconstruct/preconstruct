@@ -154,12 +154,19 @@ export let getRollupConfig = (
       type === "umd" &&
         terser({
           sourceMap: true,
-          compress: {
-            global_defs: {
-              ["process.env" + ".NODE_ENV"]: "production",
-            },
-          },
+          compress: pkg.project.experimentalFlags
+            .newProcessEnvNodeEnvReplacementStrategyAndSkipTerserOnCJSProdBuild
+            ? true
+            : {
+                global_defs: {
+                  ["process.env" + ".NODE_ENV"]: "production",
+                },
+              },
         }),
+      type === "umd" &&
+        pkg.project.experimentalFlags
+          .newProcessEnvNodeEnvReplacementStrategyAndSkipTerserOnCJSProdBuild &&
+        inlineProcessEnvNodeEnv({ sourceMap: true }),
 
       type === "node-prod" &&
         (pkg.project.experimentalFlags
