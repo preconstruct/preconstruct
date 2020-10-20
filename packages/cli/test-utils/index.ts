@@ -316,9 +316,9 @@ export const typescriptFixture: Fixture = {
                     
                     export default thing;
                   `,
-  "src/another-type.ts": ts`
-                           export type SomeType = string;
-                         `,
+  "src/another-thing.ts": ts`
+                            export type SomeType = string;
+                          `,
   "src/one-more-thing.js": js`
                              export let obj = {};
                            `,

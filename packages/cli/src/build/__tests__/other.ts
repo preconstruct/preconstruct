@@ -175,11 +175,11 @@ test("browser no module", async () => {
 });
 
 test("typescript", async () => {
-  let tmpPath = await testdir(typescriptFixture);
+  let dir = await testdir(typescriptFixture);
 
-  await build(tmpPath);
+  await build(dir);
 
-  expect(await getDist(tmpPath)).toMatchInlineSnapshot(`
+  expect(await getDist(dir)).toMatchInlineSnapshot(`
     dist/declarations/src/another-thing.d.ts -------------
     export declare type SomeType = string;
 
@@ -195,7 +195,6 @@ test("typescript", async () => {
     declare var obj: object;
 
     export { obj };
-
     dist/typescript.cjs.d.ts -------------
     export * from "./declarations/src/index";
     export { default } from "./declarations/src/index";
