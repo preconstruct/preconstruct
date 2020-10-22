@@ -17,7 +17,9 @@ module.exports = (nextConfig = {}) => {
       }
     });
     if (!hasFoundRule) {
-      throw new Error("The Next Babel loader could not be found");
+      throw new Error(
+        "If you see this error, please open an issue with your Next.js version and @preconstruct/next version. The Next Babel loader could not be found"
+      );
     }
     const { extensions } = webpackConfig.resolve;
     if (options.isServer && !options.isServerless) {
