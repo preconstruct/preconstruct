@@ -1,5 +1,11 @@
 # preconstruct
 
+## 1.1.32
+
+### Patch Changes
+
+- [`3944e88`](https://github.com/preconstruct/preconstruct/commit/3944e88feff8ff6943f24be465e6ba9d9f96c09a) [#333](https://github.com/preconstruct/preconstruct/pull/333) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Add `newProcessEnvNodeEnvReplacementStrategyAndSkipTerserOnCJSProdBuild` experimental flag
+
 ## 1.1.31
 
 ### Patch Changes
