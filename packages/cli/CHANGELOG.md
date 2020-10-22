@@ -1,5 +1,11 @@
 # preconstruct
 
+## 1.1.33
+
+### Patch Changes
+
+- [`cef98e9`](https://github.com/preconstruct/preconstruct/commit/cef98e9d82fc12d044352d5d0c8e5a3e23828a4e) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Revert change from globby to fast-glob because fast-glob doesn't directly support negations
+
 ## 1.1.32
 
 ### Patch Changes
