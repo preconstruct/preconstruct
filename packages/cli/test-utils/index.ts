@@ -1,6 +1,6 @@
 import path from "path";
 import * as fs from "fs-extra";
-import fastGlob from "fast-glob";
+import globby from "globby";
 import fixturez from "fixturez";
 import spawn from "spawndamnit";
 import outdent from "outdent";
@@ -194,7 +194,7 @@ export async function snapshotDirectory(
     transformContent?: (content: string) => string;
   } = {}
 ) {
-  let paths = await fastGlob(
+  let paths = await globby(
     [`**/${files === "js" ? "*.js" : "*"}`, "!node_modules/**", "!yarn.lock"],
     {
       cwd: tmpPath,
@@ -380,7 +380,7 @@ export async function getDist(dir: string) {
 }
 
 export async function getFiles(dir: string, glob: string[] = ["**"]) {
-  const files = await fastGlob(glob, { cwd: dir });
+  const files = await globby(glob, { cwd: dir });
   const filesObj: Record<string, string> = {
     [dirPrintingSymbol]: true,
   };
