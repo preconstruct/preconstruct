@@ -82,15 +82,15 @@ exports[`two entrypoints where one requires the other entrypoint: src/multiply.j
 export let multiply = (a, b) => identity(a * b);"
 `;
 
-exports[`two entrypoints with a common dependency: dist/chunk-this-is-not-the-real-hash-28f593ad5eeb3fc3.esm.js 1`] = `
+exports[`two entrypoints with a common dependency: dist/chunk-this-is-not-the-real-hash-09d8aa2cd41dd37e55ea1ca5c8546d35.esm.js 1`] = `
 "let identity = x => x;
 
 export { identity as i };
 "
 `;
 
-exports[`two entrypoints with a common dependency: dist/chunk-this-is-not-the-real-hash-35989183d3adae8d.cjs.dev.js 1`] = `
-"'use strict';
+exports[`two entrypoints with a common dependency: dist/chunk-this-is-not-the-real-hash-4e6129c17dfdf41eb144133ea53670b3.cjs.prod.js 1`] = `
+"\\"use strict\\";
 
 let identity = x => x;
 
@@ -98,8 +98,8 @@ exports.identity = identity;
 "
 `;
 
-exports[`two entrypoints with a common dependency: dist/chunk-this-is-not-the-real-hash-c62775dd776e24df.cjs.prod.js 1`] = `
-"\\"use strict\\";
+exports[`two entrypoints with a common dependency: dist/chunk-this-is-not-the-real-hash-f57161fefd97e3101601d153708a46b8.cjs.dev.js 1`] = `
+"'use strict';
 
 let identity = x => x;
 

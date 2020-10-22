@@ -13,7 +13,6 @@ import {
 } from "../errors";
 import { getRollupConfigs } from "./config";
 import { createWorker, destroyWorker } from "../worker-client";
-import { hasherPromise } from "../rollup-plugins/babel";
 import { isTsPath } from "../rollup-plugins/typescript-declarations";
 import { writeDevTSFile } from "../dev";
 import { validateProject } from "../validate";
@@ -117,7 +116,6 @@ export default async function build(directory: string) {
   // do more stuff with checking whether the repo is using yarn workspaces or bolt
   try {
     createWorker();
-    await hasherPromise;
     let project = await Project.create(directory);
 
     validateProject(project);

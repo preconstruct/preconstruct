@@ -3,7 +3,6 @@ import resolve from "@rollup/plugin-node-resolve";
 import alias from "@rollup/plugin-alias";
 import cjs from "@rollup/plugin-commonjs";
 import replace from "@rollup/plugin-replace";
-import resolveFrom from "resolve-from";
 import chalk from "chalk";
 import path from "path";
 import builtInModules from "builtin-modules";
@@ -20,6 +19,7 @@ import babel from "../rollup-plugins/babel";
 import terser from "../rollup-plugins/terser";
 import { getNameForDist } from "../utils";
 import { EXTENSIONS } from "../constants";
+import { inlineProcessEnvNodeEnv } from "../rollup-plugins/inline-process-env-node-env";
 
 // this makes sure nested imports of external packages are external
 const makeExternalPredicate = (externalArr: string[]) => {
@@ -50,18 +50,6 @@ export let getRollupConfig = (
   if (type === "node-dev" || type === "node-prod") {
     external.push(...builtInModules);
   }
-
-  let rollupAliases: Record<string, string> = {};
-
-  Object.keys(aliases).forEach((key) => {
-    try {
-      rollupAliases[key] = resolveFrom(pkg.directory, aliases[key]);
-    } catch (err) {
-      if (err.code !== "MODULE_NOT_FOUND") {
-        throw err;
-      }
-    }
-  });
 
   let input: Record<string, string> = {};
 
@@ -150,13 +138,12 @@ export let getRollupConfig = (
           ["typeof " + "window"]: JSON.stringify("object"),
         }),
       rewriteBabelRuntimeHelpers(),
-      // @ts-ignore
       json({
         namedExports: false,
       }),
       type === "umd" &&
         alias({
-          entries: rollupAliases,
+          entries: aliases,
         }),
       resolve({
         extensions: EXTENSIONS,
@@ -165,29 +152,40 @@ export let getRollupConfig = (
         },
       }),
       type === "umd" &&
+        pkg.project.experimentalFlags
+          .newProcessEnvNodeEnvReplacementStrategyAndSkipTerserOnCJSProdBuild &&
+        inlineProcessEnvNodeEnv({ sourceMap: true }),
+      type === "umd" &&
         terser({
           sourceMap: true,
-          compress: {
-            global_defs: {
-              ["process.env" + ".NODE_ENV"]: "production",
-            },
-          },
+          compress: pkg.project.experimentalFlags
+            .newProcessEnvNodeEnvReplacementStrategyAndSkipTerserOnCJSProdBuild
+            ? true
+            : {
+                global_defs: {
+                  ["process.env" + ".NODE_ENV"]: "production",
+                },
+              },
         }),
       type === "node-prod" &&
-        terser({
-          sourceMap: false,
-          mangle: false,
-          format: {
-            beautify: true,
-            indent_level: 2,
-          },
-          compress: {
-            global_defs: {
-              ["process.env" + ".NODE_ENV"]: "production",
-            },
-          },
-        }),
-    ].filter((x: Plugin | false): x is Plugin => !!x),
+        (pkg.project.experimentalFlags
+          .newProcessEnvNodeEnvReplacementStrategyAndSkipTerserOnCJSProdBuild
+          ? inlineProcessEnvNodeEnv({ sourceMap: false })
+          : terser({
+              sourceMap: false,
+              mangle: false,
+              format: {
+                beautify: true,
+                indent_level: 2,
+              },
+              compress: {
+                global_defs: {
+                  ["process.env" + ".NODE_ENV"]: "production",
+                },
+              },
+            })),
+      ,
+    ].filter((x): x is Plugin => !!x),
   };
 
   return config;

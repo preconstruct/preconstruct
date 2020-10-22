@@ -1,6 +1,6 @@
 import path from "path";
 import { FatalError } from "../../errors";
-import { Plugin, OutputChunk, OutputAsset } from "rollup";
+import { Plugin } from "rollup";
 import { Package } from "../../package";
 import { createDeclarationCreator } from "./create-generator";
 import { tsTemplate } from "../../utils";
@@ -18,8 +18,7 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
   }
   return {
     name: "typescript-declarations",
-    // eslint-disable-next-line no-unused-vars
-    async generateBundle(opts, bundle, something) {
+    async generateBundle(opts, bundle) {
       let creator = await (pkg.project.experimentalFlags
         .useTSMorphToGenerateTSDeclarations
         ? createDeclarationCreatorWithTSMorph
@@ -41,17 +40,15 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
       );
 
       for (const n in bundle) {
-        const _file = bundle[n];
-        const facadeModuleId = (_file as OutputChunk).facadeModuleId;
+        const file = bundle[n];
         if (
-          (_file as OutputAsset).isAsset ||
-          !(_file as OutputChunk).isEntry ||
-          facadeModuleId == null
+          file.type === "asset" ||
+          !file.isEntry ||
+          file.facadeModuleId == null
         ) {
           continue;
         }
-
-        let file = _file as OutputChunk;
+        const facadeModuleId = file.facadeModuleId;
 
         let dtsFilename = srcFilenameToDtsFilenameMap.get(
           normalizePath(facadeModuleId)

@@ -1,9 +1,7 @@
-import * as babel from "@babel/core";
 import { getWorker } from "../worker-client";
 import { AcornNode, Plugin } from "rollup";
-import initHasher from "xxhash-wasm";
 import QuickLRU from "quick-lru";
-import { HELPERS } from "../constants";
+import resolveFrom from "resolve-from";
 
 const lru = new QuickLRU<
   string,
@@ -12,15 +10,29 @@ const lru = new QuickLRU<
   maxSize: 1000,
 });
 
-let hasher: (str: string) => string;
-
-export let hasherPromise = initHasher().then(({ h64 }: any) => {
-  hasher = h64;
-});
-
 let extensionRegex = /\.[tj]sx?$/;
 
 let fakeRollupModuleRegex = /\0/;
+
+let externalHelpersCache = new Map<
+  string,
+  {
+    ast: AcornNode;
+    code: string;
+  }
+>();
+
+const resolvedBabelCore = require.resolve("@babel/core");
+
+const babelHelpers: typeof import("@babel/helpers") = require(resolveFrom(
+  resolvedBabelCore,
+  "@babel/helpers"
+));
+
+const babelGenerator: typeof import("@babel/generator") = require(resolveFrom(
+  resolvedBabelCore,
+  "@babel/generator"
+));
 
 let rollupPluginBabel = ({
   cwd,
@@ -31,23 +43,42 @@ let rollupPluginBabel = ({
 }): Plugin => {
   return {
     name: "babel",
-    resolveId(id) {
-      if (id !== HELPERS) {
+    resolveId(id, parent) {
+      const currentIsBabelHelper = id.startsWith("\0rollupPluginBabelHelpers/");
+      if (!currentIsBabelHelper) {
+        if (parent && parent.startsWith("\0rollupPluginBabelHelpers/")) {
+          return `\0rollupPluginBabelHelpers/${id}`;
+        }
         return null;
       }
       return id;
     },
 
     load(id) {
-      if (id !== HELPERS) {
+      let helperName = id.replace(/\0rollupPluginBabelHelpers\//, "");
+      if (helperName === id) {
         return null;
       }
-      return (babel as any).buildExternalHelpers(null, "module");
+      let helpersSourceDescription = externalHelpersCache.get(helperName);
+      if (helpersSourceDescription === undefined) {
+        let helpers = babelGenerator.default(
+          // @ts-ignore
+          {
+            type: "Program",
+            body: babelHelpers.get(helperName).nodes,
+          }
+        ).code;
+
+        helpersSourceDescription = {
+          ast: this.parse(helpers, undefined),
+          code: helpers,
+        };
+        externalHelpersCache.set(helperName, helpersSourceDescription);
+      }
+      return helpersSourceDescription;
     },
-    // @ts-ignore
     transform(code, filename) {
       if (
-        filename === HELPERS ||
         typeof filename !== "string" ||
         fakeRollupModuleRegex.test(filename) ||
         !extensionRegex.test(filename) ||
@@ -55,15 +86,18 @@ let rollupPluginBabel = ({
       ) {
         return null;
       }
-      let hash = hasher(filename);
-      if (lru.has(hash)) {
-        let cachedResult = lru.get(hash)!;
+      if (lru.has(filename)) {
+        let cachedResult = lru.get(filename)!;
         if (code === cachedResult.code) {
           return cachedResult.promise.then((result) => {
+            const ast = JSON.parse(JSON.stringify(result.ast));
             return {
               code: result.code,
               map: result.map,
-              ast: JSON.parse(JSON.stringify(result.ast)),
+              ast,
+              meta: {
+                babel: { ast },
+              },
             };
           });
         }
@@ -72,14 +106,17 @@ let rollupPluginBabel = ({
         .transformBabel(code, cwd, filename)
         .then((x) => {
           reportTransformedFile(filename);
+          const ast = this.parse(x.code!, undefined);
           return {
             code: x.code,
             ast: this.parse(x.code!, undefined),
             map: x.map,
+            meta: {
+              babel: { ast },
+            },
           };
         });
-      // @ts-ignore
-      lru.set(hash, { code, promise });
+      lru.set(filename, { code, promise });
       return promise;
     },
   };

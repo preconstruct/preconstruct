@@ -66,8 +66,7 @@ export default function flowAndNodeDevProdEntry(
       );
       return "could-not-resolve";
     },
-    // eslint-disable-next-line no-unused-vars
-    async generateBundle(opts, bundle, something) {
+    async generateBundle(opts, bundle) {
       for (const n in bundle) {
         const file = bundle[n];
         if (
@@ -88,7 +87,6 @@ export default function flowAndNodeDevProdEntry(
 
         if (!isEntrySourceTypeScript) {
           let flowMode: false | "all" | "named" = false;
-
           let source = await fs.readFile(file.facadeModuleId, "utf8");
           if (source.includes("@flow")) {
             flowMode = file.exports.includes("default") ? "all" : "named";

@@ -1,6 +1,6 @@
 {
   "name": "@preconstruct/cli",
-  "version": "1.1.29",
+  "version": "1.1.31",
   "description": "Dev and build your code painlessly in monorepos",
   "files": [
     "bin.js",
@@ -19,7 +19,7 @@
     "@babel/core": "^7.7.7",
     "@babel/helper-module-imports": "^7.10.4",
     "@babel/runtime": "^7.7.7",
-    "@preconstruct/hook": "^0.3.0",
+    "@preconstruct/hook": "^0.4.0",
     "@rollup/plugin-alias": "^3.1.1",
     "@rollup/plugin-commonjs": "^15.0.0",
     "@rollup/plugin-json": "^4.1.0",
@@ -30,11 +30,14 @@
     "dataloader": "^2.0.0",
     "detect-indent": "^6.0.0",
     "enquirer": "^2.3.6",
+    "estree-walker": "^2.0.1",
     "fast-deep-equal": "^2.0.1",
+    "fast-glob": "^3.2.4",
     "fs-extra": "^9.0.1",
-    "globby": "^11.0.1",
     "is-ci": "^2.0.0",
+    "is-reference": "^1.2.1",
     "jest-worker": "^26.3.0",
+    "magic-string": "^0.25.7",
     "meow": "^7.1.0",
     "micromatch": "^4.0.2",
     "ms": "^2.1.2",
@@ -46,10 +49,9 @@
     "quick-lru": "^5.1.1",
     "resolve": "^1.17.0",
     "resolve-from": "^5.0.0",
-    "rollup": "^2.26.5",
+    "rollup": "^2.32.0",
     "terser": "^5.2.1",
-    "v8-compile-cache": "^2.1.1",
-    "xxhash-wasm": "^0.4.0"
+    "v8-compile-cache": "^2.1.1"
   },
   "preconstruct": {
     "entrypoints": [

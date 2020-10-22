@@ -1,11 +1,11 @@
 // based on https://github.com/jamiebuilds/std-pkg but reading fewer things, adding setters and reading the file
-import globby from "globby";
 import * as fs from "fs-extra";
 import nodePath from "path";
 import { Item } from "./item";
 import { FatalError } from "./errors";
 import { Entrypoint } from "./entrypoint";
 import jsonParse from "parse-json";
+import fastGlob from "fast-glob";
 
 import { errors, confirms } from "./messages";
 import { Project } from "./project";
@@ -53,11 +53,10 @@ export class Package extends Item<{
     let pkg = new Package(filePath, contents);
     pkg.project = project;
     if (project.experimentalFlags.newEntrypoints) {
-      let entrypoints = await globby(pkg.configEntrypoints, {
+      let entrypoints = await fastGlob(pkg.configEntrypoints, {
         cwd: nodePath.join(pkg.directory, "src"),
         onlyFiles: true,
         absolute: true,
-        expandDirectories: false,
       });
       pkg.entrypoints = await Promise.all(
         entrypoints.map(async (sourceFile) => {
@@ -152,11 +151,10 @@ export class Package extends Item<{
         );
       });
     } else {
-      let entrypointDirectories = await globby(pkg.configEntrypoints, {
+      let entrypointDirectories = await fastGlob(pkg.configEntrypoints, {
         cwd: pkg.directory,
         onlyDirectories: true,
         absolute: true,
-        expandDirectories: false,
       });
       pkg.entrypoints = await Promise.all(
         entrypointDirectories.map(async (directory) => {
