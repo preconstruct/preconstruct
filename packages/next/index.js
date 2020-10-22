@@ -1,4 +1,5 @@
 const resolve = require("resolve");
+const path = require("path");
 
 module.exports = (nextConfig = {}) => {
   let originalWebpack = nextConfig.webpack;
