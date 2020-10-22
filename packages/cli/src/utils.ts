@@ -2,7 +2,7 @@ import normalizePath from "normalize-path";
 import { Entrypoint } from "./entrypoint";
 import { Package } from "./package";
 import * as nodePath from "path";
-import { FatalError } from "../dist/declarations/src/errors";
+import { FatalError } from "./errors";
 
 export function getNameForDistForEntrypoint(entrypoint: Entrypoint): string {
   return getDistName(entrypoint.package, entrypoint.name);
@@ -72,7 +72,7 @@ function getDistNameWithStrategy(
   strategy: DistFilenameStrategy
 ) {
   if (strategy === "full") {
-    return entrypointName.replace("@", "").replace(/\//g, "");
+    return entrypointName.replace("@", "").replace(/\//g, "-");
   }
   return pkg.name.replace(/.*\//, "");
 }

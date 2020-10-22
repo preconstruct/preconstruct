@@ -75,16 +75,20 @@ class CommandNotFoundError extends Error {}
     throw new CommandNotFoundError();
   }
 })().catch((err) => {
+  let hasFixableError = false;
   if (err instanceof FixableError) {
+    hasFixableError = true;
     error(err.message, err.scope);
-    info(
-      "The above error can be fixed automatically by running preconstruct fix"
-    );
   } else if (err instanceof FatalError) {
     error(err.message, err.scope);
   } else if (err instanceof BatchError) {
     for (let fatalError of err.errors) {
-      error(fatalError.message, fatalError.scope);
+      if (fatalError instanceof FixableError) {
+        hasFixableError = true;
+        error(fatalError.message, fatalError.scope);
+      } else {
+        error(fatalError.message, fatalError.scope);
+      }
     }
   } else if (err instanceof CommandNotFoundError) {
     error(errors.commandNotFound);
@@ -94,6 +98,11 @@ class CommandNotFoundError extends Error {}
     log(err.message);
   } else {
     error(err);
+  }
+  if (hasFixableError) {
+    info(
+      "Some of the errors above can be fixed automatically by running preconstruct fix"
+    );
   }
   info(
     "If want to learn more about the above error, check https://preconstruct.tools/errors"
