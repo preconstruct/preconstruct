@@ -17,7 +17,7 @@ import typescriptDeclarations from "../rollup-plugins/typescript-declarations";
 import json from "@rollup/plugin-json";
 import babel from "../rollup-plugins/babel";
 import terser from "../rollup-plugins/terser";
-import { getNameForDist } from "../utils";
+import { getNameForDistForEntrypoint } from "../utils";
 import { EXTENSIONS } from "../constants";
 import { inlineProcessEnvNodeEnv } from "../rollup-plugins/inline-process-env-node-env";
 
@@ -57,7 +57,11 @@ export let getRollupConfig = (
     input[
       path.relative(
         pkg.directory,
-        path.join(entrypoint.directory, "dist", getNameForDist(pkg.name))
+        path.join(
+          entrypoint.directory,
+          "dist",
+          getNameForDistForEntrypoint(entrypoint)
+        )
       )
     ] = entrypoint.source;
   });

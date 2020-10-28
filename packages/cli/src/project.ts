@@ -24,11 +24,13 @@ export class Project extends Item<{
   preconstruct: {
     globals?: Record<string, string>;
     packages?: JSONValue;
+    distFilenameStrategy?: JSONValue;
     ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
       newEntrypoints?: JSONValue;
       useSourceInsteadOfGeneratingTSDeclarations?: JSONValue;
       useTSMorphToGenerateTSDeclarations?: JSONValue;
       logCompiledFiles?: JSONValue;
+      newDistFilenames?: JSONValue;
       newProcessEnvNodeEnvReplacementStrategyAndSkipTerserOnCJSProdBuild?: JSONValue;
     };
   };
@@ -37,6 +39,7 @@ export class Project extends Item<{
     let config =
       this.json.preconstruct.___experimentalFlags_WILL_CHANGE_IN_PATCH || {};
     return {
+      newDistFilenames: !!config.newDistFilenames,
       newEntrypoints: !!config.newEntrypoints,
       useSourceInsteadOfGeneratingTSDeclarations: !!config.useSourceInsteadOfGeneratingTSDeclarations,
       useTSMorphToGenerateTSDeclarations: !!config.useTSMorphToGenerateTSDeclarations,
