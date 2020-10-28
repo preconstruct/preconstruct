@@ -9,8 +9,7 @@ import {
   js,
   repoNodeModules,
 } from "../../test-utils";
-import { FatalError } from "../errors";
-import { errors, confirms as _confirms } from "../messages";
+import { confirms as _confirms } from "../messages";
 
 const f = fixturez(__dirname);
 
@@ -66,7 +65,7 @@ test("no main field", async () => {
     await validate(tmpPath);
   } catch (e) {
     expect(e).toMatchInlineSnapshot(
-      `[Error: 🎁  no-main-field main field was not found, expected \`"dist/no-main-field.cjs.js"\`]`
+      `[Error: main field was not found, expected \`"dist/no-main-field.cjs.js"\`]`
     );
     return;
   }
@@ -100,7 +99,7 @@ test("invalid browser", async () => {
     pkg.browser = "invalid.js";
   });
   await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
-    `[Error: 🎁  no-module browser field is invalid, found \`"invalid.js"\`, expected \`{"./dist/no-module.cjs.js":"./dist/no-module.browser.cjs.js"}\`]`
+    `[Error: browser field is invalid, found \`"invalid.js"\`, expected \`{"./dist/no-module.cjs.js":"./dist/no-module.browser.cjs.js"}\`]`
   );
 });
 
