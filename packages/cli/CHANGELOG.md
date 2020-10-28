@@ -1,5 +1,11 @@
 # preconstruct
 
+## 1.1.34
+
+### Patch Changes
+
+- [`be053e7`](https://github.com/preconstruct/preconstruct/commit/be053e75d6b2793ee220f537eb0506a948874fea) [#337](https://github.com/preconstruct/preconstruct/pull/337) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Add `newDistFilenames` experimental flag
+
 ## 1.1.33
 
 ### Patch Changes
