@@ -141,6 +141,9 @@ export function validateProject(project: Project, log = false) {
     }
   }
   if (errors.length) {
+    if (errors.length === 1) {
+      throw errors[0];
+    }
     throw new BatchError(errors);
   }
 }

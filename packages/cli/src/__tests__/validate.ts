@@ -41,9 +41,6 @@ test("reports correct result on valid package", async () => {
         "🎁 info valid-package umd:main field is valid",
       ],
       Array [
-        "🎁 info valid-package package entrypoints are valid",
-      ],
-      Array [
         "🎁 success project is valid!",
       ],
     ]
@@ -69,7 +66,7 @@ test("no main field", async () => {
     await validate(tmpPath);
   } catch (e) {
     expect(e).toMatchInlineSnapshot(
-      `[Error: main field was not found, expected \`"dist/no-main-field.cjs.js"\`]`
+      `[Error: 🎁  no-main-field main field was not found, expected \`"dist/no-main-field.cjs.js"\`]`
     );
     return;
   }
@@ -90,9 +87,6 @@ test("no module", async () => {
         "🎁 info no-module main field is valid",
       ],
       Array [
-        "🎁 info no-module package entrypoints are valid",
-      ],
-      Array [
         "🎁 success project is valid!",
       ],
     ]
@@ -105,17 +99,9 @@ test("invalid browser", async () => {
   await modifyPkg(tmpPath, (pkg) => {
     pkg.browser = "invalid.js";
   });
-
-  try {
-    await validate(tmpPath);
-  } catch (e) {
-    expect(e).toBeInstanceOf(FatalError);
-    expect(e.message).toBe(
-      errors.invalidField("browser", "invalid.js", {
-        "./dist/no-module.cjs.js": "./dist/no-module.browser.cjs.js",
-      })
-    );
-  }
+  await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
+    `[Error: 🎁  no-module browser field is invalid, found \`"invalid.js"\`, expected \`{"./dist/no-module.cjs.js":"./dist/no-module.browser.cjs.js"}\`]`
+  );
 });
 
 test("valid browser", async () => {
@@ -147,9 +133,6 @@ test("valid browser", async () => {
         "🎁 info valid-package browser field is valid",
       ],
       Array [
-        "🎁 info valid-package package entrypoints are valid",
-      ],
-      Array [
         "🎁 success project is valid!",
       ],
     ]
@@ -167,9 +150,6 @@ test("monorepo single package", async () => {
       ],
       Array [
         "🎁 info @some-scope/package-two-single-package main field is valid",
-      ],
-      Array [
-        "🎁 info @some-scope/package-two-single-package package entrypoints are valid",
       ],
       Array [
         "🎁 success project is valid!",
