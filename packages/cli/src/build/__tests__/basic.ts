@@ -116,7 +116,7 @@ test("process.env.NODE_ENV reassignment", async () => {
   });
   await build(dir);
   expect(await getDist(dir)).toMatchInlineSnapshot(`
-    dist/test.cjs.dev.js -------------
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.dev.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     process.env.NODE_ENV = "development";
@@ -124,7 +124,7 @@ test("process.env.NODE_ENV reassignment", async () => {
     console.log(process.env.NODE_ENV);
     console.log(something.process.env.NODE_ENV);
 
-    dist/test.cjs.js -------------
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     if (process.env.NODE_ENV === "production") {
@@ -133,7 +133,7 @@ test("process.env.NODE_ENV reassignment", async () => {
       module.exports = require("./test.cjs.dev.js");
     }
 
-    dist/test.cjs.prod.js -------------
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     "use strict";
 
     process.env.NODE_ENV = "development", something12.process.env.NODE_ENV = "development", 
@@ -162,7 +162,7 @@ test("process.env.NODE_ENV reassignment new approach", async () => {
   });
   await build(dir);
   expect(await getDist(dir)).toMatchInlineSnapshot(`
-    dist/test.cjs.dev.js -------------
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.dev.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     process.env.NODE_ENV = "development";
@@ -170,7 +170,7 @@ test("process.env.NODE_ENV reassignment new approach", async () => {
     console.log(process.env.NODE_ENV);
     console.log(something.process.env.NODE_ENV);
 
-    dist/test.cjs.js -------------
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     if (process.env.NODE_ENV === "production") {
@@ -179,7 +179,7 @@ test("process.env.NODE_ENV reassignment new approach", async () => {
       module.exports = require("./test.cjs.dev.js");
     }
 
-    dist/test.cjs.prod.js -------------
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     process.env.NODE_ENV = "development";
@@ -204,7 +204,7 @@ test("does not duplicate babel helpers", async () => {
   });
   await build(dir);
   expect(await getDist(dir)).toMatchInlineSnapshot(`
-    dist/test.cjs.dev.js -------------
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.dev.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     Object.defineProperty(exports, '__esModule', { value: true });
@@ -226,7 +226,7 @@ test("does not duplicate babel helpers", async () => {
     exports.Other = Other;
     exports.Thing = Thing;
 
-    dist/test.cjs.js -------------
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     if (process.env.NODE_ENV === "production") {
@@ -235,7 +235,7 @@ test("does not duplicate babel helpers", async () => {
       module.exports = require("./test.cjs.dev.js");
     }
 
-    dist/test.cjs.prod.js -------------
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     "use strict";
 
     function _classCallCheck(instance, Constructor) {
@@ -275,7 +275,7 @@ test("does not duplicate babel helpers when using @babel/plugin-transform-runtim
   });
   await build(dir);
   expect(await getDist(dir)).toMatchInlineSnapshot(`
-    dist/test.cjs.dev.js -------------
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.dev.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     function _arrayLikeToArray(arr, len) {
@@ -376,7 +376,7 @@ test("does not duplicate babel helpers when using @babel/plugin-transform-runtim
       _iterator$1.f();
     }
 
-    dist/test.cjs.js -------------
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     if (process.env.NODE_ENV === "production") {
@@ -385,7 +385,7 @@ test("does not duplicate babel helpers when using @babel/plugin-transform-runtim
       module.exports = require("./test.cjs.dev.js");
     }
 
-    dist/test.cjs.prod.js -------------
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     "use strict";
 
     function _arrayLikeToArray(arr, len) {
@@ -487,7 +487,7 @@ test("new dist filenames", async () => {
   });
   await build(dir);
   await expect(getDist(dir)).resolves.toMatchInlineSnapshot(`
-          dist/scope-test.cjs.dev.js -------------
+          ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.cjs.dev.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
           'use strict';
 
           Object.defineProperty(exports, '__esModule', { value: true });
@@ -496,7 +496,7 @@ test("new dist filenames", async () => {
 
           exports.default = index;
 
-          dist/scope-test.cjs.js -------------
+          ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
           'use strict';
 
           if (process.env.NODE_ENV === "production") {
@@ -505,7 +505,7 @@ test("new dist filenames", async () => {
             module.exports = require("./scope-test.cjs.dev.js");
           }
 
-          dist/scope-test.cjs.prod.js -------------
+          ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
           "use strict";
 
           Object.defineProperty(exports, "__esModule", {
@@ -516,7 +516,7 @@ test("new dist filenames", async () => {
 
           exports.default = index;
 
-          dist/scope-test.esm.js -------------
+          ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
           var index = "something";
 
           export default index;

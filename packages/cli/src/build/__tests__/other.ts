@@ -48,7 +48,7 @@ test("browser", async () => {
 
   await build(dir);
   expect(await getDist(dir)).toMatchInlineSnapshot(`
-    dist/browser.browser.cjs.js -------------
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/browser.browser.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     Object.defineProperty(exports, '__esModule', { value: true });
@@ -67,7 +67,7 @@ test("browser", async () => {
 
     exports.default = thing$1;
 
-    dist/browser.browser.esm.js -------------
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/browser.browser.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     let thing = "wow";
 
     {
@@ -82,7 +82,7 @@ test("browser", async () => {
 
     export default thing$1;
 
-    dist/browser.cjs.dev.js -------------
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/browser.cjs.dev.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     Object.defineProperty(exports, '__esModule', { value: true });
@@ -101,7 +101,7 @@ test("browser", async () => {
 
     exports.default = thing$1;
 
-    dist/browser.cjs.js -------------
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/browser.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     if (process.env.NODE_ENV === "production") {
@@ -110,7 +110,7 @@ test("browser", async () => {
       module.exports = require("./browser.cjs.dev.js");
     }
 
-    dist/browser.cjs.prod.js -------------
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/browser.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     "use strict";
 
     Object.defineProperty(exports, "__esModule", {
@@ -125,7 +125,7 @@ test("browser", async () => {
 
     exports.default = thing$1;
 
-    dist/browser.esm.js -------------
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/browser.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     let thing = "wow";
 
     if (typeof window !== "undefined") {
@@ -180,10 +180,10 @@ test("typescript", async () => {
   await build(dir);
 
   expect(await getDist(dir)).toMatchInlineSnapshot(`
-    dist/declarations/src/another-thing.d.ts -------------
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/another-thing.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     export declare type SomeType = string;
 
-    dist/declarations/src/index.d.ts -------------
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/index.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     import { SomeType } from "./another-thing";
     export * from "./one-more-thing";
     import * as path from "path";
@@ -191,15 +191,15 @@ test("typescript", async () => {
     declare let thing: SomeType;
     export default thing;
 
-    dist/declarations/src/one-more-thing.d.ts -------------
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/one-more-thing.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     declare var obj: object;
 
     export { obj };
-    dist/typescript.cjs.d.ts -------------
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     export * from "./declarations/src/index";
     export { default } from "./declarations/src/index";
 
-    dist/typescript.cjs.dev.js -------------
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.cjs.dev.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     Object.defineProperty(exports, '__esModule', { value: true });
@@ -236,7 +236,7 @@ test("typescript", async () => {
     exports.default = thing;
     exports.obj = obj;
 
-    dist/typescript.cjs.js -------------
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     if (process.env.NODE_ENV === "production") {
@@ -245,7 +245,7 @@ test("typescript", async () => {
       module.exports = require("./typescript.cjs.dev.js");
     }
 
-    dist/typescript.cjs.prod.js -------------
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     "use strict";
 
     Object.defineProperty(exports, "__esModule", {
@@ -276,7 +276,7 @@ test("typescript", async () => {
 
     exports.path = path__namespace, exports.default = thing, exports.obj = obj;
 
-    dist/typescript.esm.js -------------
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     import * as path from 'path';
     export { path };
 
@@ -651,7 +651,7 @@ test("builds package using eval", async () => {
   await build(dir);
 
   expect(await getDist(dir)).toMatchInlineSnapshot(`
-    dist/pkg.cjs.dev.js -------------
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.dev.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     Object.defineProperty(exports, '__esModule', { value: true });
@@ -662,7 +662,7 @@ test("builds package using eval", async () => {
 
     exports.default = compute;
 
-    dist/pkg.cjs.js -------------
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     if (process.env.NODE_ENV === "production") {
@@ -671,7 +671,7 @@ test("builds package using eval", async () => {
       module.exports = require("./pkg.cjs.dev.js");
     }
 
-    dist/pkg.cjs.prod.js -------------
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     "use strict";
 
     function compute(arg) {

@@ -364,7 +364,9 @@ expect.addSnapshotSerializer({
     });
     return Object.entries(contentsByFilename)
       .map(([contents, filenames]) => {
-        return `${filenames.join(", ")} -------------\n${contents}`;
+        return `⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ ${filenames.join(
+          ", "
+        )} ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯\n${contents}`;
       })
       .join("\n");
   },

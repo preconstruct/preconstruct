@@ -30,7 +30,7 @@ test("source entrypoint option", async () => {
   await build(tmpPath);
 
   expect(await getDist(tmpPath)).toMatchInlineSnapshot(`
-    dist/source-entrypoint-option.cjs.dev.js -------------
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/source-entrypoint-option.cjs.dev.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     Object.defineProperty(exports, '__esModule', { value: true });
@@ -39,7 +39,7 @@ test("source entrypoint option", async () => {
 
     exports.something = something;
 
-    dist/source-entrypoint-option.cjs.js -------------
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/source-entrypoint-option.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     if (process.env.NODE_ENV === "production") {
@@ -48,7 +48,7 @@ test("source entrypoint option", async () => {
       module.exports = require("./source-entrypoint-option.cjs.dev.js");
     }
 
-    dist/source-entrypoint-option.cjs.prod.js -------------
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/source-entrypoint-option.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     "use strict";
 
     Object.defineProperty(exports, "__esModule", {
@@ -81,7 +81,7 @@ test("source entrypoint option flow", async () => {
   await build(tmpPath);
 
   expect(await getDist(tmpPath)).toMatchInlineSnapshot(`
-    dist/test.cjs.dev.js -------------
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.dev.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     Object.defineProperty(exports, '__esModule', { value: true });
@@ -91,7 +91,7 @@ test("source entrypoint option flow", async () => {
 
     exports.something = something;
 
-    dist/test.cjs.js -------------
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     if (process.env.NODE_ENV === "production") {
@@ -100,11 +100,11 @@ test("source entrypoint option flow", async () => {
       module.exports = require("./test.cjs.dev.js");
     }
 
-    dist/test.cjs.js.flow -------------
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.js.flow ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     // @flow
     export * from "../modules/index.js";
 
-    dist/test.cjs.prod.js -------------
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     "use strict";
 
     Object.defineProperty(exports, "__esModule", {
@@ -147,7 +147,7 @@ test("multiple entrypoints", async () => {
   await build(dir);
 
   expect(await getFiles(dir, ["**/dist/**"])).toMatchInlineSnapshot(`
-    dist/multiple-entrypoints.cjs.dev.js -------------
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/multiple-entrypoints.cjs.dev.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     Object.defineProperty(exports, '__esModule', { value: true });
@@ -156,7 +156,7 @@ test("multiple entrypoints", async () => {
 
     exports.sum = sum;
 
-    dist/multiple-entrypoints.cjs.js, multiply/dist/multiple-entrypoints.cjs.js -------------
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/multiple-entrypoints.cjs.js, multiply/dist/multiple-entrypoints.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     if (process.env.NODE_ENV === "production") {
@@ -165,7 +165,7 @@ test("multiple entrypoints", async () => {
       module.exports = require("./multiple-entrypoints.cjs.dev.js");
     }
 
-    dist/multiple-entrypoints.cjs.prod.js -------------
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/multiple-entrypoints.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     "use strict";
 
     Object.defineProperty(exports, "__esModule", {
@@ -176,12 +176,12 @@ test("multiple entrypoints", async () => {
 
     exports.sum = sum;
 
-    dist/multiple-entrypoints.esm.js -------------
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/multiple-entrypoints.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     let sum = (a, b) => a + b;
 
     export { sum };
 
-    multiply/dist/multiple-entrypoints.cjs.dev.js -------------
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ multiply/dist/multiple-entrypoints.cjs.dev.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     Object.defineProperty(exports, '__esModule', { value: true });
@@ -190,7 +190,7 @@ test("multiple entrypoints", async () => {
 
     exports.multiply = multiply;
 
-    multiply/dist/multiple-entrypoints.cjs.prod.js -------------
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ multiply/dist/multiple-entrypoints.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     "use strict";
 
     Object.defineProperty(exports, "__esModule", {
@@ -201,7 +201,7 @@ test("multiple entrypoints", async () => {
 
     exports.multiply = multiply;
 
-    multiply/dist/multiple-entrypoints.esm.js -------------
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ multiply/dist/multiple-entrypoints.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     let multiply = (a, b) => a * b;
 
     export { multiply };

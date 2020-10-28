@@ -67,7 +67,7 @@ test("clears dist folder", async () => {
   await build(dir);
 
   expect(await getDist(dir)).toMatchInlineSnapshot(`
-    dist/already-has-things-in-dist.cjs.dev.js -------------
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/already-has-things-in-dist.cjs.dev.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     Object.defineProperty(exports, '__esModule', { value: true });
@@ -76,7 +76,7 @@ test("clears dist folder", async () => {
 
     exports.default = index;
 
-    dist/already-has-things-in-dist.cjs.js -------------
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/already-has-things-in-dist.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     if (process.env.NODE_ENV === "production") {
@@ -85,7 +85,7 @@ test("clears dist folder", async () => {
       module.exports = require("./already-has-things-in-dist.cjs.dev.js");
     }
 
-    dist/already-has-things-in-dist.cjs.prod.js -------------
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/already-has-things-in-dist.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     "use strict";
 
     Object.defineProperty(exports, "__esModule", {
@@ -469,7 +469,7 @@ test("json", async () => {
   await build(tmpPath);
 
   expect(await getDist(tmpPath)).toMatchInlineSnapshot(`
-    dist/json-package.cjs.dev.js -------------
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/json-package.cjs.dev.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     Object.defineProperty(exports, '__esModule', { value: true });
@@ -488,7 +488,7 @@ test("json", async () => {
 
     exports.schema = schema;
 
-    dist/json-package.cjs.js -------------
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/json-package.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     if (process.env.NODE_ENV === "production") {
@@ -497,7 +497,7 @@ test("json", async () => {
       module.exports = require("./json-package.cjs.dev.js");
     }
 
-    dist/json-package.cjs.prod.js -------------
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/json-package.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     "use strict";
 
     Object.defineProperty(exports, "__esModule", {
@@ -515,7 +515,7 @@ test("json", async () => {
 
     exports.schema = schema;
 
-    dist/json-package.esm.js -------------
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/json-package.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     var changesetsSchema = {
     	$schema: "http://json-schema.org/draft-07/schema#",
     	type: "object",
