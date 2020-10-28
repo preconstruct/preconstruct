@@ -1,6 +1,6 @@
 {
   "name": "@preconstruct/cli",
-  "version": "1.1.31",
+  "version": "1.1.32",
   "description": "Dev and build your code painlessly in monorepos",
   "files": [
     "bin.js",
@@ -32,8 +32,8 @@
     "enquirer": "^2.3.6",
     "estree-walker": "^2.0.1",
     "fast-deep-equal": "^2.0.1",
-    "fast-glob": "^3.2.4",
     "fs-extra": "^9.0.1",
+    "globby": "^11.0.1",
     "is-ci": "^2.0.0",
     "is-reference": "^1.2.1",
     "jest-worker": "^26.3.0",
