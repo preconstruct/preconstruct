@@ -118,8 +118,7 @@ export function validateProject(project: Project, log = false) {
     } catch (err) {
       if (err instanceof BatchError) {
         errors.push(...err.errors);
-      }
-      if (err instanceof FatalError) {
+      } else if (err instanceof FatalError) {
         errors.push(err);
       } else {
         throw err;
@@ -131,8 +130,7 @@ export function validateProject(project: Project, log = false) {
       } catch (err) {
         if (err instanceof BatchError) {
           errors.push(...err.errors);
-        }
-        if (err instanceof FatalError) {
+        } else if (err instanceof FatalError) {
           errors.push(err);
         } else {
           throw err;
