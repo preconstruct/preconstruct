@@ -468,3 +468,58 @@ test("does not duplicate babel helpers when using @babel/plugin-transform-runtim
 
   `);
 });
+
+test("new dist filenames", async () => {
+  let dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "@scope/test",
+      main: "dist/scope-test.cjs.js",
+      module: "dist/scope-test.esm.js",
+      preconstruct: {
+        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+          newDistFilenames: true,
+        },
+      },
+    }),
+    "src/index.js": js`
+                      export default "something";
+                    `,
+  });
+  await build(dir);
+  await expect(getDist(dir)).resolves.toMatchInlineSnapshot(`
+          dist/scope-test.cjs.dev.js -------------
+          'use strict';
+
+          Object.defineProperty(exports, '__esModule', { value: true });
+
+          var index = "something";
+
+          exports.default = index;
+
+          dist/scope-test.cjs.js -------------
+          'use strict';
+
+          if (process.env.NODE_ENV === "production") {
+            module.exports = require("./scope-test.cjs.prod.js");
+          } else {
+            module.exports = require("./scope-test.cjs.dev.js");
+          }
+
+          dist/scope-test.cjs.prod.js -------------
+          "use strict";
+
+          Object.defineProperty(exports, "__esModule", {
+            value: !0
+          });
+
+          var index = "something";
+
+          exports.default = index;
+
+          dist/scope-test.esm.js -------------
+          var index = "something";
+
+          export default index;
+
+        `);
+});
