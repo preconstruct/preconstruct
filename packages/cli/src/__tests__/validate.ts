@@ -456,3 +456,64 @@ test("root dist directory not included in package without entrypoint at root", a
           though this package does not have an entrypoint at the root of the package, preconstruct will write common chunks to the root dist directory so it must be included.]
         `);
 });
+
+test("new entrypoints with old config", async () => {
+  let tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "pkg",
+      main: "dist/pkg.cjs.js",
+      module: "dist/pkg.esm.js",
+      preconstruct: {
+        source: "src/sum",
+        entrypoints: [".", "multiply"],
+        ___experimentalFlags_WILL_CHANGE_IN_PATCH: { newEntrypoints: true },
+      },
+    }),
+
+    "multiply/package.json": JSON.stringify({
+      main: "dist/pkg.cjs.js",
+      module: "dist/pkg.esm.js",
+
+      preconstruct: {
+        source: "../src/multiply.js",
+      },
+    }),
+
+    "src/multiply.js": js`
+                         export let multiply = (a, b) => a * b;
+                       `,
+
+    "src/sum.js": js`
+                    export let sum = (a, b) => a + b;
+                  `,
+  });
+
+  await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
+    `[Error: this package has no entrypoints but it does have some using v1's entrypoints config, please see the the changelog for how to upgrade]`
+  );
+});
+
+test.only("multiple source files for same entrypoint", async () => {
+  let tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "pkg-a",
+      preconstruct: {
+        entrypoints: ["other.js", "other/index.js"],
+        ___experimentalFlags_WILL_CHANGE_IN_PATCH: { newEntrypoints: true },
+      },
+    }),
+    "other/package.json": JSON.stringify({
+      main: "dist/pkg-a.cjs.js",
+    }),
+    "src/other.js": js`
+                      export let x = true;
+                    `,
+    "src/other/index.js": js`
+                            export let x = true;
+                          `,
+  });
+
+  await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
+    `[Error: this package has multiple source files for the same entrypoint of pkg-a/other at src/other.js and src/other/index.js]`
+  );
+});

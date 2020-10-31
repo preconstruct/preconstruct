@@ -18,9 +18,16 @@ export class Entrypoint extends Item<{
   };
 }> {
   package: Package;
-  constructor(filePath: string, contents: string, pkg: Package) {
+  _newEntrypointsSource: string | undefined;
+  constructor(
+    filePath: string,
+    contents: string,
+    pkg: Package,
+    source?: string
+  ) {
     super(filePath, contents);
     this.package = pkg;
+    this._newEntrypointsSource = source;
   }
 
   get name(): string {
@@ -34,19 +41,9 @@ export class Entrypoint extends Item<{
 
   get configSource(): string {
     if (this.package.project.experimentalFlags.newEntrypoints) {
-      if (this.json.preconstruct.source !== undefined) {
-        throw new FatalError(
-          "The source option is not allowed with the newEntrypoints experimental flag",
-          this.name
-        );
-      }
       return nodePath.relative(
         this.directory,
-        nodePath.join(
-          this.package.directory,
-          "src",
-          nodePath.relative(this.package.directory, this.directory)
-        )
+        nodePath.relative(this.package.directory, this._newEntrypointsSource!)
       );
     }
     if (
@@ -65,6 +62,9 @@ export class Entrypoint extends Item<{
   }
   _sourceCached?: string;
   get source(): string {
+    if (this._newEntrypointsSource !== undefined) {
+      return this._newEntrypointsSource;
+    }
     if (this._sourceCached === undefined) {
       this._sourceCached = resolve.sync(
         nodePath.join(this.directory, this.configSource),

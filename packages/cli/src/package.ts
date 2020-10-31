@@ -14,9 +14,9 @@ import detectIndent from "detect-indent";
 import {
   validFields,
   validFieldsFromPkg,
-  setFieldInOrder,
   JSONValue,
   getEntrypointName,
+  setFieldInOrder,
 } from "./utils";
 
 function getFieldsUsedInEntrypoints(
@@ -69,13 +69,14 @@ function createEntrypoints(
     filename: string;
     contents: string | undefined;
     hasAccepted: boolean;
+    sourceFile?: string;
   }[]
 ) {
   let fields = getFieldsUsedInEntrypoints(descriptors);
   let { indent } = detectIndent(pkg._contents);
 
   return Promise.all(
-    descriptors.map(async ({ filename, contents, hasAccepted }) => {
+    descriptors.map(async ({ filename, contents, hasAccepted, sourceFile }) => {
       if (contents === undefined || hasAccepted) {
         if (!hasAccepted) {
           const entrypointName = getEntrypointName(
@@ -97,7 +98,7 @@ function createEntrypoints(
         );
         await fs.outputFile(filename, contents);
       }
-      return new Entrypoint(filename, contents, pkg);
+      return new Entrypoint(filename, contents, pkg, sourceFile);
     })
   );
 }
@@ -143,8 +144,31 @@ export class Package extends Item<{
         absolute: true,
         expandDirectories: false,
       });
+      if (!entrypoints.length) {
+        let oldEntrypoints = await globby(pkg.configEntrypoints, {
+          cwd: pkg.directory,
+          onlyDirectories: true,
+          absolute: true,
+          expandDirectories: false,
+        });
+        if (oldEntrypoints.length) {
+          throw new FatalError(
+            "this package has no entrypoints but it does have some using v1's entrypoints config, please see the the changelog for how to upgrade",
+            pkg.name
+          );
+        }
+      }
       pkg.entrypoints = await Promise.all(
         entrypoints.map(async (sourceFile) => {
+          if (!/\.[tj]sx?$/.test(sourceFile)) {
+            throw new FatalError(
+              `entrypoint source files must end in .js, .jsx, .ts or .tsx but ${nodePath.relative(
+                pkg.directory,
+                sourceFile
+              )} does not`,
+              pkg.name
+            );
+          }
           let directory = nodePath.join(
             pkg.directory,
             nodePath
@@ -167,11 +191,32 @@ export class Package extends Item<{
             }
           }
 
-          return { filename, contents, hasAccepted: false };
+          return { filename, contents, sourceFile, hasAccepted: false };
         })
       ).then(async (descriptors) => {
         return createEntrypoints(pkg, descriptors);
       });
+      const entrypointsWithSourcePath = new Map<string, string>();
+      for (const entrypoint of pkg.entrypoints) {
+        if (entrypoint.json.preconstruct.source !== undefined) {
+          throw new FatalError(
+            "The source option on entrypoints no longer exists, see the changelog for how to upgrade to the new entrypoints config",
+            this.name
+          );
+        }
+        if (entrypointsWithSourcePath.has(entrypoint.name)) {
+          throw new FatalError(
+            `this package has multiple source files for the same entrypoint of ${
+              entrypoint.name
+            } at ${nodePath.relative(
+              pkg.directory,
+              entrypointsWithSourcePath.get(entrypoint.name)!
+            )} and ${nodePath.relative(pkg.directory, entrypoint.source)}`,
+            pkg.name
+          );
+        }
+        entrypointsWithSourcePath.set(entrypoint.name, entrypoint.source);
+      }
     } else {
       let entrypointDirectories = await globby(pkg.configEntrypoints, {
         cwd: pkg.directory,
