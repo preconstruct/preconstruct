@@ -1,11 +1,8 @@
-import fixturez from "fixturez";
 import spawn from "spawndamnit";
 import path from "path";
 import * as fs from "fs-extra";
-import { install, js, testdir } from "../../test-utils";
+import { js, testdir, typescriptFixture } from "../../test-utils";
 import dev from "../dev";
-
-const f = fixturez(__dirname);
 
 jest.mock("../prompt");
 
@@ -124,10 +121,12 @@ test("all the build types", async () => {
     // but you can still require this module and it'll be compiled
 
     // this bit of code imports the require hook and registers it
-    require(\\"../RELATIVE_PATH_TO_PRECONSTRUCT_HOOK\\").___internalHook(typeof __dirname === 'undefined' ? undefined : __dirname, \\"..\\", \\"..\\");
+    let unregister = require(\\"../RELATIVE_PATH_TO_PRECONSTRUCT_HOOK\\").___internalHook(typeof __dirname === 'undefined' ? undefined : __dirname, \\"..\\", \\"..\\");
 
     // this re-exports the source file
     module.exports = require(\\"../src/index.js\\");
+
+    unregister();
     "
   `);
 
@@ -280,9 +279,7 @@ test("flow", async () => {
 });
 
 test("typescript", async () => {
-  let tmpPath = f.copy("typescript");
-
-  await install(tmpPath);
+  let tmpPath = await testdir(typescriptFixture);
 
   await dev(tmpPath);
 

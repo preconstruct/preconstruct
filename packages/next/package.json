@@ -1,10 +1,13 @@
 {
   "name": "@preconstruct/next",
-  "version": "1.0.1",
+  "version": "2.0.0",
   "description": "A Next.js plugin to work with preconstruct repos",
   "files": [
     "index.js"
   ],
   "repository": "https://github.com/preconstruct/preconstruct/tree/master/packages/next",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "resolve": "^1.17.0"
+  }
 }

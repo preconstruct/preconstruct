@@ -1,11 +1,11 @@
 // based on https://github.com/jamiebuilds/std-pkg but reading fewer things, adding setters and reading the file
+import globby from "globby";
 import * as fs from "fs-extra";
 import nodePath from "path";
 import { Item } from "./item";
 import { FatalError } from "./errors";
 import { Entrypoint } from "./entrypoint";
 import jsonParse from "parse-json";
-import fastGlob from "fast-glob";
 
 import { errors, confirms } from "./messages";
 import { Project } from "./project";
@@ -13,10 +13,94 @@ import { getUselessGlobsThatArentReallyGlobs } from "./glob-thing";
 import detectIndent from "detect-indent";
 import {
   validFields,
-  validFieldsFromPkgName,
+  validFieldsFromPkg,
   setFieldInOrder,
   JSONValue,
+  getEntrypointName,
 } from "./utils";
+
+function getFieldsUsedInEntrypoints(
+  descriptors: { contents: string | undefined; filename: string }[]
+) {
+  const fields = new Set<keyof typeof validFields>(["main"]);
+  for (let descriptor of descriptors) {
+    if (descriptor.contents !== undefined) {
+      let parsed = jsonParse(descriptor.contents, descriptor.filename);
+      for (let field of ["module", "umd:main", "browser"] as const) {
+        if (parsed[field] !== undefined) {
+          fields.add(field);
+        }
+      }
+    }
+  }
+  return fields;
+}
+
+function getPlainEntrypointContent(
+  pkg: Package,
+  fields: Set<keyof typeof validFields>,
+  entrypointDir: string,
+  indent: string
+) {
+  const obj: Partial<Record<
+    keyof typeof validFields,
+    string | Record<string, string>
+  >> = {};
+  for (const field of fields) {
+    if (field === "browser") {
+      obj[field] = validFieldsFromPkg[field](
+        pkg,
+        fields.has("module"),
+        getEntrypointName(pkg, entrypointDir)
+      );
+    } else {
+      obj[field] = validFieldsFromPkg[field](
+        pkg,
+        getEntrypointName(pkg, entrypointDir)
+      );
+    }
+  }
+  return JSON.stringify(obj, null, indent) + "\n";
+}
+
+function createEntrypoints(
+  pkg: Package,
+  descriptors: {
+    filename: string;
+    contents: string | undefined;
+    hasAccepted: boolean;
+  }[]
+) {
+  let fields = getFieldsUsedInEntrypoints(descriptors);
+  let { indent } = detectIndent(pkg._contents);
+
+  return Promise.all(
+    descriptors.map(async ({ filename, contents, hasAccepted }) => {
+      if (contents === undefined || hasAccepted) {
+        if (!hasAccepted) {
+          const entrypointName = getEntrypointName(
+            pkg,
+            nodePath.dirname(filename)
+          );
+          let shouldCreateEntrypointPkgJson = await confirms.createEntrypointPkgJson(
+            { name: entrypointName }
+          );
+          if (!shouldCreateEntrypointPkgJson) {
+            throw new FatalError(errors.noEntrypointPkgJson, entrypointName);
+          }
+        }
+        contents = getPlainEntrypointContent(
+          pkg,
+          fields,
+          nodePath.dirname(filename),
+          indent
+        );
+        await fs.outputFile(filename, contents);
+      }
+      return new Entrypoint(filename, contents, pkg);
+    })
+  );
+}
 
 export class Package extends Item<{
   name?: JSONValue;
@@ -53,10 +137,11 @@ export class Package extends Item<{
     let pkg = new Package(filePath, contents);
     pkg.project = project;
     if (project.experimentalFlags.newEntrypoints) {
-      let entrypoints = await fastGlob(pkg.configEntrypoints, {
+      let entrypoints = await globby(pkg.configEntrypoints, {
         cwd: nodePath.join(pkg.directory, "src"),
         onlyFiles: true,
         absolute: true,
+        expandDirectories: false,
       });
       pkg.entrypoints = await Promise.all(
         entrypoints.map(async (sourceFile) => {
@@ -82,79 +167,17 @@ export class Package extends Item<{
             }
           }
 
-          return { filename, directory, contents, hasAccepted: false };
+          return { filename, contents, hasAccepted: false };
         })
       ).then(async (descriptors) => {
-        let getPlainEntrypointContent = () => {
-          let plainEntrypointObj: {
-            [key: string]: string | Record<string, string>;
-          } = {
-            main: validFieldsFromPkgName.main(pkg.name),
-          };
-          for (let descriptor of descriptors) {
-            if (descriptor.contents !== undefined) {
-              let parsed = jsonParse(descriptor.contents, descriptor.filename);
-              for (let field of ["module", "umd:main"] as const) {
-                if (parsed[field] !== undefined) {
-                  plainEntrypointObj[field] = validFieldsFromPkgName[field](
-                    pkg.name
-                  );
-                }
-              }
-              if (parsed.browser !== undefined) {
-                plainEntrypointObj.browser = validFieldsFromPkgName.browser(
-                  pkg.name,
-                  plainEntrypointObj.module !== undefined
-                );
-              }
-            }
-          }
-          let plainEntrypointContents =
-            JSON.stringify(
-              plainEntrypointObj,
-              null,
-              detectIndent(contents).indent || "  "
-            ) + "\n";
-          getPlainEntrypointContent = () => plainEntrypointContents;
-          return plainEntrypointContents;
-        };
-
-        return Promise.all(
-          descriptors.map(
-            async ({ filename, directory, contents, hasAccepted }) => {
-              if (contents === undefined || hasAccepted) {
-                if (!hasAccepted) {
-                  let shouldCreateEntrypointPkgJson = await confirms.createEntrypointPkgJson(
-                    {
-                      name: nodePath.join(
-                        pkg.name,
-                        nodePath.relative(pkg.directory, directory)
-                      ),
-                    }
-                  );
-                  if (!shouldCreateEntrypointPkgJson) {
-                    throw new FatalError(
-                      errors.noEntrypointPkgJson,
-                      nodePath.join(
-                        pkg.name,
-                        nodePath.relative(pkg.directory, directory)
-                      )
-                    );
-                  }
-                }
-                contents = getPlainEntrypointContent();
-                await fs.outputFile(filename, contents);
-              }
-              return new Entrypoint(filename, contents, pkg);
-            }
-          )
-        );
+        return createEntrypoints(pkg, descriptors);
       });
     } else {
-      let entrypointDirectories = await fastGlob(pkg.configEntrypoints, {
+      let entrypointDirectories = await globby(pkg.configEntrypoints, {
         cwd: pkg.directory,
         onlyDirectories: true,
         absolute: true,
+        expandDirectories: false,
       });
       pkg.entrypoints = await Promise.all(
         entrypointDirectories.map(async (directory) => {
@@ -173,40 +196,6 @@ export class Package extends Item<{
           return { filename, contents, hasAccepted: false };
         })
       ).then(async (descriptors) => {
-        let getPlainEntrypointContent = () => {
-          let plainEntrypointObj: {
-            [key: string]: string | Record<string, string>;
-          } = {
-            main: validFieldsFromPkgName.main(pkg.name),
-          };
-          for (let descriptor of descriptors) {
-            if (descriptor.contents !== undefined) {
-              let parsed = jsonParse(descriptor.contents, descriptor.filename);
-              for (let field of ["module", "umd:main"] as const) {
-                if (parsed[field] !== undefined) {
-                  plainEntrypointObj[field] = validFieldsFromPkgName[field](
-                    pkg.name
-                  );
-                }
-              }
-              if (parsed.browser !== undefined) {
-                plainEntrypointObj.browser = validFieldsFromPkgName.browser(
-                  pkg.name,
-                  plainEntrypointObj.module !== undefined
-                );
-              }
-            }
-          }
-          let plainEntrypointContents =
-            JSON.stringify(
-              plainEntrypointObj,
-              null,
-              detectIndent(contents).indent || "  "
-            ) + "\n";
-          getPlainEntrypointContent = () => plainEntrypointContents;
-          return plainEntrypointContents;
-        };
-
         let globErrors = await getUselessGlobsThatArentReallyGlobs(
           pkg.configEntrypoints,
           pkg.directory
@@ -246,34 +235,7 @@ export class Package extends Item<{
           await pkg.save();
         }
 
-        return Promise.all(
-          descriptors.map(async ({ filename, contents, hasAccepted }) => {
-            if (contents === undefined || hasAccepted) {
-              if (!hasAccepted) {
-                let shouldCreateEntrypointPkgJson = await confirms.createEntrypointPkgJson(
-                  {
-                    name: nodePath.join(
-                      pkg.name,
-                      nodePath.relative(pkg.directory, directory)
-                    ),
-                  }
-                );
-                if (!shouldCreateEntrypointPkgJson) {
-                  throw new FatalError(
-                    errors.noEntrypointPkgJson,
-                    nodePath.join(
-                      pkg.name,
-                      nodePath.relative(pkg.directory, directory)
-                    )
-                  );
-                }
-              }
-              contents = getPlainEntrypointContent();
-              await fs.writeFile(filename, contents);
-            }
-            return new Entrypoint(filename, contents, pkg);
-          })
-        );
+        return createEntrypoints(pkg, descriptors);
       });
     }
 

@@ -1,5 +1,4 @@
 import build from "../";
-import fixturez from "fixturez";
 import {
   snapshotDirectory,
   install,
@@ -9,10 +8,9 @@ import {
   basicPkgJson,
   ts,
   repoNodeModules,
+  typescriptFixture,
 } from "../../../test-utils";
 import { doPromptInput } from "../../prompt";
-
-const f = fixturez(__dirname);
 
 jest.mock("../../prompt");
 
@@ -50,7 +48,7 @@ test("browser", async () => {
 
   await build(dir);
   expect(await getDist(dir)).toMatchInlineSnapshot(`
-    dist/browser.browser.cjs.js -------------
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/browser.browser.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     Object.defineProperty(exports, '__esModule', { value: true });
@@ -69,7 +67,7 @@ test("browser", async () => {
 
     exports.default = thing$1;
 
-    dist/browser.browser.esm.js -------------
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/browser.browser.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     let thing = "wow";
 
     {
@@ -84,7 +82,7 @@ test("browser", async () => {
 
     export default thing$1;
 
-    dist/browser.cjs.dev.js -------------
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/browser.cjs.dev.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     Object.defineProperty(exports, '__esModule', { value: true });
@@ -103,7 +101,7 @@ test("browser", async () => {
 
     exports.default = thing$1;
 
-    dist/browser.cjs.js -------------
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/browser.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     if (process.env.NODE_ENV === "production") {
@@ -112,7 +110,7 @@ test("browser", async () => {
       module.exports = require("./browser.cjs.dev.js");
     }
 
-    dist/browser.cjs.prod.js -------------
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/browser.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     "use strict";
 
     Object.defineProperty(exports, "__esModule", {
@@ -127,7 +125,7 @@ test("browser", async () => {
 
     exports.default = thing$1;
 
-    dist/browser.esm.js -------------
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/browser.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     let thing = "wow";
 
     if (typeof window !== "undefined") {
@@ -177,12 +175,119 @@ test("browser no module", async () => {
 });
 
 test("typescript", async () => {
-  let tmpPath = f.copy("typescript");
+  let dir = await testdir(typescriptFixture);
 
-  await install(tmpPath);
-  await build(tmpPath);
+  await build(dir);
 
-  await snapshotDirectory(tmpPath, { files: "all" });
+  expect(await getDist(dir)).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/another-thing.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export declare type SomeType = string;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/index.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    import { SomeType } from "./another-thing";
+    export * from "./one-more-thing";
+    import * as path from "path";
+    export { path };
+    declare let thing: SomeType;
+    export default thing;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/one-more-thing.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    declare var obj: object;
+
+    export { obj };
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export * from "./declarations/src/index";
+    export { default } from "./declarations/src/index";
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.cjs.dev.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    var path = require('path');
+
+    function _interopNamespace(e) {
+    	if (e && e.__esModule) return e;
+    	var n = Object.create(null);
+    	if (e) {
+    		Object.keys(e).forEach(function (k) {
+    			if (k !== 'default') {
+    				var d = Object.getOwnPropertyDescriptor(e, k);
+    				Object.defineProperty(n, k, d.get ? d : {
+    					enumerable: true,
+    					get: function () {
+    						return e[k];
+    					}
+    				});
+    			}
+    		});
+    	}
+    	n['default'] = e;
+    	return Object.freeze(n);
+    }
+
+    var path__namespace = /*#__PURE__*/_interopNamespace(path);
+
+    let obj = {};
+
+    let thing = "something";
+
+    exports.path = path__namespace;
+    exports.default = thing;
+    exports.obj = obj;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./typescript.cjs.prod.js");
+    } else {
+      module.exports = require("./typescript.cjs.dev.js");
+    }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    "use strict";
+
+    Object.defineProperty(exports, "__esModule", {
+      value: !0
+    });
+
+    var path = require("path");
+
+    function _interopNamespace(e) {
+      if (e && e.__esModule) return e;
+      var n = Object.create(null);
+      return e && Object.keys(e).forEach((function(k) {
+        if ("default" !== k) {
+          var d = Object.getOwnPropertyDescriptor(e, k);
+          Object.defineProperty(n, k, d.get ? d : {
+            enumerable: !0,
+            get: function() {
+              return e[k];
+            }
+          });
+        }
+      })), n.default = e, Object.freeze(n);
+    }
+
+    var path__namespace = _interopNamespace(path);
+
+    let obj = {}, thing = "something";
+
+    exports.path = path__namespace, exports.default = thing, exports.obj = obj;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    import * as path from 'path';
+    export { path };
+
+    let obj = {};
+
+    let thing = "something";
+
+    export default thing;
+    export { obj };
+
+  `);
 });
 
 test("typescript with forced dts emit", async () => {
@@ -546,7 +651,7 @@ test("builds package using eval", async () => {
   await build(dir);
 
   expect(await getDist(dir)).toMatchInlineSnapshot(`
-    dist/pkg.cjs.dev.js -------------
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.dev.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     Object.defineProperty(exports, '__esModule', { value: true });
@@ -557,7 +662,7 @@ test("builds package using eval", async () => {
 
     exports.default = compute;
 
-    dist/pkg.cjs.js -------------
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     if (process.env.NODE_ENV === "production") {
@@ -566,7 +671,7 @@ test("builds package using eval", async () => {
       module.exports = require("./pkg.cjs.dev.js");
     }
 
-    dist/pkg.cjs.prod.js -------------
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     "use strict";
 
     function compute(arg) {

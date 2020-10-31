@@ -70,6 +70,78 @@ test("set main and module field", async () => {
   `);
 });
 
+test("new dist filenames", async () => {
+  let tmpPath = f.copy("basic-package");
+
+  await modifyPkg(tmpPath, (json) => {
+    json.name = "@scope/something";
+    json.preconstruct = {
+      ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+        newDistFilenames: true,
+      },
+    };
+    json.main = "bad.js";
+    json.module = "bad.js";
+  });
+
+  await fix(tmpPath);
+
+  let pkg = await getPkg(tmpPath);
+
+  expect(pkg).toMatchInlineSnapshot(`
+    Object {
+      "license": "MIT",
+      "main": "dist/scope-something.cjs.js",
+      "module": "dist/scope-something.esm.js",
+      "name": "@scope/something",
+      "preconstruct": Object {
+        "___experimentalFlags_WILL_CHANGE_IN_PATCH": Object {
+          "newDistFilenames": true,
+        },
+      },
+      "private": true,
+      "version": "1.0.0",
+    }
+  `);
+});
+
+test("new dist filenames only-unscoped-package-name strategy", async () => {
+  let tmpPath = f.copy("basic-package");
+
+  await modifyPkg(tmpPath, (json) => {
+    json.name = "@scope/something";
+    json.preconstruct = {
+      ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+        newDistFilenames: true,
+      },
+      distFilenameStrategy: "only-unscoped-package-name",
+    };
+    json.main = "bad.js";
+    json.module = "bad.js";
+  });
+
+  await fix(tmpPath);
+
+  let pkg = await getPkg(tmpPath);
+
+  expect(pkg).toMatchInlineSnapshot(`
+    Object {
+      "license": "MIT",
+      "main": "dist/something.cjs.js",
+      "module": "dist/something.esm.js",
+      "name": "@scope/something",
+      "preconstruct": Object {
+        "___experimentalFlags_WILL_CHANGE_IN_PATCH": Object {
+          "newDistFilenames": true,
+        },
+        "distFilenameStrategy": "only-unscoped-package-name",
+      },
+      "private": true,
+      "version": "1.0.0",
+    }
+  `);
+});
+
 test("monorepo", async () => {
   let tmpPath = f.copy("monorepo");
 

@@ -5,6 +5,7 @@ import { EXTENSIONS } from "./constants";
 import { Package } from "./package";
 import { FatalError } from "./errors";
 import { JSONValue } from "./utils";
+import normalizePath from "normalize-path";
 
 export class Entrypoint extends Item<{
   main?: JSONValue;
@@ -23,9 +24,11 @@ export class Entrypoint extends Item<{
   }
 
   get name(): string {
-    return nodePath.join(
-      this.package.name,
-      nodePath.relative(this.package.directory, this.directory)
+    return normalizePath(
+      nodePath.join(
+        this.package.name,
+        nodePath.relative(this.package.directory, this.directory)
+      )
     );
   }
 

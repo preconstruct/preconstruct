@@ -1,6 +1,6 @@
 import nodePath from "path";
 import { promptInput } from "./prompt";
-import fastGlob from "fast-glob";
+import globby from "globby";
 import * as fs from "fs-extra";
 import { Item } from "./item";
 import { Package } from "./package";
@@ -24,11 +24,14 @@ export class Project extends Item<{
   preconstruct: {
     globals?: Record<string, string>;
     packages?: JSONValue;
+    distFilenameStrategy?: JSONValue;
     ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
       newEntrypoints?: JSONValue;
       useSourceInsteadOfGeneratingTSDeclarations?: JSONValue;
       useTSMorphToGenerateTSDeclarations?: JSONValue;
       logCompiledFiles?: JSONValue;
+      newDistFilenames?: JSONValue;
+      newProcessEnvNodeEnvReplacementStrategyAndSkipTerserOnCJSProdBuild?: JSONValue;
     };
   };
 }> {
@@ -36,10 +39,12 @@ export class Project extends Item<{
     let config =
       this.json.preconstruct.___experimentalFlags_WILL_CHANGE_IN_PATCH || {};
     return {
+      newDistFilenames: !!config.newDistFilenames,
       newEntrypoints: !!config.newEntrypoints,
       useSourceInsteadOfGeneratingTSDeclarations: !!config.useSourceInsteadOfGeneratingTSDeclarations,
       useTSMorphToGenerateTSDeclarations: !!config.useTSMorphToGenerateTSDeclarations,
       logCompiledFiles: !!config.logCompiledFiles,
+      newProcessEnvNodeEnvReplacementStrategyAndSkipTerserOnCJSProdBuild: !!config.newProcessEnvNodeEnvReplacementStrategyAndSkipTerserOnCJSProdBuild,
     };
   }
   get configPackages(): Array<string> {
@@ -101,10 +106,11 @@ export class Project extends Item<{
       await this.save();
     }
 
-    let filenames = await fastGlob(this.configPackages, {
+    let filenames = await globby(this.configPackages, {
       cwd: this.directory,
       onlyDirectories: true,
       absolute: true,
+      expandDirectories: false,
     });
 
     let packages: Package[] = [];
