@@ -41,10 +41,10 @@ export class Project extends Item<{
     return {
       newDistFilenames: !!config.newDistFilenames,
       newEntrypoints: !!config.newEntrypoints,
-      useSourceInsteadOfGeneratingTSDeclarations: !!config.useSourceInsteadOfGeneratingTSDeclarations,
+      useSourceInsteadOfGeneratingTSDeclarations: true,
       useTSMorphToGenerateTSDeclarations: !!config.useTSMorphToGenerateTSDeclarations,
       logCompiledFiles: !!config.logCompiledFiles,
-      newProcessEnvNodeEnvReplacementStrategyAndSkipTerserOnCJSProdBuild: !!config.newProcessEnvNodeEnvReplacementStrategyAndSkipTerserOnCJSProdBuild,
+      newProcessEnvNodeEnvReplacementStrategyAndSkipTerserOnCJSProdBuild: true,
     };
   }
   get configPackages(): Array<string> {

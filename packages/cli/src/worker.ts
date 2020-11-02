@@ -6,6 +6,7 @@ import { hashString, resolveOptions } from "./babel-stuff";
 import resolveFrom from "resolve-from";
 import * as fs from "fs-extra";
 import path from "path";
+import { GeneratorResult } from "@babel/generator";
 
 function importHelperPlugin(babel: typeof import("@babel/core")) {
   return {
@@ -49,18 +50,23 @@ export async function transformBabel(
   cwd: string,
   filename: string
 ) {
-  const { generatorCacheKey,parseCacheKey, options } = resolveOptions({
+  const { generatorCacheKey, parseCacheKey, options } = resolveOptions({
     caller: {
       name: "rollup-plugin-babel",
       supportsStaticESM: true,
       supportsDynamicImport: true,
     },
     sourceMaps: true,
+    // @ts-ignore
+    inputSourceMap: false,
     cwd,
     filename,
     plugins: [importHelperPlugin],
   })!;
-  let cachedAST;
+  let cachedAST: {
+    parse?: { ast: babel.types.File; cacheKey: string };
+    generator?: { result: GeneratorResult; cacheKey: string };
+  } = {};
   const cacheFilename = path.join(
     cwd,
     "node_modules",
@@ -76,33 +82,38 @@ export async function transformBabel(
     }
   }
 
-  const finalCacheKey = hashString(parseCacheKey + ":" + code);
-  if (!cachedAST || cachedAST.cacheKey !== finalCacheKey) {
+  const finalParseCacheKey = hashString(parseCacheKey + ":" + code);
+  if (cachedAST.parse?.cacheKey !== finalParseCacheKey) {
     console.log("parse");
-    cachedAST = {
-      parse: {
-        ast: babelParser.parse(code, options.parserOpts),
-        cacheKey: finalCacheKey,
-      },
-      generate: {
-        result: ,
-        cacheKey: finalCacheKey,
-      },
+    cachedAST.parse = {
+      ast: babelParser.parse(code, options.parserOpts),
+      cacheKey: finalParseCacheKey,
     };
-    await fs.outputJSON(cacheFilename, cachedAST);
   }
-
-  const res = babel.transformFromAstSync(cachedAST.ast, code, {
+  debugger;
+  const res = babel.transformFromAstSync(cachedAST.parse.ast, code, {
     ...options,
     // @ts-ignore
     cloneInputAst: false,
     code: false,
     ast: true,
   });
-  const output = babelGenerator.default(res!.ast!, options.generatorOpts);
+  const finalGenerateCacheKey = hashString(
+    generatorCacheKey + ":" + JSON.stringify(res!.ast)
+  );
+
+  if (cachedAST.generator?.cacheKey !== finalGenerateCacheKey) {
+    console.log("generate");
+    cachedAST.generator = {
+      cacheKey: finalGenerateCacheKey,
+      result: babelGenerator.default(res!.ast!, options.generatorOpts, code),
+    };
+  }
+  await fs.outputJSON(cacheFilename, cachedAST);
+
   return {
-    code: output.code,
-    map: output.map,
+    code: cachedAST.generator.result.code,
+    map: cachedAST.generator.result.map,
   };
 }
 

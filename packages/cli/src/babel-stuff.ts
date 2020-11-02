@@ -92,11 +92,8 @@ export function resolveOptions(inputOptions: babel.TransformOptions) {
     options,
     passes: [options.plugins, ...options.presets],
   });
-  debugger;
   // @ts-ignore
   delete normalized.parserOpts.sourceFileName;
-  delete normalized.generatorOpts.filename;
-  delete normalized.generatorOpts.sourceFileName;
 
   const parseCacheKey = hashString(
     JSON.stringify({
