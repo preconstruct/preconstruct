@@ -116,11 +116,11 @@ test("flow", async () => {
 
     "src/index.js": js`
                       // @flow
-                      
+
                       export function doSomething(arg: string): string {
                         return "something" + arg;
                       }
-                      
+
                       export { default as something } from "./a";
                     `,
   });
@@ -144,11 +144,11 @@ test("flow", async () => {
     }),
     "src/index.js": js`
                       // @flow
-                      
+
                       export function doSomething(arg: string): string {
                         return "something" + arg;
                       }
-                      
+
                       export default "wow";
                     `,
   });
@@ -212,7 +212,7 @@ test("umd with dep on other module", async () => {
     },
     "src/index.js": js`
                       import { createElement } from "react";
-                      
+
                       createElement("div", null);
                     `,
   });
@@ -345,7 +345,7 @@ test("monorepo umd with dep on other module", async () => {
 
     "packages/package-one/src/index.js": js`
                                            import { createElement } from "react";
-                                           
+
                                            createElement("div", null);
                                          `,
 
@@ -355,7 +355,7 @@ test("monorepo umd with dep on other module", async () => {
 
     "packages/package-two/src/index.js": js`
                                            import { createElement } from "react";
-                                           
+
                                            createElement("h1", null);
                                          `,
   });
@@ -454,7 +454,7 @@ test("json", async () => {
 
     "src/index.js": js`
                       import changesetsSchema from "./schema.json";
-                      
+
                       export let schema = changesetsSchema;
                     `,
 

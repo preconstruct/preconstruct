@@ -70,7 +70,7 @@ test("typescript thing", async () => {
     ),
     "src/index.ts": ts`
                       import { makeThing } from "./thing";
-                      
+
                       export const thing = makeThing();
                     `,
 
@@ -80,7 +80,7 @@ test("typescript thing", async () => {
 
     "src/thing.tsx": tsx`
                        import { thing } from "./other";
-                       
+
                        export const makeThing = () => thing();
                      `,
 

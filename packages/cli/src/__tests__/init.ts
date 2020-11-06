@@ -103,7 +103,7 @@ test("scoped package", async () => {
 
     "src/index.js": js`
                       // @flow
-                      
+
                       export default "something";
                     `,
   });

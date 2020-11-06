@@ -56,7 +56,7 @@ test("no main field", async () => {
 
     "src/index.js": js`
                       // @flow
-                      
+
                       export default "something";
                     `,
   });
@@ -192,13 +192,13 @@ test("one-entrypoint-with-browser-field-one-without", async () => {
 
     "src/multiply.js": js`
                          import { identity } from "./identity";
-                         
+
                          export let multiply = (a, b) => identity(a * b);
                        `,
 
     "src/sum.js": js`
                     import { identity } from "./identity";
-                    
+
                     export let sum = (a, b) => identity(a + b);
                   `,
   });
@@ -338,7 +338,7 @@ test("monorepo umd with dep on other module incorrect peerDeps", async () => {
 
     "packages/package-one/src/index.js": js`
                                            import { createElement } from "react";
-                                           
+
                                            createElement("div", null);
                                          `,
 
@@ -348,7 +348,7 @@ test("monorepo umd with dep on other module incorrect peerDeps", async () => {
 
     "packages/package-two/src/index.js": js`
                                            import { createElement } from "react";
-                                           
+
                                            createElement("h1", null);
                                          `,
   });
