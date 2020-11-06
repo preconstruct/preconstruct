@@ -88,7 +88,6 @@ export let getRollupConfig = (
         case "CIRCULAR_DEPENDENCY":
         case "EMPTY_BUNDLE":
         case "EVAL":
-        case "THIS_IS_UNDEFINED":
         case "UNUSED_EXTERNAL_IMPORT": {
           break;
         }
@@ -105,6 +104,21 @@ export let getRollupConfig = (
             );
             return;
           }
+        }
+        case "THIS_IS_UNDEFINED": {
+          if (type === "umd") {
+            return;
+          }
+          warnings.push(
+            new FatalError(
+              `"${path.relative(
+                pkg.directory,
+                warning.loc!.file!
+              )}" used \`this\` keyword at the top level of an ES module. You can read more about this at ${warning.url!} and fix this issue that has happened here:\n\n${warning.frame!}\n`,
+              pkg.name
+            )
+          );
+          return;
         }
         default: {
           warnings.push(

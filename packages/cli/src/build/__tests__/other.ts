@@ -785,3 +785,26 @@ test("builds umd with a dependency containing top-level this in ESM", async () =
     {"version":3,"file":"pkg.umd.min.js","sources":["../node_modules/with-top-level-this-in-esm/index.js"],"sourcesContent":["// output transpiled by TS with inlined tslib helper\\nvar __assign =\\n  (this && this.__assign) ||\\n  function () {\\n    __assign =\\n      Object.assign ||\\n      function (t) {\\n        for (var s, i = 1, n = arguments.length; i < n; i++) {\\n          s = arguments[i];\\n          for (var p in s)\\n            if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];\\n        }\\n        return t;\\n      };\\n    return __assign.apply(this, arguments);\\n  };\\nvar foo = { bar: 42 };\\nexport default __assign({}, foo);"],"names":["__assign","Object","assign","t","s","i","n","arguments","length","p","prototype","hasOwnProperty","call","apply","this","bar"],"mappings":"oOACA,IAAIA,EAEF,WAWE,OAVAA,EACEC,OAAOC,QACP,SAAUC,GACR,IAAK,IAAIC,EAAGC,EAAI,EAAGC,EAAIC,UAAUC,OAAQH,EAAIC,EAAGD,IAE9C,IAAK,IAAII,KADTL,EAAIG,UAAUF,GAERJ,OAAOS,UAAUC,eAAeC,KAAKR,EAAGK,KAAIN,EAAEM,GAAKL,EAAEK,IAE7D,OAAON,IAEKU,MAAMC,KAAMP,mBAGjBP,EAAS,GADd,CAAEe,IAAK"}
   `);
 });
+
+test("fails for source files containing top-level this", async () => {
+  let dir = await testdir({
+    "package.json": basicPkgJson(),
+    "src/index.js": js`
+                      export default this;
+                    `,
+  });
+
+  try {
+    await build(dir);
+  } catch (err) {
+    expect(err.message).toMatchInlineSnapshot(`
+      "🎁  pkg \\"src/index.js\\" used \`this\` keyword at the top level of an ES module. You can read more about this at https://rollupjs.org/guide/en/#error-this-is-undefined and fix this issue that has happened here:
+      🎁  pkg 
+      🎁  pkg 1: export default this;
+      🎁  pkg                   ^
+      🎁  pkg "
+    `);
+    return;
+  }
+  expect(true).toBe(false);
+});
