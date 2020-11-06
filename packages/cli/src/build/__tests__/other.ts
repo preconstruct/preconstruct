@@ -802,7 +802,7 @@ test("fails for source files containing top-level this", async () => {
       🎁  pkg
       🎁  pkg 1: export default this;
       🎁  pkg                   ^
-      🎁  pkg "
+      🎁  pkg"
     `);
     return;
   }
