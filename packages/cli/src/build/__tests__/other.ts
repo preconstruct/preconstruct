@@ -33,15 +33,15 @@ test("browser", async () => {
     }),
     "src/index.js": js`
                       let thing = "wow";
-                      
+
                       if (typeof window !== "undefined") {
                         thing = "something";
                       }
-                      
+
                       if (typeof document !== undefined) {
                         thing += "other";
                       }
-                      
+
                       export default thing;
                     `,
   });
@@ -157,15 +157,15 @@ test("browser no module", async () => {
 
     "src/index.js": js`
                       let thing = "wow";
-                      
+
                       if (typeof window !== "undefined") {
                         thing = "something";
                       }
-                      
+
                       if (typeof document !== undefined) {
                         thing += "other";
                       }
-                      
+
                       export default thing;
                     `,
   });
@@ -388,9 +388,9 @@ test("typescript with forced dts emit", async () => {
                              import { configureStore, Action } from "@reduxjs/toolkit";
                              import { ThunkAction } from "redux-thunk";
                              import { rootReducer, RootState } from "./root-reducer";
-                             
+
                              export type AppThunk = ThunkAction<void, RootState, unknown, Action<string>>;
-                             
+
                              export function createStore() {
                                return configureStore<RootState>({
                                  reducer: rootReducer,
@@ -407,11 +407,11 @@ test("typescript with forced dts emit", async () => {
     "src/root-reducer.ts": ts`
                              // @ts-ignore (installed during test)
                              import { combineReducers } from "@reduxjs/toolkit";
-                             
+
                              export const rootReducer = combineReducers({
                                /* blah blah blah */
                              });
-                             
+
                              export type RootState = ReturnType<typeof rootReducer>;
                            `,
   });
@@ -437,7 +437,7 @@ test("package resolvable but not in deps", async () => {
 
     "src/index.js": js`
                       import React from "react";
-                      
+
                       export default React.createContext("something");
                     `,
   });
@@ -682,5 +682,106 @@ test("builds package using eval", async () => {
       value: !0
     }), exports.default = compute;
 
+  `);
+});
+
+test("builds umd with a dependency containing top-level this in ESM", async () => {
+  let dir = await testdir({
+    "package.json": basicPkgJson({
+      umdName: "pkg",
+      dependencies: {
+        "with-top-level-this-in-esm": "*",
+      },
+    }),
+    "src/index.js": js`
+                      export { default } from "with-top-level-this-in-esm";
+                    `,
+    "node_modules/with-top-level-this-in-esm/package.json": JSON.stringify({
+      name: "with-top-level-this-in-esm",
+    }),
+    "node_modules/with-top-level-this-in-esm/index.js": js`
+                                                          // output transpiled by TS with inlined tslib helper
+                                                          var __assign =
+                                                            (this && this.__assign) ||
+                                                            function () {
+                                                              __assign =
+                                                                Object.assign ||
+                                                                function (t) {
+                                                                  for (var s, i = 1, n = arguments.length; i < n; i++) {
+                                                                    s = arguments[i];
+                                                                    for (var p in s)
+                                                                      if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
+                                                                  }
+                                                                  return t;
+                                                                };
+                                                              return __assign.apply(this, arguments);
+                                                            };
+                                                          var foo = { bar: 42 };
+                                                          export default __assign({}, foo);
+                                                        `,
+  });
+
+  await build(dir);
+
+  expect(await getDist(dir)).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.dev.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    var withTopLevelThisInEsm = require('with-top-level-this-in-esm');
+
+    function _interopDefault (e) { return e && e.__esModule ? e : { 'default': e }; }
+
+    var withTopLevelThisInEsm__default = /*#__PURE__*/_interopDefault(withTopLevelThisInEsm);
+
+
+
+    Object.defineProperty(exports, 'default', {
+    	enumerable: true,
+    	get: function () {
+    		return withTopLevelThisInEsm__default['default'];
+    	}
+    });
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./pkg.cjs.prod.js");
+    } else {
+      module.exports = require("./pkg.cjs.dev.js");
+    }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    "use strict";
+
+    Object.defineProperty(exports, "__esModule", {
+      value: !0
+    });
+
+    var withTopLevelThisInEsm = require("with-top-level-this-in-esm");
+
+    function _interopDefault(e) {
+      return e && e.__esModule ? e : {
+        default: e
+      };
+    }
+
+    var withTopLevelThisInEsm__default = _interopDefault(withTopLevelThisInEsm);
+
+    Object.defineProperty(exports, "default", {
+      enumerable: !0,
+      get: function() {
+        return withTopLevelThisInEsm__default.default;
+      }
+    });
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.umd.min.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    !function(e,t){"object"==typeof exports&&"undefined"!=typeof module?module.exports=t():"function"==typeof define&&define.amd?define(t):(e="undefined"!=typeof globalThis?globalThis:e||self).pkg=t()}(this,(function(){"use strict";var e=function(){return(e=Object.assign||function(e){for(var t,n=1,o=arguments.length;n<o;n++)for(var r in t=arguments[n])Object.prototype.hasOwnProperty.call(t,r)&&(e[r]=t[r]);return e}).apply(this,arguments)};return e({},{bar:42})}));
+    //# sourceMappingURL=pkg.umd.min.js.map
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.umd.min.js.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {"version":3,"file":"pkg.umd.min.js","sources":["../node_modules/with-top-level-this-in-esm/index.js"],"sourcesContent":["// output transpiled by TS with inlined tslib helper\\nvar __assign =\\n  (this && this.__assign) ||\\n  function () {\\n    __assign =\\n      Object.assign ||\\n      function (t) {\\n        for (var s, i = 1, n = arguments.length; i < n; i++) {\\n          s = arguments[i];\\n          for (var p in s)\\n            if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];\\n        }\\n        return t;\\n      };\\n    return __assign.apply(this, arguments);\\n  };\\nvar foo = { bar: 42 };\\nexport default __assign({}, foo);"],"names":["__assign","Object","assign","t","s","i","n","arguments","length","p","prototype","hasOwnProperty","call","apply","this","bar"],"mappings":"oOACA,IAAIA,EAEF,WAWE,OAVAA,EACEC,OAAOC,QACP,SAAUC,GACR,IAAK,IAAIC,EAAGC,EAAI,EAAGC,EAAIC,UAAUC,OAAQH,EAAIC,EAAGD,IAE9C,IAAK,IAAII,KADTL,EAAIG,UAAUF,GAERJ,OAAOS,UAAUC,eAAeC,KAAKR,EAAGK,KAAIN,EAAEM,GAAKL,EAAEK,IAE7D,OAAON,IAEKU,MAAMC,KAAMP,mBAGjBP,EAAS,GADd,CAAEe,IAAK"}
   `);
 });

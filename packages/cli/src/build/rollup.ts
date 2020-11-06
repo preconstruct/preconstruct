@@ -85,9 +85,10 @@ export let getRollupConfig = (
         return;
       }
       switch (warning.code) {
+        case "CIRCULAR_DEPENDENCY":
         case "EMPTY_BUNDLE":
         case "EVAL":
-        case "CIRCULAR_DEPENDENCY":
+        case "THIS_IS_UNDEFINED":
         case "UNUSED_EXTERNAL_IMPORT": {
           break;
         }
