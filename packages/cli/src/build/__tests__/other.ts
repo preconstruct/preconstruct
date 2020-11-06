@@ -799,7 +799,7 @@ test("fails for source files containing top-level this", async () => {
   } catch (err) {
     expect(err.message).toMatchInlineSnapshot(`
       "🎁  pkg \\"src/index.js\\" used \`this\` keyword at the top level of an ES module. You can read more about this at https://rollupjs.org/guide/en/#error-this-is-undefined and fix this issue that has happened here:
-      🎁  pkg 
+      🎁  pkg
       🎁  pkg 1: export default this;
       🎁  pkg                   ^
       🎁  pkg "
