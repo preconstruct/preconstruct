@@ -15,6 +15,27 @@ const tags = {
   tsx: true,
 };
 
+const compareLines = (actual: string, expected: string): boolean => {
+  const actualLines = actual.split("\n");
+  const expectedLines = expected.split("\n");
+
+  if (actualLines.length !== expectedLines.length) {
+    return false;
+  }
+
+  for (let i = 0; i <= actualLines.length; i++) {
+    if (actualLines[i] === expectedLines[i]) {
+      continue;
+    }
+    if (/\S/.test(actualLines[i]) || /\S/.test(expectedLines[i])) {
+      return false;
+    }
+    // both contain just whitespaces, ignore a mismatch and continue
+  }
+
+  return true;
+};
+
 export const rules = {
   format: createRule<[], MessageId>({
     name: "format",
@@ -60,7 +81,7 @@ export const rules = {
                 .join("\n"); //+
             //   "\n" +
             //   "".padEnd(node.tag.loc.start.column);
-            if (formatted !== str) {
+            if (!compareLines(str, formatted)) {
               context.report({
                 messageId: "unformatted",
                 node: node.tag,
