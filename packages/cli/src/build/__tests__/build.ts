@@ -10,6 +10,8 @@ import {
   js,
   getDist,
   repoNodeModules,
+  basicPkgJson,
+  getFiles,
 } from "../../../test-utils";
 import { doPromptInput as _doPromptInput } from "../../prompt";
 import { confirms as _confirms } from "../../messages";
@@ -530,5 +532,47 @@ test("json", async () => {
 
     export { schema };
 
+  `);
+});
+
+test("respect browser alias field in dependencies when bundling UMD", async () => {
+  let dir = await testdir({
+    "package.json": basicPkgJson({
+      umdName: "importingPkgWithBrowserAliasField",
+      dependencies: {
+        "with-browser-alias-field": "*",
+      },
+    }),
+    "src/index.js": js`
+                      import target from "with-browser-alias-field";
+
+                      export default "And the target is: " + target;
+                    `,
+    "node_modules/with-browser-alias-field/package.json": JSON.stringify({
+      name: "with-browser-alias-field",
+      browser: {
+        "./lib/file.js": "./lib/browser-file.js",
+      },
+    }),
+    "node_modules/with-browser-alias-field/index.js": js`
+                                                        export { default } from "./lib/file";
+                                                      `,
+    "node_modules/with-browser-alias-field/lib/file.js": js`
+                                                           export default "node";
+                                                         `,
+    "node_modules/with-browser-alias-field/lib/browser-file.js": js`
+                                                                   export default "browser";
+                                                                 `,
+  });
+
+  await build(dir);
+
+  expect(await getFiles(dir, ["dist/*umd*"])).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.umd.min.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    !function(e,t){"object"==typeof exports&&"undefined"!=typeof module?module.exports=t():"function"==typeof define&&define.amd?define(t):(e="undefined"!=typeof globalThis?globalThis:e||self).importingPkgWithBrowserAliasField=t()}(this,(function(){"use strict";return"And the target is: browser"}));
+    //# sourceMappingURL=pkg.umd.min.js.map
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.umd.min.js.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {"version":3,"file":"pkg.umd.min.js","sources":["../src/index.js"],"sourcesContent":["import target from \\"with-browser-alias-field\\";\\n\\nexport default \\"And the target is: \\" + target;"],"names":[],"mappings":"wQAEe"}
   `);
 });

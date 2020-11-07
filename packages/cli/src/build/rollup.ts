@@ -166,6 +166,7 @@ export let getRollupConfig = (
         }),
       resolve({
         extensions: EXTENSIONS,
+        browser: type === "umd",
         customResolveOptions: {
           moduleDirectory: type === "umd" ? "node_modules" : [],
         },
