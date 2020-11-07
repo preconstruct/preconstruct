@@ -39,14 +39,14 @@ test("dev command works in node", async () => {
 
     "packages/package-one/src/index.js": js`
                                            import { message } from "@my-cool-scope/package-two";
-                                           
+
                                            console.log("message from package one");
                                            console.log(message);
                                          `,
 
     "packages/package-two/src/index.js": js`
                                            console.log("message from package two");
-                                           
+
                                            export let message = "message from package two but logged by package one";
                                          `,
   });
@@ -178,9 +178,9 @@ test("source maps work", async () => {
     }),
     "src/index.js": js`
                       class Bar {}
-                      
+
                       export class Foo extends Bar {}
-                      
+
                       throw new Error("i'm thrown on line 5");
                     `,
   });
@@ -235,21 +235,21 @@ test("flow", async () => {
 
     "src/index.js": js`
                       // @flow
-                      
+
                       export let something = true;
                     `,
 
     "a/src/index.js": js`
                         // @flow
-                        
+
                         export default "something";
                       `,
 
     "b/src/index.js": js`
                         // @flow
-                        
+
                         let something = true;
-                        
+
                         export { something as default };
                       `,
   });
