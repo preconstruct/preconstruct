@@ -131,7 +131,11 @@ export class Package extends Item<{
       this.name
     );
   }
-  static async create(directory: string, project: Project): Promise<Package> {
+  static async create(
+    directory: string,
+    project: Project,
+    isFix: boolean
+  ): Promise<Package> {
     let filePath = nodePath.join(directory, "package.json");
 
     let contents = await fs.readFile(filePath, "utf-8");
@@ -191,7 +195,7 @@ export class Package extends Item<{
             }
           }
 
-          return { filename, contents, sourceFile, hasAccepted: false };
+          return { filename, contents, sourceFile, hasAccepted: isFix };
         })
       ).then(async (descriptors) => {
         return createEntrypoints(pkg, descriptors);

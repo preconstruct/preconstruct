@@ -52,7 +52,7 @@ async function fixEntrypoint(entrypoint: Entrypoint) {
 }
 
 export default async function fix(directory: string) {
-  let { packages } = await Project.create(directory);
+  let { packages } = await Project.create(directory, true);
 
   let didModify = (
     await Promise.all(

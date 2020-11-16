@@ -114,7 +114,7 @@ test("new dist filenames only-unscoped-package-name strategy", async () => {
       ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
         newDistFilenames: true,
       },
-      distFilenameStrategy: "only-unscoped-package-name",
+      distFilenameStrategy: "unscoped-package-name",
     };
     json.main = "bad.js";
     json.module = "bad.js";
@@ -134,7 +134,7 @@ test("new dist filenames only-unscoped-package-name strategy", async () => {
         "___experimentalFlags_WILL_CHANGE_IN_PATCH": Object {
           "newDistFilenames": true,
         },
-        "distFilenameStrategy": "only-unscoped-package-name",
+        "distFilenameStrategy": "unscoped-package-name",
       },
       "private": true,
       "version": "1.0.0",

@@ -80,7 +80,7 @@ export function validateEntrypoint(entrypoint: Entrypoint, log: boolean) {
           )} to use the new dist filenames`
         );
         logger.info(
-          'if you want to keep the dist filename strategy of v1, add `"distFilenameStrategy": "only-unscoped-package-name"` to the Preconstruct config in your root package.json'
+          'if you want to keep the dist filename strategy of v1, add `"distFilenameStrategy": "unscoped-package-name"` to the Preconstruct config in your root package.json'
         );
       }
       fatalErrors.push(
