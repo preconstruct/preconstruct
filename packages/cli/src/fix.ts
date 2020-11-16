@@ -3,7 +3,11 @@ import { Project } from "./project";
 import { promptInput } from "./prompt";
 import * as logger from "./logger";
 import { inputs } from "./messages";
-import { validateEntrypointSource, isUmdNameSpecified } from "./validate";
+import {
+  validateEntrypointSource,
+  isUmdNameSpecified,
+  EXPERIMENTAL_FLAGS,
+} from "./validate";
 import { fixPackage } from "./validate-package";
 
 async function fixEntrypoint(entrypoint: Entrypoint) {
@@ -52,11 +56,35 @@ async function fixEntrypoint(entrypoint: Entrypoint) {
 }
 
 export default async function fix(directory: string) {
-  let { packages } = await Project.create(directory, true);
+  let project = await Project.create(directory, true);
+  let didModifyProject = false;
+  if (project.json.preconstruct.___experimentalFlags_WILL_CHANGE_IN_PATCH) {
+    Object.keys(
+      project.json.preconstruct.___experimentalFlags_WILL_CHANGE_IN_PATCH
+    ).forEach((key) => {
+      if (!EXPERIMENTAL_FLAGS.has(key)) {
+        didModifyProject = true;
+        debugger;
+        delete (project.json.preconstruct
+          .___experimentalFlags_WILL_CHANGE_IN_PATCH as any)[key];
+      }
+    });
+    if (didModifyProject) {
+      if (
+        Object.keys(
+          project.json.preconstruct.___experimentalFlags_WILL_CHANGE_IN_PATCH
+        ).length === 0
+      ) {
+        delete (project.json.preconstruct as any)
+          .___experimentalFlags_WILL_CHANGE_IN_PATCH;
+      }
+      await project.save();
+    }
+  }
 
-  let didModify = (
+  let didModifyPackages = (
     await Promise.all(
-      packages.map(async (pkg) => {
+      project.packages.map(async (pkg) => {
         let didModifyInPkgFix = await fixPackage(pkg);
         let didModifyInEntrypointsFix = (
           await Promise.all(pkg.entrypoints.map(fixEntrypoint))
@@ -66,5 +94,9 @@ export default async function fix(directory: string) {
     )
   ).some((x) => x);
 
-  logger.success(didModify ? "fixed project!" : "project already valid!");
+  logger.success(
+    didModifyProject || didModifyPackages
+      ? "fixed project!"
+      : "project already valid!"
+  );
 }

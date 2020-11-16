@@ -68,8 +68,7 @@
     "normalize-path": "^3.0.0",
     "outdent": "^0.7.1",
     "prettier": "^2.1.2",
-    "typescript": "^4.0.3",
-    "v8-profiler-next": "^1.1.1"
+    "typescript": "^4.0.3"
   },
   "jest": {
     "reporters": [
