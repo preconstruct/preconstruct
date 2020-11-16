@@ -19,7 +19,10 @@ export function format(
     util
       .format("", ...args)
       .split("\n")
-      .join("\n" + fullPrefix + " ")
+      .reduce((str, line) => {
+        const prefixed = `${str}\n${fullPrefix}`;
+        return line ? `${prefixed} ${line}` : prefixed;
+      })
   );
 }
 export function error(message: string, scope?: string) {

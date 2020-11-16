@@ -262,7 +262,7 @@ export const typescriptFixture: Fixture = {
       // "importHelpers": true,                 /* Import emit helpers from 'tslib'. */
       // "downlevelIteration": true,            /* Provide full support for iterables in 'for-of', spread, and destructuring when targeting 'ES5' or 'ES3'. */
       // "isolatedModules": true,               /* Transpile each file as a separate module (similar to 'ts.transpileModule'). */
-  
+
       /* Strict Type-Checking Options */
       "strict": true /* Enable all strict type-checking options. */,
       // "noImplicitAny": true,                 /* Raise error on expressions and declarations with an implied 'any' type. */
@@ -272,13 +272,13 @@ export const typescriptFixture: Fixture = {
       // "strictPropertyInitialization": true,  /* Enable strict checking of property initialization in classes. */
       // "noImplicitThis": true,                /* Raise error on 'this' expressions with an implied 'any' type. */
       // "alwaysStrict": true,                  /* Parse in strict mode and emit "use strict" for each source file. */
-  
+
       /* Additional Checks */
       // "noUnusedLocals": true,                /* Report errors on unused locals. */
       // "noUnusedParameters": true,            /* Report errors on unused parameters. */
       // "noImplicitReturns": true,             /* Report error when not all code paths in function return a value. */
       // "noFallthroughCasesInSwitch": true,    /* Report errors for fallthrough cases in switch statement. */
-  
+
       /* Module Resolution Options */
       // "moduleResolution": "node",            /* Specify module resolution strategy: 'node' (Node.js) or 'classic' (TypeScript pre-1.6). */
       // "baseUrl": "./",                       /* Base directory to resolve non-absolute module names. */
@@ -289,13 +289,13 @@ export const typescriptFixture: Fixture = {
       // "allowSyntheticDefaultImports": true,  /* Allow default imports from modules with no default export. This does not affect code emit, just typechecking. */
       "esModuleInterop": true /* Enables emit interoperability between CommonJS and ES Modules via creation of namespace objects for all imports. Implies 'allowSyntheticDefaultImports'. */,
       // "preserveSymlinks": true,              /* Do not resolve the real path of symlinks. */
-  
+
       /* Source Map Options */
       // "sourceRoot": "",                      /* Specify the location where debugger should locate TypeScript files instead of source locations. */
       // "mapRoot": "",                         /* Specify the location where debugger should locate map files instead of generated locations. */
       // "inlineSourceMap": true,               /* Emit a single file with source maps instead of having a separate file. */
       // "inlineSources": true,                 /* Emit the source alongside the sourcemaps within a single file; requires '--inlineSourceMap' or '--sourceMap' to be set. */
-  
+
       /* Experimental Options */
       // "experimentalDecorators": true,        /* Enables experimental support for ES7 decorators. */
       // "emitDecoratorMetadata": true,         /* Enables experimental support for emitting type metadata for decorators. */
@@ -309,11 +309,11 @@ export const typescriptFixture: Fixture = {
                     import { SomeType } from "./another-thing";
                     export * from "./one-more-thing";
                     import * as path from "path";
-                    
+
                     export { path };
-                    
+
                     let thing: SomeType = "something";
-                    
+
                     export default thing;
                   `,
   "src/another-thing.ts": ts`
@@ -324,7 +324,7 @@ export const typescriptFixture: Fixture = {
                            `,
   "src/one-more-thing.d.ts": ts`
                                declare var obj: object;
-                               
+
                                export { obj };
                              `,
 };
@@ -398,10 +398,21 @@ export async function getFiles(dir: string, glob: string[] = ["**"]) {
   return newObj;
 }
 
-export const basicPkgJson = (options?: { module?: boolean }) => {
+export const basicPkgJson = (options?: {
+  module?: boolean;
+  dependencies?: Record<string, string>;
+  umdName?: string;
+}) => {
   return JSON.stringify({
     name: "pkg",
     main: "dist/pkg.cjs.js",
     module: options?.module ? "dist/pkg.esm.js" : undefined,
+    ...(options?.umdName && {
+      "umd:main": "dist/pkg.umd.min.js",
+      preconstruct: {
+        umdName: options.umdName,
+      },
+    }),
+    dependencies: options?.dependencies,
   });
 };

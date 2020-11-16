@@ -55,6 +55,9 @@ export const rules = {
                   if (i === lines.length - 1) {
                     return "".padEnd(node.tag.loc.start.column) + line;
                   }
+                  if (line === "") {
+                    return "";
+                  }
                   return indentation + line;
                 })
                 .join("\n"); //+

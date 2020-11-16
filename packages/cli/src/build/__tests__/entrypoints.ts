@@ -73,7 +73,7 @@ test("source entrypoint option flow", async () => {
     }),
     "modules/index.js": js`
                           // @flow
-                          
+
                           export let something = "";
                         `,
   });
@@ -267,17 +267,17 @@ test("two entrypoints with a common dependency", async () => {
 
     "src/multiply.js": js`
                          import { identity } from "./identity";
-                         
+
                          export let multiply = (a, b) => identity(a * b);
-                         
+
                          export { identity };
                        `,
 
     "src/sum.js": js`
                     import { identity } from "./identity";
-                    
+
                     export let sum = (a, b) => identity(a + b);
-                    
+
                     export { identity };
                   `,
   });
@@ -317,7 +317,7 @@ test("two entrypoints where one requires the other entrypoint", async () => {
 
     "src/multiply.js": js`
                          import { identity } from "./identity";
-                         
+
                          export let multiply = (a, b) => identity(a * b);
                        `,
   });
