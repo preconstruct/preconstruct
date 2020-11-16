@@ -64,7 +64,7 @@ export function validateEntrypoint(entrypoint: Entrypoint, log: boolean) {
     }
     if (!isFieldValid[field](entrypoint)) {
       let isUsingOldDistFilenames =
-        validFields[field](entrypoint, "only-unscoped-package-name") ===
+        validFields[field](entrypoint, "unscoped-package-name") ===
         entrypoint.json[field];
       if (
         isUsingOldDistFilenames &&
