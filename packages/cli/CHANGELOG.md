@@ -1,5 +1,15 @@
 # preconstruct
 
+## 1.2.0
+
+### Minor Changes
+
+- [`3c031da`](https://github.com/preconstruct/preconstruct/commit/3c031da27fb051423d0b2bfb6c5615ac55625079) [#343](https://github.com/preconstruct/preconstruct/pull/343) Thanks [@Andarist](https://github.com/Andarist)! - Respect `package.json#browser` when bundling dependencies for the UMD build.
+
+### Patch Changes
+
+- [`a198073`](https://github.com/preconstruct/preconstruct/commit/a198073c95501517112f77fe3dd9c730ebb81dcc) [#340](https://github.com/preconstruct/preconstruct/pull/340) Thanks [@Andarist](https://github.com/Andarist)! - Allow to build UMD files for packages having dependencies with top-level `this` in ESM files. This can often happen if a dependency package is transpiled down to ES5 using TypeScript.
+
 ## 1.1.34
 
 ### Patch Changes
