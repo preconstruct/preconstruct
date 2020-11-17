@@ -493,7 +493,7 @@ test("new entrypoints with old config", async () => {
   );
 });
 
-test.only("multiple source files for same entrypoint", async () => {
+test("multiple source files for same entrypoint", async () => {
   let tmpPath = await testdir({
     "package.json": JSON.stringify({
       name: "pkg-a",
