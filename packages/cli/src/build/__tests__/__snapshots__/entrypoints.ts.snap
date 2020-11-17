@@ -35,7 +35,7 @@ exports.identity = identity;
 "
 `;
 
-exports[`two entrypoints where one requires the other entrypoint: multiply/dist/importing-another-entrypoint.cjs.dev.js 1`] = `
+exports[`two entrypoints where one requires the other entrypoint: multiply/dist/importing-another-entrypoint-multiply.cjs.dev.js 1`] = `
 "'use strict';
 
 Object.defineProperty(exports, '__esModule', { value: true });
@@ -48,18 +48,18 @@ exports.multiply = multiply;
 "
 `;
 
-exports[`two entrypoints where one requires the other entrypoint: multiply/dist/importing-another-entrypoint.cjs.js 1`] = `
+exports[`two entrypoints where one requires the other entrypoint: multiply/dist/importing-another-entrypoint-multiply.cjs.js 1`] = `
 "'use strict';
 
 if (process.env.NODE_ENV === \\"production\\") {
-  module.exports = require(\\"./importing-another-entrypoint.cjs.prod.js\\");
+  module.exports = require(\\"./importing-another-entrypoint-multiply.cjs.prod.js\\");
 } else {
-  module.exports = require(\\"./importing-another-entrypoint.cjs.dev.js\\");
+  module.exports = require(\\"./importing-another-entrypoint-multiply.cjs.dev.js\\");
 }
 "
 `;
 
-exports[`two entrypoints where one requires the other entrypoint: multiply/dist/importing-another-entrypoint.cjs.prod.js 1`] = `
+exports[`two entrypoints where one requires the other entrypoint: multiply/dist/importing-another-entrypoint-multiply.cjs.prod.js 1`] = `
 "\\"use strict\\";
 
 Object.defineProperty(exports, \\"__esModule\\", {
@@ -74,10 +74,10 @@ exports.multiply = multiply;
 "
 `;
 
-exports[`two entrypoints where one requires the other entrypoint: src/identity.js 1`] = `"export let identity = (x) => x;"`;
+exports[`two entrypoints where one requires the other entrypoint: src/index.js 1`] = `"export let identity = (x) => x;"`;
 
 exports[`two entrypoints where one requires the other entrypoint: src/multiply.js 1`] = `
-"import { identity } from \\"./identity\\";
+"import { identity } from \\"./index\\";
 
 export let multiply = (a, b) => identity(a * b);"
 `;
@@ -157,7 +157,7 @@ export { sum };
 "
 `;
 
-exports[`two entrypoints with a common dependency: multiply/dist/common-dependency-two-entrypoints.cjs.dev.js 1`] = `
+exports[`two entrypoints with a common dependency: multiply/dist/common-dependency-two-entrypoints-multiply.cjs.dev.js 1`] = `
 "'use strict';
 
 Object.defineProperty(exports, '__esModule', { value: true });
@@ -171,18 +171,18 @@ exports.multiply = multiply;
 "
 `;
 
-exports[`two entrypoints with a common dependency: multiply/dist/common-dependency-two-entrypoints.cjs.js 1`] = `
+exports[`two entrypoints with a common dependency: multiply/dist/common-dependency-two-entrypoints-multiply.cjs.js 1`] = `
 "'use strict';
 
 if (process.env.NODE_ENV === \\"production\\") {
-  module.exports = require(\\"./common-dependency-two-entrypoints.cjs.prod.js\\");
+  module.exports = require(\\"./common-dependency-two-entrypoints-multiply.cjs.prod.js\\");
 } else {
-  module.exports = require(\\"./common-dependency-two-entrypoints.cjs.dev.js\\");
+  module.exports = require(\\"./common-dependency-two-entrypoints-multiply.cjs.dev.js\\");
 }
 "
 `;
 
-exports[`two entrypoints with a common dependency: multiply/dist/common-dependency-two-entrypoints.cjs.prod.js 1`] = `
+exports[`two entrypoints with a common dependency: multiply/dist/common-dependency-two-entrypoints-multiply.cjs.prod.js 1`] = `
 "\\"use strict\\";
 
 Object.defineProperty(exports, \\"__esModule\\", {
@@ -197,7 +197,7 @@ exports.identity = identity.identity, exports.multiply = multiply;
 "
 `;
 
-exports[`two entrypoints with a common dependency: multiply/dist/common-dependency-two-entrypoints.esm.js 1`] = `
+exports[`two entrypoints with a common dependency: multiply/dist/common-dependency-two-entrypoints-multiply.esm.js 1`] = `
 "import { i as identity } from '../../dist/chunk-some-hash.esm.js';
 export { i as identity } from '../../dist/chunk-some-hash.esm.js';
 
@@ -217,7 +217,7 @@ export let multiply = (a, b) => identity(a * b);
 export { identity };"
 `;
 
-exports[`two entrypoints with a common dependency: src/sum.js 1`] = `
+exports[`two entrypoints with a common dependency: src/index.js 1`] = `
 "import { identity } from \\"./identity\\";
 
 export let sum = (a, b) => identity(a + b);
