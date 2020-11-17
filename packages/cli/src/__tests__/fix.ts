@@ -1,7 +1,7 @@
 import fixturez from "fixturez";
 import fix from "../fix";
 import path from "path";
-import { confirms as _confirms, errors, inputs } from "../messages";
+import { confirms as _confirms, inputs } from "../messages";
 import {
   getPkg,
   modifyPkg,
@@ -27,11 +27,9 @@ afterEach(() => {
 
 test("no entrypoint", async () => {
   let tmpPath = f.copy("no-entrypoint");
-  try {
-    await fix(tmpPath);
-  } catch (error) {
-    expect(error.message).toBe(errors.noSource("src/index"));
-  }
+  await expect(fix(tmpPath)).rejects.toMatchInlineSnapshot(
+    `[Error: packages must have at least one entrypoint, this package has no entrypoints]`
+  );
 });
 
 test("only main", async () => {
@@ -159,8 +157,8 @@ test("monorepo", async () => {
   expect(pkg1).toMatchInlineSnapshot(`
     Object {
       "license": "MIT",
-      "main": "dist/package-one.cjs.js",
-      "module": "dist/package-one.esm.js",
+      "main": "dist/some-scope-package-one.cjs.js",
+      "module": "dist/some-scope-package-one.esm.js",
       "name": "@some-scope/package-one",
       "private": true,
       "version": "1.0.0",
@@ -170,8 +168,8 @@ test("monorepo", async () => {
   expect(pkg2).toMatchInlineSnapshot(`
     Object {
       "license": "MIT",
-      "main": "dist/package-two.cjs.js",
-      "module": "dist/package-two.esm.js",
+      "main": "dist/some-scope-package-two.cjs.js",
+      "module": "dist/some-scope-package-two.esm.js",
       "name": "@some-scope/package-two",
       "private": true,
       "version": "1.0.0",
@@ -300,24 +298,10 @@ test("create entrypoint", async () => {
     "export let x = 1"
   );
 
-  confirms.createEntrypoint.mockImplementation(async (x) => {
-    if (x.name === "valid-package/another") {
-      debugger;
-      return true;
-    } else {
-      throw new Error("this should never happen: " + x.name);
-    }
-  });
   let x = 0;
 
   promptInput.mockImplementation(async (message, { name }, defaultAnswer) => {
     if (x === 0) {
-      x++;
-      expect(message).toBe(inputs.getSource);
-      expect(name).toBe("valid-package/another");
-      expect(defaultAnswer).toBe("src/index");
-      return "../src/another";
-    } else if (x === 1) {
       expect(message).toBe(inputs.getUmdName);
       expect(name).toBe("valid-package/another");
       return "another";
@@ -326,22 +310,20 @@ test("create entrypoint", async () => {
   });
 
   await modifyPkg(tmpPath, (pkg) => {
-    pkg.preconstruct.entrypoints = [".", "another"];
+    pkg.preconstruct.entrypoints = ["index.js", "another.js"];
   });
   await fix(tmpPath);
 
-  expect(promptInput).toBeCalledTimes(2);
-  expect(confirms.createEntrypoint).toBeCalledTimes(1);
+  expect(promptInput).toBeCalledTimes(1);
 
   expect(
     await fs.readFile(path.join(tmpPath, "another", "package.json"), "utf8")
   ).toMatchInlineSnapshot(`
     "{
-      \\"main\\": \\"dist/valid-package.cjs.js\\",
-      \\"module\\": \\"dist/valid-package.esm.js\\",
-      \\"umd:main\\": \\"dist/valid-package.umd.min.js\\",
+      \\"main\\": \\"dist/valid-package-another.cjs.js\\",
+      \\"module\\": \\"dist/valid-package-another.esm.js\\",
+      \\"umd:main\\": \\"dist/valid-package-another.umd.min.js\\",
       \\"preconstruct\\": {
-        \\"source\\": \\"../src/another\\",
         \\"umdName\\": \\"another\\"
       }
     }
@@ -356,8 +338,8 @@ test("create entrypoint", async () => {
       "name": "valid-package",
       "preconstruct": Object {
         "entrypoints": Array [
-          ".",
-          "another",
+          "index.js",
+          "another.js",
         ],
         "umdName": "validPackage",
       },
@@ -368,7 +350,7 @@ test("create entrypoint", async () => {
   `);
 });
 
-test("create entrypoint new entrypoints", async () => {
+test("create entrypoint no umd/no prompts", async () => {
   let tmpPath = f.copy("valid-package");
   await fs.writeFile(
     path.join(tmpPath, "src", "another.js"),
@@ -385,8 +367,8 @@ test("create entrypoint new entrypoints", async () => {
 
   expect(await getPkg(path.join(tmpPath, "another"))).toMatchInlineSnapshot(`
     Object {
-      "main": "dist/valid-package.cjs.js",
-      "module": "dist/valid-package.esm.js",
+      "main": "dist/valid-package-another.cjs.js",
+      "module": "dist/valid-package-another.esm.js",
     }
   `);
 

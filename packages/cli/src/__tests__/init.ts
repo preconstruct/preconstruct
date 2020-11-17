@@ -119,8 +119,8 @@ test("scoped package", async () => {
   expect(pkg).toMatchInlineSnapshot(`
     Object {
       "license": "MIT",
-      "main": "dist/some-package.cjs.js",
-      "module": "dist/some-package.esm.js",
+      "main": "dist/some-scope-some-package.cjs.js",
+      "module": "dist/some-scope-some-package.esm.js",
       "name": "@some-scope/some-package",
       "private": true,
       "version": "1.0.0",
@@ -155,8 +155,8 @@ test("monorepo", async () => {
   expect(pkg1).toMatchInlineSnapshot(`
     Object {
       "license": "MIT",
-      "main": "dist/package-one.cjs.js",
-      "module": "dist/package-one.esm.js",
+      "main": "dist/some-scope-package-one.cjs.js",
+      "module": "dist/some-scope-package-one.esm.js",
       "name": "@some-scope/package-one",
       "private": true,
       "version": "1.0.0",
@@ -166,8 +166,8 @@ test("monorepo", async () => {
   expect(pkg2).toMatchInlineSnapshot(`
     Object {
       "license": "MIT",
-      "main": "dist/package-two.cjs.js",
-      "module": "dist/package-two.esm.js",
+      "main": "dist/some-scope-package-two.cjs.js",
+      "module": "dist/some-scope-package-two.esm.js",
       "name": "@some-scope/package-two",
       "private": true,
       "version": "1.0.0",

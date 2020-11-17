@@ -164,6 +164,48 @@ export default index;
 "
 `;
 
+exports[`monorepo single package: some-scope-package-two-single-package.cjs.dev.js 1`] = `
+"'use strict';
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+var index = 2;
+
+exports.default = index;
+"
+`;
+
+exports[`monorepo single package: some-scope-package-two-single-package.cjs.js 1`] = `
+"'use strict';
+
+if (process.env.NODE_ENV === \\"production\\") {
+  module.exports = require(\\"./some-scope-package-two-single-package.cjs.prod.js\\");
+} else {
+  module.exports = require(\\"./some-scope-package-two-single-package.cjs.dev.js\\");
+}
+"
+`;
+
+exports[`monorepo single package: some-scope-package-two-single-package.cjs.prod.js 1`] = `
+"\\"use strict\\";
+
+Object.defineProperty(exports, \\"__esModule\\", {
+  value: !0
+});
+
+var index = 2;
+
+exports.default = index;
+"
+`;
+
+exports[`monorepo single package: some-scope-package-two-single-package.esm.js 1`] = `
+"var index = 2;
+
+export default index;
+"
+`;
+
 exports[`monorepo umd with dep on other module: package-four-umd-with-dep.cjs.dev.js 1`] = `
 "'use strict';
 
@@ -384,6 +426,90 @@ exports.default = index;
 `;
 
 exports[`monorepo: package-two.esm.js 1`] = `
+"var index = 2;
+
+export default index;
+"
+`;
+
+exports[`monorepo: some-scope-package-one.cjs.dev.js 1`] = `
+"'use strict';
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+var index = 1;
+
+exports.default = index;
+"
+`;
+
+exports[`monorepo: some-scope-package-one.cjs.js 1`] = `
+"'use strict';
+
+if (process.env.NODE_ENV === \\"production\\") {
+  module.exports = require(\\"./some-scope-package-one.cjs.prod.js\\");
+} else {
+  module.exports = require(\\"./some-scope-package-one.cjs.dev.js\\");
+}
+"
+`;
+
+exports[`monorepo: some-scope-package-one.cjs.prod.js 1`] = `
+"\\"use strict\\";
+
+Object.defineProperty(exports, \\"__esModule\\", {
+  value: !0
+});
+
+var index = 1;
+
+exports.default = index;
+"
+`;
+
+exports[`monorepo: some-scope-package-one.esm.js 1`] = `
+"var index = 1;
+
+export default index;
+"
+`;
+
+exports[`monorepo: some-scope-package-two.cjs.dev.js 1`] = `
+"'use strict';
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+var index = 2;
+
+exports.default = index;
+"
+`;
+
+exports[`monorepo: some-scope-package-two.cjs.js 1`] = `
+"'use strict';
+
+if (process.env.NODE_ENV === \\"production\\") {
+  module.exports = require(\\"./some-scope-package-two.cjs.prod.js\\");
+} else {
+  module.exports = require(\\"./some-scope-package-two.cjs.dev.js\\");
+}
+"
+`;
+
+exports[`monorepo: some-scope-package-two.cjs.prod.js 1`] = `
+"\\"use strict\\";
+
+Object.defineProperty(exports, \\"__esModule\\", {
+  value: !0
+});
+
+var index = 2;
+
+exports.default = index;
+"
+`;
+
+exports[`monorepo: some-scope-package-two.esm.js 1`] = `
 "var index = 2;
 
 export default index;

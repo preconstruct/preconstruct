@@ -39,8 +39,8 @@ export class Project extends Item<{
     let config =
       this.json.preconstruct.___experimentalFlags_WILL_CHANGE_IN_PATCH || {};
     return {
-      newDistFilenames: !!config.newDistFilenames,
-      newEntrypoints: !!config.newEntrypoints,
+      newDistFilenames: true,
+      newEntrypoints: true,
       useSourceInsteadOfGeneratingTSDeclarations: !!config.useSourceInsteadOfGeneratingTSDeclarations,
       useTSMorphToGenerateTSDeclarations: !!config.useTSMorphToGenerateTSDeclarations,
       logCompiledFiles: !!config.logCompiledFiles,
