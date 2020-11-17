@@ -75,7 +75,7 @@ function createEntrypoints(
 
   return Promise.all(
     descriptors.map(async ({ filename, contents, hasAccepted, sourceFile }) => {
-      if (contents === undefined || hasAccepted) {
+      if (contents === undefined) {
         if (!hasAccepted) {
           const entrypointName = getEntrypointName(
             pkg,
