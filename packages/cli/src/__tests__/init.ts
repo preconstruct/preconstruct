@@ -352,7 +352,7 @@ test("three entrypoints, no main, add main and fix browser", async () => {
   confirms.writeModuleField.mockReturnValue(Promise.resolve(false));
   confirms.fixBrowserField.mockReturnValue(Promise.resolve(true));
 
-  let result = await init(dir);
+  await init(dir);
 
   expect(await getFiles(dir, ["**/package.json"])).toMatchInlineSnapshot(`
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ one/package.json, two/package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
