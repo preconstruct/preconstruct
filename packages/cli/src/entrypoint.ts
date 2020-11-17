@@ -25,7 +25,7 @@ export class Entrypoint extends Item<{
     pkg: Package,
     source?: string
   ) {
-    super(filePath, contents);
+    super(filePath, contents, pkg._jsonDataByPath);
     this.package = pkg;
     this._newEntrypointsSource = source;
   }
@@ -60,23 +60,19 @@ export class Entrypoint extends Item<{
     }
     return this.json.preconstruct.source;
   }
-  _sourceCached?: string;
+  _sourceCached?: { value: string; configSource: string };
   get source(): string {
     if (this._newEntrypointsSource !== undefined) {
       return this._newEntrypointsSource;
     }
-    if (this._sourceCached === undefined) {
-      this._sourceCached = resolve.sync(
-        nodePath.join(this.directory, this.configSource),
-        {
+    if (this._sourceCached?.configSource !== this.configSource) {
+      this._sourceCached = {
+        configSource: this.configSource,
+        value: resolve.sync(nodePath.join(this.directory, this.configSource), {
           extensions: EXTENSIONS,
-        }
-      );
+        }),
+      };
     }
-    return this._sourceCached;
-  }
-  updater(json: typeof Entrypoint.prototype.json) {
-    super.updater(json);
-    this._sourceCached = undefined;
+    return this._sourceCached.value;
   }
 }

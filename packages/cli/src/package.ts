@@ -10,7 +10,6 @@ import jsonParse from "parse-json";
 import { errors, confirms } from "./messages";
 import { Project } from "./project";
 import { getUselessGlobsThatArentReallyGlobs } from "./glob-thing";
-import detectIndent from "detect-indent";
 import {
   validFields,
   validFieldsFromPkg,
@@ -73,7 +72,6 @@ function createEntrypoints(
   }[]
 ) {
   let fields = getFieldsUsedInEntrypoints(descriptors);
-  let { indent } = detectIndent(pkg._contents);
 
   return Promise.all(
     descriptors.map(async ({ filename, contents, hasAccepted, sourceFile }) => {
@@ -94,7 +92,7 @@ function createEntrypoints(
           pkg,
           fields,
           nodePath.dirname(filename),
-          indent
+          pkg.indent
         );
         await fs.outputFile(filename, contents);
       }
@@ -139,7 +137,7 @@ export class Package extends Item<{
     let filePath = nodePath.join(directory, "package.json");
 
     let contents = await fs.readFile(filePath, "utf-8");
-    let pkg = new Package(filePath, contents);
+    let pkg = new Package(filePath, contents, project._jsonDataByPath);
     pkg.project = project;
     if (project.experimentalFlags.newEntrypoints) {
       let entrypoints = await globby(pkg.configEntrypoints, {

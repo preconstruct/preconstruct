@@ -109,7 +109,7 @@ function validateEntrypoint(entrypoint: Entrypoint, log: boolean) {
   }
 }
 
-const FORMER_FLAGS_THAT_ARE_ENABLED_NOW = new Set([]);
+const FORMER_FLAGS_THAT_ARE_ENABLED_NOW = new Set<string>([]);
 
 export const EXPERIMENTAL_FLAGS = new Set([
   "useSourceInsteadOfGeneratingTSDeclarations",

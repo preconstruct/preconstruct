@@ -69,7 +69,7 @@ export class Project extends Item<{
   ): Promise<Project> {
     let filePath = nodePath.join(directory, "package.json");
     let contents = await fs.readFile(filePath, "utf-8");
-    let project = new Project(filePath, contents);
+    let project = new Project(filePath, contents, new Map());
     project.packages = await project._packages(isFix);
 
     return project;
