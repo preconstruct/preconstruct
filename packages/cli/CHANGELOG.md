@@ -1,5 +1,13 @@
 # preconstruct
 
+## 1.2.1
+
+### Patch Changes
+
+- [`620e71f`](https://github.com/preconstruct/preconstruct/commit/620e71fe846fe8396bf6bb77ebdcabaaa9ee4c2a) [#344](https://github.com/preconstruct/preconstruct/pull/344) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Make `preconstruct fix` automatically create entrypoint package.jsons rather than asking if it should create them with the new entrypoints experimental flag
+
+* [`620e71f`](https://github.com/preconstruct/preconstruct/commit/620e71fe846fe8396bf6bb77ebdcabaaa9ee4c2a) [#344](https://github.com/preconstruct/preconstruct/pull/344) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Rename `only-unscoped-package-name` to `unscoped-package-name` in the `distFilenameStrategy` option(which is only enabled when the experimental `newDistFilenames` flag is enabled)
+
 ## 1.2.0
 
 ### Minor Changes
