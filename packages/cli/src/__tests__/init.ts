@@ -6,9 +6,9 @@ import {
   logMock,
   modifyPkg,
   getPkg,
-  createPackageCheckTestCreator,
   js,
   testdir,
+  getFiles,
 } from "../../test-utils";
 
 const f = fixturez(__dirname);
@@ -16,8 +16,6 @@ const f = fixturez(__dirname);
 jest.mock("../prompt");
 
 let confirms = _confirms as jest.Mocked<typeof _confirms>;
-
-let testInit = createPackageCheckTestCreator(init);
 
 afterEach(() => {
   jest.resetAllMocks();
@@ -254,153 +252,135 @@ test("fix browser", async () => {
 });
 
 let basicThreeEntrypoints = {
-  "": {
+  "package.json": JSON.stringify({
     name: "something",
     preconstruct: {
       entrypoints: [".", "one", "two"],
     },
-  },
-  one: {
+  }),
+  "src/index.js": js`
+                    export let something = true;
+                  `,
+  "one/package.json": JSON.stringify({
     preconstruct: {
       source: "../src",
     },
-  },
-  two: {
+  }),
+  "two/package.json": JSON.stringify({
     preconstruct: {
       source: "../src",
     },
-  },
+  }),
 };
 
-testInit(
-  "three entrypoints, no main, only add main",
-  basicThreeEntrypoints,
-  async (run) => {
-    confirms.writeMainField.mockReturnValue(Promise.resolve(true));
-    confirms.writeModuleField.mockReturnValue(Promise.resolve(false));
+test("three entrypoints, no main, only add main", async () => {
+  const dir = await testdir(basicThreeEntrypoints);
+  confirms.writeMainField.mockReturnValue(Promise.resolve(true));
+  confirms.writeModuleField.mockReturnValue(Promise.resolve(false));
 
-    let result = await run();
+  await init(dir);
 
-    expect(result).toMatchInlineSnapshot(`
-      Object {
-        "": Object {
-          "main": "dist/something.cjs.js",
-          "name": "something",
-          "preconstruct": Object {
-            "entrypoints": Array [
-              ".",
-              "one",
-              "two",
-            ],
-          },
-        },
-        "one": Object {
-          "main": "dist/something.cjs.js",
-          "preconstruct": Object {
-            "source": "../src",
-          },
-        },
-        "two": Object {
-          "main": "dist/something.cjs.js",
-          "preconstruct": Object {
-            "source": "../src",
-          },
-        },
-      }
-    `);
-  }
-);
+  expect(await getFiles(dir, ["**/package.json"])).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ one/package.json, two/package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {
+      "preconstruct": {
+        "source": "../src"
+      },
+      "main": "dist/something.cjs.js"
+    }
 
-testInit(
-  "three entrypoints, no main, add main and module",
-  basicThreeEntrypoints,
-  async (run) => {
-    confirms.writeMainField.mockReturnValue(Promise.resolve(true));
-    confirms.writeModuleField.mockReturnValue(Promise.resolve(true));
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {
+      "name": "something",
+      "preconstruct": {
+        "entrypoints": [
+          ".",
+          "one",
+          "two"
+        ]
+      },
+      "main": "dist/something.cjs.js"
+    }
 
-    let result = await run();
+  `);
+});
 
-    expect(result).toMatchInlineSnapshot(`
-      Object {
-        "": Object {
-          "main": "dist/something.cjs.js",
-          "module": "dist/something.esm.js",
-          "name": "something",
-          "preconstruct": Object {
-            "entrypoints": Array [
-              ".",
-              "one",
-              "two",
-            ],
-          },
-        },
-        "one": Object {
-          "main": "dist/something.cjs.js",
-          "module": "dist/something.esm.js",
-          "preconstruct": Object {
-            "source": "../src",
-          },
-        },
-        "two": Object {
-          "main": "dist/something.cjs.js",
-          "module": "dist/something.esm.js",
-          "preconstruct": Object {
-            "source": "../src",
-          },
-        },
-      }
-    `);
-  }
-);
+test("three entrypoints, no main, add main and module", async () => {
+  const dir = await testdir(basicThreeEntrypoints);
 
-testInit(
-  "three entrypoints, no main, add main and fix browser",
-  {
+  confirms.writeMainField.mockReturnValue(Promise.resolve(true));
+  confirms.writeModuleField.mockReturnValue(Promise.resolve(true));
+
+  await init(dir);
+
+  expect(await getFiles(dir, ["**/package.json"])).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ one/package.json, two/package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {
+      "preconstruct": {
+        "source": "../src"
+      },
+      "main": "dist/something.cjs.js",
+      "module": "dist/something.esm.js"
+    }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {
+      "name": "something",
+      "preconstruct": {
+        "entrypoints": [
+          ".",
+          "one",
+          "two"
+        ]
+      },
+      "main": "dist/something.cjs.js",
+      "module": "dist/something.esm.js"
+    }
+
+  `);
+});
+
+test("three entrypoints, no main, add main and fix browser", async () => {
+  const dir = await testdir({
     ...basicThreeEntrypoints,
-    "": { ...basicThreeEntrypoints[""], browser: "" },
-  },
-  async (run) => {
-    confirms.writeMainField.mockReturnValue(Promise.resolve(true));
-    confirms.writeModuleField.mockReturnValue(Promise.resolve(false));
-    confirms.fixBrowserField.mockReturnValue(Promise.resolve(true));
+    "package.json": JSON.stringify({
+      ...JSON.parse(basicThreeEntrypoints["package.json"]),
+      browser: "",
+    }),
+  });
+  confirms.writeMainField.mockReturnValue(Promise.resolve(true));
+  confirms.writeModuleField.mockReturnValue(Promise.resolve(false));
+  confirms.fixBrowserField.mockReturnValue(Promise.resolve(true));
 
-    let result = await run();
+  let result = await init(dir);
 
-    expect(result).toMatchInlineSnapshot(`
-      Object {
-        "": Object {
-          "browser": Object {
-            "./dist/something.cjs.js": "./dist/something.browser.cjs.js",
-          },
-          "main": "dist/something.cjs.js",
-          "name": "something",
-          "preconstruct": Object {
-            "entrypoints": Array [
-              ".",
-              "one",
-              "two",
-            ],
-          },
-        },
-        "one": Object {
-          "browser": Object {
-            "./dist/something.cjs.js": "./dist/something.browser.cjs.js",
-          },
-          "main": "dist/something.cjs.js",
-          "preconstruct": Object {
-            "source": "../src",
-          },
-        },
-        "two": Object {
-          "browser": Object {
-            "./dist/something.cjs.js": "./dist/something.browser.cjs.js",
-          },
-          "main": "dist/something.cjs.js",
-          "preconstruct": Object {
-            "source": "../src",
-          },
-        },
+  expect(await getFiles(dir, ["**/package.json"])).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ one/package.json, two/package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {
+      "preconstruct": {
+        "source": "../src"
+      },
+      "main": "dist/something.cjs.js",
+      "browser": {
+        "./dist/something.cjs.js": "./dist/something.browser.cjs.js"
       }
-    `);
-  }
-);
+    }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {
+      "name": "something",
+      "preconstruct": {
+        "entrypoints": [
+          ".",
+          "one",
+          "two"
+        ]
+      },
+      "browser": {
+        "./dist/something.cjs.js": "./dist/something.browser.cjs.js"
+      },
+      "main": "dist/something.cjs.js"
+    }
+
+  `);
+});
