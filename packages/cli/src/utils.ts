@@ -64,7 +64,7 @@ export function getEntrypointName(pkg: Package, entrypointDir: string) {
   );
 }
 
-type DistFilenameStrategy = "full" | "only-unscoped-package-name";
+type DistFilenameStrategy = "full" | "unscoped-package-name";
 
 function getDistNameWithStrategy(
   pkg: Package,
@@ -90,33 +90,29 @@ function getDistName(
       if (
         pkg.project.json.preconstruct.distFilenameStrategy !== "full" &&
         pkg.project.json.preconstruct.distFilenameStrategy !==
-          "only-unscoped-package-name"
+          "unscoped-package-name"
       ) {
         throw new FatalError(
           `distFilenameStrategy is defined in your Preconstruct config as ${JSON.stringify(
             pkg.project.json.preconstruct.distFilenameStrategy
-          )} but the only accepted values are "full" and "only-unscoped-package-name"`,
+          )} but the only accepted values are "full" and "unscoped-package-name"`,
           pkg.project.name
         );
       }
       if (
         pkg.project.json.preconstruct.distFilenameStrategy ===
-        "only-unscoped-package-name"
+        "unscoped-package-name"
       ) {
         return getDistNameWithStrategy(
           pkg,
           entrypointName,
-          "only-unscoped-package-name"
+          "unscoped-package-name"
         );
       }
     }
     return getDistNameWithStrategy(pkg, entrypointName, "full");
   }
-  return getDistNameWithStrategy(
-    pkg,
-    entrypointName,
-    "only-unscoped-package-name"
-  );
+  return getDistNameWithStrategy(pkg, entrypointName, "unscoped-package-name");
 }
 
 export const validFieldsFromPkg = {

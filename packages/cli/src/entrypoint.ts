@@ -18,9 +18,16 @@ export class Entrypoint extends Item<{
   };
 }> {
   package: Package;
-  constructor(filePath: string, contents: string, pkg: Package) {
-    super(filePath, contents);
+  _newEntrypointsSource: string | undefined;
+  constructor(
+    filePath: string,
+    contents: string,
+    pkg: Package,
+    source?: string
+  ) {
+    super(filePath, contents, pkg._jsonDataByPath);
     this.package = pkg;
+    this._newEntrypointsSource = source;
   }
 
   get name(): string {
@@ -34,19 +41,9 @@ export class Entrypoint extends Item<{
 
   get configSource(): string {
     if (this.package.project.experimentalFlags.newEntrypoints) {
-      if (this.json.preconstruct.source !== undefined) {
-        throw new FatalError(
-          "The source option is not allowed with the newEntrypoints experimental flag",
-          this.name
-        );
-      }
       return nodePath.relative(
         this.directory,
-        nodePath.join(
-          this.package.directory,
-          "src",
-          nodePath.relative(this.package.directory, this.directory)
-        )
+        nodePath.relative(this.package.directory, this._newEntrypointsSource!)
       );
     }
     if (
@@ -63,20 +60,19 @@ export class Entrypoint extends Item<{
     }
     return this.json.preconstruct.source;
   }
-  _sourceCached?: string;
+  _sourceCached?: { value: string; configSource: string };
   get source(): string {
-    if (this._sourceCached === undefined) {
-      this._sourceCached = resolve.sync(
-        nodePath.join(this.directory, this.configSource),
-        {
-          extensions: EXTENSIONS,
-        }
-      );
+    if (this._newEntrypointsSource !== undefined) {
+      return this._newEntrypointsSource;
     }
-    return this._sourceCached;
-  }
-  updater(json: typeof Entrypoint.prototype.json) {
-    super.updater(json);
-    this._sourceCached = undefined;
+    if (this._sourceCached?.configSource !== this.configSource) {
+      this._sourceCached = {
+        configSource: this.configSource,
+        value: resolve.sync(nodePath.join(this.directory, this.configSource), {
+          extensions: EXTENSIONS,
+        }),
+      };
+    }
+    return this._sourceCached.value;
   }
 }

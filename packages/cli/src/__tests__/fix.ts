@@ -114,7 +114,7 @@ test("new dist filenames only-unscoped-package-name strategy", async () => {
       ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
         newDistFilenames: true,
       },
-      distFilenameStrategy: "only-unscoped-package-name",
+      distFilenameStrategy: "unscoped-package-name",
     };
     json.main = "bad.js";
     json.module = "bad.js";
@@ -134,7 +134,7 @@ test("new dist filenames only-unscoped-package-name strategy", async () => {
         "___experimentalFlags_WILL_CHANGE_IN_PATCH": Object {
           "newDistFilenames": true,
         },
-        "distFilenameStrategy": "only-unscoped-package-name",
+        "distFilenameStrategy": "unscoped-package-name",
       },
       "private": true,
       "version": "1.0.0",
@@ -363,6 +363,50 @@ test("create entrypoint", async () => {
       },
       "private": true,
       "umd:main": "dist/valid-package.umd.min.js",
+      "version": "1.0.0",
+    }
+  `);
+});
+
+test("create entrypoint new entrypoints", async () => {
+  let tmpPath = f.copy("valid-package");
+  await fs.writeFile(
+    path.join(tmpPath, "src", "another.js"),
+    "export let x = 1"
+  );
+  await modifyPkg(tmpPath, (pkg) => {
+    pkg.preconstruct.___experimentalFlags_WILL_CHANGE_IN_PATCH = {
+      newEntrypoints: true,
+    };
+    delete pkg["umd:main"];
+    pkg.preconstruct.entrypoints = ["index.js", "another.js"];
+  });
+  await fix(tmpPath);
+
+  expect(await getPkg(path.join(tmpPath, "another"))).toMatchInlineSnapshot(`
+    Object {
+      "main": "dist/valid-package.cjs.js",
+      "module": "dist/valid-package.esm.js",
+    }
+  `);
+
+  expect(await getPkg(tmpPath)).toMatchInlineSnapshot(`
+    Object {
+      "license": "MIT",
+      "main": "dist/valid-package.cjs.js",
+      "module": "dist/valid-package.esm.js",
+      "name": "valid-package",
+      "preconstruct": Object {
+        "___experimentalFlags_WILL_CHANGE_IN_PATCH": Object {
+          "newEntrypoints": true,
+        },
+        "entrypoints": Array [
+          "index.js",
+          "another.js",
+        ],
+        "umdName": "validPackage",
+      },
+      "private": true,
       "version": "1.0.0",
     }
   `);

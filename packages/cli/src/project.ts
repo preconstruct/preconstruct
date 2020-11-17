@@ -63,11 +63,14 @@ export class Project extends Item<{
       this.name
     );
   }
-  static async create(directory: string): Promise<Project> {
+  static async create(
+    directory: string,
+    isFix: boolean = false
+  ): Promise<Project> {
     let filePath = nodePath.join(directory, "package.json");
     let contents = await fs.readFile(filePath, "utf-8");
-    let project = new Project(filePath, contents);
-    project.packages = await project._packages();
+    let project = new Project(filePath, contents, new Map());
+    project.packages = await project._packages(isFix);
 
     return project;
   }
@@ -84,7 +87,7 @@ export class Project extends Item<{
 
   packages!: Array<Package>;
 
-  async _packages(): Promise<Array<Package>> {
+  async _packages(isFix: boolean): Promise<Array<Package>> {
     // suport bolt later probably
     // maybe lerna too though probably not
     if (!this.json.preconstruct.packages && this.json.workspaces) {
@@ -118,7 +121,7 @@ export class Project extends Item<{
     await Promise.all(
       filenames.map(async (x) => {
         try {
-          packages.push(await Package.create(x, this));
+          packages.push(await Package.create(x, this, isFix));
         } catch (err) {
           if (
             err.code === "ENOENT" &&

@@ -52,7 +52,7 @@ export function isUmdNameSpecified(entrypoint: Entrypoint) {
 
 let projectsShownOldDistNamesInfo = new WeakSet<Project>();
 
-export function validateEntrypoint(entrypoint: Entrypoint, log: boolean) {
+function validateEntrypoint(entrypoint: Entrypoint, log: boolean) {
   validateEntrypointSource(entrypoint);
   if (log) {
     logger.info(infos.validEntrypoint, entrypoint.name);
@@ -64,7 +64,7 @@ export function validateEntrypoint(entrypoint: Entrypoint, log: boolean) {
     }
     if (!isFieldValid[field](entrypoint)) {
       let isUsingOldDistFilenames =
-        validFields[field](entrypoint, "only-unscoped-package-name") ===
+        validFields[field](entrypoint, "unscoped-package-name") ===
         entrypoint.json[field];
       if (
         isUsingOldDistFilenames &&
@@ -80,7 +80,7 @@ export function validateEntrypoint(entrypoint: Entrypoint, log: boolean) {
           )} to use the new dist filenames`
         );
         logger.info(
-          'if you want to keep the dist filename strategy of v1, add `"distFilenameStrategy": "only-unscoped-package-name"` to the Preconstruct config in your root package.json'
+          'if you want to keep the dist filename strategy of v1, add `"distFilenameStrategy": "unscoped-package-name"` to the Preconstruct config in your root package.json'
         );
       }
       fatalErrors.push(
@@ -109,8 +109,44 @@ export function validateEntrypoint(entrypoint: Entrypoint, log: boolean) {
   }
 }
 
+const FORMER_FLAGS_THAT_ARE_ENABLED_NOW = new Set<string>([]);
+
+export const EXPERIMENTAL_FLAGS = new Set([
+  "useSourceInsteadOfGeneratingTSDeclarations",
+  "useTSMorphToGenerateTSDeclarations",
+  "logCompiledFiles",
+  "newEntrypoints",
+  "newDistFilenames",
+  "newProcessEnvNodeEnvReplacementStrategyAndSkipTerserOnCJSProdBuild",
+]);
+
 export function validateProject(project: Project, log = false) {
   let errors: FatalError[] = [];
+  if (project.json.preconstruct.___experimentalFlags_WILL_CHANGE_IN_PATCH) {
+    Object.keys(
+      project.json.preconstruct.___experimentalFlags_WILL_CHANGE_IN_PATCH
+    ).forEach((key) => {
+      if (FORMER_FLAGS_THAT_ARE_ENABLED_NOW.has(key)) {
+        errors.push(
+          new FixableError(
+            `The behaviour from the experimental flag ${JSON.stringify(
+              key
+            )} is the current behaviour now, the flag should be removed`,
+            project.name
+          )
+        );
+      } else if (!EXPERIMENTAL_FLAGS.has(key)) {
+        errors.push(
+          new FixableError(
+            `The experimental flag ${JSON.stringify(
+              key
+            )} in your config does not exist, the flag should be removed`,
+            project.name
+          )
+        );
+      }
+    });
+  }
 
   for (let pkg of project.packages) {
     try {
