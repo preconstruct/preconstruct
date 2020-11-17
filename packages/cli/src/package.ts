@@ -17,6 +17,7 @@ import {
   getEntrypointName,
   setFieldInOrder,
 } from "./utils";
+import normalizePath from "normalize-path";
 
 function getFieldsUsedInEntrypoints(
   descriptors: { contents: string | undefined; filename: string }[]
@@ -168,6 +169,19 @@ export class Package extends Item<{
                 pkg.directory,
                 sourceFile
               )} does not`,
+              pkg.name
+            );
+          }
+          if (
+            !normalizePath(sourceFile).includes(
+              normalizePath(nodePath.join(pkg.directory, "src"))
+            )
+          ) {
+            throw new FatalError(
+              `entrypoint source files must be inside of the src directory of a package but ${nodePath.relative(
+                pkg.directory,
+                sourceFile
+              )} is not`,
               pkg.name
             );
           }

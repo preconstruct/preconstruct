@@ -472,7 +472,7 @@ test("entrypoint outside package directory", async () => {
       main: "dist/pkg-a.cjs.js",
 
       preconstruct: {
-        source: "../some-file",
+        entrypoints: ["../../some-file.js"],
       },
     }),
   });
@@ -480,7 +480,7 @@ test("entrypoint outside package directory", async () => {
     await build(tmpPath);
   } catch (err) {
     expect(err.message).toMatchInlineSnapshot(
-      `"entrypoint source files must be inside their respective package directory but this entrypoint has specified its source file as ../some-file"`
+      `"entrypoint source files must be inside of the src directory of a package but ../some-file.js is not"`
     );
     return;
   }
@@ -503,7 +503,7 @@ test("module imported outside package directory", async () => {
 
     "pkg-a/package.json": JSON.stringify({
       name: "@imports-outside-pkg-dir/pkg-a",
-      main: "dist/pkg-a.cjs.js",
+      main: "dist/imports-outside-pkg-dir-pkg-a.cjs.js",
     }),
 
     "pkg-a/src/index.js": js`
@@ -601,14 +601,14 @@ test("batches build errors", async () => {
 
     "packages/package-one/package.json": JSON.stringify({
       name: "@errors/package-one",
-      main: "dist/package-one.cjs.js",
+      main: "dist/errors-package-one.cjs.js",
       license: "MIT",
       private: true,
     }),
 
     "packages/package-two/package.json": JSON.stringify({
       name: "@errors/package-two",
-      main: "dist/package-two.cjs.js",
+      main: "dist/errors-package-two.cjs.js",
       license: "MIT",
       private: true,
     }),
