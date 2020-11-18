@@ -95,11 +95,7 @@ export const FORMER_FLAGS_THAT_ARE_ENABLED_NOW = new Set<string>([
   "newProcessEnvNodeEnvReplacementStrategyAndSkipTerserOnCJSProdBuild",
 ]);
 
-export const EXPERIMENTAL_FLAGS = new Set([
-  "useSourceInsteadOfGeneratingTSDeclarations",
-  "useTSMorphToGenerateTSDeclarations",
-  "logCompiledFiles",
-]);
+export const EXPERIMENTAL_FLAGS = new Set(["logCompiledFiles"]);
 
 export function validateProject(project: Project, log = false) {
   let errors: FatalError[] = [];
