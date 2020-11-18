@@ -165,24 +165,20 @@ test("one-entrypoint-with-browser-field-one-without", async () => {
       module: "dist/one-entrypoint-with-browser-field-one-without.esm.js",
 
       preconstruct: {
-        source: "src/sum",
-        entrypoints: [".", "multiply"],
+        entrypoints: ["index.js", "multiply.js"],
       },
     }),
 
     "multiply/package.json": JSON.stringify({
-      main: "dist/one-entrypoint-with-browser-field-one-without.cjs.js",
-      module: "dist/one-entrypoint-with-browser-field-one-without.esm.js",
-
-      preconstruct: {
-        source: "../src/multiply.js",
-      },
-
+      main:
+        "dist/one-entrypoint-with-browser-field-one-without-multiply.cjs.js",
+      module:
+        "dist/one-entrypoint-with-browser-field-one-without-multiply.esm.js",
       browser: {
-        "./dist/one-entrypoint-with-browser-field-one-without.cjs.js":
-          "./dist/one-entrypoint-with-browser-field-one-without.browser.cjs.js",
-        "./dist/one-entrypoint-with-browser-field-one-without.esm.js":
-          "./dist/one-entrypoint-with-browser-field-one-without.browser.esm.js",
+        "./dist/one-entrypoint-with-browser-field-one-without-multiply.cjs.js":
+          "./dist/one-entrypoint-with-browser-field-one-without-multiply.browser.cjs.js",
+        "./dist/one-entrypoint-with-browser-field-one-without-multiply.esm.js":
+          "./dist/one-entrypoint-with-browser-field-one-without-multiply.browser.esm.js",
       },
     }),
 
@@ -196,11 +192,11 @@ test("one-entrypoint-with-browser-field-one-without", async () => {
                          export let multiply = (a, b) => identity(a * b);
                        `,
 
-    "src/sum.js": js`
-                    import { identity } from "./identity";
+    "src/index.js": js`
+                      import { identity } from "./identity";
 
-                    export let sum = (a, b) => identity(a + b);
-                  `,
+                      export let sum = (a, b) => identity(a + b);
+                    `,
   });
   await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
     `[Error: one-entrypoint-with-browser-field-one-without/multiply has a browser build but one-entrypoint-with-browser-field-one-without does not have a browser build. Entrypoints in a package must either all have a particular build type or all not have a particular build type.]`
@@ -215,7 +211,7 @@ test("create package.json for an entrypoint", async () => {
       module: "dist/entrypoint-pkg-json-missing.esm.js",
 
       preconstruct: {
-        entrypoints: [".", "other"],
+        entrypoints: ["index.js", "other.js"],
       },
     }),
 
@@ -223,9 +219,9 @@ test("create package.json for an entrypoint", async () => {
                       export default "something";
                     `,
 
-    "other/src/index.js": js`
-                            export default "something";
-                          `,
+    "src/other.js": js`
+                      export default "something";
+                    `,
   });
   confirms.createEntrypointPkgJson.mockReturnValue(Promise.resolve(true));
 
@@ -235,8 +231,8 @@ test("create package.json for an entrypoint", async () => {
 
   expect(await getPkg(path.join(tmpPath, "other"))).toMatchInlineSnapshot(`
     Object {
-      "main": "dist/entrypoint-pkg-json-missing.cjs.js",
-      "module": "dist/entrypoint-pkg-json-missing.esm.js",
+      "main": "dist/entrypoint-pkg-json-missing-other.cjs.js",
+      "module": "dist/entrypoint-pkg-json-missing-other.esm.js",
     }
   `);
 });
@@ -266,8 +262,10 @@ test("monorepo umd with dep on other module incorrect peerDeps", async () => {
     },
     "packages/package-four/package.json": JSON.stringify({
       name: "@some-scope-incorrect-peerdeps/package-four-umd-with-dep",
-      main: "dist/package-four-umd-with-dep.cjs.js",
-      "umd:main": "dist/package-four-umd-with-dep.umd.min.js",
+      main:
+        "dist/some-scope-incorrect-peerdeps-package-four-umd-with-dep.cjs.js",
+      "umd:main":
+        "dist/some-scope-incorrect-peerdeps-package-four-umd-with-dep.umd.min.js",
 
       preconstruct: {
         umdName: "packageFour",
@@ -280,8 +278,10 @@ test("monorepo umd with dep on other module incorrect peerDeps", async () => {
 
     "packages/package-one/package.json": JSON.stringify({
       name: "@some-scope-incorrect-peerdeps/package-one-umd-with-dep",
-      main: "dist/package-one-umd-with-dep.cjs.js",
-      "umd:main": "dist/package-one-umd-with-dep.umd.min.js",
+      main:
+        "dist/some-scope-incorrect-peerdeps-package-one-umd-with-dep.cjs.js",
+      "umd:main":
+        "dist/some-scope-incorrect-peerdeps-package-one-umd-with-dep.umd.min.js",
 
       preconstruct: {
         umdName: "packageOne",
@@ -298,8 +298,10 @@ test("monorepo umd with dep on other module incorrect peerDeps", async () => {
 
     "packages/package-three/package.json": JSON.stringify({
       name: "@some-scope-incorrect-peerdeps/package-three-umd-with-dep",
-      main: "dist/package-three-umd-with-dep.cjs.js",
-      "umd:main": "dist/package-three-umd-with-dep.umd.min.js",
+      main:
+        "dist/some-scope-incorrect-peerdeps-package-three-umd-with-dep.cjs.js",
+      "umd:main":
+        "dist/some-scope-incorrect-peerdeps-package-three-umd-with-dep.umd.min.js",
 
       preconstruct: {
         umdName: "packageThree",
@@ -316,8 +318,10 @@ test("monorepo umd with dep on other module incorrect peerDeps", async () => {
 
     "packages/package-two/package.json": JSON.stringify({
       name: "@some-scope-incorrect-peerdeps/package-two-umd-with-dep",
-      main: "dist/package-two-umd-with-dep.cjs.js",
-      "umd:main": "dist/package-two-umd-with-dep.umd.min.js",
+      main:
+        "dist/some-scope-incorrect-peerdeps-package-two-umd-with-dep.cjs.js",
+      "umd:main":
+        "dist/some-scope-incorrect-peerdeps-package-two-umd-with-dep.umd.min.js",
 
       preconstruct: {
         umdName: "packageTwo",
@@ -397,8 +401,7 @@ test("entrypoint not included in package", async () => {
       module: "dist/entrypoint-not-included-in-pkg.esm.js",
 
       preconstruct: {
-        source: "src/sum",
-        entrypoints: [".", "multiply"],
+        entrypoints: ["index.js", "multiply.js"],
       },
 
       files: ["dist"],
@@ -407,19 +410,15 @@ test("entrypoint not included in package", async () => {
     "multiply/package.json": JSON.stringify({
       main: "dist/entrypoint-not-included-in-pkg.cjs.js",
       module: "dist/entrypoint-not-included-in-pkg.esm.js",
-
-      preconstruct: {
-        source: "../src/multiply.js",
-      },
     }),
 
     "src/multiply.js": js`
                          export let multiply = (a, b) => a * b;
                        `,
 
-    "src/sum.js": js`
-                    export let sum = (a, b) => a + b;
-                  `,
+    "src/index.js": js`
+                      export let sum = (a, b) => a + b;
+                    `,
   });
 
   try {
@@ -440,7 +439,6 @@ test("root dist directory not included in package without entrypoint at root", a
       files: ["other"],
       preconstruct: {
         entrypoints: ["other.js"],
-        ___experimentalFlags_WILL_CHANGE_IN_PATCH: { newEntrypoints: true },
       },
     }),
     "other/package.json": JSON.stringify({
@@ -466,7 +464,6 @@ test("new entrypoints with old config", async () => {
       preconstruct: {
         source: "src/sum",
         entrypoints: [".", "multiply"],
-        ___experimentalFlags_WILL_CHANGE_IN_PATCH: { newEntrypoints: true },
       },
     }),
 
@@ -499,7 +496,6 @@ test("multiple source files for same entrypoint", async () => {
       name: "pkg-a",
       preconstruct: {
         entrypoints: ["other.js", "other/index.js"],
-        ___experimentalFlags_WILL_CHANGE_IN_PATCH: { newEntrypoints: true },
       },
     }),
     "other/package.json": JSON.stringify({
@@ -515,5 +511,98 @@ test("multiple source files for same entrypoint", async () => {
 
   await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
     `[Error: this package has multiple source files for the same entrypoint of pkg-a/other at src/other.js and src/other/index.js]`
+  );
+});
+
+test("unexpected source option", async () => {
+  let tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "pkg-a",
+      preconstruct: {
+        source: "src/index.js",
+      },
+    }),
+    "src/index.js": js`
+                      export let x = true;
+                    `,
+  });
+
+  await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
+    `[Error: The source option on entrypoints no longer exists, see the changelog for how to upgrade to the new entrypoints config]`
+  );
+});
+
+test("unexpected experimental flag", async () => {
+  let tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "pkg-a",
+      main: "dist/pkg-a.cjs.js",
+      preconstruct: {
+        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+          thisDoesNotExist: true,
+        },
+      },
+    }),
+    "src/index.js": js`
+                      export let x = true;
+                    `,
+  });
+
+  await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
+    `[Error: The experimental flag "thisDoesNotExist" in your config does not exist]`
+  );
+});
+
+test("unexpected former experimental flag", async () => {
+  let tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "pkg-a",
+      main: "dist/pkg-a.cjs.js",
+      preconstruct: {
+        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+          newEntrypoints: true,
+        },
+      },
+    }),
+    "src/index.js": js`
+                      export let x = true;
+                    `,
+  });
+
+  await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
+    `[Error: The behaviour from the experimental flag "newEntrypoints" is the current behaviour now, the flag should be removed]`
+  );
+});
+
+test("non-existant entrypoint", async () => {
+  let tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "pkg-a",
+      main: "dist/pkg-a.cjs.js",
+      preconstruct: {
+        entrypoints: ["index.js"],
+      },
+    }),
+  });
+
+  await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
+    `[Error: 🎁  pkg-a specifies a entrypoint "index.js" but the file does not exist, please create it or fix the config]`
+  );
+});
+
+test("negated entrypoint", async () => {
+  let tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "pkg-a",
+      main: "dist/pkg-a.cjs.js",
+      preconstruct: {
+        entrypoints: ["index.js", "!index.js"],
+      },
+    }),
+    "src/index.js": "",
+  });
+
+  await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
+    `[Error: 🎁  pkg-a specifies a entrypoint "index.js" but it is negated in the same config so it should be removed or the config should be fixed]`
   );
 });

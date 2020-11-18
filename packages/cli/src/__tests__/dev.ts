@@ -27,12 +27,12 @@ test("dev command works in node", async () => {
     },
     "packages/package-one/package.json": JSON.stringify({
       name: "@my-cool-scope/package-one",
-      main: "dist/package-one.cjs.js",
+      main: "dist/my-cool-scope-package-one.cjs.js",
     }),
 
     "packages/package-two/package.json": JSON.stringify({
       name: "@my-cool-scope/package-two",
-      main: "dist/package-two.cjs.js",
+      main: "dist/my-cool-scope-package-two.cjs.js",
       license: "MIT",
       private: true,
     }),
@@ -219,18 +219,18 @@ test("flow", async () => {
       main: "dist/flow-dev.cjs.js",
       module: "dist/flow-dev.esm.js",
       preconstruct: {
-        entrypoints: [".", "a", "b"],
+        entrypoints: ["index.js", "a.js", "b.js"],
       },
     }),
 
     "a/package.json": JSON.stringify({
-      main: "dist/flow-dev.cjs.js",
-      module: "dist/flow-dev.esm.js",
+      main: "dist/flow-dev-a.cjs.js",
+      module: "dist/flow-dev-a.esm.js",
     }),
 
     "b/package.json": JSON.stringify({
-      main: "dist/flow-dev.cjs.js",
-      module: "dist/flow-dev.esm.js",
+      main: "dist/flow-dev-b.cjs.js",
+      module: "dist/flow-dev-b.esm.js",
     }),
 
     "src/index.js": js`
@@ -239,19 +239,19 @@ test("flow", async () => {
                       export let something = true;
                     `,
 
-    "a/src/index.js": js`
-                        // @flow
+    "src/a.js": js`
+                  // @flow
 
-                        export default "something";
-                      `,
+                  export default "something";
+                `,
 
-    "b/src/index.js": js`
-                        // @flow
+    "src/b.js": js`
+                  // @flow
 
-                        let something = true;
+                  let something = true;
 
-                        export { something as default };
-                      `,
+                  export { something as default };
+                `,
   });
 
   await dev(tmpPath);
@@ -265,14 +265,14 @@ test("flow", async () => {
 
   expect(
     await fs.readFile(
-      path.join(tmpPath, "a", "dist", "flow-dev.cjs.js.flow"),
+      path.join(tmpPath, "a", "dist", "flow-dev-a.cjs.js.flow"),
       "utf8"
     )
   ).toMatchSnapshot();
 
   expect(
     await fs.readFile(
-      path.join(tmpPath, "b", "dist", "flow-dev.cjs.js.flow"),
+      path.join(tmpPath, "b", "dist", "flow-dev-b.cjs.js.flow"),
       "utf8"
     )
   ).toMatchSnapshot();

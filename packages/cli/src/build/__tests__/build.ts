@@ -69,7 +69,7 @@ test("clears dist folder", async () => {
   await build(dir);
 
   expect(await getDist(dir)).toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/already-has-things-in-dist.cjs.dev.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/already-has-things-in-dist.cjs.dev.js, dist/already-has-things-in-dist.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     Object.defineProperty(exports, '__esModule', { value: true });
@@ -86,17 +86,6 @@ test("clears dist folder", async () => {
     } else {
       module.exports = require("./already-has-things-in-dist.cjs.dev.js");
     }
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/already-has-things-in-dist.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    "use strict";
-
-    Object.defineProperty(exports, "__esModule", {
-      value: !0
-    });
-
-    var index = "something";
-
-    exports.default = index;
 
   `);
 });
@@ -271,8 +260,8 @@ test("monorepo umd with dep on other module", async () => {
     },
     "packages/package-four/package.json": JSON.stringify({
       name: "@some-scope/package-four-umd-with-dep",
-      main: "dist/package-four-umd-with-dep.cjs.js",
-      "umd:main": "dist/package-four-umd-with-dep.umd.min.js",
+      main: "dist/some-scope-package-four-umd-with-dep.cjs.js",
+      "umd:main": "dist/some-scope-package-four-umd-with-dep.umd.min.js",
 
       preconstruct: {
         umdName: "packageFour",
@@ -289,8 +278,8 @@ test("monorepo umd with dep on other module", async () => {
 
     "packages/package-one/package.json": JSON.stringify({
       name: "@some-scope/package-one-umd-with-dep",
-      main: "dist/package-one-umd-with-dep.cjs.js",
-      "umd:main": "dist/package-one-umd-with-dep.umd.min.js",
+      main: "dist/some-scope-package-one-umd-with-dep.cjs.js",
+      "umd:main": "dist/some-scope-package-one-umd-with-dep.umd.min.js",
 
       preconstruct: {
         umdName: "packageOne",
@@ -307,8 +296,8 @@ test("monorepo umd with dep on other module", async () => {
 
     "packages/package-three/package.json": JSON.stringify({
       name: "@some-scope/package-three-umd-with-dep",
-      main: "dist/package-three-umd-with-dep.cjs.js",
-      "umd:main": "dist/package-three-umd-with-dep.umd.min.js",
+      main: "dist/some-scope-package-three-umd-with-dep.cjs.js",
+      "umd:main": "dist/some-scope-package-three-umd-with-dep.umd.min.js",
 
       preconstruct: {
         umdName: "packageThree",
@@ -325,8 +314,8 @@ test("monorepo umd with dep on other module", async () => {
 
     "packages/package-two/package.json": JSON.stringify({
       name: "@some-scope/package-two-umd-with-dep",
-      main: "dist/package-two-umd-with-dep.cjs.js",
-      "umd:main": "dist/package-two-umd-with-dep.umd.min.js",
+      main: "dist/some-scope-package-two-umd-with-dep.cjs.js",
+      "umd:main": "dist/some-scope-package-two-umd-with-dep.umd.min.js",
 
       preconstruct: {
         umdName: "packageTwo",
@@ -385,7 +374,7 @@ test("monorepo umd with dep on other module", async () => {
       "devDependencies": Object {
         "react": "^16.6.3",
       },
-      "main": "dist/package-one-umd-with-dep.cjs.js",
+      "main": "dist/some-scope-package-one-umd-with-dep.cjs.js",
       "name": "@some-scope/package-one-umd-with-dep",
       "peerDependencies": Object {
         "react": "^16.6.3",
@@ -393,7 +382,7 @@ test("monorepo umd with dep on other module", async () => {
       "preconstruct": Object {
         "umdName": "packageOne",
       },
-      "umd:main": "dist/package-one-umd-with-dep.umd.min.js",
+      "umd:main": "dist/some-scope-package-one-umd-with-dep.umd.min.js",
     }
   `);
 
@@ -403,7 +392,7 @@ test("monorepo umd with dep on other module", async () => {
       "devDependencies": Object {
         "react": "^16.6.3",
       },
-      "main": "dist/package-two-umd-with-dep.cjs.js",
+      "main": "dist/some-scope-package-two-umd-with-dep.cjs.js",
       "name": "@some-scope/package-two-umd-with-dep",
       "peerDependencies": Object {
         "react": "^16.6.3",
@@ -411,7 +400,7 @@ test("monorepo umd with dep on other module", async () => {
       "preconstruct": Object {
         "umdName": "packageTwo",
       },
-      "umd:main": "dist/package-two-umd-with-dep.umd.min.js",
+      "umd:main": "dist/some-scope-package-two-umd-with-dep.umd.min.js",
     }
   `);
 
@@ -471,7 +460,7 @@ test("json", async () => {
   await build(tmpPath);
 
   expect(await getDist(tmpPath)).toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/json-package.cjs.dev.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/json-package.cjs.dev.js, dist/json-package.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     Object.defineProperty(exports, '__esModule', { value: true });
@@ -498,24 +487,6 @@ test("json", async () => {
     } else {
       module.exports = require("./json-package.cjs.dev.js");
     }
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/json-package.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    "use strict";
-
-    Object.defineProperty(exports, "__esModule", {
-      value: !0
-    });
-
-    var changesetsSchema = {
-      $schema: "http://json-schema.org/draft-07/schema#",
-      type: "object",
-      properties: {},
-      required: [ "$schema" ]
-    };
-
-    let schema = changesetsSchema;
-
-    exports.schema = schema;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/json-package.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     var changesetsSchema = {

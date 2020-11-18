@@ -117,8 +117,8 @@ test("scoped package", async () => {
   expect(pkg).toMatchInlineSnapshot(`
     Object {
       "license": "MIT",
-      "main": "dist/some-package.cjs.js",
-      "module": "dist/some-package.esm.js",
+      "main": "dist/some-scope-some-package.cjs.js",
+      "module": "dist/some-scope-some-package.esm.js",
       "name": "@some-scope/some-package",
       "private": true,
       "version": "1.0.0",
@@ -153,8 +153,8 @@ test("monorepo", async () => {
   expect(pkg1).toMatchInlineSnapshot(`
     Object {
       "license": "MIT",
-      "main": "dist/package-one.cjs.js",
-      "module": "dist/package-one.esm.js",
+      "main": "dist/some-scope-package-one.cjs.js",
+      "module": "dist/some-scope-package-one.esm.js",
       "name": "@some-scope/package-one",
       "private": true,
       "version": "1.0.0",
@@ -164,8 +164,8 @@ test("monorepo", async () => {
   expect(pkg2).toMatchInlineSnapshot(`
     Object {
       "license": "MIT",
-      "main": "dist/package-two.cjs.js",
-      "module": "dist/package-two.esm.js",
+      "main": "dist/some-scope-package-two.cjs.js",
+      "module": "dist/some-scope-package-two.esm.js",
       "name": "@some-scope/package-two",
       "private": true,
       "version": "1.0.0",
@@ -255,22 +255,20 @@ let basicThreeEntrypoints = {
   "package.json": JSON.stringify({
     name: "something",
     preconstruct: {
-      entrypoints: [".", "one", "two"],
+      entrypoints: ["index.js", "one.js", "two.js"],
     },
   }),
   "src/index.js": js`
                     export let something = true;
                   `,
-  "one/package.json": JSON.stringify({
-    preconstruct: {
-      source: "../src",
-    },
-  }),
-  "two/package.json": JSON.stringify({
-    preconstruct: {
-      source: "../src",
-    },
-  }),
+  "src/one.js": js`
+                  export let something = true;
+                `,
+  "src/two.js": js`
+                  export let something = true;
+                `,
+  "one/package.json": JSON.stringify({}),
+  "two/package.json": JSON.stringify({}),
 };
 
 test("three entrypoints, no main, only add main", async () => {
@@ -281,12 +279,9 @@ test("three entrypoints, no main, only add main", async () => {
   await init(dir);
 
   expect(await getFiles(dir, ["**/package.json"])).toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ one/package.json, two/package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ one/package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     {
-      "preconstruct": {
-        "source": "../src"
-      },
-      "main": "dist/something.cjs.js"
+      "main": "dist/something-one.cjs.js"
     }
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
@@ -294,12 +289,17 @@ test("three entrypoints, no main, only add main", async () => {
       "name": "something",
       "preconstruct": {
         "entrypoints": [
-          ".",
-          "one",
-          "two"
+          "index.js",
+          "one.js",
+          "two.js"
         ]
       },
       "main": "dist/something.cjs.js"
+    }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ two/package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {
+      "main": "dist/something-two.cjs.js"
     }
 
   `);
@@ -314,13 +314,10 @@ test("three entrypoints, no main, add main and module", async () => {
   await init(dir);
 
   expect(await getFiles(dir, ["**/package.json"])).toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ one/package.json, two/package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ one/package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     {
-      "preconstruct": {
-        "source": "../src"
-      },
-      "main": "dist/something.cjs.js",
-      "module": "dist/something.esm.js"
+      "main": "dist/something-one.cjs.js",
+      "module": "dist/something-one.esm.js"
     }
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
@@ -328,13 +325,19 @@ test("three entrypoints, no main, add main and module", async () => {
       "name": "something",
       "preconstruct": {
         "entrypoints": [
-          ".",
-          "one",
-          "two"
+          "index.js",
+          "one.js",
+          "two.js"
         ]
       },
       "main": "dist/something.cjs.js",
       "module": "dist/something.esm.js"
+    }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ two/package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {
+      "main": "dist/something-two.cjs.js",
+      "module": "dist/something-two.esm.js"
     }
 
   `);
@@ -355,14 +358,11 @@ test("three entrypoints, no main, add main and fix browser", async () => {
   await init(dir);
 
   expect(await getFiles(dir, ["**/package.json"])).toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ one/package.json, two/package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ one/package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     {
-      "preconstruct": {
-        "source": "../src"
-      },
-      "main": "dist/something.cjs.js",
+      "main": "dist/something-one.cjs.js",
       "browser": {
-        "./dist/something.cjs.js": "./dist/something.browser.cjs.js"
+        "./dist/something-one.cjs.js": "./dist/something-one.browser.cjs.js"
       }
     }
 
@@ -371,15 +371,23 @@ test("three entrypoints, no main, add main and fix browser", async () => {
       "name": "something",
       "preconstruct": {
         "entrypoints": [
-          ".",
-          "one",
-          "two"
+          "index.js",
+          "one.js",
+          "two.js"
         ]
       },
       "browser": {
         "./dist/something.cjs.js": "./dist/something.browser.cjs.js"
       },
       "main": "dist/something.cjs.js"
+    }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ two/package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {
+      "main": "dist/something-two.cjs.js",
+      "browser": {
+        "./dist/something-two.cjs.js": "./dist/something-two.browser.cjs.js"
+      }
     }
 
   `);

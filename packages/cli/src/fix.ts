@@ -7,8 +7,10 @@ import {
   validateEntrypointSource,
   isUmdNameSpecified,
   EXPERIMENTAL_FLAGS,
+  FORMER_FLAGS_THAT_ARE_ENABLED_NOW,
 } from "./validate";
 import { fixPackage } from "./validate-package";
+import { BatchError, FatalError } from "./errors";
 
 async function fixEntrypoint(entrypoint: Entrypoint) {
   let hasBeenModified = false;
@@ -59,14 +61,23 @@ export default async function fix(directory: string) {
   let project = await Project.create(directory, true);
   let didModifyProject = false;
   if (project.json.preconstruct.___experimentalFlags_WILL_CHANGE_IN_PATCH) {
+    let errors: FatalError[] = [];
     Object.keys(
       project.json.preconstruct.___experimentalFlags_WILL_CHANGE_IN_PATCH
     ).forEach((key) => {
-      if (!EXPERIMENTAL_FLAGS.has(key)) {
+      if (FORMER_FLAGS_THAT_ARE_ENABLED_NOW.has(key)) {
         didModifyProject = true;
-        debugger;
         delete (project.json.preconstruct
           .___experimentalFlags_WILL_CHANGE_IN_PATCH as any)[key];
+      } else if (!EXPERIMENTAL_FLAGS.has(key)) {
+        errors.push(
+          new FatalError(
+            `The experimental flag ${JSON.stringify(
+              key
+            )} in your config does not exist`,
+            project.name
+          )
+        );
       }
     });
     if (didModifyProject) {
@@ -79,6 +90,9 @@ export default async function fix(directory: string) {
           .___experimentalFlags_WILL_CHANGE_IN_PATCH;
       }
       await project.save();
+    }
+    if (errors.length) {
+      throw new BatchError(errors);
     }
   }
 

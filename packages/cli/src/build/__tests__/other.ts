@@ -82,7 +82,7 @@ test("browser", async () => {
 
     export default thing$1;
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/browser.cjs.dev.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/browser.cjs.dev.js, dist/browser.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     Object.defineProperty(exports, '__esModule', { value: true });
@@ -109,21 +109,6 @@ test("browser", async () => {
     } else {
       module.exports = require("./browser.cjs.dev.js");
     }
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/browser.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    "use strict";
-
-    Object.defineProperty(exports, "__esModule", {
-      value: !0
-    });
-
-    let thing = "wow";
-
-    "undefined" != typeof window && (thing = "something"), void 0 !== typeof document && (thing += "other");
-
-    var thing$1 = thing;
-
-    exports.default = thing$1;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/browser.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     let thing = "wow";
@@ -199,7 +184,7 @@ test("typescript", async () => {
     export * from "./declarations/src/index";
     export { default } from "./declarations/src/index";
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.cjs.dev.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.cjs.dev.js, dist/typescript.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     Object.defineProperty(exports, '__esModule', { value: true });
@@ -244,37 +229,6 @@ test("typescript", async () => {
     } else {
       module.exports = require("./typescript.cjs.dev.js");
     }
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    "use strict";
-
-    Object.defineProperty(exports, "__esModule", {
-      value: !0
-    });
-
-    var path = require("path");
-
-    function _interopNamespace(e) {
-      if (e && e.__esModule) return e;
-      var n = Object.create(null);
-      return e && Object.keys(e).forEach((function(k) {
-        if ("default" !== k) {
-          var d = Object.getOwnPropertyDescriptor(e, k);
-          Object.defineProperty(n, k, d.get ? d : {
-            enumerable: !0,
-            get: function() {
-              return e[k];
-            }
-          });
-        }
-      })), n.default = e, Object.freeze(n);
-    }
-
-    var path__namespace = _interopNamespace(path);
-
-    let obj = {}, thing = "something";
-
-    exports.path = path__namespace, exports.default = thing, exports.obj = obj;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     import * as path from 'path';
@@ -472,7 +426,7 @@ test("entrypoint outside package directory", async () => {
       main: "dist/pkg-a.cjs.js",
 
       preconstruct: {
-        source: "../some-file",
+        entrypoints: ["../../some-file.js"],
       },
     }),
   });
@@ -480,7 +434,7 @@ test("entrypoint outside package directory", async () => {
     await build(tmpPath);
   } catch (err) {
     expect(err.message).toMatchInlineSnapshot(
-      `"entrypoint source files must be inside their respective package directory but this entrypoint has specified its source file as ../some-file"`
+      `"entrypoint source files must be inside of the src directory of a package but ../some-file.js is not"`
     );
     return;
   }
@@ -503,7 +457,7 @@ test("module imported outside package directory", async () => {
 
     "pkg-a/package.json": JSON.stringify({
       name: "@imports-outside-pkg-dir/pkg-a",
-      main: "dist/pkg-a.cjs.js",
+      main: "dist/imports-outside-pkg-dir-pkg-a.cjs.js",
     }),
 
     "pkg-a/src/index.js": js`
@@ -601,14 +555,14 @@ test("batches build errors", async () => {
 
     "packages/package-one/package.json": JSON.stringify({
       name: "@errors/package-one",
-      main: "dist/package-one.cjs.js",
+      main: "dist/errors-package-one.cjs.js",
       license: "MIT",
       private: true,
     }),
 
     "packages/package-two/package.json": JSON.stringify({
       name: "@errors/package-two",
-      main: "dist/package-two.cjs.js",
+      main: "dist/errors-package-two.cjs.js",
       license: "MIT",
       private: true,
     }),
@@ -651,7 +605,7 @@ test("builds package using eval", async () => {
   await build(dir);
 
   expect(await getDist(dir)).toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.dev.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.dev.js, dist/pkg.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     Object.defineProperty(exports, '__esModule', { value: true });
@@ -670,17 +624,6 @@ test("builds package using eval", async () => {
     } else {
       module.exports = require("./pkg.cjs.dev.js");
     }
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    "use strict";
-
-    function compute(arg) {
-      return eval(arg);
-    }
-
-    Object.defineProperty(exports, "__esModule", {
-      value: !0
-    }), exports.default = compute;
 
   `);
 });
@@ -724,7 +667,7 @@ test("builds umd with a dependency containing top-level this in ESM", async () =
   await build(dir);
 
   expect(await getDist(dir)).toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.dev.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.dev.js, dist/pkg.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     Object.defineProperty(exports, '__esModule', { value: true });
@@ -752,30 +695,6 @@ test("builds umd with a dependency containing top-level this in ESM", async () =
     } else {
       module.exports = require("./pkg.cjs.dev.js");
     }
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    "use strict";
-
-    Object.defineProperty(exports, "__esModule", {
-      value: !0
-    });
-
-    var withTopLevelThisInEsm = require("with-top-level-this-in-esm");
-
-    function _interopDefault(e) {
-      return e && e.__esModule ? e : {
-        default: e
-      };
-    }
-
-    var withTopLevelThisInEsm__default = _interopDefault(withTopLevelThisInEsm);
-
-    Object.defineProperty(exports, "default", {
-      enumerable: !0,
-      get: function() {
-        return withTopLevelThisInEsm__default.default;
-      }
-    });
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.umd.min.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     !function(e,t){"object"==typeof exports&&"undefined"!=typeof module?module.exports=t():"function"==typeof define&&define.amd?define(t):(e="undefined"!=typeof globalThis?globalThis:e||self).pkg=t()}(this,(function(){"use strict";var e=function(){return(e=Object.assign||function(e){for(var t,n=1,o=arguments.length;n<o;n++)for(var r in t=arguments[n])Object.prototype.hasOwnProperty.call(t,r)&&(e[r]=t[r]);return e}).apply(this,arguments)};return e({},{bar:42})}));

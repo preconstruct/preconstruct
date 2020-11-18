@@ -23,11 +23,9 @@ if (process.env.NODE_ENV === \\"production\\") {
 `;
 
 exports[`basic: valid-package.cjs.prod.js 1`] = `
-"\\"use strict\\";
+"'use strict';
 
-Object.defineProperty(exports, \\"__esModule\\", {
-  value: !0
-});
+Object.defineProperty(exports, '__esModule', { value: true });
 
 var index = \\"something\\";
 
@@ -97,15 +95,17 @@ if (process.env.NODE_ENV === \\"production\\") {
 `;
 
 exports[`typescript thing: weird-typescript-thing.cjs.prod.js 1`] = `
-"\\"use strict\\";
+"'use strict';
 
-Object.defineProperty(exports, \\"__esModule\\", {
-  value: !0
-});
+Object.defineProperty(exports, '__esModule', { value: true });
 
-const thing = () => \\"wow\\", makeThing = () => \\"wow\\", thing$1 = \\"wow\\";
+const thing = () => \\"wow\\";
 
-exports.thing = \\"wow\\";
+const makeThing = () => thing();
+
+const thing$1 = makeThing();
+
+exports.thing = thing$1;
 "
 `;
 

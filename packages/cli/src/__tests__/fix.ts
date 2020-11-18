@@ -1,12 +1,14 @@
 import fixturez from "fixturez";
 import fix from "../fix";
 import path from "path";
-import { confirms as _confirms, errors, inputs } from "../messages";
+import { confirms as _confirms, inputs } from "../messages";
 import {
   getPkg,
   modifyPkg,
   logMock,
   createPackageCheckTestCreator,
+  testdir,
+  js,
 } from "../../test-utils";
 import { promptInput as _promptInput } from "../prompt";
 import fs from "fs-extra";
@@ -27,11 +29,9 @@ afterEach(() => {
 
 test("no entrypoint", async () => {
   let tmpPath = f.copy("no-entrypoint");
-  try {
-    await fix(tmpPath);
-  } catch (error) {
-    expect(error.message).toBe(errors.noSource("src/index"));
-  }
+  await expect(fix(tmpPath)).rejects.toMatchInlineSnapshot(
+    `[Error: packages must have at least one entrypoint, this package has no entrypoints]`
+  );
 });
 
 test("only main", async () => {
@@ -75,11 +75,6 @@ test("new dist filenames", async () => {
 
   await modifyPkg(tmpPath, (json) => {
     json.name = "@scope/something";
-    json.preconstruct = {
-      ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
-        newDistFilenames: true,
-      },
-    };
     json.main = "bad.js";
     json.module = "bad.js";
   });
@@ -94,11 +89,6 @@ test("new dist filenames", async () => {
       "main": "dist/scope-something.cjs.js",
       "module": "dist/scope-something.esm.js",
       "name": "@scope/something",
-      "preconstruct": Object {
-        "___experimentalFlags_WILL_CHANGE_IN_PATCH": Object {
-          "newDistFilenames": true,
-        },
-      },
       "private": true,
       "version": "1.0.0",
     }
@@ -111,9 +101,6 @@ test("new dist filenames only-unscoped-package-name strategy", async () => {
   await modifyPkg(tmpPath, (json) => {
     json.name = "@scope/something";
     json.preconstruct = {
-      ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
-        newDistFilenames: true,
-      },
       distFilenameStrategy: "unscoped-package-name",
     };
     json.main = "bad.js";
@@ -131,9 +118,6 @@ test("new dist filenames only-unscoped-package-name strategy", async () => {
       "module": "dist/something.esm.js",
       "name": "@scope/something",
       "preconstruct": Object {
-        "___experimentalFlags_WILL_CHANGE_IN_PATCH": Object {
-          "newDistFilenames": true,
-        },
         "distFilenameStrategy": "unscoped-package-name",
       },
       "private": true,
@@ -159,8 +143,8 @@ test("monorepo", async () => {
   expect(pkg1).toMatchInlineSnapshot(`
     Object {
       "license": "MIT",
-      "main": "dist/package-one.cjs.js",
-      "module": "dist/package-one.esm.js",
+      "main": "dist/some-scope-package-one.cjs.js",
+      "module": "dist/some-scope-package-one.esm.js",
       "name": "@some-scope/package-one",
       "private": true,
       "version": "1.0.0",
@@ -170,8 +154,8 @@ test("monorepo", async () => {
   expect(pkg2).toMatchInlineSnapshot(`
     Object {
       "license": "MIT",
-      "main": "dist/package-two.cjs.js",
-      "module": "dist/package-two.esm.js",
+      "main": "dist/some-scope-package-two.cjs.js",
+      "module": "dist/some-scope-package-two.esm.js",
       "name": "@some-scope/package-two",
       "private": true,
       "version": "1.0.0",
@@ -300,24 +284,10 @@ test("create entrypoint", async () => {
     "export let x = 1"
   );
 
-  confirms.createEntrypoint.mockImplementation(async (x) => {
-    if (x.name === "valid-package/another") {
-      debugger;
-      return true;
-    } else {
-      throw new Error("this should never happen: " + x.name);
-    }
-  });
   let x = 0;
 
   promptInput.mockImplementation(async (message, { name }, defaultAnswer) => {
     if (x === 0) {
-      x++;
-      expect(message).toBe(inputs.getSource);
-      expect(name).toBe("valid-package/another");
-      expect(defaultAnswer).toBe("src/index");
-      return "../src/another";
-    } else if (x === 1) {
       expect(message).toBe(inputs.getUmdName);
       expect(name).toBe("valid-package/another");
       return "another";
@@ -326,22 +296,20 @@ test("create entrypoint", async () => {
   });
 
   await modifyPkg(tmpPath, (pkg) => {
-    pkg.preconstruct.entrypoints = [".", "another"];
+    pkg.preconstruct.entrypoints = ["index.js", "another.js"];
   });
   await fix(tmpPath);
 
-  expect(promptInput).toBeCalledTimes(2);
-  expect(confirms.createEntrypoint).toBeCalledTimes(1);
+  expect(promptInput).toBeCalledTimes(1);
 
   expect(
     await fs.readFile(path.join(tmpPath, "another", "package.json"), "utf8")
   ).toMatchInlineSnapshot(`
     "{
-      \\"main\\": \\"dist/valid-package.cjs.js\\",
-      \\"module\\": \\"dist/valid-package.esm.js\\",
-      \\"umd:main\\": \\"dist/valid-package.umd.min.js\\",
+      \\"main\\": \\"dist/valid-package-another.cjs.js\\",
+      \\"module\\": \\"dist/valid-package-another.esm.js\\",
+      \\"umd:main\\": \\"dist/valid-package-another.umd.min.js\\",
       \\"preconstruct\\": {
-        \\"source\\": \\"../src/another\\",
         \\"umdName\\": \\"another\\"
       }
     }
@@ -356,8 +324,8 @@ test("create entrypoint", async () => {
       "name": "valid-package",
       "preconstruct": Object {
         "entrypoints": Array [
-          ".",
-          "another",
+          "index.js",
+          "another.js",
         ],
         "umdName": "validPackage",
       },
@@ -368,16 +336,13 @@ test("create entrypoint", async () => {
   `);
 });
 
-test("create entrypoint new entrypoints", async () => {
+test("create entrypoint no umd/no prompts", async () => {
   let tmpPath = f.copy("valid-package");
   await fs.writeFile(
     path.join(tmpPath, "src", "another.js"),
     "export let x = 1"
   );
   await modifyPkg(tmpPath, (pkg) => {
-    pkg.preconstruct.___experimentalFlags_WILL_CHANGE_IN_PATCH = {
-      newEntrypoints: true,
-    };
     delete pkg["umd:main"];
     pkg.preconstruct.entrypoints = ["index.js", "another.js"];
   });
@@ -385,8 +350,8 @@ test("create entrypoint new entrypoints", async () => {
 
   expect(await getPkg(path.join(tmpPath, "another"))).toMatchInlineSnapshot(`
     Object {
-      "main": "dist/valid-package.cjs.js",
-      "module": "dist/valid-package.esm.js",
+      "main": "dist/valid-package-another.cjs.js",
+      "module": "dist/valid-package-another.esm.js",
     }
   `);
 
@@ -397,9 +362,6 @@ test("create entrypoint new entrypoints", async () => {
       "module": "dist/valid-package.esm.js",
       "name": "valid-package",
       "preconstruct": Object {
-        "___experimentalFlags_WILL_CHANGE_IN_PATCH": Object {
-          "newEntrypoints": true,
-        },
         "entrypoints": Array [
           "index.js",
           "another.js",
@@ -410,4 +372,45 @@ test("create entrypoint new entrypoints", async () => {
       "version": "1.0.0",
     }
   `);
+});
+
+test("unexpected experimental flag throws, not removes", async () => {
+  let tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "pkg-a",
+      main: "dist/pkg-a.cjs.js",
+      preconstruct: {
+        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+          thisDoesNotExist: true,
+        },
+      },
+    }),
+    "src/index.js": js`
+                      export let x = true;
+                    `,
+  });
+
+  await expect(fix(tmpPath)).rejects.toMatchInlineSnapshot(
+    `[Error: 🎁  pkg-a The experimental flag "thisDoesNotExist" in your config does not exist]`
+  );
+});
+
+test("unexpected former experimental flag is removed", async () => {
+  let tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "pkg-a",
+      main: "dist/pkg-a.cjs.js",
+      preconstruct: {
+        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+          newEntrypoints: true,
+        },
+      },
+    }),
+    "src/index.js": js`
+                      export let x = true;
+                    `,
+  });
+
+  await expect(fix(tmpPath));
+  expect(getPkg(tmpPath)).toMatchInlineSnapshot(`Promise {}`);
 });

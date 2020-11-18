@@ -109,15 +109,16 @@ function validateEntrypoint(entrypoint: Entrypoint, log: boolean) {
   }
 }
 
-const FORMER_FLAGS_THAT_ARE_ENABLED_NOW = new Set<string>([]);
+export const FORMER_FLAGS_THAT_ARE_ENABLED_NOW = new Set<string>([
+  "newEntrypoints",
+  "newDistFilenames",
+  "newProcessEnvNodeEnvReplacementStrategyAndSkipTerserOnCJSProdBuild",
+]);
 
 export const EXPERIMENTAL_FLAGS = new Set([
   "useSourceInsteadOfGeneratingTSDeclarations",
   "useTSMorphToGenerateTSDeclarations",
   "logCompiledFiles",
-  "newEntrypoints",
-  "newDistFilenames",
-  "newProcessEnvNodeEnvReplacementStrategyAndSkipTerserOnCJSProdBuild",
 ]);
 
 export function validateProject(project: Project, log = false) {
@@ -137,10 +138,10 @@ export function validateProject(project: Project, log = false) {
         );
       } else if (!EXPERIMENTAL_FLAGS.has(key)) {
         errors.push(
-          new FixableError(
+          new FatalError(
             `The experimental flag ${JSON.stringify(
               key
-            )} in your config does not exist, the flag should be removed`,
+            )} in your config does not exist`,
             project.name
           )
         );

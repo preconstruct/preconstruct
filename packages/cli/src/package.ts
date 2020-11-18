@@ -3,13 +3,16 @@ import globby from "globby";
 import * as fs from "fs-extra";
 import nodePath from "path";
 import { Item } from "./item";
-import { FatalError } from "./errors";
+import { BatchError, FatalError } from "./errors";
 import { Entrypoint } from "./entrypoint";
 import jsonParse from "parse-json";
 
 import { errors, confirms } from "./messages";
 import { Project } from "./project";
-import { getUselessGlobsThatArentReallyGlobs } from "./glob-thing";
+import {
+  getUselessGlobsThatArentReallyGlobs,
+  getUselessGlobsThatArentReallyGlobsForNewEntrypoints,
+} from "./glob-thing";
 import {
   validFields,
   validFieldsFromPkg,
@@ -17,6 +20,7 @@ import {
   getEntrypointName,
   setFieldInOrder,
 } from "./utils";
+import normalizePath from "normalize-path";
 
 function getFieldsUsedInEntrypoints(
   descriptors: { contents: string | undefined; filename: string }[]
@@ -171,6 +175,19 @@ export class Package extends Item<{
               pkg.name
             );
           }
+          if (
+            !normalizePath(sourceFile).includes(
+              normalizePath(nodePath.join(pkg.directory, "src"))
+            )
+          ) {
+            throw new FatalError(
+              `entrypoint source files must be inside of the src directory of a package but ${nodePath.relative(
+                pkg.directory,
+                sourceFile
+              )} is not`,
+              pkg.name
+            );
+          }
           let directory = nodePath.join(
             pkg.directory,
             nodePath
@@ -196,6 +213,35 @@ export class Package extends Item<{
           return { filename, contents, sourceFile, hasAccepted: isFix };
         })
       ).then(async (descriptors) => {
+        const globErrors = await getUselessGlobsThatArentReallyGlobsForNewEntrypoints(
+          pkg.configEntrypoints,
+          entrypoints,
+          pkg.directory
+        );
+
+        if (globErrors.length) {
+          let errors = globErrors.map((globError) => {
+            if (globError.exists) {
+              return new FatalError(
+                `specifies a entrypoint ${JSON.stringify(
+                  globError.glob
+                )} but it is negated in the same config so it should be removed or the config should be fixed`,
+                pkg.name
+              );
+            } else {
+              return new FatalError(
+                `specifies a entrypoint ${JSON.stringify(
+                  globError.glob
+                )} but the file does not exist, please create it or fix the config`,
+                pkg.name
+              );
+            }
+          });
+          if (errors.length) {
+            throw new BatchError(errors);
+          }
+        }
+
         return createEntrypoints(pkg, descriptors);
       });
       const entrypointsWithSourcePath = new Map<string, string>();
