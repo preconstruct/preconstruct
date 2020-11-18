@@ -18,7 +18,6 @@ chalk.level = 0;
 
 console.error = jest.fn();
 console.log = jest.fn();
-
 export let logMock = {
   log: (console.log as any) as jest.MockInstance<void, any>,
   error: (console.error as any) as jest.MockInstance<void, any>,
