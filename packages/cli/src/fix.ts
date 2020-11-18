@@ -4,7 +4,6 @@ import { promptInput } from "./prompt";
 import * as logger from "./logger";
 import { inputs } from "./messages";
 import {
-  validateEntrypointSource,
   isUmdNameSpecified,
   EXPERIMENTAL_FLAGS,
   FORMER_FLAGS_THAT_ARE_ENABLED_NOW,
@@ -13,48 +12,16 @@ import { fixPackage } from "./validate-package";
 import { BatchError, FatalError } from "./errors";
 
 async function fixEntrypoint(entrypoint: Entrypoint) {
-  let hasBeenModified = false;
-  // we're only doing this on entrypoints that aren't at the root of the package
-  // because at the root of the package, you're less likely to want to change the entrypoint source
-  if (entrypoint.directory !== entrypoint.package.directory) {
-    try {
-      entrypoint.source;
-    } catch (err) {
-      if (err.code === "MODULE_NOT_FOUND") {
-        let val = await promptInput(inputs.getSource, entrypoint, "src/index");
-        if (
-          val !== "src/index" &&
-          val !== "src/index.js" &&
-          val !== "src/index.jsx" &&
-          val !== "src/index.ts" &&
-          val !== "src/index.tsx"
-        ) {
-          entrypoint.json.preconstruct.source = val;
-          hasBeenModified = true;
-        } else {
-          logger.info(
-            `${val} is the default value for source files so it will not be written`
-          );
-        }
-      } else {
-        throw err;
-      }
-    }
-  }
-  validateEntrypointSource(entrypoint);
-
   if (
     entrypoint.json["umd:main"] !== undefined &&
     !isUmdNameSpecified(entrypoint)
   ) {
     let umdName = await promptInput(inputs.getUmdName, entrypoint);
     entrypoint.json.preconstruct.umdName = umdName;
-    hasBeenModified = true;
-  }
-  if (hasBeenModified) {
     await entrypoint.save();
+    return true;
   }
-  return hasBeenModified;
+  return false;
 }
 
 export default async function fix(directory: string) {

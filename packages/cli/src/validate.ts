@@ -12,25 +12,6 @@ import chalk from "chalk";
 // just does validation
 // used in build and watch
 
-export function validateEntrypointSource(entrypoint: Entrypoint) {
-  try {
-    if (!entrypoint.source.startsWith(entrypoint.package.directory)) {
-      throw new FatalError(
-        `entrypoint source files must be inside their respective package directory but this entrypoint has specified its source file as ${entrypoint.configSource}`,
-        entrypoint.name
-      );
-    }
-  } catch (e) {
-    if (e.code === "MODULE_NOT_FOUND") {
-      throw new FatalError(
-        errors.noSource(entrypoint.configSource),
-        entrypoint.name
-      );
-    }
-    throw e;
-  }
-}
-
 export const isFieldValid = {
   main(entrypoint: Entrypoint) {
     return entrypoint.json.main === validFields.main(entrypoint);
@@ -53,7 +34,6 @@ export function isUmdNameSpecified(entrypoint: Entrypoint) {
 let projectsShownOldDistNamesInfo = new WeakSet<Project>();
 
 function validateEntrypoint(entrypoint: Entrypoint, log: boolean) {
-  validateEntrypointSource(entrypoint);
   if (log) {
     logger.info(infos.validEntrypoint, entrypoint.name);
   }

@@ -35,11 +35,4 @@ export class Entrypoint extends Item<{
       )
     );
   }
-
-  get configSource(): string {
-    return nodePath.relative(
-      this.directory,
-      nodePath.relative(this.package.directory, this.source)
-    );
-  }
 }
