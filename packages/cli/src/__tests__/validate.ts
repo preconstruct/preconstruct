@@ -574,7 +574,7 @@ test("unexpected former experimental flag", async () => {
   );
 });
 
-test("unexpected former experimental flag", async () => {
+test("non-existant entrypoint", async () => {
   let tmpPath = await testdir({
     "package.json": JSON.stringify({
       name: "pkg-a",
@@ -587,5 +587,22 @@ test("unexpected former experimental flag", async () => {
 
   await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
     `[Error: 🎁  pkg-a specifies a entrypoint "index.js" but the file does not exist, please create it or fix the config]`
+  );
+});
+
+test("negated entrypoint", async () => {
+  let tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "pkg-a",
+      main: "dist/pkg-a.cjs.js",
+      preconstruct: {
+        entrypoints: ["index.js", "!index.js"],
+      },
+    }),
+    "src/index.js": "",
+  });
+
+  await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
+    `[Error: 🎁  pkg-a specifies a entrypoint "index.js" but it is negated in the same config so it should be removed or the config should be fixed]`
   );
 });
