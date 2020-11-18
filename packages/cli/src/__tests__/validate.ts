@@ -440,7 +440,6 @@ test("root dist directory not included in package without entrypoint at root", a
       files: ["other"],
       preconstruct: {
         entrypoints: ["other.js"],
-        ___experimentalFlags_WILL_CHANGE_IN_PATCH: { newEntrypoints: true },
       },
     }),
     "other/package.json": JSON.stringify({
@@ -466,7 +465,6 @@ test("new entrypoints with old config", async () => {
       preconstruct: {
         source: "src/sum",
         entrypoints: [".", "multiply"],
-        ___experimentalFlags_WILL_CHANGE_IN_PATCH: { newEntrypoints: true },
       },
     }),
 
@@ -499,7 +497,6 @@ test("multiple source files for same entrypoint", async () => {
       name: "pkg-a",
       preconstruct: {
         entrypoints: ["other.js", "other/index.js"],
-        ___experimentalFlags_WILL_CHANGE_IN_PATCH: { newEntrypoints: true },
       },
     }),
     "other/package.json": JSON.stringify({
@@ -533,5 +530,47 @@ test("unexpected source option", async () => {
 
   await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
     `[Error: The source option on entrypoints no longer exists, see the changelog for how to upgrade to the new entrypoints config]`
+  );
+});
+
+test("unexpected experimental flag", async () => {
+  let tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "pkg-a",
+      main: "dist/pkg-a.cjs.js",
+      preconstruct: {
+        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+          thisDoesNotExist: true,
+        },
+      },
+    }),
+    "src/index.js": js`
+                      export let x = true;
+                    `,
+  });
+
+  await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
+    `[Error: The experimental flag "thisDoesNotExist" in your config does not exist]`
+  );
+});
+
+test("unexpected former experimental flag", async () => {
+  let tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "pkg-a",
+      main: "dist/pkg-a.cjs.js",
+      preconstruct: {
+        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+          newEntrypoints: true,
+        },
+      },
+    }),
+    "src/index.js": js`
+                      export let x = true;
+                    `,
+  });
+
+  await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
+    `[Error: The behaviour from the experimental flag "newEntrypoints" is the current behaviour now, the flag should be removed]`
   );
 });

@@ -7,6 +7,8 @@ import {
   modifyPkg,
   logMock,
   createPackageCheckTestCreator,
+  testdir,
+  js,
 } from "../../test-utils";
 import { promptInput as _promptInput } from "../prompt";
 import fs from "fs-extra";
@@ -73,11 +75,6 @@ test("new dist filenames", async () => {
 
   await modifyPkg(tmpPath, (json) => {
     json.name = "@scope/something";
-    json.preconstruct = {
-      ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
-        newDistFilenames: true,
-      },
-    };
     json.main = "bad.js";
     json.module = "bad.js";
   });
@@ -92,11 +89,6 @@ test("new dist filenames", async () => {
       "main": "dist/scope-something.cjs.js",
       "module": "dist/scope-something.esm.js",
       "name": "@scope/something",
-      "preconstruct": Object {
-        "___experimentalFlags_WILL_CHANGE_IN_PATCH": Object {
-          "newDistFilenames": true,
-        },
-      },
       "private": true,
       "version": "1.0.0",
     }
@@ -109,9 +101,6 @@ test("new dist filenames only-unscoped-package-name strategy", async () => {
   await modifyPkg(tmpPath, (json) => {
     json.name = "@scope/something";
     json.preconstruct = {
-      ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
-        newDistFilenames: true,
-      },
       distFilenameStrategy: "unscoped-package-name",
     };
     json.main = "bad.js";
@@ -129,9 +118,6 @@ test("new dist filenames only-unscoped-package-name strategy", async () => {
       "module": "dist/something.esm.js",
       "name": "@scope/something",
       "preconstruct": Object {
-        "___experimentalFlags_WILL_CHANGE_IN_PATCH": Object {
-          "newDistFilenames": true,
-        },
         "distFilenameStrategy": "unscoped-package-name",
       },
       "private": true,
@@ -357,9 +343,6 @@ test("create entrypoint no umd/no prompts", async () => {
     "export let x = 1"
   );
   await modifyPkg(tmpPath, (pkg) => {
-    pkg.preconstruct.___experimentalFlags_WILL_CHANGE_IN_PATCH = {
-      newEntrypoints: true,
-    };
     delete pkg["umd:main"];
     pkg.preconstruct.entrypoints = ["index.js", "another.js"];
   });
@@ -379,9 +362,6 @@ test("create entrypoint no umd/no prompts", async () => {
       "module": "dist/valid-package.esm.js",
       "name": "valid-package",
       "preconstruct": Object {
-        "___experimentalFlags_WILL_CHANGE_IN_PATCH": Object {
-          "newEntrypoints": true,
-        },
         "entrypoints": Array [
           "index.js",
           "another.js",
@@ -392,4 +372,45 @@ test("create entrypoint no umd/no prompts", async () => {
       "version": "1.0.0",
     }
   `);
+});
+
+test("unexpected experimental flag throws, not removes", async () => {
+  let tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "pkg-a",
+      main: "dist/pkg-a.cjs.js",
+      preconstruct: {
+        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+          thisDoesNotExist: true,
+        },
+      },
+    }),
+    "src/index.js": js`
+                      export let x = true;
+                    `,
+  });
+
+  await expect(fix(tmpPath)).rejects.toMatchInlineSnapshot(
+    `[Error: 🎁  pkg-a The experimental flag "thisDoesNotExist" in your config does not exist]`
+  );
+});
+
+test("unexpected former experimental flag is removed", async () => {
+  let tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "pkg-a",
+      main: "dist/pkg-a.cjs.js",
+      preconstruct: {
+        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+          newEntrypoints: true,
+        },
+      },
+    }),
+    "src/index.js": js`
+                      export let x = true;
+                    `,
+  });
+
+  await expect(fix(tmpPath));
+  expect(getPkg(tmpPath)).toMatchInlineSnapshot(`Promise {}`);
 });

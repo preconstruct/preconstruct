@@ -149,11 +149,6 @@ test("process.env.NODE_ENV reassignment new approach", async () => {
     "package.json": JSON.stringify({
       name: "test",
       main: "dist/test.cjs.js",
-      preconstruct: {
-        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
-          newProcessEnvNodeEnvReplacementStrategyAndSkipTerserOnCJSProdBuild: true,
-        },
-      },
     }),
     "src/index.js": js`
                       process.env.NODE_ENV = "development";
@@ -377,11 +372,6 @@ test("new dist filenames", async () => {
       name: "@scope/test",
       main: "dist/scope-test.cjs.js",
       module: "dist/scope-test.esm.js",
-      preconstruct: {
-        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
-          newDistFilenames: true,
-        },
-      },
     }),
     "src/index.js": js`
                       export default "something";
