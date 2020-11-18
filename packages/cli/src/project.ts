@@ -44,7 +44,7 @@ export class Project extends Item<{
       useSourceInsteadOfGeneratingTSDeclarations: !!config.useSourceInsteadOfGeneratingTSDeclarations,
       useTSMorphToGenerateTSDeclarations: !!config.useTSMorphToGenerateTSDeclarations,
       logCompiledFiles: !!config.logCompiledFiles,
-      newProcessEnvNodeEnvReplacementStrategyAndSkipTerserOnCJSProdBuild: !!config.newProcessEnvNodeEnvReplacementStrategyAndSkipTerserOnCJSProdBuild,
+      newProcessEnvNodeEnvReplacementStrategyAndSkipTerserOnCJSProdBuild: true,
     };
   }
   get configPackages(): Array<string> {

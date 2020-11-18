@@ -54,15 +54,19 @@ if (process.env.NODE_ENV === \\"production\\") {
 `;
 
 exports[`browser no module: dist/browser-no-module.cjs.prod.js 1`] = `
-"\\"use strict\\";
+"'use strict';
 
-Object.defineProperty(exports, \\"__esModule\\", {
-  value: !0
-});
+Object.defineProperty(exports, '__esModule', { value: true });
 
 let thing = \\"wow\\";
 
-\\"undefined\\" != typeof window && (thing = \\"something\\"), void 0 !== typeof document && (thing += \\"other\\");
+if (typeof window !== \\"undefined\\") {
+  thing = \\"something\\";
+}
+
+if (typeof document !== undefined) {
+  thing += \\"other\\";
+}
 
 var thing$1 = thing;
 
@@ -117,11 +121,9 @@ if (process.env.NODE_ENV === \\"production\\") {
 `;
 
 exports[`should lazily get globals: dist/umd-unused-peer-dep.cjs.prod.js 1`] = `
-"\\"use strict\\";
+"'use strict';
 
-Object.defineProperty(exports, \\"__esModule\\", {
-  value: !0
-});
+Object.defineProperty(exports, '__esModule', { value: true });
 
 var index = \\"something\\";
 
@@ -199,14 +201,18 @@ if (process.env.NODE_ENV === \\"production\\") {
 `;
 
 exports[`typescript with forced dts emit: dist/typescript-force-dts-emit.cjs.prod.js 1`] = `
-"\\"use strict\\";
+"'use strict';
 
-Object.defineProperty(exports, \\"__esModule\\", {
-  value: !0
+Object.defineProperty(exports, '__esModule', { value: true });
+
+var toolkit = require('@reduxjs/toolkit');
+
+// @ts-ignore (installed during test)
+var rootReducer = toolkit.combineReducers({
+  /* blah blah blah */
 });
 
-var toolkit = require(\\"@reduxjs/toolkit\\"), rootReducer = toolkit.combineReducers({});
-
+// @ts-ignore (installed during test)
 function createStore() {
   return toolkit.configureStore({
     reducer: rootReducer
@@ -267,22 +273,18 @@ if (process.env.NODE_ENV === \\"production\\") {
 `;
 
 exports[`using external @babel/runtime helpers: dist/external-babel-runtime.cjs.prod.js 1`] = `
-"\\"use strict\\";
+"'use strict';
 
-Object.defineProperty(exports, \\"__esModule\\", {
-  value: !0
-});
+Object.defineProperty(exports, '__esModule', { value: true });
 
-var _classCallCheck = require(\\"@babel/runtime/helpers/classCallCheck\\");
+var _classCallCheck = require('@babel/runtime/helpers/classCallCheck');
 
-function _interopDefault(e) {
-  return e && e.__esModule ? e : {
-    default: e
-  };
-}
+function _interopDefault (e) { return e && e.__esModule ? e : { 'default': e }; }
 
-var _classCallCheck__default = _interopDefault(_classCallCheck), Foo = function Foo() {
-  _classCallCheck__default.default(this, Foo);
+var _classCallCheck__default = /*#__PURE__*/_interopDefault(_classCallCheck);
+
+var Foo = function Foo() {
+  _classCallCheck__default['default'](this, Foo);
 };
 
 exports.default = Foo;
