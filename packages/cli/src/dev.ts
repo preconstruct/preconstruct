@@ -9,25 +9,6 @@ import { validateProject } from "./validate";
 
 let tsExtensionPattern = /tsx?$/;
 
-function cjsOnlyReexportTemplate(pathToSource: string) {
-  return `// 👋 hey!!
-// you might be reading this and seeing .esm in the filename
-// and being confused why there is commonjs below this filename
-// DON'T WORRY!
-// this is intentional
-// it's only commonjs with \`preconstruct dev\`
-// when you run \`preconstruct build\`, it will be ESM
-// why is it commonjs?
-// we need to re-export every export from the source file
-// but we can't do that with ESM without knowing what the exports are (because default exports aren't included in export/import *)
-// and they could change after running \`preconstruct dev\` so we can't look at the file without forcing people to
-// run preconstruct dev again which wouldn't be ideal
-// this solution could change but for now, it's working
-
-module.exports = require(${JSON.stringify(pathToSource)})
-`;
-}
-
 async function getTypeSystem(
   entrypoint: Entrypoint
 ): Promise<[undefined | "flow" | "typescript", string]> {
@@ -206,11 +187,9 @@ unregister();
           ];
           if (entrypoint.json.module) {
             promises.push(
-              fs.writeFile(
-                path.join(entrypoint.directory, validFields.module(entrypoint)),
-                cjsOnlyReexportTemplate(
-                  path.relative(distDirectory, entrypoint.source)
-                )
+              fs.symlink(
+                entrypoint.source,
+                path.join(entrypoint.directory, validFields.module(entrypoint))
               )
             );
           }
@@ -218,11 +197,9 @@ unregister();
             let browserField = validFields.browser(entrypoint);
             for (let key of Object.keys(browserField)) {
               promises.push(
-                fs.writeFile(
-                  path.join(entrypoint.directory, browserField[key]),
-                  cjsOnlyReexportTemplate(
-                    path.relative(distDirectory, entrypoint.source)
-                  )
+                fs.symlink(
+                  entrypoint.source,
+                  path.join(entrypoint.directory, browserField[key])
                 )
               );
             }
