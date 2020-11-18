@@ -171,39 +171,13 @@ export let getRollupConfig = (
           moduleDirectory: type === "umd" ? "node_modules" : [],
         },
       }),
-      type === "umd" &&
-        pkg.project.experimentalFlags
-          .newProcessEnvNodeEnvReplacementStrategyAndSkipTerserOnCJSProdBuild &&
-        inlineProcessEnvNodeEnv({ sourceMap: true }),
+      type === "umd" && inlineProcessEnvNodeEnv({ sourceMap: true }),
       type === "umd" &&
         terser({
           sourceMap: true,
-          compress: pkg.project.experimentalFlags
-            .newProcessEnvNodeEnvReplacementStrategyAndSkipTerserOnCJSProdBuild
-            ? true
-            : {
-                global_defs: {
-                  ["process.env" + ".NODE_ENV"]: "production",
-                },
-              },
+          compress: true,
         }),
-      type === "node-prod" &&
-        (pkg.project.experimentalFlags
-          .newProcessEnvNodeEnvReplacementStrategyAndSkipTerserOnCJSProdBuild
-          ? inlineProcessEnvNodeEnv({ sourceMap: false })
-          : terser({
-              sourceMap: false,
-              mangle: false,
-              format: {
-                beautify: true,
-                indent_level: 2,
-              },
-              compress: {
-                global_defs: {
-                  ["process.env" + ".NODE_ENV"]: "production",
-                },
-              },
-            })),
+      type === "node-prod" && inlineProcessEnvNodeEnv({ sourceMap: false }),
       ,
     ].filter((x): x is Plugin => !!x),
   };

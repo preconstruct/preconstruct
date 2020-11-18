@@ -9,10 +9,7 @@ import jsonParse from "parse-json";
 
 import { errors, confirms } from "./messages";
 import { Project } from "./project";
-import {
-  getUselessGlobsThatArentReallyGlobs,
-  getUselessGlobsThatArentReallyGlobsForNewEntrypoints,
-} from "./glob-thing";
+import { getUselessGlobsThatArentReallyGlobsForNewEntrypoints } from "./glob-thing";
 import {
   validFields,
   validFieldsFromPkg,
@@ -72,7 +69,7 @@ function createEntrypoints(
     filename: string;
     contents: string | undefined;
     hasAccepted: boolean;
-    sourceFile?: string;
+    sourceFile: string;
   }[]
 ) {
   let fields = getFieldsUsedInEntrypoints(descriptors);
@@ -117,9 +114,7 @@ export class Package extends Item<{
   entrypoints!: Array<Entrypoint>;
   get configEntrypoints(): Array<string> {
     if (this.json.preconstruct.entrypoints === undefined) {
-      return this.project.experimentalFlags.newEntrypoints
-        ? ["index.{js,jsx,ts,tsx}"]
-        : ["."];
+      return ["index.{js,jsx,ts,tsx}"];
     }
     if (
       Array.isArray(this.json.preconstruct.entrypoints) &&
@@ -143,193 +138,126 @@ export class Package extends Item<{
     let contents = await fs.readFile(filePath, "utf-8");
     let pkg = new Package(filePath, contents, project._jsonDataByPath);
     pkg.project = project;
-    if (project.experimentalFlags.newEntrypoints) {
-      let entrypoints = await globby(pkg.configEntrypoints, {
-        cwd: nodePath.join(pkg.directory, "src"),
-        onlyFiles: true,
-        absolute: true,
-        expandDirectories: false,
-      });
-      if (!entrypoints.length) {
-        let oldEntrypoints = await globby(pkg.configEntrypoints, {
-          cwd: pkg.directory,
-          onlyDirectories: true,
-          absolute: true,
-          expandDirectories: false,
-        });
-        if (oldEntrypoints.length) {
-          throw new FatalError(
-            "this package has no entrypoints but it does have some using v1's entrypoints config, please see the the changelog for how to upgrade",
-            pkg.name
-          );
-        }
-      }
-      pkg.entrypoints = await Promise.all(
-        entrypoints.map(async (sourceFile) => {
-          if (!/\.[tj]sx?$/.test(sourceFile)) {
-            throw new FatalError(
-              `entrypoint source files must end in .js, .jsx, .ts or .tsx but ${nodePath.relative(
-                pkg.directory,
-                sourceFile
-              )} does not`,
-              pkg.name
-            );
-          }
-          if (
-            !normalizePath(sourceFile).includes(
-              normalizePath(nodePath.join(pkg.directory, "src"))
-            )
-          ) {
-            throw new FatalError(
-              `entrypoint source files must be inside of the src directory of a package but ${nodePath.relative(
-                pkg.directory,
-                sourceFile
-              )} is not`,
-              pkg.name
-            );
-          }
-          let directory = nodePath.join(
-            pkg.directory,
-            nodePath
-              .resolve(sourceFile)
-              .replace(nodePath.join(pkg.directory, "src"), "")
-              .replace(/\.[tj]sx?$/, "")
-          );
-          if (nodePath.basename(directory) === "index") {
-            directory = nodePath.dirname(directory);
-          }
-          let filename = nodePath.join(directory, "package.json");
-
-          let contents: string | undefined = undefined;
-
-          try {
-            contents = await fs.readFile(filename, "utf-8");
-          } catch (e) {
-            if (e.code !== "ENOENT") {
-              throw e;
-            }
-          }
-
-          return { filename, contents, sourceFile, hasAccepted: isFix };
-        })
-      ).then(async (descriptors) => {
-        const globErrors = await getUselessGlobsThatArentReallyGlobsForNewEntrypoints(
-          pkg.configEntrypoints,
-          entrypoints,
-          pkg.directory
-        );
-
-        if (globErrors.length) {
-          let errors = globErrors.map((globError) => {
-            if (globError.exists) {
-              return new FatalError(
-                `specifies a entrypoint ${JSON.stringify(
-                  globError.glob
-                )} but it is negated in the same config so it should be removed or the config should be fixed`,
-                pkg.name
-              );
-            } else {
-              return new FatalError(
-                `specifies a entrypoint ${JSON.stringify(
-                  globError.glob
-                )} but the file does not exist, please create it or fix the config`,
-                pkg.name
-              );
-            }
-          });
-          if (errors.length) {
-            throw new BatchError(errors);
-          }
-        }
-
-        return createEntrypoints(pkg, descriptors);
-      });
-      const entrypointsWithSourcePath = new Map<string, string>();
-      for (const entrypoint of pkg.entrypoints) {
-        if (entrypoint.json.preconstruct.source !== undefined) {
-          throw new FatalError(
-            "The source option on entrypoints no longer exists, see the changelog for how to upgrade to the new entrypoints config",
-            this.name
-          );
-        }
-        if (entrypointsWithSourcePath.has(entrypoint.name)) {
-          throw new FatalError(
-            `this package has multiple source files for the same entrypoint of ${
-              entrypoint.name
-            } at ${nodePath.relative(
-              pkg.directory,
-              entrypointsWithSourcePath.get(entrypoint.name)!
-            )} and ${nodePath.relative(pkg.directory, entrypoint.source)}`,
-            pkg.name
-          );
-        }
-        entrypointsWithSourcePath.set(entrypoint.name, entrypoint.source);
-      }
-    } else {
-      let entrypointDirectories = await globby(pkg.configEntrypoints, {
+    let entrypoints = await globby(pkg.configEntrypoints, {
+      cwd: nodePath.join(pkg.directory, "src"),
+      onlyFiles: true,
+      absolute: true,
+      expandDirectories: false,
+    });
+    if (!entrypoints.length) {
+      let oldEntrypoints = await globby(pkg.configEntrypoints, {
         cwd: pkg.directory,
         onlyDirectories: true,
         absolute: true,
         expandDirectories: false,
       });
-      pkg.entrypoints = await Promise.all(
-        entrypointDirectories.map(async (directory) => {
-          let filename = nodePath.join(directory, "package.json");
-
-          let contents: undefined | string;
-
-          try {
-            contents = await fs.readFile(filename, "utf-8");
-          } catch (e) {
-            if (e.code !== "ENOENT") {
-              throw e;
-            }
-          }
-
-          return { filename, contents, hasAccepted: false };
-        })
-      ).then(async (descriptors) => {
-        let globErrors = await getUselessGlobsThatArentReallyGlobs(
-          pkg.configEntrypoints,
-          pkg.directory
+      if (oldEntrypoints.length) {
+        throw new FatalError(
+          "this package has no entrypoints but it does have some using v1's entrypoints config, please see the the changelog for how to upgrade",
+          pkg.name
         );
-
-        if (globErrors.some((x) => x !== undefined)) {
-          await Promise.all(
-            globErrors.map(async (globError, index) => {
-              if (globError !== undefined) {
-                let shouldCreateEntrypoint = await confirms.createEntrypoint({
-                  name: nodePath.join(
-                    pkg.name,
-                    nodePath.relative(pkg.directory, globError)
-                  ),
-                });
-                if (shouldCreateEntrypoint) {
-                  descriptors.push({
-                    contents: undefined,
-                    filename: nodePath.resolve(
-                      pkg.directory,
-                      globError,
-                      "package.json"
-                    ),
-                    hasAccepted: true,
-                  });
-                  await fs.mkdirp(globError);
-                } else {
-                  (pkg.json.preconstruct.entrypoints as any[])[
-                    index
-                  ] = undefined;
-                }
-              }
-            })
+      }
+    }
+    pkg.entrypoints = await Promise.all(
+      entrypoints.map(async (sourceFile) => {
+        if (!/\.[tj]sx?$/.test(sourceFile)) {
+          throw new FatalError(
+            `entrypoint source files must end in .js, .jsx, .ts or .tsx but ${nodePath.relative(
+              pkg.directory,
+              sourceFile
+            )} does not`,
+            pkg.name
           );
-          pkg.json.preconstruct.entrypoints = (pkg.json.preconstruct
-            .entrypoints as string[]).filter((x: string | undefined) => x);
-          await pkg.save();
+        }
+        if (
+          !normalizePath(sourceFile).includes(
+            normalizePath(nodePath.join(pkg.directory, "src"))
+          )
+        ) {
+          throw new FatalError(
+            `entrypoint source files must be inside of the src directory of a package but ${nodePath.relative(
+              pkg.directory,
+              sourceFile
+            )} is not`,
+            pkg.name
+          );
+        }
+        let directory = nodePath.join(
+          pkg.directory,
+          nodePath
+            .resolve(sourceFile)
+            .replace(nodePath.join(pkg.directory, "src"), "")
+            .replace(/\.[tj]sx?$/, "")
+        );
+        if (nodePath.basename(directory) === "index") {
+          directory = nodePath.dirname(directory);
+        }
+        let filename = nodePath.join(directory, "package.json");
+
+        let contents: string | undefined = undefined;
+
+        try {
+          contents = await fs.readFile(filename, "utf-8");
+        } catch (e) {
+          if (e.code !== "ENOENT") {
+            throw e;
+          }
         }
 
-        return createEntrypoints(pkg, descriptors);
-      });
+        return { filename, contents, sourceFile, hasAccepted: isFix };
+      })
+    ).then(async (descriptors) => {
+      const globErrors = await getUselessGlobsThatArentReallyGlobsForNewEntrypoints(
+        pkg.configEntrypoints,
+        entrypoints,
+        pkg.directory
+      );
+
+      if (globErrors.length) {
+        let errors = globErrors.map((globError) => {
+          if (globError.exists) {
+            return new FatalError(
+              `specifies a entrypoint ${JSON.stringify(
+                globError.glob
+              )} but it is negated in the same config so it should be removed or the config should be fixed`,
+              pkg.name
+            );
+          } else {
+            return new FatalError(
+              `specifies a entrypoint ${JSON.stringify(
+                globError.glob
+              )} but the file does not exist, please create it or fix the config`,
+              pkg.name
+            );
+          }
+        });
+        if (errors.length) {
+          throw new BatchError(errors);
+        }
+      }
+
+      return createEntrypoints(pkg, descriptors);
+    });
+    const entrypointsWithSourcePath = new Map<string, string>();
+    for (const entrypoint of pkg.entrypoints) {
+      if (entrypoint.json.preconstruct.source !== undefined) {
+        throw new FatalError(
+          "The source option on entrypoints no longer exists, see the changelog for how to upgrade to the new entrypoints config",
+          this.name
+        );
+      }
+      if (entrypointsWithSourcePath.has(entrypoint.name)) {
+        throw new FatalError(
+          `this package has multiple source files for the same entrypoint of ${
+            entrypoint.name
+          } at ${nodePath.relative(
+            pkg.directory,
+            entrypointsWithSourcePath.get(entrypoint.name)!
+          )} and ${nodePath.relative(pkg.directory, entrypoint.source)}`,
+          pkg.name
+        );
+      }
+      entrypointsWithSourcePath.set(entrypoint.name, entrypoint.source);
     }
 
     return pkg;
