@@ -401,7 +401,6 @@ test("entrypoint not included in package", async () => {
       module: "dist/entrypoint-not-included-in-pkg.esm.js",
 
       preconstruct: {
-        source: "src/sum",
         entrypoints: ["index.js", "multiply.js"],
       },
 
@@ -417,9 +416,9 @@ test("entrypoint not included in package", async () => {
                          export let multiply = (a, b) => a * b;
                        `,
 
-    "src/sum.js": js`
-                    export let sum = (a, b) => a + b;
-                  `,
+    "src/index.js": js`
+                      export let sum = (a, b) => a + b;
+                    `,
   });
 
   try {
@@ -572,5 +571,21 @@ test("unexpected former experimental flag", async () => {
 
   await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
     `[Error: The behaviour from the experimental flag "newEntrypoints" is the current behaviour now, the flag should be removed]`
+  );
+});
+
+test("unexpected former experimental flag", async () => {
+  let tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "pkg-a",
+      main: "dist/pkg-a.cjs.js",
+      preconstruct: {
+        entrypoints: ["index.js"],
+      },
+    }),
+  });
+
+  await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
+    `[Error: 🎁  pkg-a specifies a entrypoint "index.js" but the file does not exist, please create it or fix the config]`
   );
 });
