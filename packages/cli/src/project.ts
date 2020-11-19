@@ -27,6 +27,7 @@ export class Project extends Item<{
     distFilenameStrategy?: JSONValue;
     ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
       logCompiledFiles?: JSONValue;
+      typeScriptProxyFileWithImportEqualsRequireAndExportEquals?: JSONValue;
     };
   };
 }> {
@@ -35,6 +36,7 @@ export class Project extends Item<{
       this.json.preconstruct.___experimentalFlags_WILL_CHANGE_IN_PATCH || {};
     return {
       logCompiledFiles: !!config.logCompiledFiles,
+      typeScriptProxyFileWithImportEqualsRequireAndExportEquals: !!config.typeScriptProxyFileWithImportEqualsRequireAndExportEquals,
     };
   }
   get configPackages(): Array<string> {

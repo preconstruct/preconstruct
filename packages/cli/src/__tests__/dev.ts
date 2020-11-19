@@ -272,3 +272,28 @@ test("typescript", async () => {
     await fs.readFile(path.join(tmpPath, "dist", "typescript.cjs.d.ts"), "utf8")
   ).toMatchSnapshot();
 });
+
+test("typescript", async () => {
+  let tmpPath = await testdir({
+    ...typescriptFixture,
+    "package.json": JSON.stringify({
+      ...JSON.parse(typescriptFixture["package.json"]),
+      preconstruct: {
+        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+          typeScriptProxyFileWithImportEqualsRequireAndExportEquals: true,
+        },
+      },
+    }),
+  });
+
+  await dev(tmpPath);
+
+  await expect(
+    fs.readFile(path.join(tmpPath, "dist", "typescript.cjs.d.ts"), "utf8")
+  ).resolves.toMatchInlineSnapshot(`
+          "import mod = require(\\"../src/index\\");
+
+          export = mod;
+          "
+        `);
+});

@@ -67,17 +67,20 @@ export async function writeDevTSFile(
   entrypoint: Entrypoint,
   entrypointSourceContent: string
 ) {
-  let hasDefaultExport = await entrypointHasDefaultExport(
-    entrypoint,
-    entrypointSourceContent
-  );
   let cjsDistPath = path
     .join(entrypoint.directory, validFields.main(entrypoint))
-    .replace(/\.js$/, "");
+    .replace(/\.js$/, ".d.ts");
 
-  await fs.outputFile(
-    cjsDistPath + ".d.ts",
-    `// are you seeing an error that a default export doesn't exist but your source file has a default export?
+  let output = await (entrypoint.package.project.experimentalFlags
+    .typeScriptProxyFileWithImportEqualsRequireAndExportEquals
+    ? `import mod = require(${JSON.stringify(
+        path
+          .relative(path.dirname(cjsDistPath), entrypoint.source)
+          .replace(/\.tsx?$/, "")
+      )});\n\nexport = mod;\n`
+    : entrypointHasDefaultExport(entrypoint, entrypointSourceContent).then(
+        (hasDefaultExport) =>
+          `// are you seeing an error that a default export doesn't exist but your source file has a default export?
 // you should run \`yarn\` or \`yarn preconstruct dev\` if preconstruct dev isn't in your postinstall hook
 
 // curious why you need to?
@@ -88,13 +91,15 @@ export async function writeDevTSFile(
 // to check for a default export and re-export it if it exists
 // it's not ideal, but it works pretty well ¯\\_(ツ)_/¯
 ` +
-      tsTemplate(
-        hasDefaultExport,
-        path
-          .relative(path.dirname(cjsDistPath), entrypoint.source)
-          .replace(/\.tsx?$/, "")
-      )
-  );
+          tsTemplate(
+            hasDefaultExport,
+            path
+              .relative(path.dirname(cjsDistPath), entrypoint.source)
+              .replace(/\.tsx?$/, "")
+          )
+      ));
+
+  await fs.outputFile(cjsDistPath, output);
 }
 
 async function writeTypeSystemFile(

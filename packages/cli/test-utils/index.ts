@@ -227,7 +227,7 @@ export const repoNodeModules = path.resolve(
   "node_modules"
 );
 
-export const typescriptFixture: Fixture = {
+export const typescriptFixture = {
   node_modules: { kind: "symlink", path: repoNodeModules },
   "package.json": JSON.stringify({
     name: "typescript",
@@ -326,15 +326,13 @@ export const typescriptFixture: Fixture = {
 
                                export { obj };
                              `,
-};
+} as const;
 
 type Fixture = {
   [key: string]: string | { kind: "symlink"; path: string };
 };
 
-export async function testdir(dir: {
-  [key: string]: string | { kind: "symlink"; path: string };
-}) {
+export async function testdir(dir: Fixture) {
   const temp = f.temp();
   await Promise.all(
     Object.keys(dir).map(async (filename) => {
