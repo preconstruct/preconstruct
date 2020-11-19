@@ -47,7 +47,7 @@
 
   Would need the following changes to work in `@preconstruct/cli@2`
 
-  `other/package.json`
+  `package.json`
 
   ```diff
    {
