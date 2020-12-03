@@ -1,5 +1,13 @@
 # preconstruct
 
+## 2.0.1
+
+### Patch Changes
+
+- [`4afde4e`](https://github.com/preconstruct/preconstruct/commit/4afde4e6e57b31a06c45831b18f456c46b5abff3) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Add `typeScriptProxyFileWithImportEqualsRequireAndExportEquals` experimental flag
+
+* [`c2a9918`](https://github.com/preconstruct/preconstruct/commit/c2a9918ee73f5900f6c5b9a96c2efd94299ab416) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Fix entrypoint glob check on Windows
+
 ## 2.0.0
 
 ### Major Changes
