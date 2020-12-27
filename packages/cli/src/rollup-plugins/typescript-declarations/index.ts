@@ -10,12 +10,12 @@ import { createDeclarationCreatorWithTSMorph } from "./create-generator-ts-morph
 export let isTsPath = (source: string) => /\.tsx?/.test(source);
 
 export default function typescriptDeclarations(pkg: Package): Plugin {
-  // if (
-  //   !pkg.entrypoints.some(({ source }) => isTsPath(source)) ||
-  //   pkg.project.experimentalFlags.useSourceInsteadOfGeneratingTSDeclarations
-  // ) {
-  return { name: "typescript-declarations" };
-  // }
+  if (
+    !pkg.entrypoints.some(({ source }) => isTsPath(source)) ||
+    pkg.project.experimentalFlags.useSourceInsteadOfGeneratingTSDeclarations
+  ) {
+    return { name: "typescript-declarations" };
+  }
   return {
     name: "typescript-declarations",
     async generateBundle(opts, bundle) {
