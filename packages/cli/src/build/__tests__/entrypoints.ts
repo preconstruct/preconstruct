@@ -4,7 +4,6 @@ import {
   snapshotDirectory,
   stripHashes,
   testdir,
-  getDist,
   js,
   getFiles,
 } from "../../../test-utils";
@@ -13,111 +12,6 @@ jest.setTimeout(10000);
 
 jest.mock("../../prompt");
 
-test("source entrypoint option", async () => {
-  let tmpPath = await testdir({
-    "package.json": JSON.stringify({
-      name: "source-entrypoint-option",
-      main: "dist/source-entrypoint-option.cjs.js",
-      preconstruct: {
-        source: "modules",
-      },
-    }),
-    "modules/index.js": js`
-                          export let something = "";
-                        `,
-  });
-
-  await build(tmpPath);
-
-  expect(await getDist(tmpPath)).toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/source-entrypoint-option.cjs.dev.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    Object.defineProperty(exports, '__esModule', { value: true });
-
-    let something = "";
-
-    exports.something = something;
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/source-entrypoint-option.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    if (process.env.NODE_ENV === "production") {
-      module.exports = require("./source-entrypoint-option.cjs.prod.js");
-    } else {
-      module.exports = require("./source-entrypoint-option.cjs.dev.js");
-    }
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/source-entrypoint-option.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    "use strict";
-
-    Object.defineProperty(exports, "__esModule", {
-      value: !0
-    });
-
-    let something = "";
-
-    exports.something = something;
-
-  `);
-});
-
-test("source entrypoint option flow", async () => {
-  let tmpPath = await testdir({
-    "package.json": JSON.stringify({
-      name: "test",
-      main: "dist/test.cjs.js",
-      preconstruct: {
-        source: "modules",
-      },
-    }),
-    "modules/index.js": js`
-                          // @flow
-                          
-                          export let something = "";
-                        `,
-  });
-
-  await build(tmpPath);
-
-  expect(await getDist(tmpPath)).toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.dev.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    Object.defineProperty(exports, '__esModule', { value: true });
-
-    // @flow
-    let something = "";
-
-    exports.something = something;
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    if (process.env.NODE_ENV === "production") {
-      module.exports = require("./test.cjs.prod.js");
-    } else {
-      module.exports = require("./test.cjs.dev.js");
-    }
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.js.flow ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    // @flow
-    export * from "../modules/index.js";
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    "use strict";
-
-    Object.defineProperty(exports, "__esModule", {
-      value: !0
-    });
-
-    let something = "";
-
-    exports.something = something;
-
-  `);
-});
-
 test("multiple entrypoints", async () => {
   let dir = await testdir({
     "package.json": JSON.stringify({
@@ -125,20 +19,16 @@ test("multiple entrypoints", async () => {
       main: "dist/multiple-entrypoints.cjs.js",
       module: "dist/multiple-entrypoints.esm.js",
       preconstruct: {
-        source: "src/sum",
-        entrypoints: [".", "multiply"],
+        entrypoints: ["index.js", "multiply.js"],
       },
     }),
     "multiply/package.json": JSON.stringify({
-      main: "dist/multiple-entrypoints.cjs.js",
-      module: "dist/multiple-entrypoints.esm.js",
-      preconstruct: {
-        source: "../src/multiply.js",
-      },
+      main: "dist/multiple-entrypoints-multiply.cjs.js",
+      module: "dist/multiple-entrypoints-multiply.esm.js",
     }),
-    "src/sum.js": js`
-                    export let sum = (a, b) => a + b;
-                  `,
+    "src/index.js": js`
+                      export let sum = (a, b) => a + b;
+                    `,
     "src/multiply.js": js`
                          export let multiply = (a, b) => a * b;
                        `,
@@ -147,7 +37,7 @@ test("multiple entrypoints", async () => {
   await build(dir);
 
   expect(await getFiles(dir, ["**/dist/**"])).toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/multiple-entrypoints.cjs.dev.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/multiple-entrypoints.cjs.dev.js, dist/multiple-entrypoints.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     Object.defineProperty(exports, '__esModule', { value: true });
@@ -156,7 +46,7 @@ test("multiple entrypoints", async () => {
 
     exports.sum = sum;
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/multiple-entrypoints.cjs.js, multiply/dist/multiple-entrypoints.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/multiple-entrypoints.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     if (process.env.NODE_ENV === "production") {
@@ -165,23 +55,12 @@ test("multiple entrypoints", async () => {
       module.exports = require("./multiple-entrypoints.cjs.dev.js");
     }
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/multiple-entrypoints.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    "use strict";
-
-    Object.defineProperty(exports, "__esModule", {
-      value: !0
-    });
-
-    let sum = (a, b) => a + b;
-
-    exports.sum = sum;
-
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/multiple-entrypoints.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     let sum = (a, b) => a + b;
 
     export { sum };
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ multiply/dist/multiple-entrypoints.cjs.dev.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ multiply/dist/multiple-entrypoints-multiply.cjs.dev.js, multiply/dist/multiple-entrypoints-multiply.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     Object.defineProperty(exports, '__esModule', { value: true });
@@ -190,18 +69,16 @@ test("multiple entrypoints", async () => {
 
     exports.multiply = multiply;
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ multiply/dist/multiple-entrypoints.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    "use strict";
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ multiply/dist/multiple-entrypoints-multiply.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
 
-    Object.defineProperty(exports, "__esModule", {
-      value: !0
-    });
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./multiple-entrypoints-multiply.cjs.prod.js");
+    } else {
+      module.exports = require("./multiple-entrypoints-multiply.cjs.dev.js");
+    }
 
-    let multiply = (a, b) => a * b;
-
-    exports.multiply = multiply;
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ multiply/dist/multiple-entrypoints.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ multiply/dist/multiple-entrypoints-multiply.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     let multiply = (a, b) => a * b;
 
     export { multiply };
@@ -215,20 +92,16 @@ test("two entrypoints, one module, one not", async () => {
       name: "two-entrypoints-one-module-one-not",
       main: "dist/two-entrypoints-one-module-one-not.cjs.js",
       preconstruct: {
-        source: "src/sum",
-        entrypoints: [".", "multiply"],
+        entrypoints: ["index.js", "multiply.js"],
       },
     }),
     "multiply/package.json": JSON.stringify({
-      main: "dist/two-entrypoints-one-module-one-not.cjs.js",
-      module: "dist/two-entrypoints-one-module-one-not.esm.js",
-      preconstruct: {
-        source: "../src/multiply.js",
-      },
+      main: "dist/two-entrypoints-one-module-one-not-multiply.cjs.js",
+      module: "dist/two-entrypoints-one-module-one-not-multiply.esm.js",
     }),
-    "src/sum.js": js`
-                    export let sum = (a, b) => a + b;
-                  `,
+    "src/index.js": js`
+                      export let sum = (a, b) => a + b;
+                    `,
     "src/multiply.js": js`
                          export let multiply = (a, b) => a * b;
                        `,
@@ -247,18 +120,13 @@ test("two entrypoints with a common dependency", async () => {
       module: "dist/common-dependency-two-entrypoints.esm.js",
 
       preconstruct: {
-        source: "src/sum",
-        entrypoints: [".", "multiply"],
+        entrypoints: ["index.js", "multiply.js"],
       },
     }),
 
     "multiply/package.json": JSON.stringify({
-      main: "dist/common-dependency-two-entrypoints.cjs.js",
-      module: "dist/common-dependency-two-entrypoints.esm.js",
-
-      preconstruct: {
-        source: "../src/multiply.js",
-      },
+      main: "dist/common-dependency-two-entrypoints-multiply.cjs.js",
+      module: "dist/common-dependency-two-entrypoints-multiply.esm.js",
     }),
 
     "src/identity.js": js`
@@ -267,19 +135,19 @@ test("two entrypoints with a common dependency", async () => {
 
     "src/multiply.js": js`
                          import { identity } from "./identity";
-                         
+
                          export let multiply = (a, b) => identity(a * b);
-                         
+
                          export { identity };
                        `,
 
-    "src/sum.js": js`
-                    import { identity } from "./identity";
-                    
-                    export let sum = (a, b) => identity(a + b);
-                    
-                    export { identity };
-                  `,
+    "src/index.js": js`
+                      import { identity } from "./identity";
+
+                      export let sum = (a, b) => identity(a + b);
+
+                      export { identity };
+                    `,
   });
 
   await build(tmpPath);
@@ -298,26 +166,21 @@ test("two entrypoints where one requires the other entrypoint", async () => {
       main: "dist/importing-another-entrypoint.cjs.js",
 
       preconstruct: {
-        source: "src/identity",
-        entrypoints: [".", "multiply"],
+        entrypoints: ["index.js", "multiply.js"],
       },
     }),
 
     "multiply/package.json": JSON.stringify({
-      main: "dist/importing-another-entrypoint.cjs.js",
-
-      preconstruct: {
-        source: "../src/multiply.js",
-      },
+      main: "dist/importing-another-entrypoint-multiply.cjs.js",
     }),
 
-    "src/identity.js": js`
-                         export let identity = (x) => x;
-                       `,
+    "src/index.js": js`
+                      export let identity = (x) => x;
+                    `,
 
     "src/multiply.js": js`
-                         import { identity } from "./identity";
-                         
+                         import { identity } from "./index";
+
                          export let multiply = (a, b) => identity(a * b);
                        `,
   });

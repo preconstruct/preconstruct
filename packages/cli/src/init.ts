@@ -4,16 +4,9 @@ import { promptInput } from "./prompt";
 import { FatalError, FixableError } from "./errors";
 import { success, info } from "./logger";
 import { infos, confirms, errors, inputs } from "./messages";
-import {
-  validateEntrypointSource,
-  isFieldValid,
-  isUmdNameSpecified,
-} from "./validate";
+import { isFieldValid, isUmdNameSpecified } from "./validate";
 
 async function doInit(pkg: Package) {
-  pkg.entrypoints.forEach((entrypoint) => {
-    validateEntrypointSource(entrypoint);
-  });
   if (pkg.entrypoints.every((entrypoint) => isFieldValid.main(entrypoint))) {
     info(infos.validField("main"), pkg.name);
   } else {

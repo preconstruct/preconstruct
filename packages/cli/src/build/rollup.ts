@@ -85,9 +85,9 @@ export let getRollupConfig = (
         return;
       }
       switch (warning.code) {
+        case "CIRCULAR_DEPENDENCY":
         case "EMPTY_BUNDLE":
         case "EVAL":
-        case "CIRCULAR_DEPENDENCY":
         case "UNUSED_EXTERNAL_IMPORT": {
           break;
         }
@@ -104,6 +104,21 @@ export let getRollupConfig = (
             );
             return;
           }
+        }
+        case "THIS_IS_UNDEFINED": {
+          if (type === "umd") {
+            return;
+          }
+          warnings.push(
+            new FatalError(
+              `"${path.relative(
+                pkg.directory,
+                warning.loc!.file!
+              )}" used \`this\` keyword at the top level of an ES module. You can read more about this at ${warning.url!} and fix this issue that has happened here:\n\n${warning.frame!}\n`,
+              pkg.name
+            )
+          );
+          return;
         }
         default: {
           warnings.push(
@@ -151,43 +166,18 @@ export let getRollupConfig = (
         }),
       resolve({
         extensions: EXTENSIONS,
+        browser: type === "umd",
         customResolveOptions: {
           moduleDirectory: type === "umd" ? "node_modules" : [],
         },
       }),
-      type === "umd" &&
-        pkg.project.experimentalFlags
-          .newProcessEnvNodeEnvReplacementStrategyAndSkipTerserOnCJSProdBuild &&
-        inlineProcessEnvNodeEnv({ sourceMap: true }),
+      type === "umd" && inlineProcessEnvNodeEnv({ sourceMap: true }),
       type === "umd" &&
         terser({
           sourceMap: true,
-          compress: pkg.project.experimentalFlags
-            .newProcessEnvNodeEnvReplacementStrategyAndSkipTerserOnCJSProdBuild
-            ? true
-            : {
-                global_defs: {
-                  ["process.env" + ".NODE_ENV"]: "production",
-                },
-              },
+          compress: true,
         }),
-      type === "node-prod" &&
-        (pkg.project.experimentalFlags
-          .newProcessEnvNodeEnvReplacementStrategyAndSkipTerserOnCJSProdBuild
-          ? inlineProcessEnvNodeEnv({ sourceMap: false })
-          : terser({
-              sourceMap: false,
-              mangle: false,
-              format: {
-                beautify: true,
-                indent_level: 2,
-              },
-              compress: {
-                global_defs: {
-                  ["process.env" + ".NODE_ENV"]: "production",
-                },
-              },
-            })),
+      type === "node-prod" && inlineProcessEnvNodeEnv({ sourceMap: false }),
       ,
     ].filter((x): x is Plugin => !!x),
   };

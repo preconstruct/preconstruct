@@ -10,6 +10,8 @@ import {
   js,
   getDist,
   repoNodeModules,
+  basicPkgJson,
+  getFiles,
 } from "../../../test-utils";
 import { doPromptInput as _doPromptInput } from "../../prompt";
 import { confirms as _confirms } from "../../messages";
@@ -67,7 +69,7 @@ test("clears dist folder", async () => {
   await build(dir);
 
   expect(await getDist(dir)).toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/already-has-things-in-dist.cjs.dev.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/already-has-things-in-dist.cjs.dev.js, dist/already-has-things-in-dist.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     Object.defineProperty(exports, '__esModule', { value: true });
@@ -84,17 +86,6 @@ test("clears dist folder", async () => {
     } else {
       module.exports = require("./already-has-things-in-dist.cjs.dev.js");
     }
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/already-has-things-in-dist.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    "use strict";
-
-    Object.defineProperty(exports, "__esModule", {
-      value: !0
-    });
-
-    var index = "something";
-
-    exports.default = index;
 
   `);
 });
@@ -116,11 +107,11 @@ test("flow", async () => {
 
     "src/index.js": js`
                       // @flow
-                      
+
                       export function doSomething(arg: string): string {
                         return "something" + arg;
                       }
-                      
+
                       export { default as something } from "./a";
                     `,
   });
@@ -144,11 +135,11 @@ test("flow", async () => {
     }),
     "src/index.js": js`
                       // @flow
-                      
+
                       export function doSomething(arg: string): string {
                         return "something" + arg;
                       }
-                      
+
                       export default "wow";
                     `,
   });
@@ -212,7 +203,7 @@ test("umd with dep on other module", async () => {
     },
     "src/index.js": js`
                       import { createElement } from "react";
-                      
+
                       createElement("div", null);
                     `,
   });
@@ -269,8 +260,8 @@ test("monorepo umd with dep on other module", async () => {
     },
     "packages/package-four/package.json": JSON.stringify({
       name: "@some-scope/package-four-umd-with-dep",
-      main: "dist/package-four-umd-with-dep.cjs.js",
-      "umd:main": "dist/package-four-umd-with-dep.umd.min.js",
+      main: "dist/some-scope-package-four-umd-with-dep.cjs.js",
+      "umd:main": "dist/some-scope-package-four-umd-with-dep.umd.min.js",
 
       preconstruct: {
         umdName: "packageFour",
@@ -287,8 +278,8 @@ test("monorepo umd with dep on other module", async () => {
 
     "packages/package-one/package.json": JSON.stringify({
       name: "@some-scope/package-one-umd-with-dep",
-      main: "dist/package-one-umd-with-dep.cjs.js",
-      "umd:main": "dist/package-one-umd-with-dep.umd.min.js",
+      main: "dist/some-scope-package-one-umd-with-dep.cjs.js",
+      "umd:main": "dist/some-scope-package-one-umd-with-dep.umd.min.js",
 
       preconstruct: {
         umdName: "packageOne",
@@ -305,8 +296,8 @@ test("monorepo umd with dep on other module", async () => {
 
     "packages/package-three/package.json": JSON.stringify({
       name: "@some-scope/package-three-umd-with-dep",
-      main: "dist/package-three-umd-with-dep.cjs.js",
-      "umd:main": "dist/package-three-umd-with-dep.umd.min.js",
+      main: "dist/some-scope-package-three-umd-with-dep.cjs.js",
+      "umd:main": "dist/some-scope-package-three-umd-with-dep.umd.min.js",
 
       preconstruct: {
         umdName: "packageThree",
@@ -323,8 +314,8 @@ test("monorepo umd with dep on other module", async () => {
 
     "packages/package-two/package.json": JSON.stringify({
       name: "@some-scope/package-two-umd-with-dep",
-      main: "dist/package-two-umd-with-dep.cjs.js",
-      "umd:main": "dist/package-two-umd-with-dep.umd.min.js",
+      main: "dist/some-scope-package-two-umd-with-dep.cjs.js",
+      "umd:main": "dist/some-scope-package-two-umd-with-dep.umd.min.js",
 
       preconstruct: {
         umdName: "packageTwo",
@@ -345,7 +336,7 @@ test("monorepo umd with dep on other module", async () => {
 
     "packages/package-one/src/index.js": js`
                                            import { createElement } from "react";
-                                           
+
                                            createElement("div", null);
                                          `,
 
@@ -355,7 +346,7 @@ test("monorepo umd with dep on other module", async () => {
 
     "packages/package-two/src/index.js": js`
                                            import { createElement } from "react";
-                                           
+
                                            createElement("h1", null);
                                          `,
   });
@@ -383,7 +374,7 @@ test("monorepo umd with dep on other module", async () => {
       "devDependencies": Object {
         "react": "^16.6.3",
       },
-      "main": "dist/package-one-umd-with-dep.cjs.js",
+      "main": "dist/some-scope-package-one-umd-with-dep.cjs.js",
       "name": "@some-scope/package-one-umd-with-dep",
       "peerDependencies": Object {
         "react": "^16.6.3",
@@ -391,7 +382,7 @@ test("monorepo umd with dep on other module", async () => {
       "preconstruct": Object {
         "umdName": "packageOne",
       },
-      "umd:main": "dist/package-one-umd-with-dep.umd.min.js",
+      "umd:main": "dist/some-scope-package-one-umd-with-dep.umd.min.js",
     }
   `);
 
@@ -401,7 +392,7 @@ test("monorepo umd with dep on other module", async () => {
       "devDependencies": Object {
         "react": "^16.6.3",
       },
-      "main": "dist/package-two-umd-with-dep.cjs.js",
+      "main": "dist/some-scope-package-two-umd-with-dep.cjs.js",
       "name": "@some-scope/package-two-umd-with-dep",
       "peerDependencies": Object {
         "react": "^16.6.3",
@@ -409,7 +400,7 @@ test("monorepo umd with dep on other module", async () => {
       "preconstruct": Object {
         "umdName": "packageTwo",
       },
-      "umd:main": "dist/package-two-umd-with-dep.umd.min.js",
+      "umd:main": "dist/some-scope-package-two-umd-with-dep.umd.min.js",
     }
   `);
 
@@ -454,7 +445,7 @@ test("json", async () => {
 
     "src/index.js": js`
                       import changesetsSchema from "./schema.json";
-                      
+
                       export let schema = changesetsSchema;
                     `,
 
@@ -469,7 +460,7 @@ test("json", async () => {
   await build(tmpPath);
 
   expect(await getDist(tmpPath)).toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/json-package.cjs.dev.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/json-package.cjs.dev.js, dist/json-package.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     Object.defineProperty(exports, '__esModule', { value: true });
@@ -497,24 +488,6 @@ test("json", async () => {
       module.exports = require("./json-package.cjs.dev.js");
     }
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/json-package.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    "use strict";
-
-    Object.defineProperty(exports, "__esModule", {
-      value: !0
-    });
-
-    var changesetsSchema = {
-      $schema: "http://json-schema.org/draft-07/schema#",
-      type: "object",
-      properties: {},
-      required: [ "$schema" ]
-    };
-
-    let schema = changesetsSchema;
-
-    exports.schema = schema;
-
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/json-package.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     var changesetsSchema = {
     	$schema: "http://json-schema.org/draft-07/schema#",
@@ -530,5 +503,47 @@ test("json", async () => {
 
     export { schema };
 
+  `);
+});
+
+test("respect browser alias field in dependencies when bundling UMD", async () => {
+  let dir = await testdir({
+    "package.json": basicPkgJson({
+      umdName: "importingPkgWithBrowserAliasField",
+      dependencies: {
+        "with-browser-alias-field": "*",
+      },
+    }),
+    "src/index.js": js`
+                      import target from "with-browser-alias-field";
+
+                      export default "And the target is: " + target;
+                    `,
+    "node_modules/with-browser-alias-field/package.json": JSON.stringify({
+      name: "with-browser-alias-field",
+      browser: {
+        "./lib/file.js": "./lib/browser-file.js",
+      },
+    }),
+    "node_modules/with-browser-alias-field/index.js": js`
+                                                        export { default } from "./lib/file";
+                                                      `,
+    "node_modules/with-browser-alias-field/lib/file.js": js`
+                                                           export default "node";
+                                                         `,
+    "node_modules/with-browser-alias-field/lib/browser-file.js": js`
+                                                                   export default "browser";
+                                                                 `,
+  });
+
+  await build(dir);
+
+  expect(await getFiles(dir, ["dist/*umd*"])).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.umd.min.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    !function(e,t){"object"==typeof exports&&"undefined"!=typeof module?module.exports=t():"function"==typeof define&&define.amd?define(t):(e="undefined"!=typeof globalThis?globalThis:e||self).importingPkgWithBrowserAliasField=t()}(this,(function(){"use strict";return"And the target is: browser"}));
+    //# sourceMappingURL=pkg.umd.min.js.map
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.umd.min.js.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {"version":3,"file":"pkg.umd.min.js","sources":["../src/index.js"],"sourcesContent":["import target from \\"with-browser-alias-field\\";\\n\\nexport default \\"And the target is: \\" + target;"],"names":[],"mappings":"wQAEe"}
   `);
 });

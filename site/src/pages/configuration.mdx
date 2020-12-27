@@ -65,6 +65,41 @@ Projects map 1:1 with a version control repository. They specify global configur
 }
 ```
 
+### `distFilenameStrategy`
+
+`"full" | "unscoped-package-name"`
+
+`distFilenameStrategy` specifies, you should probably use `full`(which is the default) unless you need to have filenames (likely if you have UMD builds whose filename you don't want to change) in which case, you should use `unscoped-package-name`
+
+| Entrypoint | `full` | `unscoped-package-name` |
+| --- | --- | --- |
+| `pkg` | `dist/pkg.cjs.js` | `dist/pkg.cjs.js` |
+| `pkg/entrypoint` | `dist/pkg-entrypoint.cjs.js` | `dist/pkg.cjs.js` |
+| `@scope/pkg` | `dist/scope-pkg.cjs.js` | `dist/pkg.cjs.js` |
+| `@scope/pkg/entrypoint` | `dist/scope-pkg-entrypoint.cjs.js` | `dist/pkg.cjs.js` |
+
+#### Default
+
+> Note: this is the default value, if it's what you want, you don't need to specify it.
+
+```json
+{
+  "preconstruct": {
+    "distFilenameStrategy": "full"
+  }
+}
+```
+
+#### Example
+
+```json
+{
+  "preconstruct": {
+    "distFilenameStrategy": "unscoped-package-name"
+  }
+}
+```
+
 ## Packages
 
 Packages map 1:1 with npm packages. Along with specifying the `entrypoints` option described below, packages are also responsible for specifying dependencies which is necessary for bundling UMD bundles and ensuring that packages will have all of their required dependencies when installed through npm.
@@ -73,7 +108,7 @@ Packages map 1:1 with npm packages. Along with specifying the `entrypoints` opti
 
 `Array<string>`
 
-`entrypoints` is an array of globs which specify the entrypoints which consumers of your package should be able to import.
+`entrypoints` is an array of globs which specify the entrypoints which consumers of your package should be able to import. They are resolved relative to the `src` directory of the package. To get the entrypoint directory from a source file, the extension is removed from the path relative to the `src` directory and if the last part is `index`, the `index` part is removed. For example, an entrypoint of `something.js` would create an entrypoint at `pkg-name/something` and `another/index.js` would create an entrypoint at `pkg-name/another`.
 
 #### Default
 
@@ -82,7 +117,7 @@ Packages map 1:1 with npm packages. Along with specifying the `entrypoints` opti
 ```json
 {
   "preconstruct": {
-    "entrypoints": ["."]
+    "entrypoints": ["index.{js,jsx,ts,tsx}"]
   }
 }
 ```
@@ -92,7 +127,7 @@ Packages map 1:1 with npm packages. Along with specifying the `entrypoints` opti
 ```json
 {
   "preconstruct": {
-    "entrypoints": [".", "other-entrypoint"]
+    "entrypoints": ["index.js", "other.js"]
   }
 }
 ```
@@ -100,34 +135,6 @@ Packages map 1:1 with npm packages. Along with specifying the `entrypoints` opti
 ## Entrypoints
 
 Entrypoints are the lowest level configuration point and describe a set of bundles for a particular entrypoint. They are configured by the `package.json` in the folder of the entrypoint. We also have a guide on [adding a second entrypoint](/guides/adding-a-second-entrypoint)
-
-### `source`
-
-`string`
-
-`source` specifies the source file to use for a given entrypoint. It's resolved relative to the package.json where it's specified.
-
-#### Default
-
-> Note: this is the default value, if it's what you want, you don't need to specify it.
-
-```json
-{
-  "preconstruct": {
-    "source": "src/index"
-  }
-}
-```
-
-#### Example
-
-```json
-{
-  "preconstruct": {
-    "source": "modules/index"
-  }
-}
-```
 
 ### Build types
 

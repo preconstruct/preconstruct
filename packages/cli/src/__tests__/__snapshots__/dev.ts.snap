@@ -8,13 +8,13 @@ export * from \\"../src/index.js\\";
 
 exports[`flow 2`] = `
 "// @flow
-export * from \\"../src/index.js\\";
+export * from \\"../../src/a.js\\";
 "
 `;
 
 exports[`flow 3`] = `
 "// @flow
-export * from \\"../src/index.js\\";
+export * from \\"../../src/b.js\\";
 "
 `;
 

@@ -1976,11 +1976,6 @@
   dependencies:
     "@babel/types" "^7.3.0"
 
-"@types/braces@*":
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/@types/braces/-/braces-3.0.0.tgz#7da1c0d44ff1c7eb660a36ec078ea61ba7eb42cb"
-  integrity sha512-TbH79tcyi9FHwbyboOKeRachRq63mSuWYXOflsNO9ZyE5ClQ/JaozNKl+aWUq87qPNsXasXxi2AbgfwIJ+8GQw==
-
 "@types/color-name@^1.1.1":
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/@types/color-name/-/color-name-1.1.1.tgz#1c1261bbeaa10a8055bbc5d8ab84b7b2afc846a0"
@@ -2102,13 +2097,6 @@
   integrity sha512-csdM22P8TFF5KwuHseifUBOzWiGtiLfYmQosrKPGpA/xdK3o3PNo3+4YOpiJ5BQBshwO2kuhdJ7NoAitQ6m/jg==
   dependencies:
     "@types/minimist-options" "*"
-
-"@types/micromatch@^3.1.0":
-  version "3.1.1"
-  resolved "https://registry.yarnpkg.com/@types/micromatch/-/micromatch-3.1.1.tgz#98eac88894da6606c2690624a9893a59c812d9fa"
-  integrity sha512-Wr5y4uv3r7JP4jEUqv7rZeYiMBGRHcbojDVsl11wq6gw1v/ZZQvJexd9rtvVx3EIVqw8dwtcRjSs8m2DV9qHjQ==
-  dependencies:
-    "@types/braces" "*"
 
 "@types/minimatch@*", "@types/minimatch@^3.0.3":
   version "3.0.3"
@@ -10503,7 +10491,7 @@ name-all-modules-plugin@^1.0.1:
   resolved "https://registry.yarnpkg.com/name-all-modules-plugin/-/name-all-modules-plugin-1.0.1.tgz#0abfb6ad835718b9fb4def0674e06657a954375c"
   integrity sha1-Cr+2rYNXGLn7Te8GdOBmV6lUN1w=
 
-nan@^2.12.1, nan@^2.14.0:
+nan@^2.12.1:
   version "2.14.0"
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.14.0.tgz#7818f722027b2459a86f0295d434d1fc2336c52c"
   integrity sha512-INOFj37C7k3AfaNTtX8RhsTw7qRy7eLET14cROi9+5HAVbbHuIWUHEauBv5qT4Av2tWasiTY1Jw6puUNqRJXQg==
@@ -15159,13 +15147,6 @@ v8-compile-cache@^2.1.1:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/v8-compile-cache/-/v8-compile-cache-2.1.1.tgz#54bc3cdd43317bca91e35dcaf305b1a7237de745"
   integrity sha512-8OQ9CL+VWyt3JStj7HX7/ciTL2V3Rl1Wf5OL+SNTm0yK1KvtReVulksyeRnCANHHuUxHlQig+JJDlUhBt1NQDQ==
-
-v8-profiler-next@^1.1.1:
-  version "1.2.2"
-  resolved "https://registry.yarnpkg.com/v8-profiler-next/-/v8-profiler-next-1.2.2.tgz#9eae99b8ae62658fd862c4530e6a6a7df72ca699"
-  integrity sha512-I9qiU6UfNJz5QIeXpx31kTh4ypH3r5W0ljgX92jBjfmEYRpSK2DK5OaPQYUr7mKnDgJALtG2eBX9j8fDp+b62w==
-  dependencies:
-    nan "^2.14.0"
 
 valid-url@^1.0.9:
   version "1.0.9"

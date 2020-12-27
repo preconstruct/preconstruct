@@ -70,7 +70,7 @@ test("typescript thing", async () => {
     ),
     "src/index.ts": ts`
                       import { makeThing } from "./thing";
-                      
+
                       export const thing = makeThing();
                     `,
 
@@ -80,7 +80,7 @@ test("typescript thing", async () => {
 
     "src/thing.tsx": tsx`
                        import { thing } from "./other";
-                       
+
                        export const makeThing = () => thing();
                      `,
 
@@ -134,10 +134,12 @@ test("process.env.NODE_ENV reassignment", async () => {
     }
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    "use strict";
+    'use strict';
 
-    process.env.NODE_ENV = "development", something12.process.env.NODE_ENV = "development", 
-    console.log("production"), console.log(something.process.env.NODE_ENV);
+    process.env.NODE_ENV = "development";
+    something12.process.env.NODE_ENV = "development";
+    console.log(        "production");
+    console.log(something.process.env.NODE_ENV);
 
   `);
 });
@@ -147,11 +149,6 @@ test("process.env.NODE_ENV reassignment new approach", async () => {
     "package.json": JSON.stringify({
       name: "test",
       main: "dist/test.cjs.js",
-      preconstruct: {
-        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
-          newProcessEnvNodeEnvReplacementStrategyAndSkipTerserOnCJSProdBuild: true,
-        },
-      },
     }),
     "src/index.js": js`
                       process.env.NODE_ENV = "development";
@@ -204,7 +201,7 @@ test("does not duplicate babel helpers", async () => {
   });
   await build(dir);
   expect(await getDist(dir)).toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.dev.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.dev.js, dist/test.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     Object.defineProperty(exports, '__esModule', { value: true });
@@ -235,25 +232,6 @@ test("does not duplicate babel helpers", async () => {
       module.exports = require("./test.cjs.dev.js");
     }
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    "use strict";
-
-    function _classCallCheck(instance, Constructor) {
-      if (!(instance instanceof Constructor)) throw new TypeError("Cannot call a class as a function");
-    }
-
-    Object.defineProperty(exports, "__esModule", {
-      value: !0
-    });
-
-    var Other = function Other() {
-      _classCallCheck(this, Other);
-    }, Thing = function Thing() {
-      _classCallCheck(this, Thing);
-    };
-
-    exports.Other = Other, exports.Thing = Thing;
-
   `);
 });
 
@@ -275,7 +253,7 @@ test("does not duplicate babel helpers when using @babel/plugin-transform-runtim
   });
   await build(dir);
   expect(await getDist(dir)).toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.dev.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.dev.js, dist/test.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     function _arrayLikeToArray(arr, len) {
@@ -385,87 +363,6 @@ test("does not duplicate babel helpers when using @babel/plugin-transform-runtim
       module.exports = require("./test.cjs.dev.js");
     }
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    "use strict";
-
-    function _arrayLikeToArray(arr, len) {
-      (null == len || len > arr.length) && (len = arr.length);
-      for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i];
-      return arr2;
-    }
-
-    function _unsupportedIterableToArray(o, minLen) {
-      if (o) {
-        if ("string" == typeof o) return _arrayLikeToArray(o, minLen);
-        var n = Object.prototype.toString.call(o).slice(8, -1);
-        return "Object" === n && o.constructor && (n = o.constructor.name), "Map" === n || "Set" === n ? Array.from(n) : "Arguments" === n || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n) ? _arrayLikeToArray(o, minLen) : void 0;
-      }
-    }
-
-    function _createForOfIteratorHelper(o) {
-      if ("undefined" == typeof Symbol || null == o[Symbol.iterator]) {
-        if (Array.isArray(o) || (o = _unsupportedIterableToArray(o))) {
-          var i = 0, F = function() {};
-          return {
-            s: F,
-            n: function() {
-              return i >= o.length ? {
-                done: !0
-              } : {
-                done: !1,
-                value: o[i++]
-              };
-            },
-            e: function(e) {
-              throw e;
-            },
-            f: F
-          };
-        }
-        throw new TypeError("Invalid attempt to iterate non-iterable instance.\\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
-      }
-      var it, err, normalCompletion = !0, didErr = !1;
-      return {
-        s: function() {
-          it = o[Symbol.iterator]();
-        },
-        n: function() {
-          var step = it.next();
-          return normalCompletion = step.done, step;
-        },
-        e: function(e) {
-          didErr = !0, err = e;
-        },
-        f: function() {
-          try {
-            normalCompletion || null == it.return || it.return();
-          } finally {
-            if (didErr) throw err;
-          }
-        }
-      };
-    }
-
-    var _step, _iterator = _createForOfIteratorHelper(something);
-
-    try {
-      for (_iterator.s(); !(_step = _iterator.n()).done; ) var x = _step.value;
-    } catch (err) {
-      _iterator.e(err);
-    } finally {
-      _iterator.f();
-    }
-
-    var _step$1, _iterator$1 = _createForOfIteratorHelper(something);
-
-    try {
-      for (_iterator$1.s(); !(_step$1 = _iterator$1.n()).done; ) var x$1 = _step$1.value;
-    } catch (err) {
-      _iterator$1.e(err);
-    } finally {
-      _iterator$1.f();
-    }
-
   `);
 });
 
@@ -475,11 +372,6 @@ test("new dist filenames", async () => {
       name: "@scope/test",
       main: "dist/scope-test.cjs.js",
       module: "dist/scope-test.esm.js",
-      preconstruct: {
-        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
-          newDistFilenames: true,
-        },
-      },
     }),
     "src/index.js": js`
                       export default "something";
@@ -487,7 +379,7 @@ test("new dist filenames", async () => {
   });
   await build(dir);
   await expect(getDist(dir)).resolves.toMatchInlineSnapshot(`
-          ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.cjs.dev.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+          ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.cjs.dev.js, dist/scope-test.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
           'use strict';
 
           Object.defineProperty(exports, '__esModule', { value: true });
@@ -504,17 +396,6 @@ test("new dist filenames", async () => {
           } else {
             module.exports = require("./scope-test.cjs.dev.js");
           }
-
-          ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-          "use strict";
-
-          Object.defineProperty(exports, "__esModule", {
-            value: !0
-          });
-
-          var index = "something";
-
-          exports.default = index;
 
           ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
           var index = "something";

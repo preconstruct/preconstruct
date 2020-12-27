@@ -5,24 +5,17 @@ import { Package } from "../../package";
 import { createDeclarationCreator } from "./create-generator";
 import { tsTemplate } from "../../utils";
 import normalizePath from "normalize-path";
-import { createDeclarationCreatorWithTSMorph } from "./create-generator-ts-morph";
 
 export let isTsPath = (source: string) => /\.tsx?/.test(source);
 
 export default function typescriptDeclarations(pkg: Package): Plugin {
-  if (
-    !pkg.entrypoints.some(({ source }) => isTsPath(source)) ||
-    pkg.project.experimentalFlags.useSourceInsteadOfGeneratingTSDeclarations
-  ) {
+  if (!pkg.entrypoints.some(({ source }) => isTsPath(source))) {
     return { name: "typescript-declarations" };
   }
   return {
     name: "typescript-declarations",
     async generateBundle(opts, bundle) {
-      let creator = await (pkg.project.experimentalFlags
-        .useTSMorphToGenerateTSDeclarations
-        ? createDeclarationCreatorWithTSMorph
-        : createDeclarationCreator)(pkg.directory, pkg.name);
+      let creator = await createDeclarationCreator(pkg.directory, pkg.name);
 
       let srcFilenameToDtsFilenameMap = new Map<string, string>();
 

@@ -9,25 +9,6 @@ import { validateProject } from "./validate";
 
 let tsExtensionPattern = /tsx?$/;
 
-function cjsOnlyReexportTemplate(pathToSource: string) {
-  return `// 👋 hey!!
-// you might be reading this and seeing .esm in the filename
-// and being confused why there is commonjs below this filename
-// DON'T WORRY!
-// this is intentional
-// it's only commonjs with \`preconstruct dev\`
-// when you run \`preconstruct build\`, it will be ESM
-// why is it commonjs?
-// we need to re-export every export from the source file
-// but we can't do that with ESM without knowing what the exports are (because default exports aren't included in export/import *)
-// and they could change after running \`preconstruct dev\` so we can't look at the file without forcing people to
-// run preconstruct dev again which wouldn't be ideal
-// this solution could change but for now, it's working
-
-module.exports = require(${JSON.stringify(pathToSource)})
-`;
-}
-
 async function getTypeSystem(
   entrypoint: Entrypoint
 ): Promise<[undefined | "flow" | "typescript", string]> {
@@ -86,17 +67,20 @@ export async function writeDevTSFile(
   entrypoint: Entrypoint,
   entrypointSourceContent: string
 ) {
-  let hasDefaultExport = await entrypointHasDefaultExport(
-    entrypoint,
-    entrypointSourceContent
-  );
   let cjsDistPath = path
     .join(entrypoint.directory, validFields.main(entrypoint))
-    .replace(/\.js$/, "");
+    .replace(/\.js$/, ".d.ts");
 
-  await fs.outputFile(
-    cjsDistPath + ".d.ts",
-    `// are you seeing an error that a default export doesn't exist but your source file has a default export?
+  let output = await (entrypoint.package.project.experimentalFlags
+    .typeScriptProxyFileWithImportEqualsRequireAndExportEquals
+    ? `import mod = require(${JSON.stringify(
+        path
+          .relative(path.dirname(cjsDistPath), entrypoint.source)
+          .replace(/\.tsx?$/, "")
+      )});\n\nexport = mod;\n`
+    : entrypointHasDefaultExport(entrypoint, entrypointSourceContent).then(
+        (hasDefaultExport) =>
+          `// are you seeing an error that a default export doesn't exist but your source file has a default export?
 // you should run \`yarn\` or \`yarn preconstruct dev\` if preconstruct dev isn't in your postinstall hook
 
 // curious why you need to?
@@ -107,13 +91,15 @@ export async function writeDevTSFile(
 // to check for a default export and re-export it if it exists
 // it's not ideal, but it works pretty well ¯\\_(ツ)_/¯
 ` +
-      tsTemplate(
-        hasDefaultExport,
-        path
-          .relative(path.dirname(cjsDistPath), entrypoint.source)
-          .replace(/\.tsx?$/, "")
-      )
-  );
+          tsTemplate(
+            hasDefaultExport,
+            path
+              .relative(path.dirname(cjsDistPath), entrypoint.source)
+              .replace(/\.tsx?$/, "")
+          )
+      ));
+
+  await fs.outputFile(cjsDistPath, output);
 }
 
 async function writeTypeSystemFile(
@@ -206,11 +192,9 @@ unregister();
           ];
           if (entrypoint.json.module) {
             promises.push(
-              fs.writeFile(
-                path.join(entrypoint.directory, validFields.module(entrypoint)),
-                cjsOnlyReexportTemplate(
-                  path.relative(distDirectory, entrypoint.source)
-                )
+              fs.symlink(
+                entrypoint.source,
+                path.join(entrypoint.directory, validFields.module(entrypoint))
               )
             );
           }
@@ -218,11 +202,9 @@ unregister();
             let browserField = validFields.browser(entrypoint);
             for (let key of Object.keys(browserField)) {
               promises.push(
-                fs.writeFile(
-                  path.join(entrypoint.directory, browserField[key]),
-                  cjsOnlyReexportTemplate(
-                    path.relative(distDirectory, entrypoint.source)
-                  )
+                fs.symlink(
+                  entrypoint.source,
+                  path.join(entrypoint.directory, browserField[key])
                 )
               );
             }

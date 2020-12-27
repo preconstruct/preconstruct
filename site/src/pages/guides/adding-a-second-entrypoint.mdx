@@ -26,56 +26,21 @@ and our package.json looks like:
   "name": "emoji-uid",
   "version": "1.0.2",
   "description": "Get 🔥 UIDs to help make things 💯",
-  "main": "dist/emoji-uid.cjs.js",
-  "preconstruct": {
-    "source": "src/index.js"
-  }
+  "main": "dist/emoji-uid.cjs.js"
 }
 ```
 
-Let's assume we've written our new function and written it to `src/awesomenewFunction.js`
+Let's assume we've written our new function in `src/awesome.js`
 
-The first bit of config we need to do is to add an `entrypoints` field to our preconstruct config. We should modify this in our package.json to read:
+The first bit of config we need to do is to add an `entrypoints` field to our preconstruct config. We should add this in our package.json:
 
 ```json
   "preconstruct": {
-    "source": "src/index.js"
-    "entrypoints": [".", "awesome"]
+    "entrypoints": ["index.js", "awesome.js"]
   },
 ```
 
 This tells preconstruct to look for these two entrypoints. We have written out two, as the first is preconstruct's default entrypoint which we still want to include.
-
-Next, we will want to do to add the location the entrypoint resolves to. We are going to add a new directory with its own `package.json` that represents this. We can run:
-
-```bash
-mkdir awesome
-touch awesome/package.json
-```
-
-After all this, our project should look like:
-
-```
-- src
-    /index.js
-    /awesomeNewFunction.js
-- package.json
-- awesome
-    /package.json
-```
-
-The next thing we need to do is tell the new `awesome` entrypoint where to find the source file that it should be bundling from. If we open it up, we want to make it look like:
-
-```json
-{
-  "main": "dist/emoji-uid.cjs.js",
-  "preconstruct": {
-    "source": "../src/awesomeNewFunction"
-  }
-}
-```
-
-This tells this entrypoint where to find the source code it should bundle to here.
 
 Finally, run
 
@@ -101,10 +66,9 @@ That's fine! If you haven't needed to add this field yet, you can add it with ju
   "name": "emoji-uid",
   "version": "1.0.2",
   "description": "Get 🔥 UIDs to help make things 💯",
-  "main": "dist/emoji-uid/.cjs.js",
+  "main": "dist/emoji-uid.cjs.js",
   "preconstruct": {
-    "entrypoints": [".", "awesome"]
-  },
-  "files": ["dist"]
+    "entrypoints": ["index.js", "awesome.js"]
+  }
 }
 ```

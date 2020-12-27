@@ -1,6 +1,6 @@
 import nodePath from "path";
 import { promptInput } from "./prompt";
-import globby from "globby";
+import fastGlob from "fast-glob";
 import * as fs from "fs-extra";
 import { Item } from "./item";
 import { Package } from "./package";
@@ -26,12 +26,8 @@ export class Project extends Item<{
     packages?: JSONValue;
     distFilenameStrategy?: JSONValue;
     ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
-      newEntrypoints?: JSONValue;
-      useSourceInsteadOfGeneratingTSDeclarations?: JSONValue;
-      useTSMorphToGenerateTSDeclarations?: JSONValue;
       logCompiledFiles?: JSONValue;
-      newDistFilenames?: JSONValue;
-      newProcessEnvNodeEnvReplacementStrategyAndSkipTerserOnCJSProdBuild?: JSONValue;
+      typeScriptProxyFileWithImportEqualsRequireAndExportEquals?: JSONValue;
     };
   };
 }> {
@@ -39,12 +35,8 @@ export class Project extends Item<{
     let config =
       this.json.preconstruct.___experimentalFlags_WILL_CHANGE_IN_PATCH || {};
     return {
-      newDistFilenames: !!config.newDistFilenames,
-      newEntrypoints: !!config.newEntrypoints,
-      useSourceInsteadOfGeneratingTSDeclarations: true,
-      useTSMorphToGenerateTSDeclarations: !!config.useTSMorphToGenerateTSDeclarations,
       logCompiledFiles: !!config.logCompiledFiles,
-      newProcessEnvNodeEnvReplacementStrategyAndSkipTerserOnCJSProdBuild: true,
+      typeScriptProxyFileWithImportEqualsRequireAndExportEquals: !!config.typeScriptProxyFileWithImportEqualsRequireAndExportEquals,
     };
   }
   get configPackages(): Array<string> {
@@ -63,11 +55,14 @@ export class Project extends Item<{
       this.name
     );
   }
-  static async create(directory: string): Promise<Project> {
+  static async create(
+    directory: string,
+    isFix: boolean = false
+  ): Promise<Project> {
     let filePath = nodePath.join(directory, "package.json");
     let contents = await fs.readFile(filePath, "utf-8");
-    let project = new Project(filePath, contents);
-    project.packages = await project._packages();
+    let project = new Project(filePath, contents, new Map());
+    project.packages = await project._packages(isFix);
 
     return project;
   }
@@ -84,7 +79,7 @@ export class Project extends Item<{
 
   packages!: Array<Package>;
 
-  async _packages(): Promise<Array<Package>> {
+  async _packages(isFix: boolean): Promise<Array<Package>> {
     // suport bolt later probably
     // maybe lerna too though probably not
     if (!this.json.preconstruct.packages && this.json.workspaces) {
@@ -106,11 +101,10 @@ export class Project extends Item<{
       await this.save();
     }
 
-    let filenames = await globby(this.configPackages, {
+    let filenames = await fastGlob(this.configPackages, {
       cwd: this.directory,
       onlyDirectories: true,
       absolute: true,
-      expandDirectories: false,
     });
 
     let packages: Package[] = [];
@@ -118,7 +112,7 @@ export class Project extends Item<{
     await Promise.all(
       filenames.map(async (x) => {
         try {
-          packages.push(await Package.create(x, this));
+          packages.push(await Package.create(x, this, isFix));
         } catch (err) {
           if (
             err.code === "ENOENT" &&

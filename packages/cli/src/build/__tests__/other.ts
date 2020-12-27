@@ -33,15 +33,15 @@ test("browser", async () => {
     }),
     "src/index.js": js`
                       let thing = "wow";
-                      
+
                       if (typeof window !== "undefined") {
                         thing = "something";
                       }
-                      
+
                       if (typeof document !== undefined) {
                         thing += "other";
                       }
-                      
+
                       export default thing;
                     `,
   });
@@ -82,7 +82,7 @@ test("browser", async () => {
 
     export default thing$1;
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/browser.cjs.dev.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/browser.cjs.dev.js, dist/browser.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     Object.defineProperty(exports, '__esModule', { value: true });
@@ -109,21 +109,6 @@ test("browser", async () => {
     } else {
       module.exports = require("./browser.cjs.dev.js");
     }
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/browser.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    "use strict";
-
-    Object.defineProperty(exports, "__esModule", {
-      value: !0
-    });
-
-    let thing = "wow";
-
-    "undefined" != typeof window && (thing = "something"), void 0 !== typeof document && (thing += "other");
-
-    var thing$1 = thing;
-
-    exports.default = thing$1;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/browser.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     let thing = "wow";
@@ -157,15 +142,15 @@ test("browser no module", async () => {
 
     "src/index.js": js`
                       let thing = "wow";
-                      
+
                       if (typeof window !== "undefined") {
                         thing = "something";
                       }
-                      
+
                       if (typeof document !== undefined) {
                         thing += "other";
                       }
-                      
+
                       export default thing;
                     `,
   });
@@ -199,7 +184,7 @@ test("typescript", async () => {
     export * from "./declarations/src/index";
     export { default } from "./declarations/src/index";
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.cjs.dev.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.cjs.dev.js, dist/typescript.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     Object.defineProperty(exports, '__esModule', { value: true });
@@ -244,37 +229,6 @@ test("typescript", async () => {
     } else {
       module.exports = require("./typescript.cjs.dev.js");
     }
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    "use strict";
-
-    Object.defineProperty(exports, "__esModule", {
-      value: !0
-    });
-
-    var path = require("path");
-
-    function _interopNamespace(e) {
-      if (e && e.__esModule) return e;
-      var n = Object.create(null);
-      return e && Object.keys(e).forEach((function(k) {
-        if ("default" !== k) {
-          var d = Object.getOwnPropertyDescriptor(e, k);
-          Object.defineProperty(n, k, d.get ? d : {
-            enumerable: !0,
-            get: function() {
-              return e[k];
-            }
-          });
-        }
-      })), n.default = e, Object.freeze(n);
-    }
-
-    var path__namespace = _interopNamespace(path);
-
-    let obj = {}, thing = "something";
-
-    exports.path = path__namespace, exports.default = thing, exports.obj = obj;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     import * as path from 'path';
@@ -388,9 +342,9 @@ test("typescript with forced dts emit", async () => {
                              import { configureStore, Action } from "@reduxjs/toolkit";
                              import { ThunkAction } from "redux-thunk";
                              import { rootReducer, RootState } from "./root-reducer";
-                             
+
                              export type AppThunk = ThunkAction<void, RootState, unknown, Action<string>>;
-                             
+
                              export function createStore() {
                                return configureStore<RootState>({
                                  reducer: rootReducer,
@@ -407,11 +361,11 @@ test("typescript with forced dts emit", async () => {
     "src/root-reducer.ts": ts`
                              // @ts-ignore (installed during test)
                              import { combineReducers } from "@reduxjs/toolkit";
-                             
+
                              export const rootReducer = combineReducers({
                                /* blah blah blah */
                              });
-                             
+
                              export type RootState = ReturnType<typeof rootReducer>;
                            `,
   });
@@ -437,7 +391,7 @@ test("package resolvable but not in deps", async () => {
 
     "src/index.js": js`
                       import React from "react";
-                      
+
                       export default React.createContext("something");
                     `,
   });
@@ -472,7 +426,7 @@ test("entrypoint outside package directory", async () => {
       main: "dist/pkg-a.cjs.js",
 
       preconstruct: {
-        source: "../some-file",
+        entrypoints: ["../../some-file.js"],
       },
     }),
   });
@@ -480,7 +434,7 @@ test("entrypoint outside package directory", async () => {
     await build(tmpPath);
   } catch (err) {
     expect(err.message).toMatchInlineSnapshot(
-      `"entrypoint source files must be inside their respective package directory but this entrypoint has specified its source file as ../some-file"`
+      `"entrypoint source files must be inside of the src directory of a package but ../some-file.js is not"`
     );
     return;
   }
@@ -503,7 +457,7 @@ test("module imported outside package directory", async () => {
 
     "pkg-a/package.json": JSON.stringify({
       name: "@imports-outside-pkg-dir/pkg-a",
-      main: "dist/pkg-a.cjs.js",
+      main: "dist/imports-outside-pkg-dir-pkg-a.cjs.js",
     }),
 
     "pkg-a/src/index.js": js`
@@ -601,14 +555,14 @@ test("batches build errors", async () => {
 
     "packages/package-one/package.json": JSON.stringify({
       name: "@errors/package-one",
-      main: "dist/package-one.cjs.js",
+      main: "dist/errors-package-one.cjs.js",
       license: "MIT",
       private: true,
     }),
 
     "packages/package-two/package.json": JSON.stringify({
       name: "@errors/package-two",
-      main: "dist/package-two.cjs.js",
+      main: "dist/errors-package-two.cjs.js",
       license: "MIT",
       private: true,
     }),
@@ -651,7 +605,7 @@ test("builds package using eval", async () => {
   await build(dir);
 
   expect(await getDist(dir)).toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.dev.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.dev.js, dist/pkg.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     Object.defineProperty(exports, '__esModule', { value: true });
@@ -671,16 +625,105 @@ test("builds package using eval", async () => {
       module.exports = require("./pkg.cjs.dev.js");
     }
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    "use strict";
+  `);
+});
 
-    function compute(arg) {
-      return eval(arg);
+test("builds umd with a dependency containing top-level this in ESM", async () => {
+  let dir = await testdir({
+    "package.json": basicPkgJson({
+      umdName: "pkg",
+      dependencies: {
+        "with-top-level-this-in-esm": "*",
+      },
+    }),
+    "src/index.js": js`
+                      export { default } from "with-top-level-this-in-esm";
+                    `,
+    "node_modules/with-top-level-this-in-esm/package.json": JSON.stringify({
+      name: "with-top-level-this-in-esm",
+    }),
+    "node_modules/with-top-level-this-in-esm/index.js": js`
+                                                          // output transpiled by TS with inlined tslib helper
+                                                          var __assign =
+                                                            (this && this.__assign) ||
+                                                            function () {
+                                                              __assign =
+                                                                Object.assign ||
+                                                                function (t) {
+                                                                  for (var s, i = 1, n = arguments.length; i < n; i++) {
+                                                                    s = arguments[i];
+                                                                    for (var p in s)
+                                                                      if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
+                                                                  }
+                                                                  return t;
+                                                                };
+                                                              return __assign.apply(this, arguments);
+                                                            };
+                                                          var foo = { bar: 42 };
+                                                          export default __assign({}, foo);
+                                                        `,
+  });
+
+  await build(dir);
+
+  expect(await getDist(dir)).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.dev.js, dist/pkg.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    var withTopLevelThisInEsm = require('with-top-level-this-in-esm');
+
+    function _interopDefault (e) { return e && e.__esModule ? e : { 'default': e }; }
+
+    var withTopLevelThisInEsm__default = /*#__PURE__*/_interopDefault(withTopLevelThisInEsm);
+
+
+
+    Object.defineProperty(exports, 'default', {
+    	enumerable: true,
+    	get: function () {
+    		return withTopLevelThisInEsm__default['default'];
+    	}
+    });
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./pkg.cjs.prod.js");
+    } else {
+      module.exports = require("./pkg.cjs.dev.js");
     }
 
-    Object.defineProperty(exports, "__esModule", {
-      value: !0
-    }), exports.default = compute;
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.umd.min.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    !function(e,t){"object"==typeof exports&&"undefined"!=typeof module?module.exports=t():"function"==typeof define&&define.amd?define(t):(e="undefined"!=typeof globalThis?globalThis:e||self).pkg=t()}(this,(function(){"use strict";var e=function(){return(e=Object.assign||function(e){for(var t,n=1,o=arguments.length;n<o;n++)for(var r in t=arguments[n])Object.prototype.hasOwnProperty.call(t,r)&&(e[r]=t[r]);return e}).apply(this,arguments)};return e({},{bar:42})}));
+    //# sourceMappingURL=pkg.umd.min.js.map
 
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.umd.min.js.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {"version":3,"file":"pkg.umd.min.js","sources":["../node_modules/with-top-level-this-in-esm/index.js"],"sourcesContent":["// output transpiled by TS with inlined tslib helper\\nvar __assign =\\n  (this && this.__assign) ||\\n  function () {\\n    __assign =\\n      Object.assign ||\\n      function (t) {\\n        for (var s, i = 1, n = arguments.length; i < n; i++) {\\n          s = arguments[i];\\n          for (var p in s)\\n            if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];\\n        }\\n        return t;\\n      };\\n    return __assign.apply(this, arguments);\\n  };\\nvar foo = { bar: 42 };\\nexport default __assign({}, foo);"],"names":["__assign","Object","assign","t","s","i","n","arguments","length","p","prototype","hasOwnProperty","call","apply","this","bar"],"mappings":"oOACA,IAAIA,EAEF,WAWE,OAVAA,EACEC,OAAOC,QACP,SAAUC,GACR,IAAK,IAAIC,EAAGC,EAAI,EAAGC,EAAIC,UAAUC,OAAQH,EAAIC,EAAGD,IAE9C,IAAK,IAAII,KADTL,EAAIG,UAAUF,GAERJ,OAAOS,UAAUC,eAAeC,KAAKR,EAAGK,KAAIN,EAAEM,GAAKL,EAAEK,IAE7D,OAAON,IAEKU,MAAMC,KAAMP,mBAGjBP,EAAS,GADd,CAAEe,IAAK"}
   `);
+});
+
+test("fails for source files containing top-level this", async () => {
+  let dir = await testdir({
+    "package.json": basicPkgJson(),
+    "src/index.js": js`
+                      export default this;
+                    `,
+  });
+
+  try {
+    await build(dir);
+  } catch (err) {
+    expect(err.message).toMatchInlineSnapshot(`
+      "🎁  pkg \\"src/index.js\\" used \`this\` keyword at the top level of an ES module. You can read more about this at https://rollupjs.org/guide/en/#error-this-is-undefined and fix this issue that has happened here:
+      🎁  pkg
+      🎁  pkg 1: export default this;
+      🎁  pkg                   ^
+      🎁  pkg"
+    `);
+    return;
+  }
+  expect(true).toBe(false);
 });

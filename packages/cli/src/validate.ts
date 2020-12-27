@@ -12,25 +12,6 @@ import chalk from "chalk";
 // just does validation
 // used in build and watch
 
-export function validateEntrypointSource(entrypoint: Entrypoint) {
-  try {
-    if (!entrypoint.source.startsWith(entrypoint.package.directory)) {
-      throw new FatalError(
-        `entrypoint source files must be inside their respective package directory but this entrypoint has specified its source file as ${entrypoint.configSource}`,
-        entrypoint.name
-      );
-    }
-  } catch (e) {
-    if (e.code === "MODULE_NOT_FOUND") {
-      throw new FatalError(
-        errors.noSource(entrypoint.configSource),
-        entrypoint.name
-      );
-    }
-    throw e;
-  }
-}
-
 export const isFieldValid = {
   main(entrypoint: Entrypoint) {
     return entrypoint.json.main === validFields.main(entrypoint);
@@ -52,8 +33,7 @@ export function isUmdNameSpecified(entrypoint: Entrypoint) {
 
 let projectsShownOldDistNamesInfo = new WeakSet<Project>();
 
-export function validateEntrypoint(entrypoint: Entrypoint, log: boolean) {
-  validateEntrypointSource(entrypoint);
+function validateEntrypoint(entrypoint: Entrypoint, log: boolean) {
   if (log) {
     logger.info(infos.validEntrypoint, entrypoint.name);
   }
@@ -64,7 +44,7 @@ export function validateEntrypoint(entrypoint: Entrypoint, log: boolean) {
     }
     if (!isFieldValid[field](entrypoint)) {
       let isUsingOldDistFilenames =
-        validFields[field](entrypoint, "only-unscoped-package-name") ===
+        validFields[field](entrypoint, "unscoped-package-name") ===
         entrypoint.json[field];
       if (
         isUsingOldDistFilenames &&
@@ -80,7 +60,7 @@ export function validateEntrypoint(entrypoint: Entrypoint, log: boolean) {
           )} to use the new dist filenames`
         );
         logger.info(
-          'if you want to keep the dist filename strategy of v1, add `"distFilenameStrategy": "only-unscoped-package-name"` to the Preconstruct config in your root package.json'
+          'if you want to keep the dist filename strategy of v1, add `"distFilenameStrategy": "unscoped-package-name"` to the Preconstruct config in your root package.json'
         );
       }
       fatalErrors.push(
@@ -109,8 +89,44 @@ export function validateEntrypoint(entrypoint: Entrypoint, log: boolean) {
   }
 }
 
+export const FORMER_FLAGS_THAT_ARE_ENABLED_NOW = new Set<string>([
+  "newEntrypoints",
+  "newDistFilenames",
+  "newProcessEnvNodeEnvReplacementStrategyAndSkipTerserOnCJSProdBuild",
+]);
+
+export const EXPERIMENTAL_FLAGS = new Set([
+  "logCompiledFiles",
+  "typeScriptProxyFileWithImportEqualsRequireAndExportEquals",
+]);
+
 export function validateProject(project: Project, log = false) {
   let errors: FatalError[] = [];
+  if (project.json.preconstruct.___experimentalFlags_WILL_CHANGE_IN_PATCH) {
+    Object.keys(
+      project.json.preconstruct.___experimentalFlags_WILL_CHANGE_IN_PATCH
+    ).forEach((key) => {
+      if (FORMER_FLAGS_THAT_ARE_ENABLED_NOW.has(key)) {
+        errors.push(
+          new FixableError(
+            `The behaviour from the experimental flag ${JSON.stringify(
+              key
+            )} is the current behaviour now, the flag should be removed`,
+            project.name
+          )
+        );
+      } else if (!EXPERIMENTAL_FLAGS.has(key)) {
+        errors.push(
+          new FatalError(
+            `The experimental flag ${JSON.stringify(
+              key
+            )} in your config does not exist`,
+            project.name
+          )
+        );
+      }
+    });
+  }
 
   for (let pkg of project.packages) {
     try {

@@ -1,5 +1,114 @@
 # preconstruct
 
+## 2.0.1
+
+### Patch Changes
+
+- [`4afde4e`](https://github.com/preconstruct/preconstruct/commit/4afde4e6e57b31a06c45831b18f456c46b5abff3) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Add `typeScriptProxyFileWithImportEqualsRequireAndExportEquals` experimental flag
+
+* [`c2a9918`](https://github.com/preconstruct/preconstruct/commit/c2a9918ee73f5900f6c5b9a96c2efd94299ab416) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Fix entrypoint glob check on Windows
+
+## 2.0.0
+
+### Major Changes
+
+- [`9ac1df4`](https://github.com/preconstruct/preconstruct/commit/9ac1df42b73fa39b91ce18b9e9bf62872c29c0e6) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Change the way entrypoints are configured. Instead of the entrypoints option referring to the entrypoint directories, they new refer to entrypoint source files. They are resolved relative to the `src` directory of the package. To get the entrypoint directory from a source file, the extension is removed from the path relative to the `src` directory and if the last part is `index`, the `index` part is removed. For example, an entrypoint of `something.js` would create an entrypoint at `pkg-name/something` and `another/index.js` would create an entrypoint at `pkg-name/another`.
+
+  `preconstruct fix` will also now automatically create the entrypoint `package.json`s because it already knows where the source file is.
+
+  For example, a package that looks like the following in `@preconstruct/cli@1`
+
+  `package.json`
+
+  ```json
+  {
+    "name": "pkg",
+    "main": "dist/pkg.cjs.js",
+    "preconstruct": {
+      "entrypoints": [".", "other"]
+    }
+  }
+  ```
+
+  `src/index.js`
+
+  ```js
+  export const something = true;
+  ```
+
+  `src/other.js`
+
+  ```js
+  export const other = true;
+  ```
+
+  `other/package.json`
+
+  ```json
+  {
+    "main": "dist/pkg.cjs.js",
+    "preconstruct": {
+      "source": "../src/other.js"
+    }
+  }
+  ```
+
+  Would need the following changes to work in `@preconstruct/cli@2`
+
+  `package.json`
+
+  ```diff
+   {
+     "name": "pkg",
+     "main": "dist/pkg.cjs.js",
+     "preconstruct": {
+  -    "entrypoints": [".", "other"]
+  +    "entrypoints": ["index.js", "other.js"]
+     }
+   }
+  ```
+
+  `other/package.json`
+
+  ```diff
+   {
+     "main": "dist/pkg.cjs.js",
+  -  "preconstruct": {
+  -    "source": "../src/other.js"
+  -  }
+   }
+  ```
+
+* [`9ac1df4`](https://github.com/preconstruct/preconstruct/commit/9ac1df42b73fa39b91ce18b9e9bf62872c29c0e6) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Change the way that `process.env.NODE_ENV` is replaced in the production CJS bundle to search for `process.env.NODE_ENV` in the AST and replace it rather than using Terser to replace it and also skip running Terser on the production CJS bundle and instead rely on Rollup's dead code elimination to improve build performance. It's extremely unlikely that this will break anything but this is being made in a major release just in case it does.
+
+- [`9ac1df4`](https://github.com/preconstruct/preconstruct/commit/9ac1df42b73fa39b91ce18b9e9bf62872c29c0e6) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Change default dist filename strategy to include the scope and entrypoint path. For example, with an entrypoint accessible at `@scope/pkg/entrypoint`, the CJS dist filename would be `scope-pkg-entrypoint.cjs.js`. If you'd like to use the old dist filenames, you can set `"distFilenameStrategy": "unscoped-package-name"` in your root Preconstruct config.
+
+* [`dd0f041`](https://github.com/preconstruct/preconstruct/commit/dd0f04103faffb4ec43e1b519c356de8e344003f) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Use fast-glob directly instead of globby. This _shouldn't_ break anything but because using fast-glob directly instead of globby may have subtly different behaviour, this is being done in a major version.
+
+### Patch Changes
+
+- [`027e44d`](https://github.com/preconstruct/preconstruct/commit/027e44d8722d4731b43137fa240b76a084e335b8) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Remove the `useSourceInsteadOfGeneratingTSDeclarations` and `useTSMorphToGenerateTSDeclarations` experimental flags as the TypeScript declaration generator no longer has the issues that these experimental flags tried to solve
+
+* [`20902dc`](https://github.com/preconstruct/preconstruct/commit/20902dcb30cd9035aa79282b2b2eceb1421c9efb) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Use symlinks instead of CJS re-export files for "module" and "browser" field when using `preconstruct dev`.
+
+## 1.2.1
+
+### Patch Changes
+
+- [`620e71f`](https://github.com/preconstruct/preconstruct/commit/620e71fe846fe8396bf6bb77ebdcabaaa9ee4c2a) [#344](https://github.com/preconstruct/preconstruct/pull/344) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Make `preconstruct fix` automatically create entrypoint package.jsons rather than asking if it should create them with the new entrypoints experimental flag
+
+* [`620e71f`](https://github.com/preconstruct/preconstruct/commit/620e71fe846fe8396bf6bb77ebdcabaaa9ee4c2a) [#344](https://github.com/preconstruct/preconstruct/pull/344) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Rename `only-unscoped-package-name` to `unscoped-package-name` in the `distFilenameStrategy` option(which is only enabled when the experimental `newDistFilenames` flag is enabled)
+
+## 1.2.0
+
+### Minor Changes
+
+- [`3c031da`](https://github.com/preconstruct/preconstruct/commit/3c031da27fb051423d0b2bfb6c5615ac55625079) [#343](https://github.com/preconstruct/preconstruct/pull/343) Thanks [@Andarist](https://github.com/Andarist)! - Respect `package.json#browser` when bundling dependencies for the UMD build.
+
+### Patch Changes
+
+- [`a198073`](https://github.com/preconstruct/preconstruct/commit/a198073c95501517112f77fe3dd9c730ebb81dcc) [#340](https://github.com/preconstruct/preconstruct/pull/340) Thanks [@Andarist](https://github.com/Andarist)! - Allow to build UMD files for packages having dependencies with top-level `this` in ESM files. This can often happen if a dependency package is transpiled down to ES5 using TypeScript.
+
 ## 1.1.34
 
 ### Patch Changes

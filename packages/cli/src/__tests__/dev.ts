@@ -27,26 +27,26 @@ test("dev command works in node", async () => {
     },
     "packages/package-one/package.json": JSON.stringify({
       name: "@my-cool-scope/package-one",
-      main: "dist/package-one.cjs.js",
+      main: "dist/my-cool-scope-package-one.cjs.js",
     }),
 
     "packages/package-two/package.json": JSON.stringify({
       name: "@my-cool-scope/package-two",
-      main: "dist/package-two.cjs.js",
+      main: "dist/my-cool-scope-package-two.cjs.js",
       license: "MIT",
       private: true,
     }),
 
     "packages/package-one/src/index.js": js`
                                            import { message } from "@my-cool-scope/package-two";
-                                           
+
                                            console.log("message from package one");
                                            console.log(message);
                                          `,
 
     "packages/package-two/src/index.js": js`
                                            console.log("message from package two");
-                                           
+
                                            export let message = "message from package two but logged by package one";
                                          `,
   });
@@ -138,24 +138,9 @@ test("all the build types", async () => {
 
   await Promise.all(
     shouldBeCjsThingsToSource.map(async (filename) => {
-      let content = await fs.readFile(path.join(distPath, filename), "utf8");
-
-      expect(content).toBe(`// 👋 hey!!
-// you might be reading this and seeing .esm in the filename
-// and being confused why there is commonjs below this filename
-// DON'T WORRY!
-// this is intentional
-// it's only commonjs with \`preconstruct dev\`
-// when you run \`preconstruct build\`, it will be ESM
-// why is it commonjs?
-// we need to re-export every export from the source file
-// but we can't do that with ESM without knowing what the exports are (because default exports aren't included in export/import *)
-// and they could change after running \`preconstruct dev\` so we can't look at the file without forcing people to
-// run preconstruct dev again which wouldn't be ideal
-// this solution could change but for now, it's working
-
-module.exports = require("../src/index.js")
-`);
+      expect(await fs.realpath(path.join(distPath, filename))).toBe(
+        path.join(tmpPath, "src/index.js")
+      );
     })
   );
 });
@@ -178,9 +163,9 @@ test("source maps work", async () => {
     }),
     "src/index.js": js`
                       class Bar {}
-                      
+
                       export class Foo extends Bar {}
-                      
+
                       throw new Error("i'm thrown on line 5");
                     `,
   });
@@ -219,39 +204,39 @@ test("flow", async () => {
       main: "dist/flow-dev.cjs.js",
       module: "dist/flow-dev.esm.js",
       preconstruct: {
-        entrypoints: [".", "a", "b"],
+        entrypoints: ["index.js", "a.js", "b.js"],
       },
     }),
 
     "a/package.json": JSON.stringify({
-      main: "dist/flow-dev.cjs.js",
-      module: "dist/flow-dev.esm.js",
+      main: "dist/flow-dev-a.cjs.js",
+      module: "dist/flow-dev-a.esm.js",
     }),
 
     "b/package.json": JSON.stringify({
-      main: "dist/flow-dev.cjs.js",
-      module: "dist/flow-dev.esm.js",
+      main: "dist/flow-dev-b.cjs.js",
+      module: "dist/flow-dev-b.esm.js",
     }),
 
     "src/index.js": js`
                       // @flow
-                      
+
                       export let something = true;
                     `,
 
-    "a/src/index.js": js`
-                        // @flow
-                        
-                        export default "something";
-                      `,
+    "src/a.js": js`
+                  // @flow
 
-    "b/src/index.js": js`
-                        // @flow
-                        
-                        let something = true;
-                        
-                        export { something as default };
-                      `,
+                  export default "something";
+                `,
+
+    "src/b.js": js`
+                  // @flow
+
+                  let something = true;
+
+                  export { something as default };
+                `,
   });
 
   await dev(tmpPath);
@@ -265,14 +250,14 @@ test("flow", async () => {
 
   expect(
     await fs.readFile(
-      path.join(tmpPath, "a", "dist", "flow-dev.cjs.js.flow"),
+      path.join(tmpPath, "a", "dist", "flow-dev-a.cjs.js.flow"),
       "utf8"
     )
   ).toMatchSnapshot();
 
   expect(
     await fs.readFile(
-      path.join(tmpPath, "b", "dist", "flow-dev.cjs.js.flow"),
+      path.join(tmpPath, "b", "dist", "flow-dev-b.cjs.js.flow"),
       "utf8"
     )
   ).toMatchSnapshot();
@@ -286,4 +271,29 @@ test("typescript", async () => {
   expect(
     await fs.readFile(path.join(tmpPath, "dist", "typescript.cjs.d.ts"), "utf8")
   ).toMatchSnapshot();
+});
+
+test("typescript", async () => {
+  let tmpPath = await testdir({
+    ...typescriptFixture,
+    "package.json": JSON.stringify({
+      ...JSON.parse(typescriptFixture["package.json"]),
+      preconstruct: {
+        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+          typeScriptProxyFileWithImportEqualsRequireAndExportEquals: true,
+        },
+      },
+    }),
+  });
+
+  await dev(tmpPath);
+
+  await expect(
+    fs.readFile(path.join(tmpPath, "dist", "typescript.cjs.d.ts"), "utf8")
+  ).resolves.toMatchInlineSnapshot(`
+          "import mod = require(\\"../src/index\\");
+
+          export = mod;
+          "
+        `);
 });

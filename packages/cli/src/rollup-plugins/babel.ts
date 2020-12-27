@@ -12,8 +12,6 @@ const lru = new QuickLRU<
 
 let extensionRegex = /\.[tj]sx?$/;
 
-let fakeRollupModuleRegex = /\0/;
-
 let externalHelpersCache = new Map<
   string,
   {
@@ -80,7 +78,7 @@ let rollupPluginBabel = ({
     transform(code, filename) {
       if (
         typeof filename !== "string" ||
-        fakeRollupModuleRegex.test(filename) ||
+        filename[0] === "\0" ||
         !extensionRegex.test(filename) ||
         filename.includes("node_modules")
       ) {
