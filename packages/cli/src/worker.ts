@@ -65,13 +65,18 @@ export async function transformBabel(
   })!;
   let cachedAST: {
     parse?: { ast: babel.types.File; cacheKey: string };
-    generator?: { result: GeneratorResult; cacheKey: string };
+    generator?: {
+      cacheKey: string;
+      code: string;
+      map: GeneratorResult["map"];
+    };
   } = {};
   const cacheFilename = path.join(
     cwd,
     "node_modules",
     ".cache",
     "preconstruct",
+    "babel",
     `${hashString(path.relative(cwd, filename))}.json`
   );
   try {
@@ -82,6 +87,9 @@ export async function transformBabel(
     }
   }
 
+  const originalParseCacheKey = cachedAST.parse?.cacheKey;
+  const originalGeneratorCacheKey = cachedAST.generator?.cacheKey;
+
   const finalParseCacheKey = hashString(parseCacheKey + ":" + code);
   if (cachedAST.parse?.cacheKey !== finalParseCacheKey) {
     console.log("parse");
@@ -90,7 +98,6 @@ export async function transformBabel(
       cacheKey: finalParseCacheKey,
     };
   }
-  debugger;
   const res = babel.transformFromAstSync(cachedAST.parse.ast, code, {
     ...options,
     // @ts-ignore
@@ -104,16 +111,27 @@ export async function transformBabel(
 
   if (cachedAST.generator?.cacheKey !== finalGenerateCacheKey) {
     console.log("generate");
+    const generated = babelGenerator.default(
+      res!.ast!,
+      options.generatorOpts,
+      code
+    );
+
     cachedAST.generator = {
       cacheKey: finalGenerateCacheKey,
-      result: babelGenerator.default(res!.ast!, options.generatorOpts, code),
+      code: generated.code,
+      map: generated.map,
     };
   }
-  await fs.outputJSON(cacheFilename, cachedAST);
+  if (
+    originalParseCacheKey !== finalParseCacheKey ||
+    originalGeneratorCacheKey !== finalGenerateCacheKey
+  )
+    await fs.outputJSON(cacheFilename, cachedAST);
 
   return {
-    code: cachedAST.generator.result.code,
-    map: cachedAST.generator.result.map,
+    code: cachedAST.generator.code,
+    map: cachedAST.generator.map,
   };
 }
 
