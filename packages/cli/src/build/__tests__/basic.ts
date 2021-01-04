@@ -235,6 +235,189 @@ test("does not duplicate babel helpers", async () => {
   `);
 });
 
+test("imports helpers from @babel/runtime without @babel/plugin-transform-runtime", async () => {
+  const dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "test",
+      main: "dist/test.cjs.js",
+      module: "dist/test.esm.js",
+      dependencies: {
+        "@babel/runtime": "7",
+      },
+    }),
+    "babel.config.json": JSON.stringify({
+      presets: [require.resolve("@babel/preset-env")],
+    }),
+    "src/index.js": "export {Other} from './other'; export class Thing {}",
+    "src/other.js": "export class Other {}",
+  });
+  await build(dir);
+  expect(await getDist(dir)).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.dev.js, dist/test.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    var _classCallCheck = require('@babel/runtime/helpers/classCallCheck');
+
+    var Other = function Other() {
+      _classCallCheck(this, Other);
+    };
+
+    var Thing = function Thing() {
+      _classCallCheck(this, Thing);
+    };
+
+    exports.Other = Other;
+    exports.Thing = Thing;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./test.cjs.prod.js");
+    } else {
+      module.exports = require("./test.cjs.dev.js");
+    }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    import _classCallCheck from '@babel/runtime/helpers/esm/classCallCheck';
+
+    var Other = function Other() {
+      _classCallCheck(this, Other);
+    };
+
+    var Thing = function Thing() {
+      _classCallCheck(this, Thing);
+    };
+
+    export { Other, Thing };
+
+  `);
+});
+
+test("imports helpers from @babel/runtime-corejs2 without @babel/plugin-transform-runtime", async () => {
+  const dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "test",
+      main: "dist/test.cjs.js",
+      module: "dist/test.esm.js",
+      dependencies: {
+        "@babel/runtime-corejs2": "7",
+      },
+    }),
+    "babel.config.json": JSON.stringify({
+      presets: [require.resolve("@babel/preset-env")],
+    }),
+    "src/index.js": "export {Other} from './other'; export class Thing {}",
+    "src/other.js": "export class Other {}",
+  });
+  await build(dir);
+  expect(await getDist(dir)).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.dev.js, dist/test.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    var _classCallCheck = require('@babel/runtime-corejs2/helpers/classCallCheck');
+
+    var Other = function Other() {
+      _classCallCheck(this, Other);
+    };
+
+    var Thing = function Thing() {
+      _classCallCheck(this, Thing);
+    };
+
+    exports.Other = Other;
+    exports.Thing = Thing;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./test.cjs.prod.js");
+    } else {
+      module.exports = require("./test.cjs.dev.js");
+    }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    import _classCallCheck from '@babel/runtime-corejs2/helpers/esm/classCallCheck';
+
+    var Other = function Other() {
+      _classCallCheck(this, Other);
+    };
+
+    var Thing = function Thing() {
+      _classCallCheck(this, Thing);
+    };
+
+    export { Other, Thing };
+
+  `);
+});
+
+test("imports helpers from @babel/runtime-corejs3 without @babel/plugin-transform-runtime", async () => {
+  const dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "test",
+      main: "dist/test.cjs.js",
+      module: "dist/test.esm.js",
+      dependencies: {
+        "@babel/runtime-corejs3": "7",
+      },
+    }),
+    "babel.config.json": JSON.stringify({
+      presets: [require.resolve("@babel/preset-env")],
+    }),
+    "src/index.js": "export {Other} from './other'; export class Thing {}",
+    "src/other.js": "export class Other {}",
+  });
+  await build(dir);
+  expect(await getDist(dir)).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.dev.js, dist/test.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    var _classCallCheck = require('@babel/runtime-corejs3/helpers/classCallCheck');
+
+    var Other = function Other() {
+      _classCallCheck(this, Other);
+    };
+
+    var Thing = function Thing() {
+      _classCallCheck(this, Thing);
+    };
+
+    exports.Other = Other;
+    exports.Thing = Thing;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./test.cjs.prod.js");
+    } else {
+      module.exports = require("./test.cjs.dev.js");
+    }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    import _classCallCheck from '@babel/runtime-corejs3/helpers/esm/classCallCheck';
+
+    var Other = function Other() {
+      _classCallCheck(this, Other);
+    };
+
+    var Thing = function Thing() {
+      _classCallCheck(this, Thing);
+    };
+
+    export { Other, Thing };
+
+  `);
+});
+
 test("does not duplicate babel helpers when using @babel/plugin-transform-runtime but the helper isn't in the version of @babel/runtime that the user has specified", async () => {
   const dir = await testdir({
     "package.json": JSON.stringify({
@@ -327,6 +510,66 @@ test("does not duplicate babel helpers when using @babel/plugin-transform-runtim
         }
       };
     }
+
+    var _iterator = _createForOfIteratorHelper(something),
+        _step;
+
+    try {
+      for (_iterator.s(); !(_step = _iterator.n()).done;) {
+        var x = _step.value;
+      }
+    } catch (err) {
+      _iterator.e(err);
+    } finally {
+      _iterator.f();
+    }
+
+    var _iterator$1 = _createForOfIteratorHelper(something),
+        _step$1;
+
+    try {
+      for (_iterator$1.s(); !(_step$1 = _iterator$1.n()).done;) {
+        var x$1 = _step$1.value;
+      }
+    } catch (err) {
+      _iterator$1.e(err);
+    } finally {
+      _iterator$1.f();
+    }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./test.cjs.prod.js");
+    } else {
+      module.exports = require("./test.cjs.dev.js");
+    }
+
+  `);
+});
+
+test("imports helpers for a helper only available in a newer version of @babel/runtime (without @babel/plugin-transfrom-runtime)", async () => {
+  const dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "test",
+      main: "dist/test.cjs.js",
+      dependencies: {
+        "@babel/runtime": "7.9",
+      },
+    }),
+    "babel.config.json": JSON.stringify({
+      presets: [require.resolve("@babel/preset-env")],
+    }),
+    "src/index.js": "import './other'; for (const x of something) {}",
+    "src/other.js": "for (const x of something) {}",
+  });
+  await build(dir);
+  expect(await getDist(dir)).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.dev.js, dist/test.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    var _createForOfIteratorHelper = require('@babel/runtime/helpers/createForOfIteratorHelper');
 
     var _iterator = _createForOfIteratorHelper(something),
         _step;

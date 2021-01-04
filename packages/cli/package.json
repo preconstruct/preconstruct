@@ -49,6 +49,7 @@
     "resolve": "^1.17.0",
     "resolve-from": "^5.0.0",
     "rollup": "^2.32.0",
+    "semver": "^7.3.4",
     "terser": "^5.2.1",
     "v8-compile-cache": "^2.1.1"
   },
