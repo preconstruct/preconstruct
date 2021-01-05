@@ -22,7 +22,8 @@ function importHelperPlugin(babel: typeof import("@babel/core")) {
 
         return (cachedHelpers[name] = addDefault(
           file.path,
-          `\0rollupPluginBabelHelpers/${name}`
+          `\0rollupPluginBabelHelpers/${name}`,
+          { nameHint: name }
         ));
       });
     },

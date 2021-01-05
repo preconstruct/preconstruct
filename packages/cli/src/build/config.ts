@@ -57,6 +57,11 @@ function getGlobal(project: Project, name: string) {
   }
 }
 
+const babelHelperId = /@babel\/runtime(|-corejs[23])\/helpers\//;
+
+const interop = (id: string | null): "auto" | "default" =>
+  id && babelHelperId.test(id) ? "default" : "auto";
+
 export function getRollupConfigs(pkg: Package, aliases: Aliases) {
   let configs: Array<{
     config: RollupOptions;
@@ -86,7 +91,7 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
         chunkFileNames: "dist/[name]-[hash].cjs.dev.js",
         dir: pkg.directory,
         exports: "named" as const,
-        interop: "auto",
+        interop,
       },
       ...(hasModuleField
         ? [
@@ -116,7 +121,7 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
         chunkFileNames: "dist/[name]-[hash].cjs.prod.js",
         dir: pkg.directory,
         exports: "named",
-        interop: "auto",
+        interop,
       },
     ],
   });
@@ -135,7 +140,7 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
             entryFileNames: "[name].umd.min.js",
             name: entrypoint.json.preconstruct.umdName as string,
             dir: pkg.directory,
-            interop: "auto",
+            interop,
             globals: (name: string) => {
               if (name === (entrypoint.json.preconstruct.umdName as string)) {
                 return name;
@@ -165,7 +170,7 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
           chunkFileNames: "dist/[name]-[hash].browser.cjs.js",
           dir: pkg.directory,
           exports: "named" as const,
-          interop: "auto",
+          interop,
         },
         ...(hasModuleField
           ? [

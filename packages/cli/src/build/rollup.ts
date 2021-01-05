@@ -146,6 +146,18 @@ export let getRollupConfig = (
       babel({
         cwd: pkg.project.directory,
         reportTransformedFile,
+        babelRuntime: (() => {
+          for (const dep of [
+            "@babel/runtime",
+            "@babel/runtime-corejs2",
+            "@babel/runtime-corejs3",
+          ]) {
+            const range = pkg.json.dependencies?.[dep];
+            if (range !== undefined) {
+              return { range, name: dep };
+            }
+          }
+        })(),
       }),
       type === "umd" &&
         cjs({

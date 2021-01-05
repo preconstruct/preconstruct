@@ -249,12 +249,8 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 var _classCallCheck = require('@babel/runtime/helpers/classCallCheck');
 
-function _interopDefault (e) { return e && e.__esModule ? e : { 'default': e }; }
-
-var _classCallCheck__default = /*#__PURE__*/_interopDefault(_classCallCheck);
-
 var Foo = function Foo() {
-  _classCallCheck__default['default'](this, Foo);
+  _classCallCheck(this, Foo);
 };
 
 exports.default = Foo;
@@ -279,12 +275,8 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 var _classCallCheck = require('@babel/runtime/helpers/classCallCheck');
 
-function _interopDefault (e) { return e && e.__esModule ? e : { 'default': e }; }
-
-var _classCallCheck__default = /*#__PURE__*/_interopDefault(_classCallCheck);
-
 var Foo = function Foo() {
-  _classCallCheck__default['default'](this, Foo);
+  _classCallCheck(this, Foo);
 };
 
 exports.default = Foo;
