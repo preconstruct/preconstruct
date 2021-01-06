@@ -3,7 +3,11 @@ import * as babel from "@babel/core";
 import resolveFrom from "resolve-from";
 import { importHelperPlugin } from "./babel-import-helper-plugin";
 
-export function transformBabel(code: string, cwd: string, filename: string) {
+export async function transformBabel(
+  code: string,
+  cwd: string,
+  filename: string
+) {
   const babel = lazyRequire<typeof import("@babel/core")>();
 
   return babel
