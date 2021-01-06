@@ -7,16 +7,25 @@ let shouldUseWorker =
   process.env.NODE_ENV !== "test" &&
   !isCI;
 
-let worker: (Worker & typeof import("./worker")) | void;
+type RawWorkerImport = typeof import("./worker");
 
-let unsafeRequire = require;
+type WorkerExports = {
+  [Key in keyof RawWorkerImport]: ReturnType<
+    RawWorkerImport[Key]
+  > extends Promise<any>
+    ? RawWorkerImport[Key]
+    : (
+        ...args: Parameters<RawWorkerImport[Key]>
+      ) => Promise<ReturnType<RawWorkerImport[Key]>>;
+};
+
+let worker: (Worker & WorkerExports) | undefined;
 
 export function createWorker() {
   if (shouldUseWorker) {
-    worker = new Worker(require.resolve("@preconstruct/cli/worker")) as Worker &
-      typeof import("./worker");
+    worker = new Worker(require.resolve("@preconstruct/cli/worker")) as any;
   } else {
-    worker = unsafeRequire("@preconstruct/cli/worker");
+    worker = require("@preconstruct/cli/worker");
   }
 }
 

@@ -2,6 +2,7 @@ import { getWorker } from "../worker-client";
 import { AcornNode, Plugin } from "rollup";
 import QuickLRU from "quick-lru";
 import resolveFrom from "resolve-from";
+import { cachedTransformBabel } from "../babel-stuff";
 
 const lru = new QuickLRU<
   string,
@@ -35,10 +36,15 @@ const babelGenerator: typeof import("@babel/generator") = require(resolveFrom(
 let rollupPluginBabel = ({
   cwd,
   reportTransformedFile,
+  babelParseAndGenerationCaching,
 }: {
   cwd: string;
+  babelParseAndGenerationCaching: boolean;
   reportTransformedFile: (filename: string) => void;
 }): Plugin => {
+  const babelTransform = babelParseAndGenerationCaching
+    ? getWorker().transformBabel
+    : cachedTransformBabel;
   return {
     name: "babel",
     resolveId(id, parent) {
@@ -100,20 +106,18 @@ let rollupPluginBabel = ({
           });
         }
       }
-      let promise = getWorker()
-        .transformBabel(code, cwd, filename)
-        .then((x) => {
-          reportTransformedFile(filename);
-          const ast = this.parse(x.code!, undefined);
-          return {
-            code: x.code,
-            ast,
-            map: x.map,
-            meta: {
-              babel: { ast },
-            },
-          };
-        });
+      let promise = babelTransform(code, cwd, filename).then((x) => {
+        reportTransformedFile(filename);
+        const ast = this.parse(x.code!, undefined);
+        return {
+          code: x.code,
+          ast,
+          map: x.map,
+          meta: {
+            babel: { ast },
+          },
+        };
+      });
       lru.set(filename, { code, promise });
       return promise;
     },

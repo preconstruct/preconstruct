@@ -1,38 +1,26 @@
 import { lazyRequire } from "lazy-require.macro";
-// @ts-ignore
-import { addDefault } from "@babel/helper-module-imports";
 import * as babel from "@babel/core";
-import { hashString, resolveOptions } from "./babel-stuff";
 import resolveFrom from "resolve-from";
-import * as fs from "fs-extra";
-import path from "path";
-import { GeneratorResult } from "@babel/generator";
+import { importHelperPlugin } from "./babel-import-helper-plugin";
 
-function importHelperPlugin(babel: typeof import("@babel/core")) {
-  return {
-    pre(file: any) {
-      const cachedHelpers: Record<string, babel.types.Identifier> = {};
-      const previousHelperGenerator = file.get("helperGenerator");
-      file.set("helperGenerator", (name: string) => {
-        if (previousHelperGenerator) {
-          const helperFromPrev = previousHelperGenerator(name);
-          if (helperFromPrev != null) return helperFromPrev;
-        }
-        if (!file.availableHelper(name)) {
-          return null;
-        }
+export function transformBabel(code: string, cwd: string, filename: string) {
+  const babel = lazyRequire<typeof import("@babel/core")>();
 
-        if (cachedHelpers[name]) {
-          return babel.types.identifier(cachedHelpers[name].name);
-        }
-
-        return (cachedHelpers[name] = addDefault(
-          file.path,
-          `\0rollupPluginBabelHelpers/${name}`
-        ));
-      });
-    },
-  };
+  return babel
+    .transformAsync(code, {
+      caller: {
+        name: "rollup-plugin-babel",
+        supportsStaticESM: true,
+        supportsDynamicImport: true,
+      },
+      sourceMaps: true,
+      cwd,
+      filename,
+      plugins: [importHelperPlugin],
+    })
+    .then((res) => {
+      return { code: res!.code!, map: res!.map };
+    });
 }
 
 const babelParser: typeof import("@babel/parser") = require(resolveFrom(
@@ -45,94 +33,14 @@ const babelGenerator: typeof import("@babel/generator") = require(resolveFrom(
   "@babel/generator"
 ));
 
-export async function transformBabel(
-  code: string,
-  cwd: string,
-  filename: string
+export const babelParse = babelParser.parse;
+
+export function babelGenerate(
+  ast: babel.types.Node,
+  opts: babel.GeneratorOptions
 ) {
-  const { generatorCacheKey, parseCacheKey, options } = resolveOptions({
-    caller: {
-      name: "rollup-plugin-babel",
-      supportsStaticESM: true,
-      supportsDynamicImport: true,
-    },
-    sourceMaps: true,
-    // @ts-ignore
-    inputSourceMap: false,
-    cwd,
-    filename,
-    plugins: [importHelperPlugin],
-  })!;
-  let cachedAST: {
-    parse?: { ast: babel.types.File; cacheKey: string };
-    generator?: {
-      cacheKey: string;
-      code: string;
-      map: GeneratorResult["map"];
-    };
-  } = {};
-  const cacheFilename = path.join(
-    cwd,
-    "node_modules",
-    ".cache",
-    "preconstruct",
-    "babel",
-    `${hashString(path.relative(cwd, filename))}.json`
-  );
-  try {
-    cachedAST = await fs.readJson(cacheFilename);
-  } catch (err) {
-    if (err.code !== "ENOENT") {
-      throw err;
-    }
-  }
-
-  const originalParseCacheKey = cachedAST.parse?.cacheKey;
-  const originalGeneratorCacheKey = cachedAST.generator?.cacheKey;
-
-  const finalParseCacheKey = hashString(parseCacheKey + ":" + code);
-  if (cachedAST.parse?.cacheKey !== finalParseCacheKey) {
-    console.log("parse");
-    cachedAST.parse = {
-      ast: babelParser.parse(code, options.parserOpts),
-      cacheKey: finalParseCacheKey,
-    };
-  }
-  const res = babel.transformFromAstSync(cachedAST.parse.ast, code, {
-    ...options,
-    // @ts-ignore
-    cloneInputAst: false,
-    code: false,
-    ast: true,
-  });
-  const finalGenerateCacheKey = hashString(
-    generatorCacheKey + ":" + JSON.stringify(res!.ast)
-  );
-
-  if (cachedAST.generator?.cacheKey !== finalGenerateCacheKey) {
-    console.log("generate");
-    const generated = babelGenerator.default(
-      res!.ast!,
-      options.generatorOpts,
-      code
-    );
-
-    cachedAST.generator = {
-      cacheKey: finalGenerateCacheKey,
-      code: generated.code,
-      map: generated.map,
-    };
-  }
-  if (
-    originalParseCacheKey !== finalParseCacheKey ||
-    originalGeneratorCacheKey !== finalGenerateCacheKey
-  )
-    await fs.outputJSON(cacheFilename, cachedAST);
-
-  return {
-    code: cachedAST.generator.code,
-    map: cachedAST.generator.map,
-  };
+  const { code, map } = babelGenerator.default(ast, opts);
+  return { code, map };
 }
 
 export function transformTerser(code: string, optionsString: string) {
