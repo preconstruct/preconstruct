@@ -150,7 +150,7 @@ let rollupPluginBabel = ({
               map: result.map,
               ast,
               meta: {
-                babel: { ast },
+                babel: { ast, codeAtBabelTime: result.code },
               },
             };
           });
@@ -166,7 +166,7 @@ let rollupPluginBabel = ({
             ast: this.parse(x.code!, undefined),
             map: x.map,
             meta: {
-              babel: { ast },
+              babel: { ast, codeAtBabelTime: x.code },
             },
           };
         });

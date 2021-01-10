@@ -777,3 +777,121 @@ test("new dist filenames", async () => {
 
         `);
 });
+
+test("UMD with dep that uses process.env.NODE_ENV", async () => {
+  let dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "@scope/test",
+      main: "dist/scope-test.cjs.js",
+      "umd:main": "dist/scope-test.umd.min.js",
+      dependencies: {
+        somewhere: "*",
+      },
+      preconstruct: { umdName: "test" },
+    }),
+    "src/index.js": js`
+                      import { x } from "somewhere";
+                      console.log(x);
+                      export default "something";
+                    `,
+    "node_modules/somewhere/index.js": js`
+                                         export let x = process.env.NODE_ENV;
+                                       `,
+
+    "node_modules/somewhere/package.json": JSON.stringify({
+      name: "somewhere",
+    }),
+  });
+  await build(dir);
+  await expect(getDist(dir)).resolves.toMatchInlineSnapshot(`
+          ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.cjs.dev.js, dist/scope-test.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+          'use strict';
+
+          Object.defineProperty(exports, '__esModule', { value: true });
+
+          var somewhere = require('somewhere');
+
+          console.log(somewhere.x);
+          var index = "something";
+
+          exports.default = index;
+
+          ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+          'use strict';
+
+          if (process.env.NODE_ENV === "production") {
+            module.exports = require("./scope-test.cjs.prod.js");
+          } else {
+            module.exports = require("./scope-test.cjs.dev.js");
+          }
+
+          ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.umd.min.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+          !function(e,o){"object"==typeof exports&&"undefined"!=typeof module?module.exports=o():"function"==typeof define&&define.amd?define(o):(e="undefined"!=typeof globalThis?globalThis:e||self).test=o()}(this,(function(){"use strict";console.log("production");return"something"}));
+          //# sourceMappingURL=scope-test.umd.min.js.map
+
+          ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.umd.min.js.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+          {"version":3,"file":"scope-test.umd.min.js","sources":["../src/index.js"],"sourcesContent":["import { x } from \\"somewhere\\";\\nconsole.log(x);\\nexport default \\"something\\";"],"names":["console","log"],"mappings":"qOACAA,QAAQC,wBACO"}
+        `);
+});
+
+test("UMD build with process.env.NODE_ENV and typeof document", async () => {
+  let dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "@scope/test",
+      main: "dist/scope-test.cjs.js",
+      "umd:main": "dist/scope-test.umd.min.js",
+      preconstruct: {
+        umdName: "x",
+      },
+    }),
+    "src/index.js": js`
+                      let x = typeof document;
+
+                      const thing = () => {
+                        console.log(process.env.NODE_ENV);
+                      };
+
+                      export default thing;
+                    `,
+  });
+  await build(dir);
+  await expect(getDist(dir)).resolves.toMatchInlineSnapshot(`
+          ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.cjs.dev.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+          'use strict';
+
+          Object.defineProperty(exports, '__esModule', { value: true });
+
+          const thing = () => {
+            console.log(process.env.NODE_ENV);
+          };
+
+          exports.default = thing;
+
+          ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+          'use strict';
+
+          if (process.env.NODE_ENV === "production") {
+            module.exports = require("./scope-test.cjs.prod.js");
+          } else {
+            module.exports = require("./scope-test.cjs.dev.js");
+          }
+
+          ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+          'use strict';
+
+          Object.defineProperty(exports, '__esModule', { value: true });
+
+          const thing = () => {
+            console.log(        "production");
+          };
+
+          exports.default = thing;
+
+          ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.umd.min.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+          !function(e,o){"object"==typeof exports&&"undefined"!=typeof module?module.exports=o():"function"==typeof define&&define.amd?define(o):(e="undefined"!=typeof globalThis?globalThis:e||self).x=o()}(this,(function(){"use strict";return()=>{console.log("production")}}));
+          //# sourceMappingURL=scope-test.umd.min.js.map
+
+          ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.umd.min.js.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+          {"version":3,"file":"scope-test.umd.min.js","sources":["../src/index.js"],"sourcesContent":["let x = typeof document;\\n\\nconst thing = () => {\\n  console.log(process.env.NODE_ENV);\\n};\\n\\nexport default thing;"],"names":["console","log"],"mappings":"wOAEc,KACZA,QAAQC"}
+        `);
+});

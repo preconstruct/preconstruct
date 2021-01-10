@@ -13,7 +13,13 @@ export function inlineProcessEnvNodeEnv({
     transform(code, id) {
       if (code.includes("process.env" + ".NODE_ENV")) {
         let magicString = new MagicString(code);
-        const ast = this.getModuleInfo(id)!.meta.babel.ast;
+        const ast = (() => {
+          const babelMeta = this.getModuleInfo(id)!.meta.babel;
+          if (babelMeta?.codeAtBabelTime === code) {
+            return this.getModuleInfo(id)!.meta.babel.ast;
+          }
+          return this.parse(code);
+        })();
         walk(ast, {
           enter(n, p) {
             const parent = p as import("estree").Node;

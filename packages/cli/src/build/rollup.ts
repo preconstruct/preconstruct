@@ -163,11 +163,7 @@ export let getRollupConfig = (
         cjs({
           include: ["**/node_modules/**", "node_modules/**"],
         }),
-      (type === "browser" || type === "umd") &&
-        replace({
-          ["typeof " + "document"]: JSON.stringify("object"),
-          ["typeof " + "window"]: JSON.stringify("object"),
-        }),
+
       rewriteBabelRuntimeHelpers(),
       json({
         namedExports: false,
@@ -190,7 +186,11 @@ export let getRollupConfig = (
           compress: true,
         }),
       type === "node-prod" && inlineProcessEnvNodeEnv({ sourceMap: false }),
-      ,
+      (type === "browser" || type === "umd") &&
+        replace({
+          ["typeof " + "document"]: JSON.stringify("object"),
+          ["typeof " + "window"]: JSON.stringify("object"),
+        }),
     ].filter((x): x is Plugin => !!x),
   };
 
