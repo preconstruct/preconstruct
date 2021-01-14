@@ -163,7 +163,7 @@ let rollupPluginBabel = ({
           const ast = this.parse(x.code!, undefined);
           return {
             code: x.code,
-            ast: this.parse(x.code!, undefined),
+            ast,
             map: x.map,
             meta: {
               babel: { ast, codeAtBabelTime: x.code },
