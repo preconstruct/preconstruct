@@ -3,17 +3,17 @@ name: CI
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
 jobs:
   test:
     name: Tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@main
 
       - name: Set Node.js 10.x
-        uses: actions/setup-node@master
+        uses: actions/setup-node@main
         with:
           node-version: 10.x
 
@@ -45,10 +45,10 @@ jobs:
     name: TypeScript
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@main
 
       - name: Set Node.js 10.x
-        uses: actions/setup-node@master
+        uses: actions/setup-node@main
         with:
           node-version: 10.x
 
@@ -75,10 +75,10 @@ jobs:
     name: ESLint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@main
 
       - name: Set Node.js 10.x
-        uses: actions/setup-node@master
+        uses: actions/setup-node@main
         with:
           node-version: 10.x
 

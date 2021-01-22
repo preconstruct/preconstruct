@@ -1,8 +1,9 @@
 {
-  "$schema": "https://unpkg.com/@changesets/config@0.2.0/schema.json",
+  "$schema": "https://unpkg.com/@changesets/config@1.4.0/schema.json",
   "changelog": [
     "@changesets/changelog-github",
     { "repo": "preconstruct/preconstruct" }
   ],
-  "access": "public"
+  "access": "public",
+  "baseBranch": "main"
 }

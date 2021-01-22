@@ -9,7 +9,7 @@
     "index.js",
     "noop.js"
   ],
-  "repository": "https://github.com/preconstruct/preconstruct/tree/master/packages/hook",
+  "repository": "https://github.com/preconstruct/preconstruct/tree/main/packages/hook",
   "license": "MIT",
   "dependencies": {
     "@babel/core": "^7.7.7",

@@ -5,7 +5,7 @@
   "files": [
     "index.js"
   ],
-  "repository": "https://github.com/preconstruct/preconstruct/tree/master/packages/next",
+  "repository": "https://github.com/preconstruct/preconstruct/tree/main/packages/next",
   "license": "MIT",
   "dependencies": {
     "resolve": "^1.17.0"

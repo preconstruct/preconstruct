@@ -7,5 +7,6 @@
     "@types/prettier": "^2.1.1",
     "@typescript-eslint/experimental-utils": "^4.2.0",
     "prettier": "^2.1.2"
-  }
+  },
+  "repository": "https://github.com/preconstruct/preconstruct/tree/main/packages/eslint-plugin-format-js-tag"
 }

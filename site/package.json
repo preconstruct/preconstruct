@@ -24,5 +24,6 @@
     "react-dom": "^16.11.0",
     "react-typography": "^0.16.19",
     "typography": "^0.16.19"
-  }
+  },
+  "repository": "https://github.com/preconstruct/preconstruct/tree/main/site"
 }

@@ -12,7 +12,7 @@
   "bin": {
     "preconstruct": "./bin.js"
   },
-  "repository": "https://github.com/preconstruct/preconstruct",
+  "repository": "https://github.com/preconstruct/preconstruct/tree/main/packages/cli",
   "license": "MIT",
   "dependencies": {
     "@babel/code-frame": "^7.5.5",
