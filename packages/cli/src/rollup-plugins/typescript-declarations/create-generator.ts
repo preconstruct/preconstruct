@@ -62,7 +62,13 @@ async function nonMemoizedGetService(
     typescript.createDocumentRegistry()
   );
   servicesHost.setLanguageService(service);
-  return { service, options: thing.options };
+  let program = service.getProgram();
+  if (!program) {
+    throw new Error(
+      "This is an internal error, please open an issue if you see this: program not found"
+    );
+  }
+  return { service, options: thing.options, program };
 }
 
 let getService = weakMemoize((typescript: Typescript) =>
@@ -107,7 +113,7 @@ export async function createDeclarationCreator(
   // and if we keep it, we could run out of memory for large projects
   // if the tsconfig _isn't_ in the package directory though, it's probably fine to memoize it
   // since it should just be a root level tsconfig
-  let { service, options } = await (normalizePath(configFileName) ===
+  let { service, options, program } = await (normalizePath(configFileName) ===
   normalizePath(path.join(dirname, "tsconfig.json"))
     ? nonMemoizedGetService(typescript, configFileName)
     : getService(typescript)(configFileName));
@@ -119,12 +125,6 @@ export async function createDeclarationCreator(
 
   return {
     getDeps: (entrypoints: Array<string>) => {
-      let program = service.getProgram();
-      if (!program) {
-        throw new Error(
-          "This is an internal error, please open an issue if you see this: program not found"
-        );
-      }
       let resolvedEntrypointPaths = entrypoints.map((x) => {
         let { resolvedModule } = typescript.resolveModuleName(
           path.join(path.dirname(x), path.basename(x, path.extname(x))),
