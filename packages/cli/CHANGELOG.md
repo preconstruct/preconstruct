@@ -1,5 +1,19 @@
 # preconstruct
 
+## 2.0.2
+
+### Patch Changes
+
+- [`1451fc4`](https://github.com/preconstruct/preconstruct/commit/1451fc43cdb68701ddab53a8308efe77ad1b186b) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Fix UMD builds where files contain typeof window/document and process.env.NODE_ENV
+
+* [`e3b4196`](https://github.com/preconstruct/preconstruct/commit/e3b419663e45b6b2d1de7170b9c1095f7e908eaf) [#358](https://github.com/preconstruct/preconstruct/pull/358) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Improvements to Babel helper generation so that @babel/runtime(and the core-js versions) is automatically used when it is a dependency even without @babel/plugin-transform-runtime including using all of the available helpers in the version of @babel/runtime that is specified as a dependency(without Preconstruct, unless you specify the version of @babel/runtime that you use in @babel/plugin-transform-runtime, Babel helpers that aren't available in the oldest version of @babel/runtime will be inlined rather than imported from @babel/runtime).
+
+- [`1451fc4`](https://github.com/preconstruct/preconstruct/commit/1451fc43cdb68701ddab53a8308efe77ad1b186b) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Fix UMD builds where external dependencies contain process.env.NODE_ENV
+
+* [`93acf0c`](https://github.com/preconstruct/preconstruct/commit/93acf0c57e235b256d1af4e84d36cf8720168574) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Remove an unnecessary parse
+
+- [`fe57d4c`](https://github.com/preconstruct/preconstruct/commit/fe57d4cda81a373041fcd29e94a3a7bdf7d6422d) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Improve TypeScript declaration generation performance by only creating a single program per TS project rather than one per package
+
 ## 2.0.1
 
 ### Patch Changes
