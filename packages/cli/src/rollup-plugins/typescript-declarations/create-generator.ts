@@ -183,8 +183,8 @@ export async function createDeclarationCreator(
       if (filename.endsWith(".d.ts")) {
         return {
           name: filename.replace(
-            dirname,
-            path.join(dirname, "dist", "declarations")
+            normalizePath(dirname),
+            normalizePath(path.join(dirname, "dist", "declarations"))
           ),
           content: await fs.readFile(filename, "utf8"),
         };
@@ -192,8 +192,8 @@ export async function createDeclarationCreator(
       let output = service.getEmitOutput(filename, true, true);
       return {
         name: output.outputFiles[0].name.replace(
-          dirname,
-          path.join(dirname, "dist", "declarations")
+          normalizePath(dirname),
+          normalizePath(path.join(dirname, "dist", "declarations"))
         ),
         content: output.outputFiles[0].text,
       };
