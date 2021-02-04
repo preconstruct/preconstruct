@@ -1,5 +1,11 @@
 # preconstruct
 
+## 2.0.3
+
+### Patch Changes
+
+- [`a41034d`](https://github.com/preconstruct/preconstruct/commit/a41034d26e0f675d3b9f452ded490276306bb402) [#366](https://github.com/preconstruct/preconstruct/pull/366) Thanks [@Andarist](https://github.com/Andarist)! - Fixed destination paths of generated `.d.ts` files in TypeScript projects on Windows.
+
 ## 2.0.2
 
 ### Patch Changes
