@@ -111,9 +111,8 @@ export let getRollupConfig = (
           }
           warnings.push(
             new FatalError(
-              `"${path.relative(
-                pkg.directory,
-                warning.loc!.file!
+              `"${normalizePath(
+                path.relative(pkg.directory, warning.loc!.file!)
               )}" used \`this\` keyword at the top level of an ES module. You can read more about this at ${warning.url!} and fix this issue that has happened here:\n\n${warning.frame!}\n`,
               pkg.name
             )

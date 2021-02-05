@@ -2,6 +2,7 @@ import * as fs from "fs-extra";
 import nodePath from "path";
 import detectIndent from "detect-indent";
 import parseJson from "parse-json";
+import realpathNative from "realpath-native";
 import { JSONValue } from "./utils";
 
 type JSONDataByPath = Map<
@@ -25,7 +26,7 @@ export class Item<JSONData extends BaseConfig = BaseConfig> {
   ) {
     this.indent = detectIndent(contents).indent || "  ";
     this.path = filePath;
-    this.directory = nodePath.dirname(filePath);
+    this.directory = realpathNative.sync(nodePath.dirname(filePath));
     this._jsonDataByPath = jsonDataByPath;
     if (!jsonDataByPath.has(this.path)) {
       const json = parseJson(contents, filePath);

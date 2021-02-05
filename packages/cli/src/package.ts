@@ -173,9 +173,8 @@ export class Package extends Item<{
           )
         ) {
           throw new FatalError(
-            `entrypoint source files must be inside of the src directory of a package but ${nodePath.relative(
-              pkg.directory,
-              sourceFile
+            `entrypoint source files must be inside of the src directory of a package but ${normalizePath(
+              nodePath.relative(pkg.directory, sourceFile)
             )} is not`,
             pkg.name
           );

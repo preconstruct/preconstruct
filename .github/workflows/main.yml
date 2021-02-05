@@ -9,7 +9,7 @@ jobs:
   test:
     name: "Tests on ${{matrix.platform}}"
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         platform:
           - ubuntu-latest
