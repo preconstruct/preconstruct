@@ -13,8 +13,7 @@ export class BatchError extends Error {
   constructor(errors: FatalError[]) {
     super(
       errors
-        .map(x => {
-          debugger;
+        .map((x) => {
           return format([x.message], "none", x.scope);
         })
         .join("\n")

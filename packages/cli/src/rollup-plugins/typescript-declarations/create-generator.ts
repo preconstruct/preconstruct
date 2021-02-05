@@ -4,6 +4,7 @@ import path from "path";
 import { FatalError } from "../../errors";
 // @ts-ignore
 import { createLanguageServiceHostClass } from "./language-service-host";
+import normalizePath from "normalize-path";
 
 type Typescript = typeof import("typescript");
 
@@ -32,34 +33,47 @@ function memoize<V>(fn: (arg: string) => V): (arg: string) => V {
   };
 }
 
+async function nonMemoizedGetService(
+  typescript: Typescript,
+  configFileName: string
+) {
+  let configFileContents = await fs.readFile(configFileName, "utf8");
+  const result = typescript.parseConfigFileTextToJson(
+    configFileName,
+    configFileContents
+  );
+
+  let thing = typescript.parseJsonConfigFileContent(
+    result.config,
+    typescript.sys,
+    process.cwd(),
+    undefined,
+    configFileName
+  );
+  thing.options.declaration = true;
+  thing.options.noEmit = false;
+
+  let LanguageServiceHostClass = createLanguageServiceHostClass(typescript);
+
+  let servicesHost = new LanguageServiceHostClass(thing, []);
+
+  let service = typescript.createLanguageService(
+    servicesHost,
+    typescript.createDocumentRegistry()
+  );
+  servicesHost.setLanguageService(service);
+  let program = service.getProgram();
+  if (!program) {
+    throw new Error(
+      "This is an internal error, please open an issue if you see this: program not found"
+    );
+  }
+  return { service, options: thing.options, program };
+}
+
 let getService = weakMemoize((typescript: Typescript) =>
   memoize(async (configFileName: string) => {
-    let configFileContents = await fs.readFile(configFileName, "utf8");
-    const result = typescript.parseConfigFileTextToJson(
-      configFileName,
-      configFileContents
-    );
-
-    let thing = typescript.parseJsonConfigFileContent(
-      result,
-      typescript.sys,
-      process.cwd(),
-      undefined,
-      configFileName
-    );
-    thing.options.declaration = true;
-    thing.options.noEmit = false;
-
-    let LanguageServiceHostClass = createLanguageServiceHostClass(typescript);
-
-    let servicesHost = new LanguageServiceHostClass(thing, []);
-
-    let service = typescript.createLanguageService(
-      servicesHost,
-      typescript.createDocumentRegistry()
-    );
-    servicesHost.setLanguageService(service);
-    return { service, options: thing.options };
+    return nonMemoizedGetService(typescript, configFileName);
   })
 );
 
@@ -94,7 +108,15 @@ export async function createDeclarationCreator(
       pkgName
     );
   }
-  let { service, options } = await getService(typescript)(configFileName);
+  // if the tsconfig is inside the package directory, let's not memoize getting the ts service
+  // since it'll only ever be used once
+  // and if we keep it, we could run out of memory for large projects
+  // if the tsconfig _isn't_ in the package directory though, it's probably fine to memoize it
+  // since it should just be a root level tsconfig
+  let { service, options, program } = await (normalizePath(configFileName) ===
+  normalizePath(path.join(dirname, "tsconfig.json"))
+    ? nonMemoizedGetService(typescript, configFileName)
+    : getService(typescript)(configFileName));
   let moduleResolutionCache = typescript.createModuleResolutionCache(
     dirname,
     (x) => x,
@@ -103,12 +125,6 @@ export async function createDeclarationCreator(
 
   return {
     getDeps: (entrypoints: Array<string>) => {
-      let program = service.getProgram();
-      if (!program) {
-        throw new Error(
-          "This is an internal error, please open an issue if you see this: program not found"
-        );
-      }
       let resolvedEntrypointPaths = entrypoints.map((x) => {
         let { resolvedModule } = typescript.resolveModuleName(
           path.join(path.dirname(x), path.basename(x, path.extname(x))),
@@ -131,7 +147,7 @@ export async function createDeclarationCreator(
           let sourceFile = program!.getSourceFile(dep);
           if (!sourceFile) {
             throw new FatalError(
-              `Could not generate type declarations because ${dep} does not exist or is not a TypeScript file`,
+              `Could not generate type declarations because ${dep} is not in a TypeScript project. Make sure this file is included in your tsconfig.`,
               pkgName
             );
           }
@@ -167,8 +183,8 @@ export async function createDeclarationCreator(
       if (filename.endsWith(".d.ts")) {
         return {
           name: filename.replace(
-            dirname,
-            path.join(dirname, "dist", "declarations")
+            normalizePath(dirname),
+            normalizePath(path.join(dirname, "dist", "declarations"))
           ),
           content: await fs.readFile(filename, "utf8"),
         };
@@ -176,8 +192,8 @@ export async function createDeclarationCreator(
       let output = service.getEmitOutput(filename, true, true);
       return {
         name: output.outputFiles[0].name.replace(
-          dirname,
-          path.join(dirname, "dist", "declarations")
+          normalizePath(dirname),
+          normalizePath(path.join(dirname, "dist", "declarations"))
         ),
         content: output.outputFiles[0].text,
       };

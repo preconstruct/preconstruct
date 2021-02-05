@@ -3,12 +3,11 @@ import resolve from "@rollup/plugin-node-resolve";
 import alias from "@rollup/plugin-alias";
 import cjs from "@rollup/plugin-commonjs";
 import replace from "@rollup/plugin-replace";
-import resolveFrom from "resolve-from";
 import chalk from "chalk";
 import path from "path";
 import builtInModules from "builtin-modules";
 import { Package } from "../package";
-import { StrictEntrypoint } from "../entrypoint";
+import { Entrypoint } from "../entrypoint";
 import { RollupOptions, Plugin } from "rollup";
 import { Aliases } from "./aliases";
 import { FatalError, BatchError } from "../errors";
@@ -18,8 +17,9 @@ import typescriptDeclarations from "../rollup-plugins/typescript-declarations";
 import json from "@rollup/plugin-json";
 import babel from "../rollup-plugins/babel";
 import terser from "../rollup-plugins/terser";
-import { getNameForDist } from "../utils";
+import { getNameForDistForEntrypoint } from "../utils";
 import { EXTENSIONS } from "../constants";
+import { inlineProcessEnvNodeEnv } from "../rollup-plugins/inline-process-env-node-env";
 import normalizePath from "normalize-path";
 
 // this makes sure nested imports of external packages are external
@@ -35,9 +35,10 @@ export type RollupConfigType = "umd" | "browser" | "node-dev" | "node-prod";
 
 export let getRollupConfig = (
   pkg: Package,
-  entrypoints: Array<StrictEntrypoint>,
+  entrypoints: Array<Entrypoint>,
   aliases: Aliases,
-  type: RollupConfigType
+  type: RollupConfigType,
+  reportTransformedFile: (filename: string) => void
 ): RollupOptions => {
   let external = [];
   if (pkg.json.peerDependencies) {
@@ -51,25 +52,17 @@ export let getRollupConfig = (
     external.push(...builtInModules);
   }
 
-  let rollupAliases: Record<string, string> = {};
-
-  Object.keys(aliases).forEach((key) => {
-    try {
-      rollupAliases[key] = resolveFrom(pkg.directory, aliases[key]);
-    } catch (err) {
-      if (err.code !== "MODULE_NOT_FOUND") {
-        throw err;
-      }
-    }
-  });
-
   let input: Record<string, string> = {};
 
   entrypoints.forEach((entrypoint) => {
     input[
       path.relative(
         pkg.directory,
-        path.join(entrypoint.directory, "dist", getNameForDist(pkg.name))
+        path.join(
+          entrypoint.directory,
+          "dist",
+          getNameForDistForEntrypoint(entrypoint)
+        )
       )
     ] = entrypoint.source;
   });
@@ -93,9 +86,9 @@ export let getRollupConfig = (
         return;
       }
       switch (warning.code) {
+        case "CIRCULAR_DEPENDENCY":
         case "EMPTY_BUNDLE":
         case "EVAL":
-        case "CIRCULAR_DEPENDENCY":
         case "UNUSED_EXTERNAL_IMPORT": {
           break;
         }
@@ -111,6 +104,21 @@ export let getRollupConfig = (
             );
             return;
           }
+        }
+        case "THIS_IS_UNDEFINED": {
+          if (type === "umd") {
+            return;
+          }
+          warnings.push(
+            new FatalError(
+              `"${path.relative(
+                pkg.directory,
+                warning.loc!.file!
+              )}" used \`this\` keyword at the top level of an ES module. You can read more about this at ${warning.url!} and fix this issue that has happened here:\n\n${warning.frame!}\n`,
+              pkg.name
+            )
+          );
+          return;
         }
         default: {
           warnings.push(
@@ -137,47 +145,53 @@ export let getRollupConfig = (
       type === "node-prod" && typescriptDeclarations(pkg),
       babel({
         cwd: pkg.project.directory,
-        extensions: EXTENSIONS,
+        reportTransformedFile,
+        babelRuntime: (() => {
+          for (const dep of [
+            "@babel/runtime",
+            "@babel/runtime-corejs2",
+            "@babel/runtime-corejs3",
+          ]) {
+            const range = pkg.json.dependencies?.[dep];
+            if (range !== undefined) {
+              return { range, name: dep };
+            }
+          }
+        })(),
       }),
       type === "umd" &&
         cjs({
           include: ["**/node_modules/**", "node_modules/**"],
         }),
-      (type === "browser" || type === "umd") &&
-        replace({
-          ["typeof " + "document"]: JSON.stringify("object"),
-          ["typeof " + "window"]: JSON.stringify("object"),
-        }),
+
       rewriteBabelRuntimeHelpers(),
-      // @ts-ignore
       json({
         namedExports: false,
       }),
       type === "umd" &&
         alias({
-          entries: rollupAliases,
+          entries: aliases,
         }),
       resolve({
         extensions: EXTENSIONS,
+        browser: type === "umd",
         customResolveOptions: {
           moduleDirectory: type === "umd" ? "node_modules" : [],
         },
       }),
-      (type === "umd" || type === "node-prod") &&
-        replace({
-          // tricking static analysis is fun...
-          ["process" + ".env.NODE_ENV"]: '"production"',
-        }),
-      type === "umd" && terser(),
-      type === "node-prod" &&
+      type === "umd" && inlineProcessEnvNodeEnv({ sourceMap: true }),
+      type === "umd" &&
         terser({
-          mangle: false,
-          output: {
-            beautify: true,
-            indent_level: 2,
-          },
+          sourceMap: true,
+          compress: true,
         }),
-    ].filter((x: Plugin | false): x is Plugin => !!x),
+      type === "node-prod" && inlineProcessEnvNodeEnv({ sourceMap: false }),
+      (type === "browser" || type === "umd") &&
+        replace({
+          ["typeof " + "document"]: JSON.stringify("object"),
+          ["typeof " + "window"]: JSON.stringify("object"),
+        }),
+    ].filter((x): x is Plugin => !!x),
   };
 
   return config;

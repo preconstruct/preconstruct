@@ -1,30 +1,32 @@
-import globby from "globby";
 import parseGlob from "parse-glob";
-import micromatch from "micromatch";
 import * as fs from "fs-extra";
 import path from "path";
+import normalizePath from "normalize-path";
 
-export async function getUselessGlobsThatArentReallyGlobs(
+export async function getUselessGlobsThatArentReallyGlobsForNewEntrypoints(
   globs: string[],
+  files: string[],
   cwd: string
 ) {
-  return Promise.all(
-    globs.map(async glob => {
-      let parsedGlobResult = parseGlob(glob);
-      if (!parsedGlobResult.is.glob) {
-        let result = micromatch([glob], globs);
-        if (result.length) {
-          let resolvedPath = path.resolve(cwd, glob);
+  let filesSet = new Set(files.map((x) => normalizePath(x)));
+  return (
+    await Promise.all(
+      globs.map(async (glob) => {
+        let parsedGlobResult = parseGlob(glob);
+        if (!parsedGlobResult.is.glob) {
+          let filename = normalizePath(path.resolve(cwd, "src", glob));
+          if (filesSet.has(filename)) return;
           try {
-            await fs.readdir(resolvedPath);
+            await fs.stat(filename);
           } catch (err) {
-            if (err.code !== "ENOENT") {
-              throw err;
+            if (err.code === "ENOENT") {
+              return { filename, glob, exists: false };
             }
-            return resolvedPath;
+            throw err;
           }
+          return { filename, glob, exists: true };
         }
-      }
-    })
-  );
+      })
+    )
+  ).filter((x): x is NonNullable<typeof x> => !!x);
 }

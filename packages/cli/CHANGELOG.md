@@ -1,5 +1,279 @@
 # preconstruct
 
+## 2.0.3
+
+### Patch Changes
+
+- [`a41034d`](https://github.com/preconstruct/preconstruct/commit/a41034d26e0f675d3b9f452ded490276306bb402) [#366](https://github.com/preconstruct/preconstruct/pull/366) Thanks [@Andarist](https://github.com/Andarist)! - Fixed destination paths of generated `.d.ts` files in TypeScript projects on Windows.
+
+## 2.0.2
+
+### Patch Changes
+
+- [`1451fc4`](https://github.com/preconstruct/preconstruct/commit/1451fc43cdb68701ddab53a8308efe77ad1b186b) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Fix UMD builds where files contain typeof window/document and process.env.NODE_ENV
+
+* [`e3b4196`](https://github.com/preconstruct/preconstruct/commit/e3b419663e45b6b2d1de7170b9c1095f7e908eaf) [#358](https://github.com/preconstruct/preconstruct/pull/358) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Improvements to Babel helper generation so that @babel/runtime(and the core-js versions) is automatically used when it is a dependency even without @babel/plugin-transform-runtime including using all of the available helpers in the version of @babel/runtime that is specified as a dependency(without Preconstruct, unless you specify the version of @babel/runtime that you use in @babel/plugin-transform-runtime, Babel helpers that aren't available in the oldest version of @babel/runtime will be inlined rather than imported from @babel/runtime).
+
+- [`1451fc4`](https://github.com/preconstruct/preconstruct/commit/1451fc43cdb68701ddab53a8308efe77ad1b186b) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Fix UMD builds where external dependencies contain process.env.NODE_ENV
+
+* [`93acf0c`](https://github.com/preconstruct/preconstruct/commit/93acf0c57e235b256d1af4e84d36cf8720168574) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Remove an unnecessary parse
+
+- [`fe57d4c`](https://github.com/preconstruct/preconstruct/commit/fe57d4cda81a373041fcd29e94a3a7bdf7d6422d) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Improve TypeScript declaration generation performance by only creating a single program per TS project rather than one per package
+
+## 2.0.1
+
+### Patch Changes
+
+- [`4afde4e`](https://github.com/preconstruct/preconstruct/commit/4afde4e6e57b31a06c45831b18f456c46b5abff3) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Add `typeScriptProxyFileWithImportEqualsRequireAndExportEquals` experimental flag
+
+* [`c2a9918`](https://github.com/preconstruct/preconstruct/commit/c2a9918ee73f5900f6c5b9a96c2efd94299ab416) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Fix entrypoint glob check on Windows
+
+## 2.0.0
+
+### Major Changes
+
+- [`9ac1df4`](https://github.com/preconstruct/preconstruct/commit/9ac1df42b73fa39b91ce18b9e9bf62872c29c0e6) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Change the way entrypoints are configured. Instead of the entrypoints option referring to the entrypoint directories, they new refer to entrypoint source files. They are resolved relative to the `src` directory of the package. To get the entrypoint directory from a source file, the extension is removed from the path relative to the `src` directory and if the last part is `index`, the `index` part is removed. For example, an entrypoint of `something.js` would create an entrypoint at `pkg-name/something` and `another/index.js` would create an entrypoint at `pkg-name/another`.
+
+  `preconstruct fix` will also now automatically create the entrypoint `package.json`s because it already knows where the source file is.
+
+  For example, a package that looks like the following in `@preconstruct/cli@1`
+
+  `package.json`
+
+  ```json
+  {
+    "name": "pkg",
+    "main": "dist/pkg.cjs.js",
+    "preconstruct": {
+      "entrypoints": [".", "other"]
+    }
+  }
+  ```
+
+  `src/index.js`
+
+  ```js
+  export const something = true;
+  ```
+
+  `src/other.js`
+
+  ```js
+  export const other = true;
+  ```
+
+  `other/package.json`
+
+  ```json
+  {
+    "main": "dist/pkg.cjs.js",
+    "preconstruct": {
+      "source": "../src/other.js"
+    }
+  }
+  ```
+
+  Would need the following changes to work in `@preconstruct/cli@2`
+
+  `package.json`
+
+  ```diff
+   {
+     "name": "pkg",
+     "main": "dist/pkg.cjs.js",
+     "preconstruct": {
+  -    "entrypoints": [".", "other"]
+  +    "entrypoints": ["index.js", "other.js"]
+     }
+   }
+  ```
+
+  `other/package.json`
+
+  ```diff
+   {
+     "main": "dist/pkg.cjs.js",
+  -  "preconstruct": {
+  -    "source": "../src/other.js"
+  -  }
+   }
+  ```
+
+* [`9ac1df4`](https://github.com/preconstruct/preconstruct/commit/9ac1df42b73fa39b91ce18b9e9bf62872c29c0e6) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Change the way that `process.env.NODE_ENV` is replaced in the production CJS bundle to search for `process.env.NODE_ENV` in the AST and replace it rather than using Terser to replace it and also skip running Terser on the production CJS bundle and instead rely on Rollup's dead code elimination to improve build performance. It's extremely unlikely that this will break anything but this is being made in a major release just in case it does.
+
+- [`9ac1df4`](https://github.com/preconstruct/preconstruct/commit/9ac1df42b73fa39b91ce18b9e9bf62872c29c0e6) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Change default dist filename strategy to include the scope and entrypoint path. For example, with an entrypoint accessible at `@scope/pkg/entrypoint`, the CJS dist filename would be `scope-pkg-entrypoint.cjs.js`. If you'd like to use the old dist filenames, you can set `"distFilenameStrategy": "unscoped-package-name"` in your root Preconstruct config.
+
+* [`dd0f041`](https://github.com/preconstruct/preconstruct/commit/dd0f04103faffb4ec43e1b519c356de8e344003f) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Use fast-glob directly instead of globby. This _shouldn't_ break anything but because using fast-glob directly instead of globby may have subtly different behaviour, this is being done in a major version.
+
+### Patch Changes
+
+- [`027e44d`](https://github.com/preconstruct/preconstruct/commit/027e44d8722d4731b43137fa240b76a084e335b8) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Remove the `useSourceInsteadOfGeneratingTSDeclarations` and `useTSMorphToGenerateTSDeclarations` experimental flags as the TypeScript declaration generator no longer has the issues that these experimental flags tried to solve
+
+* [`20902dc`](https://github.com/preconstruct/preconstruct/commit/20902dcb30cd9035aa79282b2b2eceb1421c9efb) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Use symlinks instead of CJS re-export files for "module" and "browser" field when using `preconstruct dev`.
+
+## 1.2.1
+
+### Patch Changes
+
+- [`620e71f`](https://github.com/preconstruct/preconstruct/commit/620e71fe846fe8396bf6bb77ebdcabaaa9ee4c2a) [#344](https://github.com/preconstruct/preconstruct/pull/344) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Make `preconstruct fix` automatically create entrypoint package.jsons rather than asking if it should create them with the new entrypoints experimental flag
+
+* [`620e71f`](https://github.com/preconstruct/preconstruct/commit/620e71fe846fe8396bf6bb77ebdcabaaa9ee4c2a) [#344](https://github.com/preconstruct/preconstruct/pull/344) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Rename `only-unscoped-package-name` to `unscoped-package-name` in the `distFilenameStrategy` option(which is only enabled when the experimental `newDistFilenames` flag is enabled)
+
+## 1.2.0
+
+### Minor Changes
+
+- [`3c031da`](https://github.com/preconstruct/preconstruct/commit/3c031da27fb051423d0b2bfb6c5615ac55625079) [#343](https://github.com/preconstruct/preconstruct/pull/343) Thanks [@Andarist](https://github.com/Andarist)! - Respect `package.json#browser` when bundling dependencies for the UMD build.
+
+### Patch Changes
+
+- [`a198073`](https://github.com/preconstruct/preconstruct/commit/a198073c95501517112f77fe3dd9c730ebb81dcc) [#340](https://github.com/preconstruct/preconstruct/pull/340) Thanks [@Andarist](https://github.com/Andarist)! - Allow to build UMD files for packages having dependencies with top-level `this` in ESM files. This can often happen if a dependency package is transpiled down to ES5 using TypeScript.
+
+## 1.1.34
+
+### Patch Changes
+
+- [`be053e7`](https://github.com/preconstruct/preconstruct/commit/be053e75d6b2793ee220f537eb0506a948874fea) [#337](https://github.com/preconstruct/preconstruct/pull/337) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Add `newDistFilenames` experimental flag
+
+## 1.1.33
+
+### Patch Changes
+
+- [`cef98e9`](https://github.com/preconstruct/preconstruct/commit/cef98e9d82fc12d044352d5d0c8e5a3e23828a4e) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Revert change from globby to fast-glob because fast-glob doesn't directly support negations
+
+## 1.1.32
+
+### Patch Changes
+
+- [`3944e88`](https://github.com/preconstruct/preconstruct/commit/3944e88feff8ff6943f24be465e6ba9d9f96c09a) [#333](https://github.com/preconstruct/preconstruct/pull/333) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Add `newProcessEnvNodeEnvReplacementStrategyAndSkipTerserOnCJSProdBuild` experimental flag
+
+## 1.1.31
+
+### Patch Changes
+
+- [`b79bb61`](https://github.com/preconstruct/preconstruct/commit/b79bb614f2952fa60ec9c14e87bd4953aad06bb2) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Skip unnecessary repeated module resolution when doing a build (this won't make a very noticable difference for projects with a small amount of packages and entrypoints but will for projects with a large amount of packages and entrypoint)
+
+* [`4e0d249`](https://github.com/preconstruct/preconstruct/commit/4e0d249988e375059765d410996f94f936fe24df) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Revert change in `@preconstruct/cli@1.1.30` that skips unregistering the require hook in the code generated by `preconstruct dev` because not unregistering the hook caused some issues when using Preconstruct to build a Babel plugin.
+
+- [`b79bb61`](https://github.com/preconstruct/preconstruct/commit/b79bb614f2952fa60ec9c14e87bd4953aad06bb2) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Only generate the Babel helpers that are used and not imported from `@babel/runtime` along with only generating and parsing them once rather than per package (note that unused helpers were already removed from the bundles, this is just a performance improvement when doing a build)
+
+## 1.1.30
+
+### Patch Changes
+
+- [`47515cd`](https://github.com/preconstruct/preconstruct/commit/47515cd533d341c1138f108abc660061eb3486a3) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Validate that the root dist directory of a package is included in the published files since common chunks may be written to it
+
+* [`cfda1c6`](https://github.com/preconstruct/preconstruct/commit/cfda1c69e32aec01607e1f103bf4a9878cc5bd5b) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Fix the error message shown when an entrypoint in a package has a given build type and another doesn't
+
+- [`cfe7d95`](https://github.com/preconstruct/preconstruct/commit/cfe7d9537c0b08f9f127929d62fa97b24d4c31ae) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Add no-op file to `@preconstruct/hook` that will be imported by bundlers instead of the real require hook so that the `preconstruct dev` output will work in bundlers without a module build or bundler config changes(including for React Native's bundler, Metro)
+
+* [`9a64c4e`](https://github.com/preconstruct/preconstruct/commit/9a64c4e3b90887d69dbfaf408f4dd29497a241aa) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Cache Acorn parse step so that modules are only parsed a single time with Acorn rather than a number of times equal to the number of build types for a given package
+
+- [`47515cd`](https://github.com/preconstruct/preconstruct/commit/47515cd533d341c1138f108abc660061eb3486a3) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Improve error messages for invalid fields
+
+- Updated dependencies [[`cfe7d95`](https://github.com/preconstruct/preconstruct/commit/cfe7d9537c0b08f9f127929d62fa97b24d4c31ae)]:
+  - @preconstruct/hook@0.4.0
+
+## 1.1.29
+
+### Patch Changes
+
+- [`77b6d2f`](https://github.com/preconstruct/preconstruct/commit/77b6d2f3c2d82827c1270e03a48585967f4be8db) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Fix dist directory not being published in previous release
+
+## 1.1.28
+
+### Patch Changes
+
+- [`86d8d3d`](https://github.com/preconstruct/preconstruct/commit/86d8d3d76ba6fc7966dc392de904040f72bd9f3d) [#322](https://github.com/preconstruct/preconstruct/pull/322) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Deduplicate Babel helpers when not using @babel/plugin-transform-runtime(note that we still recommend using @babel/plugin-transform-runtime, this is just stopping the duplication if you choose not to use it)
+
+* [`3b3cacb`](https://github.com/preconstruct/preconstruct/commit/3b3cacbb33ddef7cf782c5b596c7b5d866ac8ede) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Disable usage of worker processes when running on CI to improve performance(Emotion's preconstruct build on CircleCI went from ~2 minutes to ~10 seconds when disabling the worker)
+
+- [`2d62357`](https://github.com/preconstruct/preconstruct/commit/2d6235707318cc9faae8d544058068d34d0bddab) [#320](https://github.com/preconstruct/preconstruct/pull/320) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Fix process.env.NODE_ENV reassignment throwing a syntax error
+
+## 1.1.27
+
+### Patch Changes
+
+- [`f4e9954`](https://github.com/preconstruct/preconstruct/commit/f4e9954fec700dd8467100d555df573be3be6e19) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Stop memoizing creation of TS programs for declaration generation when the tsconfig is in the package directory to allow garbage collection and prevent out of memory errors (Note that having a tsconfig per package will still be slower than having one at the root of the project since TS will be doing unnecessary repeated work)
+
+* [`8aaec07`](https://github.com/preconstruct/preconstruct/commit/8aaec072ce6c89acddac0e79109a81fd34f6ebfa) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Correctly cache entrypoint source file resolution
+
+## 1.1.26
+
+### Patch Changes
+
+- [`99090cb`](https://github.com/preconstruct/preconstruct/commit/99090cbf61fa080ed53857d7d1247bbf275a6b1b) [#312](https://github.com/preconstruct/preconstruct/pull/312) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Upgrade dependencies
+
+## 1.1.25
+
+### Patch Changes
+
+- [`6b3f95e`](https://github.com/preconstruct/preconstruct/commit/6b3f95e2db4704722dc5d3c9ade64fb2d3a76965) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Fix bug in reading of TS config resulting in wrong type definitions being generated in some cases. This should remove the need for the experimental `useTSMorphToGenerateTSDeclarations` and `useSourceInsteadOfGeneratingTSDeclarations` flags.
+
+## 1.1.24
+
+### Patch Changes
+
+- [`6727d9b`](https://github.com/preconstruct/preconstruct/commit/6727d9b0eb504a64072ddb710af570ecb7ac28c6) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Add `logCompiledFiles` experimental flag for logging when files are compiled with Babel
+
+## 1.1.23
+
+### Patch Changes
+
+- [`d56018d`](https://github.com/preconstruct/preconstruct/commit/d56018d6793d7298912bf2e4dc9fd92c981e7e9f) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Skip double removing of package dist directory to attempt to fix EINVAL errors on build
+
+## 1.1.22
+
+### Patch Changes
+
+- [`5ad1c73`](https://github.com/preconstruct/preconstruct/commit/5ad1c73c3615ac1742b7beb8abb15680be5ad0e4) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Correctly only compile files within the package directory in the require hook for `preconstruct dev`
+
+- Updated dependencies [[`5ad1c73`](https://github.com/preconstruct/preconstruct/commit/5ad1c73c3615ac1742b7beb8abb15680be5ad0e4)]:
+  - @preconstruct/hook@0.3.0
+
+## 1.1.21
+
+### Patch Changes
+
+- [`286d8fb`](https://github.com/preconstruct/preconstruct/commit/286d8fbfbe251b6c8c4f876a3dddb6ce0ecdaed9) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Make check for default exports more reliable for preconstruct dev's `.d.ts` redirect file generation
+
+* [`b8d1906`](https://github.com/preconstruct/preconstruct/commit/b8d19066e6fa520f153497ee403d6dcd76c8edec) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Only compile files within the package directory in the require hook for `preconstruct dev`
+
+* Updated dependencies [[`b8d1906`](https://github.com/preconstruct/preconstruct/commit/b8d19066e6fa520f153497ee403d6dcd76c8edec)]:
+  - @preconstruct/hook@0.2.0
+
+## 1.1.20
+
+### Patch Changes
+
+- [`a723556`](https://github.com/preconstruct/preconstruct/commit/a7235569dd4055125bb7a099c1bf4d7dba8dc1ba) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Fix prompt for creating entrypoint package.jsons showing every entrypoint as the package name when using `newEntrypoints` experimental flag
+
+## 1.1.19
+
+### Patch Changes
+
+- [`cae339b`](https://github.com/preconstruct/preconstruct/commit/cae339b721ee0cd857e84f6454208e265be3cdc0) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Fix `newEntrypoints` experimental flag on Windows
+
+## 1.1.18
+
+### Patch Changes
+
+- [`68fdeeb`](https://github.com/preconstruct/preconstruct/commit/68fdeebd8160a6aca9aedea027fb5f06e2e86323) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Cache source module resolution
+
+* [`e3a5c0c`](https://github.com/preconstruct/preconstruct/commit/e3a5c0c86011b439fef65a750b0e0acbc07c65de) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Skip parsing modules with Babel to determine if they have default exports or not if we're sure they don't based on a regex when running `preconstruct dev`
+
+## 1.1.17
+
+### Patch Changes
+
+- [`933d831`](https://github.com/preconstruct/preconstruct/commit/933d83165ff021a704904759b6e7004159c3322a) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Fix the ts-morph declaration generator generating files outside of the package's directory
+
+## 1.1.16
+
+### Patch Changes
+
+- [`3c5743a`](https://github.com/preconstruct/preconstruct/commit/3c5743a86005e261671452c9bdf4b985d3a90ee3) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Add experimental `useTSMorphToGenerateTSDeclarations` flag
+
 ## 1.1.15
 
 ### Patch Changes

@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "gatsby";
 import colors from "./colors";
 
-export let LinksContainer = props => (
+export let LinksContainer = (props) => (
   <div
     css={{ display: "flex", justifyContent: "center", alignItems: "center" }}
     {...props}
@@ -24,9 +24,9 @@ let fancyCSS = {
   borderRadius: 8,
   ":hover": {
     backgroundColor: colors.base,
-    color: "white"
-  }
+    color: "white",
+  },
 };
 
-export let FancyLink = props => <Link css={fancyCSS} {...props} />;
-export let FancyAnchor = props => <a css={fancyCSS} {...props} />;
+export let FancyLink = (props) => <Link css={fancyCSS} {...props} />;
+export let FancyAnchor = (props) => <a css={fancyCSS} {...props} />;

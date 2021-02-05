@@ -8,47 +8,13 @@
 
 We're going to create another package from `a-random-number` called `a-random-number-with-create` and add another entrypoint called `create` so that people can import `a-random-number-with-create/create` to create their own random numbers and still import `a-random-number-with-create` to get a random number.
 
-The first thing we're going to do is create our entrypoint directory.
-
-```bash
-mkdir create
-```
-
-Then we can set what the entrypoints for our package should be.
-
-```json
-"preconstruct": {
-  "entrypoints": [
-    ".",
-    "create"
-  ]
-}
-```
-
-<details>
-
-<summary>
-  What does <code>"."</code> mean here?
-</summary>
-
-`"."` is referring to the current directory so in this context it means that the current directory should be an entrypoint. So consumers should be able to import `a-random-number` (`"."`) and `a-random-number/create` (`"create"`)
-
-</details>
-
-If we run `yarn preconstruct fix` now, it'll ask us a question and fix any problems with our project.
-
-```bash
-🎁 ? a-random-number-with-create A package.json file does not exist for this entrypoint, would you like to create one automatically? Yes
-🎁 error a-random-number-with-create/create no source file was provided, please create a file at src/index or specify a custom source file with the preconstruct source option
-```
-
-Now preconstruct is complaining that there isn't a source file so we need to create one. We're going to create one at `src/create.js`
+First, we'll create `src/create.js`.
 
 ```jsx
 export let createRandom = () => Math.random();
 ```
 
-We're also going to change `src/index.js` to use our new `createRandom` function
+We'll also make `src/index.js` use it.
 
 ```jsx
 import { createRandom } from "./create";
@@ -56,16 +22,17 @@ import { createRandom } from "./create";
 export let random = createRandom();
 ```
 
-Since the source file for our `create` entrypoint isn't at the default of `src/index.js` relative to the entrypoint, we need to use the `source` option in the `package.json` in the `create` directory.
+Then we can set what the entrypoints for our package should be in our `package.json`
 
 ```json
-{
-  "main": "dist/a-random-number-with-create.cjs.js",
-  "module": "dist/a-random-number-with-create.esm.js",
-  "preconstruct": {
-    "source": "../src/random"
-  }
+"preconstruct": {
+  "entrypoints": [
+    "index.js",
+    "create.js"
+  ]
 }
 ```
 
-Now if we run `yarn preconstruct build`, everything will work and after publishing the package, people can import `a-random-number-with-create/create`.
+If we run `yarn preconstruct fix` now, Preconstruct will create a package.json at `create/package.json` that will allow people to import `a-random-number-with-create/create` and have the CommonJS bundle loaded when required in Node and the ESM file loaded in bundlers.
+
+Now if we run `yarn preconstruct build` and publish the package, users can import `a-random-number-with-create/create`.

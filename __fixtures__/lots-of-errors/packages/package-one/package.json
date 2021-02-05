@@ -1,7 +1,0 @@
-{
-  "name": "@errors/package-one",
-  "version": "1.0.0",
-  "main": "dist/package-one.cjs.js",
-  "license": "MIT",
-  "private": true
-}

@@ -10,7 +10,8 @@
     "changeset": "changeset",
     "release": "yarn build && changeset publish",
     "start:site": "cd site && yarn start",
-    "build:site": "cd site && yarn build"
+    "build:site": "cd site && yarn build",
+    "lint": "eslint . --ext tsx,ts,js"
   },
   "repository": "https://github.com/preconstruct/preconstruct",
   "license": "MIT",
@@ -30,16 +31,16 @@
     "@babel/plugin-proposal-object-rest-spread": "^7.7.7",
     "@babel/plugin-transform-runtime": "^7.7.6",
     "@babel/preset-env": "^7.7.7",
+    "@babel/preset-flow": "^7.10.4",
     "@babel/preset-typescript": "^7.9.0",
     "@changesets/changelog-github": "^0.2.1",
-    "@changesets/cli": "^2.5.1",
-    "@manypkg/cli": "^0.8.1",
-    "@mitchellhamilton/experimental-changesets-auto-release": "^0.0.2",
+    "@changesets/cli": "^2.13.1",
+    "@manypkg/cli": "^0.17.0",
     "@types/babel__code-frame": "^7.0.1",
+    "@types/fs-extra": "^9.0.6",
     "@types/inquirer": "^6.5.0",
     "@types/jest": "^24.0.21",
     "@types/meow": "^5.0.0",
-    "@types/micromatch": "^3.1.0",
     "@types/ms": "^0.7.31",
     "@types/node": "^12.12.5",
     "@types/normalize-path": "^3.0.0",
@@ -49,24 +50,26 @@
     "@types/rollup-plugin-json": "^3.0.2",
     "@types/source-map-support": "^0.5.0",
     "@types/terser": "^3.12.0",
+    "@typescript-eslint/parser": "^4.2.0",
     "babel-core": "^7.0.0-bridge.0",
     "babel-eslint": "^10.0.3",
     "babel-jest": "^24.9.0",
+    "babel-plugin-macros": "^2.8.0",
     "codecov": "^3.6.1",
     "cross-env": "^7.0.2",
     "eslint": "^6.6.0",
     "eslint-plugin-import": "^2.18.2",
-    "eslint-plugin-prettier": "^3.1.1",
+    "eslint-plugin-prettier": "^3.1.4",
     "eslint-plugin-react": "^7.16.0",
     "fixturez": "^1.1.0",
-    "globby": "^10.0.1",
     "jest": "^24.9.0",
     "jest-in-case": "^1.0.2",
     "jest-junit": "^9.0.0",
+    "lazy-require.macro": "^0.1.0",
     "normalize-path": "^3.0.0",
-    "prettier": "^2.0.5",
-    "typescript": "^3.8.3",
-    "v8-profiler-next": "^1.1.1"
+    "outdent": "^0.7.1",
+    "prettier": "^2.1.2",
+    "typescript": "^4.0.3"
   },
   "jest": {
     "reporters": [
@@ -74,11 +77,14 @@
       "jest-junit"
     ]
   },
+  "manypkg": {
+    "defaultBranch": "main"
+  },
   "preconstruct": {
     "packages": [
       "packages/*",
       "!packages/next",
-      "!packages/preconstruct"
+      "!packages/hook"
     ]
   }
 }

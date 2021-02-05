@@ -2,65 +2,69 @@ import * as fs from "fs-extra";
 import nodePath from "path";
 import detectIndent from "detect-indent";
 import parseJson from "parse-json";
-import { PKG_JSON_CONFIG_FIELD } from "./constants";
-import normalizePath from "normalize-path";
+import { JSONValue } from "./utils";
 
-let itemsByPath: { [key: string]: Set<Item> } = {};
+type JSONDataByPath = Map<
+  string,
+  { value: JSONValue; stringifiedSaved: string }
+>;
 
-export class Item {
-  _contents: string;
-  _stringifiedSavedJson: string;
+type BaseConfig = Record<string, JSONValue | undefined> & {
+  preconstruct?: JSONValue;
+};
+
+export class Item<JSONData extends BaseConfig = BaseConfig> {
   path: string;
+  indent: string;
   directory: string;
-
-  json: Record<string, any>;
-  _config: Record<string, any>;
-  constructor(filePath: string, contents: string) {
-    this.json = parseJson(contents, filePath);
-    this._stringifiedSavedJson = JSON.stringify(this.json, null, 2);
-    this._contents = contents;
+  _jsonDataByPath: JSONDataByPath;
+  constructor(
+    filePath: string,
+    contents: string,
+    jsonDataByPath: JSONDataByPath
+  ) {
+    this.indent = detectIndent(contents).indent || "  ";
     this.path = filePath;
     this.directory = nodePath.dirname(filePath);
-    this._config = this.json[PKG_JSON_CONFIG_FIELD] || {};
-    if (itemsByPath[this.path] === undefined) {
-      itemsByPath[this.path] = new Set();
+    this._jsonDataByPath = jsonDataByPath;
+    if (!jsonDataByPath.has(this.path)) {
+      const json = parseJson(contents, filePath);
+      jsonDataByPath.set(this.path, {
+        value: json,
+        stringifiedSaved: JSON.stringify(json),
+      });
+      if (!this.json.preconstruct) {
+        this.json.preconstruct = {};
+      }
     }
-    itemsByPath[this.path].add(this);
   }
 
-  updater(json: Object) {
-    this.json = json;
+  get json() {
+    return this._jsonDataByPath.get(this.path)!.value as JSONData;
   }
 
-  async refresh() {
-    let contents: string = await fs.readFile(this.path, "utf-8");
-    let json = parseJson(contents, this.path);
-    for (let item of itemsByPath[this.path]) {
-      item.updater(json);
-    }
+  set json(value) {
+    this._jsonDataByPath.set(this.path, {
+      value,
+      stringifiedSaved: this._jsonDataByPath.get(this.path)!.stringifiedSaved,
+    });
   }
   async save() {
-    if (Object.keys(this._config).length) {
-      this.json[PKG_JSON_CONFIG_FIELD] = this._config;
-    } else {
-      delete this.json[PKG_JSON_CONFIG_FIELD];
+    const json = { ...this.json };
+    if (
+      json.preconstruct &&
+      json.preconstruct !== null &&
+      typeof json.preconstruct === "object" &&
+      !Object.keys(json.preconstruct).length
+    ) {
+      delete json.preconstruct;
     }
-    let stringified = JSON.stringify(this.json, null, 2);
-    if (stringified !== this._stringifiedSavedJson) {
+    let stringified = JSON.stringify(json);
+    if (stringified !== this._jsonDataByPath.get(this.path)!.stringifiedSaved) {
       await fs.writeFile(
         this.path,
-        JSON.stringify(
-          this.json,
-          null,
-          detectIndent(this._contents).indent || "  "
-        ) + "\n"
+        JSON.stringify(json, null, this.indent) + "\n"
       );
-
-      this._config = this.json[PKG_JSON_CONFIG_FIELD] || {};
-      for (let item of itemsByPath[this.path]) {
-        item.updater(this.json);
-      }
-      this._stringifiedSavedJson = stringified;
       return true;
     }
     return false;

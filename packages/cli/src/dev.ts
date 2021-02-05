@@ -1,36 +1,18 @@
 import { Project } from "./project";
 import { success, info } from "./logger";
-import { tsTemplate, flowTemplate } from "./utils";
+import { tsTemplate, flowTemplate, validFields } from "./utils";
 import * as babel from "@babel/core";
 import * as fs from "fs-extra";
 import path from "path";
 import normalizePath from "normalize-path";
-import { StrictEntrypoint } from "./entrypoint";
+import { Entrypoint } from "./entrypoint";
+import { validateProject } from "./validate";
 
 let tsExtensionPattern = /tsx?$/;
 
-function cjsOnlyReexportTemplate(pathToSource: string) {
-  return `// 👋 hey!!
-// you might be reading this and seeing .esm in the filename
-// and being confused why there is commonjs below this filename
-// DON'T WORRY!
-// this is intentional
-// it's only commonjs with \`preconstruct dev\`
-// when you run \`preconstruct build\`, it will be ESM
-// why is it commonjs?
-// we need to re-export every export from the source file
-// but we can't do that with ESM without knowing what the exports are (because default exports aren't included in export/import *)
-// and they could change after running \`preconstruct dev\` so we can't look at the file without forcing people to
-// run preconstruct dev again which wouldn't be ideal
-// this solution could change but for now, it's working
-
-module.exports = require(${JSON.stringify(pathToSource)})
-`;
-}
-
 async function getTypeSystem(
-  entrypoint: StrictEntrypoint
-): Promise<[null | "flow" | "typescript", string]> {
+  entrypoint: Entrypoint
+): Promise<[undefined | "flow" | "typescript", string]> {
   let content = await fs.readFile(entrypoint.source, "utf8");
 
   if (tsExtensionPattern.test(entrypoint.source)) {
@@ -41,20 +23,28 @@ async function getTypeSystem(
   if (content.includes("@flow")) {
     return ["flow", content];
   }
-  return [null, content];
+  return [undefined, content];
 }
 
-export async function writeDevTSFile(
-  entrypoint: StrictEntrypoint,
-  entrypointSourceContent: string
+async function entrypointHasDefaultExport(
+  entrypoint: Entrypoint,
+  content: string
 ) {
-  let ast = (await babel.parseAsync(entrypointSourceContent, {
+  // this regex won't tell us that a module definitely has a default export
+  // if it doesn't match though, it will tell us that the module
+  // definitely _doesn't_ have a default export
+  // we want to do this because a Babel parse is very expensive
+  // so we want to avoid doing it unless we absolutely have to
+  if (
+    !/(export\s*{[^}]*default|export\s+(|\*\s+as\s+)default\s)/.test(content)
+  ) {
+    return false;
+  }
+  let ast = (await babel.parseAsync(content, {
     filename: entrypoint.source,
     sourceType: "module",
     cwd: entrypoint.package.project.directory,
   }))! as babel.types.File;
-
-  let hasDefaultExport = false;
 
   for (let statement of ast.program.body) {
     if (
@@ -62,21 +52,36 @@ export async function writeDevTSFile(
       (statement.type === "ExportNamedDeclaration" &&
         statement.specifiers.some(
           (specifier) =>
-            specifier.type === "ExportSpecifier" &&
+            (specifier.type === "ExportDefaultSpecifier" ||
+              specifier.type === "ExportNamespaceSpecifier" ||
+              specifier.type === "ExportSpecifier") &&
             specifier.exported.name === "default"
         ))
     ) {
-      hasDefaultExport = true;
-      break;
+      return true;
     }
   }
-  let cjsDistPath = path
-    .join(entrypoint.directory, entrypoint.main)
-    .replace(/\.js$/, "");
+  return false;
+}
 
-  await fs.outputFile(
-    cjsDistPath + ".d.ts",
-    `// are you seeing an error that a default export doesn't exist but your source file has a default export?
+export async function writeDevTSFile(
+  entrypoint: Entrypoint,
+  entrypointSourceContent: string
+) {
+  let cjsDistPath = path
+    .join(entrypoint.directory, validFields.main(entrypoint))
+    .replace(/\.js$/, ".d.ts");
+
+  let output = await (entrypoint.package.project.experimentalFlags
+    .typeScriptProxyFileWithImportEqualsRequireAndExportEquals
+    ? `import mod = require(${JSON.stringify(
+        path
+          .relative(path.dirname(cjsDistPath), entrypoint.source)
+          .replace(/\.tsx?$/, "")
+      )});\n\nexport = mod;\n`
+    : entrypointHasDefaultExport(entrypoint, entrypointSourceContent).then(
+        (hasDefaultExport) =>
+          `// are you seeing an error that a default export doesn't exist but your source file has a default export?
 // you should run \`yarn\` or \`yarn preconstruct dev\` if preconstruct dev isn't in your postinstall hook
 
 // curious why you need to?
@@ -87,24 +92,29 @@ export async function writeDevTSFile(
 // to check for a default export and re-export it if it exists
 // it's not ideal, but it works pretty well ¯\\_(ツ)_/¯
 ` +
-      tsTemplate(
-        hasDefaultExport,
-        normalizePath(
-          path
-            .relative(path.dirname(cjsDistPath), entrypoint.source)
-            .replace(/\.tsx?$/, "")
-        )
-      )
-  );
+          tsTemplate(
+            hasDefaultExport,
+            normalizePath(
+              path
+                .relative(path.dirname(cjsDistPath), entrypoint.source)
+                .replace(/\.tsx?$/, "")
+            )
+          )
+      ));
+
+  await fs.outputFile(cjsDistPath, output);
 }
 
 async function writeTypeSystemFile(
-  typeSystemPromise: Promise<[null | "flow" | "typescript", string]>,
-  entrypoint: StrictEntrypoint
+  typeSystemPromise: Promise<[undefined | "flow" | "typescript", string]>,
+  entrypoint: Entrypoint
 ) {
   let [typeSystem, content] = await typeSystemPromise;
-  if (typeSystem === null) return;
-  let cjsDistPath = path.join(entrypoint.directory, entrypoint.main);
+  if (typeSystem === undefined) return;
+  let cjsDistPath = path.join(
+    entrypoint.directory,
+    validFields.main(entrypoint)
+  );
 
   if (typeSystem === "flow") {
     // so...
@@ -135,18 +145,15 @@ async function writeTypeSystemFile(
 }
 
 export default async function dev(projectDir: string) {
-  let project: Project = await Project.create(projectDir);
-  project.packages.forEach(({ entrypoints }) =>
-    entrypoints.forEach((x) => x.strict())
-  );
+  let project = await Project.create(projectDir);
+  validateProject(project);
   info("project is valid!");
 
   let promises: Promise<unknown>[] = [];
   await Promise.all(
     project.packages.map((pkg) => {
       return Promise.all(
-        pkg.entrypoints.map(async (_entrypoint) => {
-          let entrypoint = _entrypoint.strict();
+        pkg.entrypoints.map(async (entrypoint) => {
           let typeSystemPromise = getTypeSystem(entrypoint);
 
           let distDirectory = path.join(entrypoint.directory, "dist");
@@ -157,7 +164,7 @@ export default async function dev(projectDir: string) {
           let promises = [
             writeTypeSystemFile(typeSystemPromise, entrypoint),
             fs.writeFile(
-              path.join(entrypoint.directory, entrypoint.main),
+              path.join(entrypoint.directory, validFields.main(entrypoint)),
               `"use strict";
 // this file might look strange and you might be wondering what it's for
 // it's lets you import your source files by importing this entrypoint
@@ -167,53 +174,44 @@ export default async function dev(projectDir: string) {
 // this means that you don't have to set up @babel/register or anything like that
 // but you can still require this module and it'll be compiled
 
-const path = require("path");
-
 // this bit of code imports the require hook and registers it
 let unregister = require(${JSON.stringify(
                 normalizePath(
                   path.relative(
                     distDirectory,
-                    require.resolve("@preconstruct/hook")
+                    path.dirname(require.resolve("@preconstruct/hook"))
                   )
                 )
-              )}).___internalHook(path.resolve(__dirname, ${JSON.stringify(
+              )}).___internalHook(typeof __dirname === 'undefined' ? undefined : __dirname, ${JSON.stringify(
                 normalizePath(path.relative(distDirectory, project.directory))
-              )}));
+              )}, ${JSON.stringify(
+                normalizePath(path.relative(distDirectory, pkg.directory))
+              )});
 
 // this re-exports the source file
 module.exports = require(${JSON.stringify(
                 normalizePath(path.relative(distDirectory, entrypoint.source))
               )});
 
-// this unregisters the require hook so that any modules required after this one
-// aren't compiled with the require hook in case you have some other require hook
-// or something that should be used on other modules
 unregister();
 `
             ),
           ];
-          if (entrypoint.module) {
+          if (entrypoint.json.module) {
             promises.push(
-              fs.writeFile(
-                path.join(entrypoint.directory, entrypoint.module),
-                cjsOnlyReexportTemplate(
-                  normalizePath(path.relative(distDirectory, entrypoint.source))
-                )
+              fs.symlink(
+                entrypoint.source,
+                path.join(entrypoint.directory, validFields.module(entrypoint))
               )
             );
           }
-          let browserField = entrypoint.browser;
-          if (browserField) {
+          if (entrypoint.json.browser) {
+            let browserField = validFields.browser(entrypoint);
             for (let key of Object.keys(browserField)) {
               promises.push(
-                fs.writeFile(
-                  path.join(entrypoint.directory, browserField[key]),
-                  cjsOnlyReexportTemplate(
-                    normalizePath(
-                      path.relative(distDirectory, entrypoint.source)
-                    )
-                  )
+                fs.symlink(
+                  entrypoint.source,
+                  path.join(entrypoint.directory, browserField[key])
                 )
               );
             }

@@ -14,26 +14,26 @@ export default new Typography({
   includeNormalize: false,
   overrideStyles: () => ({
     a: {
-      color: colors.blue
+      color: colors.blue,
     },
     pre: {
       fontFamily: '"Roboto Mono", Menlo, monospace',
-      color: colors.blue
+      color: colors.blue,
     },
     code: {
       fontFamily: '"Roboto Mono", Menlo, monospace',
-      color: colors.blue
+      color: colors.blue,
       // backgroundColor: colors.gray,
-    }
+    },
   }),
   googleFonts: [
     {
       name: "Roboto",
-      styles: ["400", "700"]
+      styles: ["400", "700"],
     },
     {
       name: "Roboto Mono",
-      styles: ["400", "700"]
-    }
-  ]
+      styles: ["400", "700"],
+    },
+  ],
 });

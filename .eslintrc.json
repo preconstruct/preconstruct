@@ -1,10 +1,11 @@
 {
-  "parser": "babel-eslint",
-  "plugins": ["react", "import"],
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["react", "import", "format-js-tag","prettier"],
   "rules": {
-    "no-unused-vars": "error",
     "react/jsx-uses-react": "error",
-    "react/jsx-uses-vars": "error"
+    "react/jsx-uses-vars": "error",
+    "format-js-tag/format": "error",
+    "prettier/prettier": "error"
   },
   "overrides": [
     {

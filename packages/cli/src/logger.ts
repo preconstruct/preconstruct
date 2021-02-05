@@ -10,7 +10,7 @@ export function format(
     error: chalk.red("error"),
     success: chalk.green("success"),
     info: chalk.cyan("info"),
-    none: ""
+    none: "",
   }[messageType];
   let fullPrefix =
     "🎁 " + prefix + (scope === undefined ? "" : " " + chalk.cyan(scope));
@@ -19,7 +19,10 @@ export function format(
     util
       .format("", ...args)
       .split("\n")
-      .join("\n" + fullPrefix + " ")
+      .reduce((str, line) => {
+        const prefixed = `${str}\n${fullPrefix}`;
+        return line ? `${prefixed} ${line}` : prefixed;
+      })
   );
 }
 export function error(message: string, scope?: string) {

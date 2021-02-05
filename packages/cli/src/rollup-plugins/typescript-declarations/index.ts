@@ -1,30 +1,21 @@
 import path from "path";
-import fs from "fs-extra";
 import { FatalError } from "../../errors";
-import { Plugin, OutputChunk, OutputAsset } from "rollup";
+import { Plugin } from "rollup";
 import { Package } from "../../package";
 import { createDeclarationCreator } from "./create-generator";
 import { tsTemplate } from "../../utils";
 import normalizePath from "normalize-path";
-import { createDeclarationCreatorWithTSMorph } from "./create-generator-ts-morph";
 
 export let isTsPath = (source: string) => /\.tsx?/.test(source);
 
 export default function typescriptDeclarations(pkg: Package): Plugin {
-  if (
-    !pkg.entrypoints.some(({ source }) => isTsPath(source)) ||
-    pkg.project.experimentalFlags.useSourceInsteadOfGeneratingTSDeclarations
-  ) {
+  if (!pkg.entrypoints.some(({ source }) => isTsPath(source))) {
     return { name: "typescript-declarations" };
   }
   return {
     name: "typescript-declarations",
-    // eslint-disable-next-line no-unused-vars
-    async generateBundle(opts, bundle, something) {
-      let creator = await (pkg.project.experimentalFlags
-        .useTSMorphToGenerateTSDeclarations
-        ? createDeclarationCreatorWithTSMorph
-        : createDeclarationCreator)(pkg.directory, pkg.name);
+    async generateBundle(opts, bundle) {
+      let creator = await createDeclarationCreator(pkg.directory, pkg.name);
 
       let srcFilenameToDtsFilenameMap = new Map<string, string>();
 
@@ -42,17 +33,15 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
       );
 
       for (const n in bundle) {
-        const _file = bundle[n];
-        const facadeModuleId = (_file as OutputChunk).facadeModuleId;
+        const file = bundle[n];
         if (
-          (_file as OutputAsset).isAsset ||
-          !(_file as OutputChunk).isEntry ||
-          facadeModuleId == null
+          file.type === "asset" ||
+          !file.isEntry ||
+          file.facadeModuleId == null
         ) {
           continue;
         }
-
-        let file = _file as OutputChunk;
+        const facadeModuleId = file.facadeModuleId;
 
         let dtsFilename = srcFilenameToDtsFilenameMap.get(
           normalizePath(facadeModuleId)

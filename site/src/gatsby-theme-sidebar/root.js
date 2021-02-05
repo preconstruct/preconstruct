@@ -18,15 +18,15 @@ let linkStyles = {
   marginLeft: -32,
   marginRight: -32,
   "&.active": {
-    color: colors.active
-  }
+    color: colors.active,
+  },
 };
 
-const NavLink = props => (
+const NavLink = (props) => (
   <Link activeClassName="active" css={linkStyles} {...props} />
 );
 
-const MenuButton = props => (
+const MenuButton = (props) => (
   <button
     {...props}
     css={{
@@ -39,18 +39,18 @@ const MenuButton = props => (
       border: "none",
       "&:focus": {
         color: colors.blue,
-        outline: `1px solid ${colors.blue}`
-      }
+        outline: `1px solid ${colors.blue}`,
+      },
     }}
   />
 );
 
-const Title = props => (
+const Title = (props) => (
   <h1
     {...props}
     css={{
       margin: 0,
-      fontSize: 16
+      fontSize: 16,
     }}
   />
 );
@@ -74,7 +74,7 @@ let components = {
     }
     return <Link to={href} {...props} />;
   },
-  blockquote: props => {
+  blockquote: (props) => {
     return (
       <blockquote
         css={{
@@ -83,7 +83,7 @@ let components = {
           marginLeft: 0,
           backgroundColor: colors.pink,
           paddingTop: 16,
-          paddingBottom: 16
+          paddingBottom: 16,
         }}
         {...props}
       />
@@ -100,8 +100,8 @@ let components = {
           "& pre": {
             overflowX: "auto",
             width: "100%",
-            padding: 16
-          }
+            padding: 16,
+          },
         }}
       >
         <Highlight
@@ -124,7 +124,7 @@ let components = {
         </Highlight>
       </div>
     );
-  }
+  },
 };
 
 export default ({
@@ -141,13 +141,13 @@ export default ({
   return (
     <Layout
       css={{
-        color: colors.black
+        color: colors.black,
       }}
     >
       <Header
         css={{
           color: "white",
-          backgroundColor: colors.base
+          backgroundColor: colors.base,
         }}
       >
         <NavLink
@@ -155,14 +155,14 @@ export default ({
           css={{
             display: "inline-flex",
             justifyContent: "center",
-            alignItems: "center"
+            alignItems: "center",
           }}
           to="/"
         >
           <div
             css={{
               fontSize: 24,
-              marginRight: 8
+              marginRight: 8,
             }}
           >
             🎁
@@ -174,7 +174,7 @@ export default ({
           css={{
             display: "inline-flex",
             justifyContent: "center",
-            alignItems: "center"
+            alignItems: "center",
           }}
         >
           <a
@@ -209,7 +209,7 @@ export default ({
           css={{
             paddingTop: 32,
             paddingBottom: 32,
-            backgroundColor: colors.pink
+            backgroundColor: colors.pink,
           }}
         >
           <NavLink to="/">Introduction</NavLink>
@@ -248,17 +248,17 @@ export default ({
             paddingTop: 32,
             paddingBottom: 32,
             "h1 code, h2 code, h3 code, h4 code, h5 code, h6 code": {
-              fontSize: "inherit"
+              fontSize: "inherit",
             },
             details: {
               borderLeft: `8px solid ${colors.base}`,
               backgroundColor: colors.pink,
               padding: 16,
-              marginBottom: 16
+              marginBottom: 16,
             },
             "details[open] summary": {
-              marginBottom: 16
-            }
+              marginBottom: 16,
+            },
           }}
         >
           <MDXProvider components={components}>{props.children}</MDXProvider>

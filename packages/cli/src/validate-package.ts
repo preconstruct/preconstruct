@@ -4,13 +4,6 @@ import chalk from "chalk";
 import { errors } from "./messages";
 import { Package } from "./package";
 
-let camelToPkgJsonField = {
-  main: "main",
-  module: "module",
-  umdMain: "umd:main",
-  browser: "browser"
-};
-
 let keys: <Obj>(obj: Obj) => (keyof Obj)[] = Object.keys;
 
 export async function fixPackage(pkg: Package) {
@@ -19,17 +12,19 @@ export async function fixPackage(pkg: Package) {
   }
   let fields = {
     main: true,
-    module: pkg.entrypoints.some(x => x.module),
-    umdMain: pkg.entrypoints.some(x => x.umdMain),
-    browser: pkg.entrypoints.some(x => x.browser)
+    module: pkg.entrypoints.some((x) => x.json.module !== undefined),
+    "umd:main": pkg.entrypoints.some((x) => x.json["umd:main"] !== undefined),
+    browser: pkg.entrypoints.some((x) => x.json.browser !== undefined),
   };
 
   keys(fields)
-    .filter(x => fields[x])
-    .forEach(field => {
+    .filter((x) => fields[x])
+    .forEach((field) => {
       pkg.setFieldOnEntrypoints(field);
     });
-  return (await Promise.all(pkg.entrypoints.map(x => x.save()))).some(x => x);
+  return (await Promise.all(pkg.entrypoints.map((x) => x.save()))).some(
+    (x) => x
+  );
 }
 
 let unsafeRequire = require;
@@ -43,30 +38,22 @@ export function validatePackage(pkg: Package) {
     // main is intentionally not here, since it's always required
     // it will be validated in validateEntrypoint and the case
     // which this function validates will never happen
-    module: !!pkg.entrypoints[0].module,
-    umdMain: !!pkg.entrypoints[0].umdMain,
-    browser: !!pkg.entrypoints[0].browser
+    module: pkg.entrypoints[0].json.module !== undefined,
+    "umd:main": pkg.entrypoints[0].json["umd:main"] !== undefined,
+    browser: pkg.entrypoints[0].json.browser !== undefined,
   };
 
-  pkg.entrypoints.forEach(entrypoint => {
-    keys(fields).forEach(field => {
-      if (
-        // $FlowFixMe
-        entrypoint[field] &&
-        !fields[field]
-      ) {
+  pkg.entrypoints.forEach((entrypoint) => {
+    keys(fields).forEach((field) => {
+      if (entrypoint.json[field] && !fields[field]) {
         throw new FixableError(
-          `${pkg.entrypoints[0].name} has a ${camelToPkgJsonField[field]} build but ${entrypoint.name} does not have a ${camelToPkgJsonField[field]} build. Entrypoints in a package must either all have a particular build type or all not have a particular build type.`,
+          `${entrypoint.name} has a ${field} build but ${pkg.entrypoints[0].name} does not have a ${field} build. Entrypoints in a package must either all have a particular build type or all not have a particular build type.`,
           pkg.name
         );
       }
-      if (
-        // $FlowFixMe
-        !entrypoint[field] &&
-        fields[field]
-      ) {
+      if (!entrypoint.json[field] && fields[field]) {
         throw new FixableError(
-          `${entrypoint.name} has a ${camelToPkgJsonField[field]} build but ${pkg.entrypoints[0].name} does not have a ${camelToPkgJsonField[field]} build. Entrypoints in a package must either all have a particular build type or all not have a particular build type.`,
+          `${pkg.entrypoints[0].name} has a ${field} build but ${entrypoint.name} does not have a ${field} build. Entrypoints in a package must either all have a particular build type or all not have a particular build type.`,
           pkg.name
         );
       }
@@ -74,7 +61,7 @@ export function validatePackage(pkg: Package) {
   });
 
   // TODO: do this well
-  if (fields.umdMain) {
+  if (fields["umd:main"]) {
     // this is a sorta naive check
     // but it's handling the most common case
     // i don't think it's worth implementing this well at this exact moment
@@ -85,7 +72,7 @@ export function validatePackage(pkg: Package) {
       ...(pkg.json.peerDependencies
         ? Object.keys(pkg.json.peerDependencies)
         : []),
-      ...(pkg.json.dependencies ? Object.keys(pkg.json.dependencies) : [])
+      ...(pkg.json.dependencies ? Object.keys(pkg.json.dependencies) : []),
     ]);
 
     for (let depName in pkg.json.dependencies) {
