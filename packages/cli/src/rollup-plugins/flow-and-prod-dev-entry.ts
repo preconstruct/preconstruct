@@ -52,7 +52,7 @@ export default function flowAndNodeDevProdEntry(
       if (
         source.startsWith("\0") ||
         resolved.id.startsWith("\0") ||
-        resolved.id.startsWith(pkg.directory)
+        resolved.id.startsWith(normalizePath(pkg.directory))
       ) {
         return resolved;
       }
