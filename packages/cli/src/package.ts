@@ -247,10 +247,14 @@ export class Package extends Item<{
         throw new FatalError(
           `this package has multiple source files for the same entrypoint of ${
             entrypoint.name
-          } at ${nodePath.relative(
-            pkg.directory,
-            entrypointsWithSourcePath.get(entrypoint.name)!
-          )} and ${nodePath.relative(pkg.directory, entrypoint.source)}`,
+          } at ${normalizePath(
+            nodePath.relative(
+              pkg.directory,
+              entrypointsWithSourcePath.get(entrypoint.name)!
+            )
+          )} and ${normalizePath(
+            nodePath.relative(pkg.directory, entrypoint.source)
+          )}`,
           pkg.name
         );
       }

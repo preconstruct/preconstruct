@@ -75,9 +75,11 @@ export async function writeDevTSFile(
   let output = await (entrypoint.package.project.experimentalFlags
     .typeScriptProxyFileWithImportEqualsRequireAndExportEquals
     ? `import mod = require(${JSON.stringify(
-        path
-          .relative(path.dirname(cjsDistPath), entrypoint.source)
-          .replace(/\.tsx?$/, "")
+        normalizePath(
+          path
+            .relative(path.dirname(cjsDistPath), entrypoint.source)
+            .replace(/\.tsx?$/, "")
+        )
       )});\n\nexport = mod;\n`
     : entrypointHasDefaultExport(entrypoint, entrypointSourceContent).then(
         (hasDefaultExport) =>
