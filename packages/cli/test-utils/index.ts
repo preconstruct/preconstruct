@@ -346,6 +346,13 @@ type Fixture = {
   [key: string]: string | { kind: "symlink"; path: string };
 };
 
+// basically replicating https://github.com/nodejs/node/blob/72f9c53c0f5cc03000f9a4eb1cf31f43e1d30b89/lib/fs.js#L1163-L1174
+// for some reason the builtin auto-detection doesn't work, the code probably doesn't land go into that logic or something
+async function getSymlinkType(targetPath: string): Promise<"dir" | "file"> {
+  const stat = await fs.stat(targetPath);
+  return stat.isDirectory() ? "dir" : "file";
+}
+
 export async function testdir(dir: Fixture) {
   const temp = f.temp();
   await Promise.all(
@@ -357,7 +364,9 @@ export async function testdir(dir: Fixture) {
       } else {
         const dir = path.dirname(fullPath);
         await fs.ensureDir(dir);
-        await fs.symlink(path.resolve(temp, output.path), fullPath);
+        const targetPath = path.resolve(temp, output.path);
+        const symlinkType = await getSymlinkType(targetPath);
+        await fs.symlink(targetPath, fullPath, symlinkType);
       }
     })
   );
