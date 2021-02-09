@@ -12407,6 +12407,11 @@ realpath-native@^1.1.0:
   dependencies:
     util.promisify "^1.0.0"
 
+realpath-native@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/realpath-native/-/realpath-native-3.0.0.tgz#b05f133f90b8a0eb41345f8d31e38784dc0cf649"
+  integrity sha512-wo8UcDdReNSM53uPYlCfdCSQ4C6DY1wJg4tkXFMeR0unroR3Yt/VhobEk9TmGowbRwtzYmXwAERkcVI2ih0JVA==
+
 recursive-readdir@2.2.1:
   version "2.2.1"
   resolved "https://registry.yarnpkg.com/recursive-readdir/-/recursive-readdir-2.2.1.tgz#90ef231d0778c5ce093c9a48d74e5c5422d13a99"

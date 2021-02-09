@@ -107,7 +107,7 @@ test("all the build types", async () => {
     ).replace(
       normalizePath(
         path.relative(
-          tmpPath,
+          distPath,
           path.dirname(require.resolve("@preconstruct/hook"))
         )
       ),
@@ -124,7 +124,7 @@ test("all the build types", async () => {
     // but you can still require this module and it'll be compiled
 
     // this bit of code imports the require hook and registers it
-    let unregister = require(\\"../RELATIVE_PATH_TO_PRECONSTRUCT_HOOK\\").___internalHook(typeof __dirname === 'undefined' ? undefined : __dirname, \\"..\\", \\"..\\");
+    let unregister = require(\\"RELATIVE_PATH_TO_PRECONSTRUCT_HOOK\\").___internalHook(typeof __dirname === 'undefined' ? undefined : __dirname, \\"..\\", \\"..\\");
 
     // this re-exports the source file
     module.exports = require(\\"../src/index.js\\");
