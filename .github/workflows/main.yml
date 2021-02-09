@@ -17,6 +17,8 @@ jobs:
     runs-on: ${{matrix.platform}}
     steps:
       - uses: actions/checkout@main
+        with:
+          fetch-depth: 0
 
       - name: Set Node.js 10.x
         uses: actions/setup-node@main
