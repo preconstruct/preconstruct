@@ -1,5 +1,4 @@
 import * as fs from "fs-extra";
-import * as realFs from "fs";
 import nodePath from "path";
 import detectIndent from "detect-indent";
 import parseJson from "parse-json";
