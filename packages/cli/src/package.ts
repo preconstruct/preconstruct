@@ -173,9 +173,8 @@ export class Package extends Item<{
           )
         ) {
           throw new FatalError(
-            `entrypoint source files must be inside of the src directory of a package but ${nodePath.relative(
-              pkg.directory,
-              sourceFile
+            `entrypoint source files must be inside of the src directory of a package but ${normalizePath(
+              nodePath.relative(pkg.directory, sourceFile)
             )} is not`,
             pkg.name
           );
@@ -248,10 +247,14 @@ export class Package extends Item<{
         throw new FatalError(
           `this package has multiple source files for the same entrypoint of ${
             entrypoint.name
-          } at ${nodePath.relative(
-            pkg.directory,
-            entrypointsWithSourcePath.get(entrypoint.name)!
-          )} and ${nodePath.relative(pkg.directory, entrypoint.source)}`,
+          } at ${normalizePath(
+            nodePath.relative(
+              pkg.directory,
+              entrypointsWithSourcePath.get(entrypoint.name)!
+            )
+          )} and ${normalizePath(
+            nodePath.relative(pkg.directory, entrypoint.source)
+          )}`,
           pkg.name
         );
       }

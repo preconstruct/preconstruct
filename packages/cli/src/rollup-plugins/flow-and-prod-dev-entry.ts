@@ -6,6 +6,7 @@ import { Package } from "../package";
 import { FatalError } from "../errors";
 
 import * as fs from "fs-extra";
+import normalizePath from "normalize-path";
 
 export default function flowAndNodeDevProdEntry(
   pkg: Package,
@@ -33,7 +34,9 @@ export default function flowAndNodeDevProdEntry(
             new FatalError(
               `"${source}" is imported ${
                 importer
-                  ? `by "${path.relative(pkg.directory, importer!)}"`
+                  ? `by "${normalizePath(
+                      path.relative(pkg.directory, importer!)
+                    )}"`
                   : ""
               } but the package is not specified in dependencies or peerDependencies`,
               pkg.name
@@ -59,7 +62,7 @@ export default function flowAndNodeDevProdEntry(
         new FatalError(
           `all relative imports in a package should only import modules inside of their package directory but ${
             importer
-              ? `"${path.relative(pkg.directory, importer)}"`
+              ? `"${normalizePath(path.relative(pkg.directory, importer))}"`
               : "a module"
           } is importing "${source}"`,
           pkg.name
@@ -96,7 +99,7 @@ export default function flowAndNodeDevProdEntry(
           if (flowMode !== false) {
             let flowFileSource = flowTemplate(
               flowMode === "all",
-              relativeToSource
+              normalizePath(relativeToSource)
             );
             let flowFileName = mainFieldPath + ".flow";
             this.emitFile({

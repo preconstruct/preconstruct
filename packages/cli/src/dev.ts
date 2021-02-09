@@ -4,6 +4,7 @@ import { tsTemplate, flowTemplate, validFields } from "./utils";
 import * as babel from "@babel/core";
 import * as fs from "fs-extra";
 import path from "path";
+import normalizePath from "normalize-path";
 import { Entrypoint } from "./entrypoint";
 import { validateProject } from "./validate";
 
@@ -74,9 +75,11 @@ export async function writeDevTSFile(
   let output = await (entrypoint.package.project.experimentalFlags
     .typeScriptProxyFileWithImportEqualsRequireAndExportEquals
     ? `import mod = require(${JSON.stringify(
-        path
-          .relative(path.dirname(cjsDistPath), entrypoint.source)
-          .replace(/\.tsx?$/, "")
+        normalizePath(
+          path
+            .relative(path.dirname(cjsDistPath), entrypoint.source)
+            .replace(/\.tsx?$/, "")
+        )
       )});\n\nexport = mod;\n`
     : entrypointHasDefaultExport(entrypoint, entrypointSourceContent).then(
         (hasDefaultExport) =>
@@ -93,9 +96,11 @@ export async function writeDevTSFile(
 ` +
           tsTemplate(
             hasDefaultExport,
-            path
-              .relative(path.dirname(cjsDistPath), entrypoint.source)
-              .replace(/\.tsx?$/, "")
+            normalizePath(
+              path
+                .relative(path.dirname(cjsDistPath), entrypoint.source)
+                .replace(/\.tsx?$/, "")
+            )
           )
       ));
 
@@ -130,7 +135,9 @@ async function writeTypeSystemFile(
       cjsDistPath + ".flow",
       flowTemplate(
         false,
-        path.relative(path.dirname(cjsDistPath), entrypoint.source)
+        normalizePath(
+          path.relative(path.dirname(cjsDistPath), entrypoint.source)
+        )
       )
     );
   }
@@ -171,19 +178,21 @@ export default async function dev(projectDir: string) {
 
 // this bit of code imports the require hook and registers it
 let unregister = require(${JSON.stringify(
-                path.relative(
-                  distDirectory,
-                  path.dirname(require.resolve("@preconstruct/hook"))
+                normalizePath(
+                  path.relative(
+                    distDirectory,
+                    path.dirname(require.resolve("@preconstruct/hook"))
+                  )
                 )
               )}).___internalHook(typeof __dirname === 'undefined' ? undefined : __dirname, ${JSON.stringify(
-                path.relative(distDirectory, project.directory)
+                normalizePath(path.relative(distDirectory, project.directory))
               )}, ${JSON.stringify(
-                path.relative(distDirectory, pkg.directory)
+                normalizePath(path.relative(distDirectory, pkg.directory))
               )});
 
 // this re-exports the source file
 module.exports = require(${JSON.stringify(
-                path.relative(distDirectory, entrypoint.source)
+                normalizePath(path.relative(distDirectory, entrypoint.source))
               )});
 
 unregister();

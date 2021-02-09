@@ -56,9 +56,10 @@ export class Project extends Item<{
     );
   }
   static async create(
-    directory: string,
+    _directory: string,
     isFix: boolean = false
   ): Promise<Project> {
+    const directory = await (fs.realpath as any).native(_directory);
     let filePath = nodePath.join(directory, "package.json");
     let contents = await fs.readFile(filePath, "utf-8");
     let project = new Project(filePath, contents, new Map());

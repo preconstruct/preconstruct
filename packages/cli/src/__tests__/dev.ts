@@ -1,8 +1,11 @@
 import spawn from "spawndamnit";
 import path from "path";
 import * as fs from "fs-extra";
+import * as realFs from "fs";
 import { js, testdir, typescriptFixture } from "../../test-utils";
 import dev from "../dev";
+import normalizePath from "normalize-path";
+import escapeStringRegexp from "escape-string-regexp";
 
 jest.mock("../prompt");
 
@@ -69,23 +72,24 @@ test("dev command works in node", async () => {
 
 test("all the build types", async () => {
   // TODO: maybe actually require them
-
-  let tmpPath = await testdir({
-    "package.json": JSON.stringify({
-      name: "all-the-build-types",
-      main: "dist/all-the-build-types.cjs.js",
-      module: "dist/all-the-build-types.esm.js",
-      browser: {
-        "./dist/all-the-build-types.cjs.js":
-          "./dist/all-the-build-types.browser.cjs.js",
-        "./dist/all-the-build-types.esm.js":
-          "./dist/all-the-build-types.browser.esm.js",
-      },
-    }),
-    "src/index.js": js`
-                      export default "some cool thing";
-                    `,
-  });
+  let tmpPath = realFs.realpathSync.native(
+    await testdir({
+      "package.json": JSON.stringify({
+        name: "all-the-build-types",
+        main: "dist/all-the-build-types.cjs.js",
+        module: "dist/all-the-build-types.esm.js",
+        browser: {
+          "./dist/all-the-build-types.cjs.js":
+            "./dist/all-the-build-types.browser.cjs.js",
+          "./dist/all-the-build-types.esm.js":
+            "./dist/all-the-build-types.browser.esm.js",
+        },
+      }),
+      "src/index.js": js`
+                        export default "some cool thing";
+                      `,
+    })
+  );
 
   await dev(tmpPath);
 
@@ -104,9 +108,11 @@ test("all the build types", async () => {
         "utf-8"
       )
     ).replace(
-      path.relative(
-        tmpPath,
-        path.dirname(require.resolve("@preconstruct/hook"))
+      normalizePath(
+        path.relative(
+          distPath,
+          path.dirname(require.resolve("@preconstruct/hook"))
+        )
       ),
       "RELATIVE_PATH_TO_PRECONSTRUCT_HOOK"
     )
@@ -121,7 +127,7 @@ test("all the build types", async () => {
     // but you can still require this module and it'll be compiled
 
     // this bit of code imports the require hook and registers it
-    let unregister = require(\\"../RELATIVE_PATH_TO_PRECONSTRUCT_HOOK\\").___internalHook(typeof __dirname === 'undefined' ? undefined : __dirname, \\"..\\", \\"..\\");
+    let unregister = require(\\"RELATIVE_PATH_TO_PRECONSTRUCT_HOOK\\").___internalHook(typeof __dirname === 'undefined' ? undefined : __dirname, \\"..\\", \\"..\\");
 
     // this re-exports the source file
     module.exports = require(\\"../src/index.js\\");
@@ -193,7 +199,9 @@ test("source maps work", async () => {
       .split("\n")[0]
   ).toEqual(
     // the important thing we're checking is that it's mapping to line 5
-    expect.stringMatching(/\/src\/index\.js:5$/)
+    expect.stringMatching(
+      new RegExp(`${escapeStringRegexp(path.join("src", "index.js"))}:5$`)
+    )
   );
 });
 

@@ -18,6 +18,7 @@ chalk.level = 0;
 
 console.error = jest.fn();
 console.log = jest.fn();
+
 export let logMock = {
   log: (console.log as any) as jest.MockInstance<void, any>,
   error: (console.error as any) as jest.MockInstance<void, any>,
@@ -30,6 +31,7 @@ afterEach(() => {
 
 import init from "../src/init";
 import { confirms } from "../src/messages";
+import normalizePath from "normalize-path";
 
 let mockedConfirms = confirms as jest.Mocked<typeof confirms>;
 
@@ -152,9 +154,9 @@ export async function snapshotDistFiles(tmpPath: string) {
 
   await Promise.all(
     distFiles.map(async (x) => {
-      expect(
-        await fs.readFile(path.join(distPath, x), "utf-8")
-      ).toMatchSnapshot(x);
+      expect(await readNormalizedFile(path.join(distPath, x))).toMatchSnapshot(
+        normalizePath(x)
+      );
     })
   );
 }
@@ -205,12 +207,14 @@ export async function snapshotDirectory(
       .filter((fp) => filterPath(fp))
       .map(async (x) => {
         let content = transformContent(
-          await fs.readFile(path.join(tmpPath, x), "utf-8")
+          await readNormalizedFile(path.join(tmpPath, x))
         );
         if (x.endsWith(".json") && !x.endsWith("tsconfig.json")) {
           content = JSON.parse(content);
         }
-        expect(content).toMatchSnapshot(transformPath(x, content));
+        expect(content).toMatchSnapshot(
+          normalizePath(transformPath(x, content))
+        );
       })
   );
 }
@@ -332,6 +336,13 @@ type Fixture = {
   [key: string]: string | { kind: "symlink"; path: string };
 };
 
+// basically replicating https://github.com/nodejs/node/blob/72f9c53c0f5cc03000f9a4eb1cf31f43e1d30b89/lib/fs.js#L1163-L1174
+// for some reason the builtin auto-detection doesn't work, the code probably doesn't land go into that logic or something
+async function getSymlinkType(targetPath: string): Promise<"dir" | "file"> {
+  const stat = await fs.stat(targetPath);
+  return stat.isDirectory() ? "dir" : "file";
+}
+
 export async function testdir(dir: Fixture) {
   const temp = f.temp();
   await Promise.all(
@@ -343,7 +354,9 @@ export async function testdir(dir: Fixture) {
       } else {
         const dir = path.dirname(fullPath);
         await fs.ensureDir(dir);
-        await fs.symlink(path.resolve(temp, output.path), fullPath);
+        const targetPath = path.resolve(temp, output.path);
+        const symlinkType = await getSymlinkType(targetPath);
+        await fs.symlink(targetPath, fullPath, symlinkType);
       }
     })
   );
@@ -378,6 +391,20 @@ export async function getDist(dir: string) {
   return getFiles(dir, ["dist/**"]);
 }
 
+async function readNormalizedFile(filePath: string): Promise<string> {
+  let content = await fs.readFile(filePath, "utf8");
+  // to normalise windows line endings
+  content = content.replace(/\r\n/g, "\n");
+  if (/\.map$/.test(filePath)) {
+    const sourceMap = JSON.parse(content);
+    sourceMap.sourcesContent = sourceMap.sourcesContent.map((source: string) =>
+      source.replace(/\r\n/g, "\n")
+    );
+    content = JSON.stringify(sourceMap);
+  }
+  return content;
+}
+
 export async function getFiles(dir: string, glob: string[] = ["**"]) {
   const files = await fastGlob(glob, { cwd: dir });
   const filesObj: Record<string, string> = {
@@ -385,7 +412,7 @@ export async function getFiles(dir: string, glob: string[] = ["**"]) {
   };
   await Promise.all(
     files.map(async (filename) => {
-      filesObj[filename] = await fs.readFile(path.join(dir, filename), "utf8");
+      filesObj[filename] = await readNormalizedFile(path.join(dir, filename));
     })
   );
   let newObj: Record<string, string> = { [dirPrintingSymbol]: true };

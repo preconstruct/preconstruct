@@ -64,7 +64,7 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
         }
         let tsFileSource = tsTemplate(
           file.exports.includes("default"),
-          relativeToSource
+          normalizePath(relativeToSource)
         );
         let tsFileName = mainFieldPath + ".d.ts";
         this.emitFile({

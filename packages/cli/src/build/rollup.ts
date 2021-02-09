@@ -20,6 +20,7 @@ import terser from "../rollup-plugins/terser";
 import { getNameForDistForEntrypoint } from "../utils";
 import { EXTENSIONS } from "../constants";
 import { inlineProcessEnvNodeEnv } from "../rollup-plugins/inline-process-env-node-env";
+import normalizePath from "normalize-path";
 
 // this makes sure nested imports of external packages are external
 const makeExternalPredicate = (externalArr: string[]) => {
@@ -95,9 +96,8 @@ export let getRollupConfig = (
           if (!warning.source!.startsWith(".")) {
             warnings.push(
               new FatalError(
-                `"${warning.source}" is imported by "${path.relative(
-                  pkg.directory,
-                  warning.importer!
+                `"${warning.source}" is imported by "${normalizePath(
+                  path.relative(pkg.directory, warning.importer!)
                 )}" but the package is not specified in dependencies or peerDependencies`,
                 pkg.name
               )
@@ -111,9 +111,8 @@ export let getRollupConfig = (
           }
           warnings.push(
             new FatalError(
-              `"${path.relative(
-                pkg.directory,
-                warning.loc!.file!
+              `"${normalizePath(
+                path.relative(pkg.directory, warning.loc!.file!)
               )}" used \`this\` keyword at the top level of an ES module. You can read more about this at ${warning.url!} and fix this issue that has happened here:\n\n${warning.frame!}\n`,
               pkg.name
             )

@@ -122,6 +122,7 @@ export async function createDeclarationCreator(
     (x) => x,
     options
   );
+  let normalizedDirname = normalizePath(dirname);
 
   return {
     getDeps: (entrypoints: Array<string>) => {
@@ -164,7 +165,7 @@ export async function createDeclarationCreator(
               if (
                 !allDeps.has(resolvedModule.resolvedFileName) &&
                 !resolvedModule.isExternalLibraryImport &&
-                resolvedModule.resolvedFileName.includes(dirname)
+                resolvedModule.resolvedFileName.includes(normalizedDirname)
               ) {
                 internalDeps.add(resolvedModule.resolvedFileName);
                 allDeps.add(resolvedModule.resolvedFileName);
@@ -183,7 +184,7 @@ export async function createDeclarationCreator(
       if (filename.endsWith(".d.ts")) {
         return {
           name: filename.replace(
-            normalizePath(dirname),
+            normalizedDirname,
             normalizePath(path.join(dirname, "dist", "declarations"))
           ),
           content: await fs.readFile(filename, "utf8"),
@@ -192,7 +193,7 @@ export async function createDeclarationCreator(
       let output = service.getEmitOutput(filename, true, true);
       return {
         name: output.outputFiles[0].name.replace(
-          normalizePath(dirname),
+          normalizedDirname,
           normalizePath(path.join(dirname, "dist", "declarations"))
         ),
         content: output.outputFiles[0].text,

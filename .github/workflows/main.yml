@@ -7,10 +7,18 @@ on:
   pull_request:
 jobs:
   test:
-    name: Tests
-    runs-on: ubuntu-latest
+    name: "Tests on ${{matrix.platform}}"
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - ubuntu-latest
+          - windows-latest
+    runs-on: ${{matrix.platform}}
     steps:
       - uses: actions/checkout@main
+        with:
+          fetch-depth: 0
 
       - name: Set Node.js 10.x
         uses: actions/setup-node@main
@@ -35,10 +43,11 @@ jobs:
         run: yarn
 
       - name: Run Tests
-        run: CI=true yarn jest --coverage --color
+        run: yarn cross-env CI=true yarn jest --coverage --color
 
       - name: Upload coverage to Codecov
         run: bash <(curl -s https://codecov.io/bash) -C $GITHUB_SHA -B ${GITHUB_REF#refs/heads/} -Z
+        if: ${{ matrix.platform == 'ubuntu-latest' && always() }}
         env:
           CODECOV_TOKEN: dc4ed93e-11a9-421e-b141-8a2f11913593
   typescript:
