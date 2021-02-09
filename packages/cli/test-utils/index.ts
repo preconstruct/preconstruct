@@ -19,16 +19,6 @@ chalk.level = 0;
 console.error = jest.fn();
 console.log = jest.fn();
 
-// to normalise windows line endings
-expect.addSnapshotSerializer({
-  print(val, print) {
-    return print(val.replace(/\r\n/g, "\n"));
-  },
-  test(val) {
-    return typeof val === "string" && val.includes("\r\n");
-  },
-});
-
 export let logMock = {
   log: (console.log as any) as jest.MockInstance<void, any>,
   error: (console.error as any) as jest.MockInstance<void, any>,
@@ -164,9 +154,9 @@ export async function snapshotDistFiles(tmpPath: string) {
 
   await Promise.all(
     distFiles.map(async (x) => {
-      expect(
-        await fs.readFile(path.join(distPath, x), "utf-8")
-      ).toMatchSnapshot(normalizePath(x));
+      expect(await readNormalizedFile(path.join(distPath, x))).toMatchSnapshot(
+        normalizePath(x)
+      );
     })
   );
 }
@@ -217,7 +207,7 @@ export async function snapshotDirectory(
       .filter((fp) => filterPath(fp))
       .map(async (x) => {
         let content = transformContent(
-          await fs.readFile(path.join(tmpPath, x), "utf-8")
+          await readNormalizedFile(path.join(tmpPath, x))
         );
         if (x.endsWith(".json") && !x.endsWith("tsconfig.json")) {
           content = JSON.parse(content);
@@ -401,6 +391,20 @@ export async function getDist(dir: string) {
   return getFiles(dir, ["dist/**"]);
 }
 
+async function readNormalizedFile(filePath: string): Promise<string> {
+  let content = await fs.readFile(filePath, "utf8");
+  // to normalise windows line endings
+  content = content.replace(/\r\n/g, "\n");
+  if (/\.map$/.test(filePath)) {
+    const sourceMap = JSON.parse(content);
+    sourceMap.sourcesContent = sourceMap.sourcesContent.map((source: string) =>
+      source.replace(/\r\n/g, "\n")
+    );
+    content = JSON.stringify(sourceMap);
+  }
+  return content;
+}
+
 export async function getFiles(dir: string, glob: string[] = ["**"]) {
   const files = await fastGlob(glob, { cwd: dir });
   const filesObj: Record<string, string> = {
@@ -408,7 +412,7 @@ export async function getFiles(dir: string, glob: string[] = ["**"]) {
   };
   await Promise.all(
     files.map(async (filename) => {
-      filesObj[filename] = await fs.readFile(path.join(dir, filename), "utf8");
+      filesObj[filename] = await readNormalizedFile(path.join(dir, filename));
     })
   );
   let newObj: Record<string, string> = { [dirPrintingSymbol]: true };
