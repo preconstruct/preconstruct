@@ -5,6 +5,7 @@ import { js, testdir, typescriptFixture } from "../../test-utils";
 import dev from "../dev";
 import normalizePath from "normalize-path";
 import realpathNative from "realpath-native";
+import escapeStringRegexp from "escape-string-regexp";
 
 jest.mock("../prompt");
 
@@ -199,7 +200,9 @@ test("source maps work", async () => {
       .split("\n")[0]
   ).toEqual(
     // the important thing we're checking is that it's mapping to line 5
-    expect.stringMatching(/\/src\/index\.js:5$/)
+    expect.stringMatching(
+      new RegExp(`${escapeStringRegexp(path.join("src", "index.js"))}:5$`)
+    )
   );
 });
 

@@ -61,6 +61,7 @@
     ]
   },
   "devDependencies": {
+    "escape-string-regexp": "^4.0.0",
     "ts-morph": "^7.1.3"
   }
 }
