@@ -4,7 +4,7 @@
 
 ### Patch Changes
 
-- [`87e8713`](https://github.com/preconstruct/preconstruct/commit/87e871399483b5687cd28bb1829cd355b31ce59f) [#295](https://github.com/preconstruct/preconstruct/pull/295) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Fixed destination paths of generated "local dependency" `.d.ts` files (for files other than `src/index.ts`) in TypeScript projects on Windows.
+- [`87e8713`](https://github.com/preconstruct/preconstruct/commit/87e871399483b5687cd28bb1829cd355b31ce59f) [#295](https://github.com/preconstruct/preconstruct/pull/295) Thanks [@Andarist](https://github.com/Andarist)! - Fixed destination paths of generated "local dependency" `.d.ts` files (for files other than `src/index.ts`) in TypeScript projects on Windows.
 
 ## 2.0.3
 
