@@ -4,6 +4,7 @@ import * as fs from "fs-extra";
 import { js, testdir, typescriptFixture } from "../../test-utils";
 import dev from "../dev";
 import normalizePath from "normalize-path";
+import realpathNative from "realpath-native";
 
 jest.mock("../prompt");
 
@@ -71,22 +72,24 @@ test("dev command works in node", async () => {
 test("all the build types", async () => {
   // TODO: maybe actually require them
 
-  let tmpPath = await testdir({
-    "package.json": JSON.stringify({
-      name: "all-the-build-types",
-      main: "dist/all-the-build-types.cjs.js",
-      module: "dist/all-the-build-types.esm.js",
-      browser: {
-        "./dist/all-the-build-types.cjs.js":
-          "./dist/all-the-build-types.browser.cjs.js",
-        "./dist/all-the-build-types.esm.js":
-          "./dist/all-the-build-types.browser.esm.js",
-      },
-    }),
-    "src/index.js": js`
-                      export default "some cool thing";
-                    `,
-  });
+  let tmpPath = realpathNative.sync(
+    await testdir({
+      "package.json": JSON.stringify({
+        name: "all-the-build-types",
+        main: "dist/all-the-build-types.cjs.js",
+        module: "dist/all-the-build-types.esm.js",
+        browser: {
+          "./dist/all-the-build-types.cjs.js":
+            "./dist/all-the-build-types.browser.cjs.js",
+          "./dist/all-the-build-types.esm.js":
+            "./dist/all-the-build-types.browser.esm.js",
+        },
+      }),
+      "src/index.js": js`
+                        export default "some cool thing";
+                      `,
+    })
+  );
 
   await dev(tmpPath);
 
