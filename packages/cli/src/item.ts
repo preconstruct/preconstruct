@@ -26,7 +26,7 @@ export class Item<JSONData extends BaseConfig = BaseConfig> {
   ) {
     this.indent = detectIndent(contents).indent || "  ";
     this.path = filePath;
-    this.directory = realFs.realpathSync.native(nodePath.dirname(filePath));
+    this.directory = nodePath.dirname(filePath);
     this._jsonDataByPath = jsonDataByPath;
     if (!jsonDataByPath.has(this.path)) {
       const json = parseJson(contents, filePath);
