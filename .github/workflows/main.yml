@@ -45,7 +45,7 @@ jobs:
 
       - name: Upload coverage to Codecov
         run: bash <(curl -s https://codecov.io/bash) -C $GITHUB_SHA -B ${GITHUB_REF#refs/heads/} -Z
-        if: ${{ matrix.platform == 'windows-latest' && always() }}
+        if: ${{ matrix.platform == 'ubuntu-latest' && always() }}
         env:
           CODECOV_TOKEN: dc4ed93e-11a9-421e-b141-8a2f11913593
   typescript:
