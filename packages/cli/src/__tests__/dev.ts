@@ -1,10 +1,10 @@
 import spawn from "spawndamnit";
 import path from "path";
 import * as fs from "fs-extra";
+import * as realFs from "fs";
 import { js, testdir, typescriptFixture } from "../../test-utils";
 import dev from "../dev";
 import normalizePath from "normalize-path";
-import realpathNative from "realpath-native";
 import escapeStringRegexp from "escape-string-regexp";
 
 jest.mock("../prompt");
@@ -72,8 +72,7 @@ test("dev command works in node", async () => {
 
 test("all the build types", async () => {
   // TODO: maybe actually require them
-
-  let tmpPath = realpathNative.sync(
+  let tmpPath = realFs.realpathSync.native(
     await testdir({
       "package.json": JSON.stringify({
         name: "all-the-build-types",

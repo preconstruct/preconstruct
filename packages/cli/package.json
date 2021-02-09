@@ -46,7 +46,6 @@
     "parse-glob": "^3.0.4",
     "parse-json": "^5.1.0",
     "quick-lru": "^5.1.1",
-    "realpath-native": "^3.0.0",
     "resolve": "^1.17.0",
     "resolve-from": "^5.0.0",
     "rollup": "^2.32.0",
