@@ -34,7 +34,9 @@ export default function flowAndNodeDevProdEntry(
             new FatalError(
               `"${source}" is imported ${
                 importer
-                  ? `by "${path.relative(pkg.directory, importer!)}"`
+                  ? `by "${normalizePath(
+                      path.relative(pkg.directory, importer!)
+                    )}"`
                   : ""
               } but the package is not specified in dependencies or peerDependencies`,
               pkg.name
