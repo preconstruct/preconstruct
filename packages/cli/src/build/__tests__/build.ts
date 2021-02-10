@@ -26,20 +26,6 @@ let doPromptInput = _doPromptInput as jest.MockedFunction<
 
 let unsafeRequire = require;
 
-test("monorepo", async () => {
-  let tmpPath = f.copy("monorepo");
-  await initBasic(tmpPath);
-  await install(tmpPath);
-  await build(tmpPath);
-  let counter = 1;
-  for (let pkg of ["package-one", "package-two"]) {
-    let pkgPath = path.join(tmpPath, "packages", pkg);
-    await snapshotDistFiles(pkgPath);
-
-    expect(unsafeRequire(pkgPath).default).toBe(counter++);
-  }
-});
-
 test("no module", async () => {
   let tmpPath = f.copy("no-module");
 

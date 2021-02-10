@@ -1,0 +1,81 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`monorepo: some-scope-package-one.cjs.dev.js 1`] = `
+"'use strict';
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+var index = 1;
+
+exports.default = index;
+"
+`;
+
+exports[`monorepo: some-scope-package-one.cjs.js 1`] = `
+"'use strict';
+
+if (process.env.NODE_ENV === \\"production\\") {
+  module.exports = require(\\"./some-scope-package-one.cjs.prod.js\\");
+} else {
+  module.exports = require(\\"./some-scope-package-one.cjs.dev.js\\");
+}
+"
+`;
+
+exports[`monorepo: some-scope-package-one.cjs.prod.js 1`] = `
+"'use strict';
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+var index = 1;
+
+exports.default = index;
+"
+`;
+
+exports[`monorepo: some-scope-package-one.esm.js 1`] = `
+"var index = 1;
+
+export default index;
+"
+`;
+
+exports[`monorepo: some-scope-package-two.cjs.dev.js 1`] = `
+"'use strict';
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+var index = 2;
+
+exports.default = index;
+"
+`;
+
+exports[`monorepo: some-scope-package-two.cjs.js 1`] = `
+"'use strict';
+
+if (process.env.NODE_ENV === \\"production\\") {
+  module.exports = require(\\"./some-scope-package-two.cjs.prod.js\\");
+} else {
+  module.exports = require(\\"./some-scope-package-two.cjs.dev.js\\");
+}
+"
+`;
+
+exports[`monorepo: some-scope-package-two.cjs.prod.js 1`] = `
+"'use strict';
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+var index = 2;
+
+exports.default = index;
+"
+`;
+
+exports[`monorepo: some-scope-package-two.esm.js 1`] = `
+"var index = 2;
+
+export default index;
+"
+`;

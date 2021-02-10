@@ -44,6 +44,7 @@ export async function transformBabel(
         supportsStaticESM: true,
         supportsDynamicImport: true,
       },
+      babelrcRoots: true,
       sourceMaps: true,
       cwd,
       filename,
