@@ -8,7 +8,7 @@
     "preconstruct": "node ./build/node_modules/.bin/preconstruct",
     "postinstall": "manypkg check && cd build && yarn && cd .. && yarn preconstruct dev",
     "changeset": "changeset",
-    "release": "yarn build && changeset publish --tag v1",
+    "release": "yarn build && changeset publish --tag one",
     "start:site": "cd site && yarn start",
     "build:site": "cd site && yarn build",
     "lint": "eslint . --ext tsx,ts,js"
