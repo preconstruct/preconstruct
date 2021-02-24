@@ -187,8 +187,11 @@ export let getRollupConfig = (
       type === "node-prod" && inlineProcessEnvNodeEnv({ sourceMap: false }),
       (type === "browser" || type === "umd") &&
         replace({
-          ["typeof " + "document"]: JSON.stringify("object"),
-          ["typeof " + "window"]: JSON.stringify("object"),
+          values: {
+            ["typeof " + "document"]: JSON.stringify("object"),
+            ["typeof " + "window"]: JSON.stringify("object"),
+          },
+          preventAssignment: true,
         }),
     ].filter((x): x is Plugin => !!x),
   };
