@@ -1,5 +1,11 @@
 # preconstruct
 
+## 2.0.5
+
+### Patch Changes
+
+- [`3c30480`](https://github.com/preconstruct/preconstruct/commit/3c3048083b0a92e8e8e1553489f1f813eaac860a) [#372](https://github.com/preconstruct/preconstruct/pull/372) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Set `preventAssignment` on `@rollup/plugin-replace` to stop browser builds failing to build.
+
 ## 2.0.4
 
 ### Patch Changes
