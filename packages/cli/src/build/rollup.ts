@@ -153,8 +153,11 @@ export let getRollupConfig = (
         }),
       (type === "browser" || type === "umd") &&
         replace({
-          ["typeof " + "document"]: JSON.stringify("object"),
-          ["typeof " + "window"]: JSON.stringify("object"),
+          values: {
+            ["typeof " + "document"]: JSON.stringify("object"),
+            ["typeof " + "window"]: JSON.stringify("object"),
+          },
+          preventAssignment: true,
         }),
       rewriteBabelRuntimeHelpers(),
       json({

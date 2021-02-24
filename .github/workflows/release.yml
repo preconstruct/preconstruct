@@ -3,7 +3,7 @@ name: Release
 on:
   push:
     branches:
-      - master
+      - v1
 
 jobs:
   release:
@@ -40,7 +40,7 @@ jobs:
       - name: "Create Pull Request or Publish to npm"
         uses: changesets/action@master
         with:
-          publish: yarn release --otp=1
+          publish: yarn release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
