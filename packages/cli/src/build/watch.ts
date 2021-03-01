@@ -18,7 +18,13 @@ function relativePath(id: string) {
 
 async function watchPackage(pkg: Package, aliases: Aliases) {
   const _configs = getRollupConfigs(pkg, aliases);
-  await fs.remove(path.join(pkg.directory, "dist"));
+
+  await Promise.all(
+    pkg.entrypoints.map((entrypoint) =>
+      fs.remove(path.join(entrypoint.directory, "dist"))
+    )
+  );
+
   let configs = _configs.map((config) => {
     return { ...config.config, output: config.outputs };
   });
