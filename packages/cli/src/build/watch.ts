@@ -4,13 +4,13 @@ import { watch } from "rollup";
 import chalk from "chalk";
 import path from "path";
 import ms from "ms";
-import * as fs from "fs-extra";
 import { getRollupConfigs } from "./config";
 import { Aliases, getAliases } from "./aliases";
 import { success, info } from "../logger";
 import { successes } from "../messages";
 import { createWorker } from "../worker-client";
 import { validateProject } from "../validate";
+import { cleanProjectBeforeBuild } from "./utils";
 
 function relativePath(id: string) {
   return path.relative(process.cwd(), id);
@@ -18,7 +18,7 @@ function relativePath(id: string) {
 
 async function watchPackage(pkg: Package, aliases: Aliases) {
   const _configs = getRollupConfigs(pkg, aliases);
-  await fs.remove(path.join(pkg.directory, "dist"));
+
   let configs = _configs.map((config) => {
     return { ...config.config, output: config.outputs };
   });
@@ -108,6 +108,7 @@ export default async function build(directory: string) {
   createWorker();
   let project = await Project.create(directory);
   validateProject(project);
+  await cleanProjectBeforeBuild(project);
   let aliases = getAliases(project);
   let startCount = 0;
   await Promise.all(
