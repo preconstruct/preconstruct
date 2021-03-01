@@ -13,9 +13,8 @@ import {
 } from "../errors";
 import { getRollupConfigs } from "./config";
 import { createWorker, destroyWorker } from "../worker-client";
-import { isTsPath } from "../rollup-plugins/typescript-declarations";
-import { writeDevTSFile } from "../dev";
 import { validateProject } from "../validate";
+import { cleanProjectBeforeBuild } from "./utils";
 
 // https://github.com/rollup/rollup/blob/28ffcf4c4a2ab4323091f63944b2a609b7bcd701/src/utils/sourceMappingURL.ts
 // this looks ridiculous, but it prevents sourcemap tooling from mistaking
@@ -122,32 +121,10 @@ export default async function build(directory: string) {
 
     logger.info("building bundles!");
 
+    await cleanProjectBeforeBuild(project);
+
     let aliases = getAliases(project);
     let errors: FatalError[] = [];
-    await Promise.all(
-      project.packages.map(async (pkg) => {
-        await Promise.all([
-          fs.remove(path.join(pkg.directory, "dist")),
-          ...pkg.entrypoints
-            .filter((entrypoint) => entrypoint.name !== pkg.name)
-            .map((entrypoint) => {
-              return fs.remove(path.join(entrypoint.directory, "dist"));
-            }),
-        ]);
-
-        await Promise.all(
-          pkg.entrypoints.map(async (entrypoint) => {
-            if (isTsPath(entrypoint.source)) {
-              await fs.mkdir(path.join(entrypoint.directory, "dist"));
-              await writeDevTSFile(
-                entrypoint,
-                await fs.readFile(entrypoint.source, "utf8")
-              );
-            }
-          })
-        );
-      })
-    );
 
     await Promise.all(
       project.packages.map(async (pkg) => {
