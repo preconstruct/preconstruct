@@ -2,7 +2,15 @@ import normalizePath from "normalize-path";
 import { Entrypoint } from "./entrypoint";
 import { Package } from "./package";
 import * as nodePath from "path";
-import { FatalError } from "./errors";
+import {
+  BatchError,
+  FatalError,
+  FixableError,
+  ScopelessError,
+  UnexpectedBuildError,
+} from "./errors";
+import * as logger from "./logger";
+import { errors } from "./messages";
 
 export function getNameForDistForEntrypoint(entrypoint: Entrypoint): string {
   return getDistName(entrypoint.package, entrypoint.name);
@@ -16,6 +24,37 @@ let fields = [
   "umd:main",
   "browser",
 ];
+
+export function printError(err: any) {
+  let hasFixableError = false;
+  if (err instanceof FixableError) {
+    hasFixableError = true;
+    logger.error(err.message, err.scope);
+  } else if (err instanceof FatalError) {
+    logger.error(err.message, err.scope);
+  } else if (err instanceof BatchError) {
+    for (let fatalError of err.errors) {
+      if (fatalError instanceof FixableError) {
+        hasFixableError = true;
+        logger.error(fatalError.message, fatalError.scope);
+      } else {
+        logger.error(fatalError.message, fatalError.scope);
+      }
+    }
+  } else if (err instanceof UnexpectedBuildError) {
+    logger.error(err.message, err.scope);
+  } else if (err instanceof ScopelessError) {
+    logger.log(err.message);
+  } else if (err?.pluginCode === "BABEL_PARSE_ERROR") {
+  } else {
+    logger.error(err);
+  }
+  if (hasFixableError) {
+    logger.info(
+      "Some of the errors above can be fixed automatically by running preconstruct fix"
+    );
+  }
+}
 
 export function setFieldInOrder<
   Obj extends { [key: string]: any },

@@ -13,6 +13,7 @@ import {
   ScopelessError,
   BatchError,
 } from "./errors";
+import { printError } from "./utils";
 
 // tricking static analysis is fun
 // @ts-ignore
@@ -75,34 +76,10 @@ class CommandNotFoundError extends Error {}
     throw new CommandNotFoundError();
   }
 })().catch((err) => {
-  let hasFixableError = false;
-  if (err instanceof FixableError) {
-    hasFixableError = true;
-    error(err.message, err.scope);
-  } else if (err instanceof FatalError) {
-    error(err.message, err.scope);
-  } else if (err instanceof BatchError) {
-    for (let fatalError of err.errors) {
-      if (fatalError instanceof FixableError) {
-        hasFixableError = true;
-        error(fatalError.message, fatalError.scope);
-      } else {
-        error(fatalError.message, fatalError.scope);
-      }
-    }
-  } else if (err instanceof CommandNotFoundError) {
+  if (err instanceof CommandNotFoundError) {
     error(errors.commandNotFound);
-  } else if (err instanceof UnexpectedBuildError) {
-    error(err.message, err.scope);
-  } else if (err instanceof ScopelessError) {
-    log(err.message);
   } else {
-    error(err);
-  }
-  if (hasFixableError) {
-    info(
-      "Some of the errors above can be fixed automatically by running preconstruct fix"
-    );
+    printError(err);
   }
   info(
     "If want to learn more about the above error, check https://preconstruct.tools/errors"
