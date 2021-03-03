@@ -1,5 +1,11 @@
 # preconstruct
 
+## 2.0.6
+
+### Patch Changes
+
+- [`d1feb8e`](https://github.com/preconstruct/preconstruct/commit/d1feb8e40c6596faa928470f1021b0a541221e26) [#376](https://github.com/preconstruct/preconstruct/pull/376) Thanks [@Andarist](https://github.com/Andarist)! - Fixed the `watch` command not clearing dev links of additional entrypoints correctly and creating an infinite loop because of this.
+
 ## 2.0.5
 
 ### Patch Changes
