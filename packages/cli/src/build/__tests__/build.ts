@@ -547,3 +547,46 @@ test("respect browser alias field in dependencies when bundling UMD", async () =
     {"version":3,"file":"pkg.umd.min.js","sources":["../src/index.js"],"sourcesContent":["import target from \\"with-browser-alias-field\\";\\n\\nexport default \\"And the target is: \\" + target;"],"names":[],"mappings":"wQAEe"}
   `);
 });
+
+test("keepDynamicImportAsDynamicImportInCommonJS experimental flag", async () => {
+  let dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "test",
+      main: "dist/test.cjs.js",
+      dependencies: {
+        "some-dep": "*",
+      },
+      preconstruct: {
+        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+          keepDynamicImportAsDynamicImportInCommonJS: true,
+        },
+      },
+    }),
+    "src/index.js": js`
+                      import "some-dep";
+
+                      import("some-dep");
+                    `,
+  });
+
+  await build(dir);
+
+  expect(await getDist(dir)).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.dev.js, dist/test.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    require('some-dep');
+
+    import('some-dep');
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./test.cjs.prod.js");
+    } else {
+      module.exports = require("./test.cjs.dev.js");
+    }
+
+  `);
+});

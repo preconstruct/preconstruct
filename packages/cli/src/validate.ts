@@ -98,6 +98,7 @@ export const FORMER_FLAGS_THAT_ARE_ENABLED_NOW = new Set<string>([
 export const EXPERIMENTAL_FLAGS = new Set([
   "logCompiledFiles",
   "typeScriptProxyFileWithImportEqualsRequireAndExportEquals",
+  "keepDynamicImportAsDynamicImportInCommonJS",
 ]);
 
 export function validateProject(project: Project, log = false) {
