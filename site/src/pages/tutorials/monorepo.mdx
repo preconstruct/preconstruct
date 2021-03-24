@@ -92,7 +92,7 @@ We'll also want to add Babel so that we can use modern features when writing our
 We're going to install `@babel/core` and `@babel/preset-env` and add it our Babel config.
 
 ```bash
-yarn add @babel/preset-env
+yarn add -W @babel/core @babel/preset-env
 ```
 
 `babel.config.js`
@@ -102,6 +102,8 @@ module.exports = {
   presets: ["@babel/preset-env"]
 };
 ```
+
+If you'd like to use TypeScript, read the [Building TypeScript packages guide](/guides/building-typescript-packages). You'll want to _add_ `@babel/preset-typescript` to the `presets` array.
 
 > Curious about why we're using a babel.config.js file here instead of a .babelrc file? Read the [Configuring Babel guide](/guides/configuring-babel)
 
