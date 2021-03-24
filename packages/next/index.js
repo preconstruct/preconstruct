@@ -28,7 +28,7 @@ module.exports = (nextConfig = {}) => {
     }
     webpackConfig.module.rules.unshift({
       test: /\/node_modules\/@preconstruct\/hook\/index\.js$/,
-      use: require.resolve("./hook-loader.js"),
+      use: hookLoader,
     });
 
     const { extensions } = webpackConfig.resolve;
