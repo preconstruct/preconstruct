@@ -1,5 +1,9 @@
+"use strict";
+
 const resolve = require("resolve");
 const path = require("path");
+
+const hookLoader = require.resolve("./hook-loader");
 
 module.exports = (nextConfig = {}) => {
   let originalWebpack = nextConfig.webpack;
@@ -22,6 +26,11 @@ module.exports = (nextConfig = {}) => {
         "If you see this error, please open an issue with your Next.js version and @preconstruct/next version. The Next Babel loader could not be found"
       );
     }
+    webpackConfig.module.rules.unshift({
+      test: /\/node_modules\/@preconstruct\/hook\/index\.js$/,
+      use: hookLoader,
+    });
+
     const { extensions } = webpackConfig.resolve;
     if (options.isServer && !options.isServerless) {
       let externalsFunc = webpackConfig.externals[0];
