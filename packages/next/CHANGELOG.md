@@ -1,5 +1,11 @@
 # @preconstruct/next
 
+## 2.0.1
+
+### Patch Changes
+
+- [`71c6af6`](https://github.com/preconstruct/preconstruct/commit/71c6af6f583b502eb80f1b78ff04cc17bc613014) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Importing dependencies in server-side code will no longer bundle @preconstruct/hook(and therefore Babel) when using `preconstruct dev` and this package. Note this is specific to Next and is not generally needed because Next changes webpack's `mainFields` when bundling for Node to prefer the `main` field over webpack's default of prefering the `module` field.
+
 ## 2.0.0
 
 ### Major Changes
