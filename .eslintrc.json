@@ -1,10 +1,10 @@
 {
   "parser": "@typescript-eslint/parser",
-  "plugins": ["react", "import", "format-js-tag","prettier"],
+  "plugins": ["react", "import", "@preconstruct/format-js-tag","prettier"],
   "rules": {
     "react/jsx-uses-react": "error",
     "react/jsx-uses-vars": "error",
-    "format-js-tag/format": "error",
+    "@preconstruct/format-js-tag/format": "error",
     "prettier/prettier": "error"
   },
   "overrides": [
