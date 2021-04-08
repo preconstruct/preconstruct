@@ -1,5 +1,11 @@
 # @preconstruct/next
 
+## 2.0.2
+
+### Patch Changes
+
+- [`559cb00`](https://github.com/preconstruct/preconstruct/commit/559cb00229d76387bc2fb7d6a9fdaf845d36e618) [#388](https://github.com/preconstruct/preconstruct/pull/388) Thanks [@VadimZhiltsov](https://github.com/VadimZhiltsov)! - Add "hook-loader.js" to package files list so it exists on npm
+
 ## 2.0.1
 
 ### Patch Changes
