@@ -1,5 +1,13 @@
 # preconstruct
 
+## 2.0.7
+
+### Patch Changes
+
+- [`eee1b6e`](https://github.com/preconstruct/preconstruct/commit/eee1b6e825dd0e7f7826ee846433af9defe511fd) [#383](https://github.com/preconstruct/preconstruct/pull/383) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Add `keepDynamicImportAsDynamicImportInCommonJS` experimental flag to allow importing Node ESM-only packages in Preconstruct packages. This can be used to ship a package that can be both imported and required and has a dependency that doesn't have a CommonJS distribution.
+
+  Note that `import()` is asynchronous so it won't be possible to get access to such ESM-only dependency synchronously.
+
 ## 2.0.6
 
 ### Patch Changes
