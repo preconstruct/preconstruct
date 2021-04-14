@@ -7,8 +7,5 @@
     "hook-loader.js"
   ],
   "repository": "https://github.com/preconstruct/preconstruct/tree/main/packages/next",
-  "license": "MIT",
-  "dependencies": {
-    "resolve": "^1.17.0"
-  }
+  "license": "MIT"
 }

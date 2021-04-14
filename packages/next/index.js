@@ -1,8 +1,5 @@
 "use strict";
 
-const resolve = require("resolve");
-const path = require("path");
-
 const hookLoader = require.resolve("./hook-loader");
 
 module.exports = (nextConfig = {}) => {
@@ -30,52 +27,6 @@ module.exports = (nextConfig = {}) => {
       test: /\/node_modules\/@preconstruct\/hook\/index\.js$/,
       use: hookLoader,
     });
-
-    const { extensions } = webpackConfig.resolve;
-    if (options.isServer && !options.isServerless) {
-      let externalsFunc = webpackConfig.externals[0];
-      let makeCallback = (callback, context, request) => (err, result) => {
-        if (err) {
-          return callback(err);
-        }
-        if (result === undefined) {
-          return callback();
-        }
-        if (
-          result === "commonjs next" ||
-          result.startsWith(`commonjs next${path.posix.sep}`) ||
-          result.startsWith(`commonjs next${path.win32.sep}`)
-        ) {
-          return callback(undefined, result);
-        }
-
-        const resolved = resolve.sync(request, {
-          basedir: context,
-          extensions,
-          preserveSymlinks: false,
-        });
-        if (resolved.includes("node_modules")) {
-          return callback(undefined, request);
-        }
-        callback();
-      };
-      webpackConfig.externals = [
-        externalsFunc.length === 2
-          ? ({ context, request }, callback) => {
-              externalsFunc(
-                { context, request },
-                makeCallback(callback, context, request)
-              );
-            }
-          : (context, request, callback) => {
-              externalsFunc(
-                context,
-                request,
-                makeCallback(callback, context, request)
-              );
-            },
-      ];
-    }
 
     return originalWebpack
       ? originalWebpack(webpackConfig, options)
