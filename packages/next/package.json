@@ -1,6 +1,6 @@
 {
   "name": "@preconstruct/next",
-  "version": "2.0.2",
+  "version": "3.0.0",
   "description": "A Next.js plugin to work with preconstruct repos",
   "files": [
     "index.js",
