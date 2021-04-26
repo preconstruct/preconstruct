@@ -21,3 +21,7 @@ Preconstruct requires that all imports in a package must either packages that ar
 ## {entrypoint-name-a} has a {field-name} build but {entrypoint-name-b} does not have a {field-name} build. Entrypoints in a package must either all have a particular build type or all not have a particular build type.
 
 Preconstruct requires that all entrypoints in a package have the same fields so that it can guarantee that common modules between entrypoints will never be instantiated twice within an environment.
+
+## '{export-a}' is not exported by {module-a}, imported by {module-b}
+
+If you are building a TypeScript package, chances are you're re-exporting a type in a way that's not compatible with `@babel/preset-typescript`. See [Building TypeScript packages](/guides/building-typescript-packages) for more information. To fix it, you should use [type-only imports and exports](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-8.html#type-only-imports-and-export)
