@@ -82,9 +82,9 @@ export async function createDeclarationCreator(
   pkgName: string
 ): Promise<{
   getDeps: (entrypoints: Array<string>) => Set<string>;
-  getDeclarationFile: (
+  getDeclarationFiles: (
     filename: string
-  ) => Promise<{ name: string; content: string }>;
+  ) => Promise<{ name: string; content: string }[]>;
 }> {
   let typescript: Typescript;
   try {
@@ -178,26 +178,28 @@ export async function createDeclarationCreator(
       searchDeps(new Set(resolvedEntrypointPaths));
       return allDeps;
     },
-    getDeclarationFile: async (
+    getDeclarationFiles: async (
       filename: string
-    ): Promise<{ name: string; content: string }> => {
+    ): Promise<{ name: string; content: string }[]> => {
       if (filename.endsWith(".d.ts")) {
-        return {
-          name: filename.replace(
-            normalizedDirname,
-            normalizePath(path.join(dirname, "dist", "declarations"))
-          ),
-          content: await fs.readFile(filename, "utf8"),
-        };
+        return [
+          {
+            name: filename.replace(
+              normalizedDirname,
+              normalizePath(path.join(dirname, "dist", "declarations"))
+            ),
+            content: await fs.readFile(filename, "utf8"),
+          },
+        ];
       }
       let output = service.getEmitOutput(filename, true, true);
-      return {
-        name: output.outputFiles[0].name.replace(
+      return output.outputFiles.map(({ name, text }) => ({
+        name: name.replace(
           normalizedDirname,
           normalizePath(path.join(dirname, "dist", "declarations"))
         ),
-        content: output.outputFiles[0].text,
-      };
+        content: text,
+      }));
     },
   };
 }

@@ -101,6 +101,86 @@ test("typescript thing", async () => {
   await snapshotDirectory(path.join(tmpPath, "dist"), { files: "all" });
 });
 
+test("typescript declarationMap", async () => {
+  let dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "typescript-declarationMap",
+      main: "dist/typescript-declarationMap.cjs.js",
+      module: "dist/typescript-declarationMap.esm.js",
+
+      dependencies: {
+        "@babel/runtime": "^7.8.7",
+      },
+
+      devDependencies: {
+        typescript: "^3.8.3",
+      },
+    }),
+    ".babelrc": JSON.stringify({
+      presets: [require.resolve("@babel/preset-typescript")],
+    }),
+    node_modules: {
+      kind: "symlink",
+      path: repoNodeModules,
+    },
+    "tsconfig.json": JSON.stringify(
+      {
+        compilerOptions: {
+          target: "esnext",
+          module: "esnext",
+          declarationMap: true,
+          jsx: "react",
+          isolatedModules: true,
+          strict: true,
+          moduleResolution: "node",
+          esModuleInterop: true,
+          noEmit: true,
+        },
+      },
+      null,
+      2
+    ),
+    "src/index.ts": ts`
+                      export const thing = "wow" as const;
+                    `,
+  });
+
+  await build(dir);
+  await expect(getDist(dir)).resolves.toMatchInlineSnapshot(`
+          ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/index.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+          export declare const thing: "wow";
+          //# sourceMappingURL=index.d.ts.map
+          ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/index.d.ts.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+          {"version":3,"file":"index.d.ts","sourceRoot":"","sources":["index.ts"],"names":[],"mappings":"AAAA,eAAO,MAAM,KAAK,OAAiB,CAAC"}
+          ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript-declarationMap.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+          export * from "./declarations/src/index";
+
+          ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript-declarationMap.cjs.dev.js, dist/typescript-declarationMap.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+          'use strict';
+
+          Object.defineProperty(exports, '__esModule', { value: true });
+
+          const thing = "wow";
+
+          exports.thing = thing;
+
+          ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript-declarationMap.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+          'use strict';
+
+          if (process.env.NODE_ENV === "production") {
+            module.exports = require("./typescript-declarationMap.cjs.prod.js");
+          } else {
+            module.exports = require("./typescript-declarationMap.cjs.dev.js");
+          }
+
+          ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript-declarationMap.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+          const thing = "wow";
+
+          export { thing };
+
+        `);
+});
+
 test("process.env.NODE_ENV reassignment", async () => {
   const dir = await testdir({
     "package.json": JSON.stringify({

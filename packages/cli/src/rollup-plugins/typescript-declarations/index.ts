@@ -22,12 +22,14 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
       let deps = creator.getDeps(pkg.entrypoints.map((x) => x.source));
       await Promise.all(
         [...deps].map(async (dep) => {
-          let { name, content } = await creator.getDeclarationFile(dep);
-          srcFilenameToDtsFilenameMap.set(normalizePath(dep), name);
-          this.emitFile({
-            type: "asset",
-            fileName: path.relative(opts.dir!, name),
-            source: content,
+          let files = await creator.getDeclarationFiles(dep);
+          files.forEach(({ name, content }) => {
+            srcFilenameToDtsFilenameMap.set(normalizePath(dep), name);
+            this.emitFile({
+              type: "asset",
+              fileName: path.relative(opts.dir!, name),
+              source: content,
+            });
           });
         })
       );
