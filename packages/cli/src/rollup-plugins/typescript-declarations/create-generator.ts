@@ -6,6 +6,18 @@ import { FatalError } from "../../errors";
 import { createLanguageServiceHostClass } from "./language-service-host";
 import normalizePath from "normalize-path";
 
+interface DeclarationFile {
+  name: string;
+  content: string;
+}
+
+interface EmittedDeclarationOutput {
+  /** The emitted d.ts types file. */
+  types: DeclarationFile;
+  /** The emitted d.ts.map declaration map file. */
+  map?: DeclarationFile;
+}
+
 type Typescript = typeof import("typescript");
 
 let unsafeRequire = require;
@@ -82,9 +94,7 @@ export async function createDeclarationCreator(
   pkgName: string
 ): Promise<{
   getDeps: (entrypoints: Array<string>) => Set<string>;
-  getDeclarationFiles: (
-    filename: string
-  ) => Promise<{ name: string; content: string }[]>;
+  getDeclarationFiles: (filename: string) => Promise<EmittedDeclarationOutput>;
 }> {
   let typescript: Typescript;
   try {
@@ -180,26 +190,42 @@ export async function createDeclarationCreator(
     },
     getDeclarationFiles: async (
       filename: string
-    ): Promise<{ name: string; content: string }[]> => {
+    ): Promise<EmittedDeclarationOutput> => {
       if (filename.endsWith(".d.ts")) {
-        return [
-          {
+        return {
+          types: {
             name: filename.replace(
               normalizedDirname,
               normalizePath(path.join(dirname, "dist", "declarations"))
             ),
             content: await fs.readFile(filename, "utf8"),
           },
-        ];
+        };
       }
       let output = service.getEmitOutput(filename, true, true);
-      return output.outputFiles.map(({ name, text }) => ({
-        name: name.replace(
-          normalizedDirname,
-          normalizePath(path.join(dirname, "dist", "declarations"))
-        ),
-        content: text,
-      }));
+      return output.outputFiles.reduce((emitted, { name, text }) => {
+        if (name.endsWith(".d.ts")) {
+          emitted.types = {
+            name: name.replace(
+              normalizedDirname,
+              normalizePath(path.join(dirname, "dist", "declarations"))
+            ),
+            content: text,
+          };
+        }
+
+        if (name.endsWith(".d.ts.map")) {
+          emitted.map = {
+            name: name.replace(
+              normalizedDirname,
+              normalizePath(path.join(dirname, "dist", "declarations"))
+            ),
+            content: text,
+          };
+        }
+
+        return emitted;
+      }, {} as EmittedDeclarationOutput);
     },
   };
 }
