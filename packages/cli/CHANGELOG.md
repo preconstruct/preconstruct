@@ -1,5 +1,11 @@
 # preconstruct
 
+## 2.1.0
+
+### Minor Changes
+
+- [`f798f04`](https://github.com/preconstruct/preconstruct/commit/f798f04f610d5bdfb8ae434cd70ba1f46477f886) [#393](https://github.com/preconstruct/preconstruct/pull/393) Thanks [@with-heart](https://github.com/with-heart)! - Added support for the `tsconfig.declarationMap` option. `preconstruct` now outputs both `d.ts` and `d.ts.map` files to `dist/declarations/src` when the option is enabled.
+
 ## 2.0.7
 
 ### Patch Changes
