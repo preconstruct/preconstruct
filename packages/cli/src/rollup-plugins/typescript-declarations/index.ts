@@ -32,8 +32,8 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
           });
 
           if (map) {
-            const sourceRoot = path.dirname(
-              path.relative(path.dirname(map.name), normalizePath(dep))
+            const sourceRoot = normalizePath(
+              path.dirname(path.relative(path.dirname(map.name), dep))
             );
             const source = overwriteDeclarationMapSourceRoot(
               map.content,
