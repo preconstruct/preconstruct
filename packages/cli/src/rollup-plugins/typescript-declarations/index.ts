@@ -3,7 +3,7 @@ import { FatalError } from "../../errors";
 import { Plugin } from "rollup";
 import { Package } from "../../package";
 import { createDeclarationCreator } from "./create-generator";
-import { tsTemplate } from "../../utils";
+import { overwriteDeclarationMapSourceRoot, tsTemplate } from "../../utils";
 import normalizePath from "normalize-path";
 
 export let isTsPath = (source: string) => /\.tsx?/.test(source);
@@ -22,13 +22,29 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
       let deps = creator.getDeps(pkg.entrypoints.map((x) => x.source));
       await Promise.all(
         [...deps].map(async (dep) => {
-          let { name, content } = await creator.getDeclarationFile(dep);
-          srcFilenameToDtsFilenameMap.set(normalizePath(dep), name);
+          let { types, map } = await creator.getDeclarationFiles(dep);
+
+          srcFilenameToDtsFilenameMap.set(normalizePath(dep), types.name);
           this.emitFile({
             type: "asset",
-            fileName: path.relative(opts.dir!, name),
-            source: content,
+            fileName: path.relative(opts.dir!, types.name),
+            source: types.content,
           });
+
+          if (map) {
+            const sourceRoot = normalizePath(
+              path.dirname(path.relative(path.dirname(map.name), dep))
+            );
+            const source = overwriteDeclarationMapSourceRoot(
+              map.content,
+              sourceRoot
+            );
+            this.emitFile({
+              type: "asset",
+              fileName: path.relative(opts.dir!, map.name),
+              source,
+            });
+          }
         })
       );
 

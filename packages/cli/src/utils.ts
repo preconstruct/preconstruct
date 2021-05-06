@@ -202,6 +202,15 @@ export function tsTemplate(hasDefaultExport: boolean, relativePath: string) {
   }\n`;
 }
 
+export function overwriteDeclarationMapSourceRoot(
+  content: string,
+  actualSourceRoot: string
+): string {
+  const src = JSON.parse(content);
+  src.sourceRoot = actualSourceRoot;
+  return JSON.stringify(src);
+}
+
 export type JSONValue =
   | string
   | number
