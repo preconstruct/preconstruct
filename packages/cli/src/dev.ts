@@ -68,18 +68,35 @@ export async function writeDevTSFile(
   entrypoint: Entrypoint,
   entrypointSourceContent: string
 ) {
+  await writeTSReexportFile(
+    entrypoint,
+    entrypointSourceContent,
+    entrypoint.source
+  );
+}
+
+export async function writeTSReexportFile(
+  entrypoint: Entrypoint,
+  entrypointSourceContent: string,
+  fileToPointTo: string
+) {
   let cjsDistPath = path
     .join(entrypoint.directory, validFields.main(entrypoint))
     .replace(/\.js$/, ".d.ts");
 
+  let relativePath = normalizePath(
+    path
+      .relative(path.dirname(cjsDistPath), fileToPointTo)
+      .replace(/\.tsx?$/, "")
+  );
+  if (!relativePath.startsWith(".")) {
+    relativePath = `./${relativePath}`;
+  }
+
   let output = await (entrypoint.package.project.experimentalFlags
     .typeScriptProxyFileWithImportEqualsRequireAndExportEquals
     ? `import mod = require(${JSON.stringify(
-        normalizePath(
-          path
-            .relative(path.dirname(cjsDistPath), entrypoint.source)
-            .replace(/\.tsx?$/, "")
-        )
+        relativePath
       )});\n\nexport = mod;\n`
     : entrypointHasDefaultExport(entrypoint, entrypointSourceContent).then(
         (hasDefaultExport) =>
@@ -93,15 +110,7 @@ export async function writeDevTSFile(
 // and since export * doesn't include default exports, we need to read your source file
 // to check for a default export and re-export it if it exists
 // it's not ideal, but it works pretty well ¯\\_(ツ)_/¯
-` +
-          tsTemplate(
-            hasDefaultExport,
-            normalizePath(
-              path
-                .relative(path.dirname(cjsDistPath), entrypoint.source)
-                .replace(/\.tsx?$/, "")
-            )
-          )
+` + tsTemplate(hasDefaultExport, relativePath)
       ));
 
   await fs.outputFile(cjsDistPath, output);

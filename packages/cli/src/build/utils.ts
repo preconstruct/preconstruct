@@ -1,8 +1,9 @@
 import { Project } from "../project";
 import { isTsPath } from "../rollup-plugins/typescript-declarations";
-import { writeDevTSFile } from "../dev";
+import { writeDevTSFile, writeTSReexportFile } from "../dev";
 import * as fs from "fs-extra";
 import path from "path";
+import normalizePath from "normalize-path";
 
 export function getDevPath(cjsPath: string) {
   return cjsPath.replace(/\.js$/, ".dev.js");
@@ -28,9 +29,15 @@ export async function cleanProjectBeforeBuild(project: Project) {
         pkg.entrypoints.map(async (entrypoint) => {
           if (isTsPath(entrypoint.source)) {
             await fs.mkdir(path.join(entrypoint.directory, "dist"));
-            await writeDevTSFile(
+            await writeTSReexportFile(
               entrypoint,
-              await fs.readFile(entrypoint.source, "utf8")
+              await fs.readFile(entrypoint.source, "utf8"),
+              normalizePath(entrypoint.source).replace(
+                normalizePath(entrypoint.directory),
+                normalizePath(
+                  path.join(entrypoint.directory, "dist", "declarations")
+                )
+              )
             );
           }
         })

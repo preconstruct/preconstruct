@@ -3,6 +3,7 @@ import nodePath from "path";
 import detectIndent from "detect-indent";
 import parseJson from "parse-json";
 import { JSONValue } from "./utils";
+import normalizePath from "normalize-path";
 
 type JSONDataByPath = Map<
   string,
@@ -24,8 +25,8 @@ export class Item<JSONData extends BaseConfig = BaseConfig> {
     jsonDataByPath: JSONDataByPath
   ) {
     this.indent = detectIndent(contents).indent || "  ";
-    this.path = filePath;
-    this.directory = nodePath.dirname(filePath);
+    this.path = normalizePath(filePath);
+    this.directory = normalizePath(nodePath.dirname(filePath));
     this._jsonDataByPath = jsonDataByPath;
     if (!jsonDataByPath.has(this.path)) {
       const json = parseJson(contents, filePath);

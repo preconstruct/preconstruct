@@ -5,6 +5,8 @@ import { FatalError } from "../../errors";
 // @ts-ignore
 import { createLanguageServiceHostClass } from "./language-service-host";
 import normalizePath from "normalize-path";
+import { Project } from "../../project";
+import { Diagnostic, ModuleResolutionHost } from "typescript";
 
 interface DeclarationFile {
   name: string;
@@ -47,7 +49,8 @@ function memoize<V>(fn: (arg: string) => V): (arg: string) => V {
 
 async function nonMemoizedGetService(
   typescript: Typescript,
-  configFileName: string
+  configFileName: string,
+  project: Project
 ) {
   let configFileContents = await fs.readFile(configFileName, "utf8");
   const result = typescript.parseConfigFileTextToJson(
@@ -65,7 +68,61 @@ async function nonMemoizedGetService(
   thing.options.declaration = true;
   thing.options.noEmit = false;
 
-  let LanguageServiceHostClass = createLanguageServiceHostClass(typescript);
+  const distDirsToRoot = new Map<string, string>();
+
+  for (const pkg of project.packages) {
+    const distDeclDir = normalizePath(
+      path.join(pkg.directory, "dist", "declarations")
+    );
+    distDirsToRoot.set(distDeclDir, pkg.directory);
+  }
+
+  type PathReplacement =
+    | {
+        kind: "none";
+        path: string;
+      }
+    | {
+        kind: "replaced";
+        path: string;
+        originalSection: string;
+        replacedSection: string;
+      };
+
+  let replacePath = (pathname: string): PathReplacement => {
+    // this is purely an optimisation, this should not affect correctness
+    if (!pathname.includes("dist")) {
+      return { kind: "none", path: pathname };
+    }
+    const normalized = normalizePath(pathname);
+    let currentPath = normalized;
+    let iterations = 0;
+    while (true) {
+      const root = distDirsToRoot.get(currentPath);
+      if (root !== undefined) {
+        return {
+          kind: "replaced",
+          path: normalized.replace(currentPath, root),
+          originalSection: currentPath,
+          replacedSection: root,
+        };
+      }
+      const dirOfPath = normalizePath(path.dirname(currentPath));
+      if (currentPath === dirOfPath) {
+        return { kind: "none", path: pathname };
+      }
+      if (iterations === 100) {
+        throw new Error("over 100 iterations in while true thing");
+      }
+      iterations++;
+      currentPath = dirOfPath;
+    }
+  };
+
+  let LanguageServiceHostClass = createLanguageServiceHostClass(
+    typescript,
+    (x) => replacePath(x).path
+  );
 
   let servicesHost = new LanguageServiceHostClass(thing, []);
 
@@ -80,18 +137,60 @@ async function nonMemoizedGetService(
       "This is an internal error, please open an issue if you see this: program not found"
     );
   }
-  return { service, options: thing.options, program };
+  let diagnostics: Diagnostic[] = [];
+  for (const sourceFile of program.getSourceFiles()) {
+    diagnostics.push(...program.getSemanticDiagnostics(sourceFile));
+  }
+
+  console.log(
+    typescript.formatDiagnostics(diagnostics, {
+      getCurrentDirectory: () => process.cwd(),
+      getCanonicalFileName: (x) => x,
+      getNewLine: () => "\n",
+    })
+  );
+
+  const realpath = typescript.sys.realpath;
+  const moduleResolutionHost: ModuleResolutionHost = {
+    fileExists(filename) {
+      return typescript.sys.fileExists(replacePath(filename).path);
+    },
+    readFile(filename) {
+      return typescript.sys.readFile(replacePath(filename).path);
+    },
+    directoryExists(dirpath) {
+      return typescript.sys.directoryExists(replacePath(dirpath).path);
+    },
+    getCurrentDirectory: typescript.sys.getCurrentDirectory,
+    realpath: realpath
+      ? (filename) => {
+          const replaced = replacePath(filename);
+          let real = realpath(replaced.path);
+          if (replaced.kind === "replaced") {
+            return normalizePath(real).replace(
+              replaced.originalSection,
+              replaced.replacedSection
+            );
+          }
+          return real;
+        }
+      : undefined,
+  };
+  return { service, options: thing.options, program, moduleResolutionHost };
 }
 
-let getService = weakMemoize((typescript: Typescript) =>
-  memoize(async (configFileName: string) => {
-    return nonMemoizedGetService(typescript, configFileName);
-  })
+let getService = weakMemoize((project: Project) =>
+  weakMemoize((typescript: Typescript) =>
+    memoize(async (configFileName: string) => {
+      return nonMemoizedGetService(typescript, configFileName, project);
+    })
+  )
 );
 
 export async function createDeclarationCreator(
   dirname: string,
-  pkgName: string
+  pkgName: string,
+  project: Project
 ): Promise<{
   getDeps: (entrypoints: Array<string>) => Set<string>;
   getDeclarationFiles: (filename: string) => Promise<EmittedDeclarationOutput>;
@@ -123,15 +222,21 @@ export async function createDeclarationCreator(
   // and if we keep it, we could run out of memory for large projects
   // if the tsconfig _isn't_ in the package directory though, it's probably fine to memoize it
   // since it should just be a root level tsconfig
-  let { service, options, program } = await (normalizePath(configFileName) ===
+  let {
+    service,
+    options,
+    program,
+    moduleResolutionHost,
+  } = await (normalizePath(configFileName) ===
   normalizePath(path.join(dirname, "tsconfig.json"))
-    ? nonMemoizedGetService(typescript, configFileName)
-    : getService(typescript)(configFileName));
+    ? nonMemoizedGetService(typescript, configFileName, project)
+    : getService(project)(typescript)(configFileName));
   let moduleResolutionCache = typescript.createModuleResolutionCache(
     dirname,
     (x) => x,
     options
   );
+
   let normalizedDirname = normalizePath(dirname);
 
   return {
@@ -141,7 +246,7 @@ export async function createDeclarationCreator(
           path.join(path.dirname(x), path.basename(x, path.extname(x))),
           dirname,
           options,
-          typescript.sys,
+          moduleResolutionHost,
           moduleResolutionCache
         );
         if (!resolvedModule) {
@@ -168,7 +273,7 @@ export async function createDeclarationCreator(
               text,
               dep,
               options,
-              typescript.sys,
+              moduleResolutionHost,
               moduleResolutionCache
             );
             if (resolvedModule) {

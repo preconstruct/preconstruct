@@ -4,7 +4,10 @@ export function normalize(fileName: string) {
   return fileName.split("\\").join("/");
 }
 
-export let createLanguageServiceHostClass = (typescript: any) =>
+export let createLanguageServiceHostClass = (
+  typescript: typeof import("typescript"),
+  replacePath: (path: string) => string
+) =>
   class LanguageServiceHost {
     parsedConfig: any;
     transformers: any;
@@ -42,9 +45,9 @@ export let createLanguageServiceHostClass = (typescript: any) =>
     getScriptSnapshot(fileName: string) {
       fileName = normalize(fileName);
       if (this.snapshots[fileName]) return this.snapshots[fileName];
-      if (fs.existsSync(fileName)) {
+      if (this.fileExists(fileName)) {
         this.snapshots[fileName] = typescript.ScriptSnapshot.fromString(
-          typescript.sys.readFile(fileName)
+          this.readFile(fileName, "utf8")!
         );
         this.versions[fileName] = (this.versions[fileName] || 0) + 1;
         return this.snapshots[fileName];
@@ -71,22 +74,31 @@ export let createLanguageServiceHostClass = (typescript: any) =>
       return typescript.sys.useCaseSensitiveFileNames;
     }
     readDirectory(path: string, extensions: any, exclude: any, include: any) {
-      return typescript.sys.readDirectory(path, extensions, exclude, include);
+      let read = typescript.sys.readDirectory(
+        replacePath(path),
+        extensions,
+        exclude,
+        include
+      );
+      console.log(read);
+      return read;
     }
     readFile(path: string, encoding: string) {
-      return typescript.sys.readFile(path, encoding);
+      return typescript.sys.readFile(replacePath(path), encoding);
     }
     fileExists(path: string) {
-      return typescript.sys.fileExists(path);
+      return typescript.sys.fileExists(replacePath(path));
     }
     getTypeRootsVersion() {
       return 0;
     }
     directoryExists(directoryName: string) {
-      return typescript.sys.directoryExists(directoryName);
+      return typescript.sys.directoryExists(replacePath(directoryName));
     }
     getDirectories(directoryName: string) {
-      return typescript.sys.getDirectories(directoryName);
+      let dirs = typescript.sys.getDirectories(replacePath(directoryName));
+      console.log(dirs);
+      return dirs;
     }
     getCustomTransformers() {
       return undefined;
