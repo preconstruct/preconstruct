@@ -76,9 +76,20 @@ export function validatePackage(pkg: Package) {
     ]);
 
     for (let depName in pkg.json.dependencies) {
-      let depPkgJson = unsafeRequire(
-        resolveFrom(pkg.directory, depName + "/package.json")
-      );
+      let depPkgJson: any;
+      try {
+        depPkgJson = unsafeRequire(
+          resolveFrom(pkg.directory, depName + "/package.json")
+        );
+      } catch (err) {
+        // ideally we'd resolve the packages ignoring the exports field but emitting
+        // the peer dependency error thing below isn't that important
+        // and having this be not broken for now is better
+        if (err.code === "ERR_PACKAGE_PATH_NOT_EXPORTED") {
+          continue;
+        }
+        throw err;
+      }
       if (depPkgJson.peerDependencies) {
         for (let pkgName in depPkgJson.peerDependencies) {
           if (!sortaAllDeps.has(pkgName)) {

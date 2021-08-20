@@ -29,7 +29,10 @@ function getGlobal(project: Project, name: string) {
         return pkgJson[PKG_JSON_CONFIG_FIELD].umdName;
       }
     } catch (err) {
-      if (err.code !== "MODULE_NOT_FOUND") {
+      if (
+        err.code !== "MODULE_NOT_FOUND" &&
+        err.code !== "ERR_PACKAGE_PATH_NOT_EXPORTED"
+      ) {
         throw err;
       }
     }
