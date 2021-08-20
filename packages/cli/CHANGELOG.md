@@ -1,5 +1,11 @@
 # preconstruct
 
+## 2.1.1
+
+### Patch Changes
+
+- [`adcca78`](https://github.com/preconstruct/preconstruct/commit/adcca7878979f2bff7f5957c02a470884edf3adf) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Fixed issues around `ERR_PACKAGE_PATH_NOT_EXPORTED` errors when resolving the location of dependencies' package.jsons with UMD builds
+
 ## 2.1.0
 
 ### Minor Changes
