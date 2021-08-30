@@ -1,0 +1,7 @@
+{
+  "name": "no-main",
+  "version": "1.0.0",
+  "module": "dist/no-main.esm.js",
+  "license": "MIT",
+  "private": true
+}

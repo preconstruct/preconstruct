@@ -46,33 +46,6 @@ test("reports correct result on valid package", async () => {
   `);
 });
 
-test("no main field", async () => {
-  let tmpPath = await testdir({
-    "package.json": JSON.stringify({
-      name: "no-main-field",
-      license: "MIT",
-      private: true,
-    }),
-
-    "src/index.js": js`
-                      // @flow
-
-                      export default "something";
-                    `,
-  });
-
-  try {
-    await validate(tmpPath);
-  } catch (e) {
-    expect(e).toMatchInlineSnapshot(
-      `[Error: main field was not found, expected \`"dist/no-main-field.cjs.js"\`]`
-    );
-    return;
-  }
-
-  expect(true).toBe(false);
-});
-
 test("no module", async () => {
   let tmpPath = f.find("no-module");
 

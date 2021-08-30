@@ -87,6 +87,8 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
   }> = [];
 
   let hasModuleField = pkg.entrypoints[0].json.module !== undefined;
+  let hasMainField = pkg.entrypoints[0].json.main !== undefined;
+
   configs.push({
     config: getRollupConfig(
       pkg,
@@ -103,15 +105,19 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
         : () => {}
     ),
     outputs: [
-      {
-        format: "cjs" as const,
-        entryFileNames: "[name].cjs.dev.js",
-        chunkFileNames: "dist/[name]-[hash].cjs.dev.js",
-        dir: pkg.directory,
-        exports: "named" as const,
-        interop,
-        plugins: cjsPlugins,
-      },
+      ...(hasMainField
+        ? [
+            {
+              format: "cjs" as const,
+              entryFileNames: "[name].cjs.dev.js",
+              chunkFileNames: "dist/[name]-[hash].cjs.dev.js",
+              dir: pkg.directory,
+              exports: "named" as const,
+              interop,
+              plugins: cjsPlugins,
+            },
+          ]
+        : []),
       ...(hasModuleField
         ? [
             {
@@ -125,26 +131,28 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
     ],
   });
 
-  configs.push({
-    config: getRollupConfig(
-      pkg,
-      pkg.entrypoints,
-      aliases,
-      "node-prod",
-      () => {}
-    ),
-    outputs: [
-      {
-        format: "cjs",
-        entryFileNames: "[name].cjs.prod.js",
-        chunkFileNames: "dist/[name]-[hash].cjs.prod.js",
-        dir: pkg.directory,
-        exports: "named",
-        interop,
-        plugins: cjsPlugins,
-      },
-    ],
-  });
+  if (hasMainField) {
+    configs.push({
+      config: getRollupConfig(
+        pkg,
+        pkg.entrypoints,
+        aliases,
+        "node-prod",
+        () => {}
+      ),
+      outputs: [
+        {
+          format: "cjs",
+          entryFileNames: "[name].cjs.prod.js",
+          chunkFileNames: "dist/[name]-[hash].cjs.prod.js",
+          dir: pkg.directory,
+          exports: "named",
+          interop,
+          plugins: cjsPlugins,
+        },
+      ],
+    });
+  }
 
   // umd builds are a bit special
   // we don't guarantee that shared modules are shared across umd builds

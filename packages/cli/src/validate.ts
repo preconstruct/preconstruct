@@ -39,7 +39,7 @@ function validateEntrypoint(entrypoint: Entrypoint, log: boolean) {
   }
   const fatalErrors: FatalError[] = [];
   for (const field of ["main", "module", "umd:main", "browser"] as const) {
-    if (field !== "main" && entrypoint.json[field] === undefined) {
+    if (entrypoint.json[field] === undefined) {
       continue;
     }
     if (!isFieldValid[field](entrypoint)) {

@@ -383,6 +383,13 @@ export default index;
 "
 `;
 
+exports[`no main: no-main.esm.js 1`] = `
+"var index = \\"this does not have a module build\\";
+
+export default index;
+"
+`;
+
 exports[`no module: no-module.cjs.dev.js 1`] = `
 "'use strict';
 

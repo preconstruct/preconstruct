@@ -14,7 +14,6 @@ import {
   getFiles,
 } from "../../../test-utils";
 import { doPromptInput as _doPromptInput } from "../../prompt";
-import { confirms as _confirms } from "../../messages";
 
 const f = fixturez(__dirname);
 
@@ -28,12 +27,16 @@ let unsafeRequire = require;
 
 test("monorepo", async () => {
   let tmpPath = f.copy("monorepo");
+
   await initBasic(tmpPath);
   await install(tmpPath);
   await build(tmpPath);
+
   let counter = 1;
+
   for (let pkg of ["package-one", "package-two"]) {
     let pkgPath = path.join(tmpPath, "packages", pkg);
+
     await snapshotDistFiles(pkgPath);
 
     expect(unsafeRequire(pkgPath).default).toBe(counter++);
@@ -50,6 +53,14 @@ test("no module", async () => {
   expect(unsafeRequire(tmpPath).default).toBe(
     "this does not have a module build"
   );
+});
+
+test("no main", async () => {
+  let tmpPath = f.copy("no-main");
+
+  await build(tmpPath);
+
+  await snapshotDistFiles(tmpPath);
 });
 
 test("clears dist folder", async () => {
