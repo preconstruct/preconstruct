@@ -384,7 +384,7 @@ export default index;
 `;
 
 exports[`no main: no-main.esm.js 1`] = `
-"var index = \\"this does not have a module build\\";
+"var index = \\"this does not have a main build\\";
 
 export default index;
 "
