@@ -48,27 +48,27 @@ exports[`basic: valid-package.umd.min.js 1`] = `
 
 exports[`basic: valid-package.umd.min.js.map 1`] = `"{\\"version\\":3,\\"file\\":\\"valid-package.umd.min.js\\",\\"sources\\":[\\"../src/index.js\\"],\\"sourcesContent\\":[\\"export default \\\\\\"something\\\\\\";\\\\n\\"],\\"names\\":[],\\"mappings\\":\\"mPAAe\\"}"`;
 
-exports[`typescript thing with alternativeTypeScriptDeclarationEmitStrategy: false: declarations/src/index.d.ts 1`] = `
+exports[`typescript thing: declarations/src/index.d.ts 1`] = `
 "export declare const thing: \\"wow\\";
 "
 `;
 
-exports[`typescript thing with alternativeTypeScriptDeclarationEmitStrategy: false: declarations/src/other.d.ts 1`] = `
+exports[`typescript thing: declarations/src/other.d.ts 1`] = `
 "export declare const thing: () => \\"wow\\";
 "
 `;
 
-exports[`typescript thing with alternativeTypeScriptDeclarationEmitStrategy: false: declarations/src/thing.d.ts 1`] = `
+exports[`typescript thing: declarations/src/thing.d.ts 1`] = `
 "export declare const makeThing: () => \\"wow\\";
 "
 `;
 
-exports[`typescript thing with alternativeTypeScriptDeclarationEmitStrategy: false: weird-typescript-thing.cjs.d.ts 1`] = `
+exports[`typescript thing: weird-typescript-thing.cjs.d.ts 1`] = `
 "export * from \\"./declarations/src/index\\";
 "
 `;
 
-exports[`typescript thing with alternativeTypeScriptDeclarationEmitStrategy: false: weird-typescript-thing.cjs.dev.js 1`] = `
+exports[`typescript thing: weird-typescript-thing.cjs.dev.js 1`] = `
 "'use strict';
 
 Object.defineProperty(exports, '__esModule', { value: true });
@@ -83,7 +83,7 @@ exports.thing = thing$1;
 "
 `;
 
-exports[`typescript thing with alternativeTypeScriptDeclarationEmitStrategy: false: weird-typescript-thing.cjs.js 1`] = `
+exports[`typescript thing: weird-typescript-thing.cjs.js 1`] = `
 "'use strict';
 
 if (process.env.NODE_ENV === \\"production\\") {
@@ -94,7 +94,7 @@ if (process.env.NODE_ENV === \\"production\\") {
 "
 `;
 
-exports[`typescript thing with alternativeTypeScriptDeclarationEmitStrategy: false: weird-typescript-thing.cjs.prod.js 1`] = `
+exports[`typescript thing: weird-typescript-thing.cjs.prod.js 1`] = `
 "'use strict';
 
 Object.defineProperty(exports, '__esModule', { value: true });
@@ -109,79 +109,7 @@ exports.thing = thing$1;
 "
 `;
 
-exports[`typescript thing with alternativeTypeScriptDeclarationEmitStrategy: false: weird-typescript-thing.esm.js 1`] = `
-"const thing = () => \\"wow\\";
-
-const makeThing = () => thing();
-
-const thing$1 = makeThing();
-
-export { thing$1 as thing };
-"
-`;
-
-exports[`typescript thing with alternativeTypeScriptDeclarationEmitStrategy: true: declarations/src/index.d.ts 1`] = `
-"export declare const thing: \\"wow\\";
-"
-`;
-
-exports[`typescript thing with alternativeTypeScriptDeclarationEmitStrategy: true: declarations/src/other.d.ts 1`] = `
-"export declare const thing: () => \\"wow\\";
-"
-`;
-
-exports[`typescript thing with alternativeTypeScriptDeclarationEmitStrategy: true: declarations/src/thing.d.ts 1`] = `
-"export declare const makeThing: () => \\"wow\\";
-"
-`;
-
-exports[`typescript thing with alternativeTypeScriptDeclarationEmitStrategy: true: weird-typescript-thing.cjs.d.ts 1`] = `
-"export * from \\"./declarations/src/index\\";
-"
-`;
-
-exports[`typescript thing with alternativeTypeScriptDeclarationEmitStrategy: true: weird-typescript-thing.cjs.dev.js 1`] = `
-"'use strict';
-
-Object.defineProperty(exports, '__esModule', { value: true });
-
-const thing = () => \\"wow\\";
-
-const makeThing = () => thing();
-
-const thing$1 = makeThing();
-
-exports.thing = thing$1;
-"
-`;
-
-exports[`typescript thing with alternativeTypeScriptDeclarationEmitStrategy: true: weird-typescript-thing.cjs.js 1`] = `
-"'use strict';
-
-if (process.env.NODE_ENV === \\"production\\") {
-  module.exports = require(\\"./weird-typescript-thing.cjs.prod.js\\");
-} else {
-  module.exports = require(\\"./weird-typescript-thing.cjs.dev.js\\");
-}
-"
-`;
-
-exports[`typescript thing with alternativeTypeScriptDeclarationEmitStrategy: true: weird-typescript-thing.cjs.prod.js 1`] = `
-"'use strict';
-
-Object.defineProperty(exports, '__esModule', { value: true });
-
-const thing = () => \\"wow\\";
-
-const makeThing = () => thing();
-
-const thing$1 = makeThing();
-
-exports.thing = thing$1;
-"
-`;
-
-exports[`typescript thing with alternativeTypeScriptDeclarationEmitStrategy: true: weird-typescript-thing.esm.js 1`] = `
+exports[`typescript thing: weird-typescript-thing.esm.js 1`] = `
 "const thing = () => \\"wow\\";
 
 const makeThing = () => thing();

@@ -11,6 +11,8 @@ import {
   repoNodeModules,
   js,
 } from "../../../test-utils";
+import { BatchError } from "../../errors";
+import stripAnsi from "strip-ansi";
 
 const f = fixturez(__dirname);
 
@@ -1018,42 +1020,14 @@ test("typescript declaration emit with unreferencable types emits diagnostic", a
                   export const x = () => new A();
                 `,
   });
-  await build(dir);
-  await expect(getDist(dir)).resolves.toMatchInlineSnapshot(`
-          ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/index.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-          export declare const thing: A;
-
-          ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/x.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-          declare class A {
-              private a?;
-          }
-          export declare const x: () => A;
-          export {};
-
-          ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-          export * from "./declarations/src/index";
-
-          ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.cjs.dev.js, dist/scope-test.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-          'use strict';
-
-          Object.defineProperty(exports, '__esModule', { value: true });
-
-          class A {}
-
-          const x = () => new A();
-
-          const thing = x();
-
-          exports.thing = thing;
-
-          ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-          'use strict';
-
-          if (process.env.NODE_ENV === "production") {
-            module.exports = require("./scope-test.cjs.prod.js");
-          } else {
-            module.exports = require("./scope-test.cjs.dev.js");
-          }
-
-        `);
+  const error = await build(dir).catch((x) => x);
+  expect(error).toBeInstanceOf(BatchError);
+  expect(stripAnsi(error.message.replace(dir, "DIR"))).toMatchInlineSnapshot(`
+    "🎁   Generating TypeScript declarations for src/index.ts failed:
+    🎁   src/index.ts:3:14 - error TS4023: Exported variable 'thing' has or is using name 'A' from external module \\"DIR/src/x\\" but cannot be named.
+    🎁  
+    🎁   3 export const thing = x();
+    🎁                  ~~~~~
+    🎁  "
+  `);
 });
