@@ -1024,13 +1024,19 @@ test("typescript declaration emit with unreferencable types emits diagnostic", a
   });
   const error = await build(dir).catch((x) => x);
   expect(error).toBeInstanceOf(BatchError);
-  expect(dir).toEqual(fs.realpathSync(dir));
   expect(
     stripAnsi(
       error.message.replace(
-        normalizePath(path.join(fs.realpathSync(dir), "src", "x")),
-        "path-to-module-with-a"
+        /external module "[^"]+" but cannot be named/,
+        'external module "path-to-module-with-a" but cannot be named'
       )
     )
-  ).toEqual(normalizePath(path.join(fs.realpathSync(dir), "src", "x")));
+  ).toMatchInlineSnapshot(`
+    "🎁   Generating TypeScript declarations for src/index.ts failed:
+    🎁   src/index.ts:3:14 - error TS4023: Exported variable 'thing' has or is using name 'A' from external module \\"path-to-module-with-a\\" but cannot be named.
+    🎁  
+    🎁   3 export const thing = x();
+    🎁                  ~~~~~
+    🎁  "
+  `);
 });
