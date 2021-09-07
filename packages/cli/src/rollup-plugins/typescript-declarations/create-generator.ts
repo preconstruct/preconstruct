@@ -87,7 +87,7 @@ export async function createDeclarationCreator(
   let typescript: Typescript;
   try {
     typescript = unsafeRequire(resolveFrom(dirname, "typescript"));
-  } catch (err: any) {
+  } catch (err) {
     if (err.code === "MODULE_NOT_FOUND") {
       throw new FatalError(
         "an entrypoint source file ends with the .ts or .tsx extension but the typescript module could not be resolved from the project directory, please install it.",
