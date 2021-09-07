@@ -204,7 +204,9 @@ export async function createDeclarationCreator(
           : filename.toLowerCase()
       );
       if (!sourceFile) {
-        throw new Error(`Could not find source file at ${filename}`);
+        throw new Error(
+          `Could not find source file at ${filename} in TypeScript declaration generation, this is likely a bug in Preconstruct`
+        );
       }
       const emitted: Partial<EmittedDeclarationOutput> = {};
       const { diagnostics } = program.emit(
