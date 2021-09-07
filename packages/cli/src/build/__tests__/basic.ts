@@ -975,3 +975,85 @@ test("UMD build with process.env.NODE_ENV and typeof document", async () => {
           {"version":3,"file":"scope-test.umd.min.js","sources":["../src/index.js"],"sourcesContent":["let x = typeof document;\\n\\nconst thing = () => {\\n  console.log(process.env.NODE_ENV);\\n};\\n\\nexport default thing;"],"names":["console","log"],"mappings":"wOAEc,KACZA,QAAQC"}
         `);
 });
+
+test("typescript declaration emit with unreferencable types emits diagnostic", async () => {
+  let dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "@scope/test",
+      main: "dist/scope-test.cjs.js",
+    }),
+    ".babelrc": JSON.stringify({
+      presets: [require.resolve("@babel/preset-typescript")],
+    }),
+    node_modules: {
+      kind: "symlink",
+      path: repoNodeModules,
+    },
+    "tsconfig.json": JSON.stringify(
+      {
+        compilerOptions: {
+          target: "esnext",
+          module: "esnext",
+          jsx: "react",
+          isolatedModules: true,
+          strict: true,
+          moduleResolution: "node",
+          esModuleInterop: true,
+          noEmit: true,
+        },
+      },
+      null,
+      2
+    ),
+    "src/index.ts": ts`
+                      import { x } from "./x";
+
+                      export const thing = x();
+                    `,
+    "src/x.ts": ts`
+                  class A {
+                    private a?: string;
+                  }
+
+                  export const x = () => new A();
+                `,
+  });
+  await build(dir);
+  await expect(getDist(dir)).resolves.toMatchInlineSnapshot(`
+          ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/index.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+          export declare const thing: A;
+
+          ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/x.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+          declare class A {
+              private a?;
+          }
+          export declare const x: () => A;
+          export {};
+
+          ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+          export * from "./declarations/src/index";
+
+          ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.cjs.dev.js, dist/scope-test.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+          'use strict';
+
+          Object.defineProperty(exports, '__esModule', { value: true });
+
+          class A {}
+
+          const x = () => new A();
+
+          const thing = x();
+
+          exports.thing = thing;
+
+          ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+          'use strict';
+
+          if (process.env.NODE_ENV === "production") {
+            module.exports = require("./scope-test.cjs.prod.js");
+          } else {
+            module.exports = require("./scope-test.cjs.dev.js");
+          }
+
+        `);
+});
