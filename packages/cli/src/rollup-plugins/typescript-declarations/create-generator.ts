@@ -236,9 +236,8 @@ export async function createDeclarationCreator(
 
       if (!emitted.types || diagnostics.length) {
         throw new FatalError(
-          `Generating TypeScript declarations for ${path.relative(
-            projectDir,
-            filename
+          `Generating TypeScript declarations for ${normalizePath(
+            path.relative(projectDir, filename)
           )} failed:\n${typescript.formatDiagnosticsWithColorAndContext(
             diagnostics,
             diagnosticsHost
