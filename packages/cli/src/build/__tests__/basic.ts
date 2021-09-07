@@ -1,5 +1,4 @@
 import path from "path";
-import fs from "fs-extra";
 import build from "../";
 import fixturez from "fixturez";
 import {
@@ -14,7 +13,6 @@ import {
 } from "../../../test-utils";
 import { BatchError } from "../../errors";
 import stripAnsi from "strip-ansi";
-import normalizePath from "normalize-path";
 
 const f = fixturez(__dirname);
 
