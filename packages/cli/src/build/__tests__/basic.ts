@@ -13,6 +13,7 @@ import {
 } from "../../../test-utils";
 import { BatchError } from "../../errors";
 import stripAnsi from "strip-ansi";
+import normalizePath from "normalize-path";
 
 const f = fixturez(__dirname);
 
@@ -1024,7 +1025,10 @@ test("typescript declaration emit with unreferencable types emits diagnostic", a
   expect(error).toBeInstanceOf(BatchError);
   expect(
     stripAnsi(
-      error.message.replace(path.join(dir, "src", "x"), "path-to-module-with-a")
+      error.message.replace(
+        normalizePath(path.join(dir, "src", "x")),
+        "path-to-module-with-a"
+      )
     )
   ).toMatchInlineSnapshot(`
     "🎁   Generating TypeScript declarations for src/index.ts failed:
