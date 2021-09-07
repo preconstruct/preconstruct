@@ -1024,6 +1024,7 @@ test("typescript declaration emit with unreferencable types emits diagnostic", a
   });
   const error = await build(dir).catch((x) => x);
   expect(error).toBeInstanceOf(BatchError);
+  expect(dir).toEqual(fs.realpathSync(dir));
   expect(
     stripAnsi(
       error.message.replace(
