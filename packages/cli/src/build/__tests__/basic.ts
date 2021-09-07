@@ -1,4 +1,5 @@
 import path from "path";
+import fs from "fs-extra";
 import build from "../";
 import fixturez from "fixturez";
 import {
@@ -1026,9 +1027,16 @@ test("typescript declaration emit with unreferencable types emits diagnostic", a
   expect(
     stripAnsi(
       error.message.replace(
-        normalizePath(path.join(dir, "src", "x")),
+        normalizePath(path.join(fs.realpathSync(dir), "src", "x")),
         "path-to-module-with-a"
       )
     )
-  ).toEqual(normalizePath(path.join(dir, "src", "x")));
+  ).toMatchInlineSnapshot(`
+    "🎁   Generating TypeScript declarations for src/index.ts failed:
+    🎁   src/index.ts:3:14 - error TS4023: Exported variable 'thing' has or is using name 'A' from external module \\"path-to-module-with-a\\" but cannot be named.
+    🎁  
+    🎁   3 export const thing = x();
+    🎁                  ~~~~~
+    🎁  "
+  `);
 });
