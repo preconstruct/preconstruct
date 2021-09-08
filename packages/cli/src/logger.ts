@@ -12,8 +12,7 @@ export function format(
     info: chalk.cyan("info"),
     none: "",
   }[messageType];
-  let fullPrefix =
-    "🎁 " + prefix + (scope === undefined ? "" : " " + chalk.cyan(scope));
+  let fullPrefix = "🎁 " + prefix + (scope ? " " + chalk.cyan(scope) : "");
   return (
     fullPrefix +
     util
