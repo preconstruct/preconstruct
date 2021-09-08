@@ -15,7 +15,11 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
   return {
     name: "typescript-declarations",
     async generateBundle(opts, bundle) {
-      let creator = await createDeclarationCreator(pkg.directory, pkg.name);
+      let creator = await createDeclarationCreator(
+        pkg.directory,
+        pkg.name,
+        pkg.project.directory
+      );
 
       let srcFilenameToDtsFilenameMap = new Map<string, string>();
 

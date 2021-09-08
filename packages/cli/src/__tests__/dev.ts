@@ -281,7 +281,7 @@ test("typescript", async () => {
   ).toMatchSnapshot();
 });
 
-test("typescript", async () => {
+test("typescript with typeScriptProxyFileWithImportEqualsRequireAndExportEquals", async () => {
   let tmpPath = await testdir({
     ...typescriptFixture,
     "package.json": JSON.stringify({

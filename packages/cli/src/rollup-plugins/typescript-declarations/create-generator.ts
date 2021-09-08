@@ -2,21 +2,20 @@ import resolveFrom from "resolve-from";
 import * as fs from "fs-extra";
 import path from "path";
 import { FatalError } from "../../errors";
-// @ts-ignore
-import { createLanguageServiceHostClass } from "./language-service-host";
 import normalizePath from "normalize-path";
+import { EOL } from "os";
 
-interface DeclarationFile {
+type DeclarationFile = {
   name: string;
   content: string;
-}
+};
 
-interface EmittedDeclarationOutput {
+type EmittedDeclarationOutput = {
   /** The emitted d.ts types file. */
   types: DeclarationFile;
   /** The emitted d.ts.map declaration map file. */
   map?: DeclarationFile;
-}
+};
 
 type Typescript = typeof import("typescript");
 
@@ -45,7 +44,7 @@ function memoize<V>(fn: (arg: string) => V): (arg: string) => V {
   };
 }
 
-async function nonMemoizedGetService(
+async function nonMemoizedGetProgram(
   typescript: Typescript,
   configFileName: string
 ) {
@@ -62,36 +61,25 @@ async function nonMemoizedGetService(
     undefined,
     configFileName
   );
+
   thing.options.declaration = true;
+  thing.options.emitDeclarationOnly = true;
   thing.options.noEmit = false;
 
-  let LanguageServiceHostClass = createLanguageServiceHostClass(typescript);
-
-  let servicesHost = new LanguageServiceHostClass(thing, []);
-
-  let service = typescript.createLanguageService(
-    servicesHost,
-    typescript.createDocumentRegistry()
-  );
-  servicesHost.setLanguageService(service);
-  let program = service.getProgram();
-  if (!program) {
-    throw new Error(
-      "This is an internal error, please open an issue if you see this: program not found"
-    );
-  }
-  return { service, options: thing.options, program };
+  let program = typescript.createProgram(thing.fileNames, thing.options);
+  return { options: thing.options, program };
 }
 
-let getService = weakMemoize((typescript: Typescript) =>
+let getProgram = weakMemoize((typescript: Typescript) =>
   memoize(async (configFileName: string) => {
-    return nonMemoizedGetService(typescript, configFileName);
+    return nonMemoizedGetProgram(typescript, configFileName);
   })
 );
 
 export async function createDeclarationCreator(
   dirname: string,
-  pkgName: string
+  pkgName: string,
+  projectDir: string
 ): Promise<{
   getDeps: (entrypoints: Array<string>) => Set<string>;
   getDeclarationFiles: (filename: string) => Promise<EmittedDeclarationOutput>;
@@ -123,16 +111,23 @@ export async function createDeclarationCreator(
   // and if we keep it, we could run out of memory for large projects
   // if the tsconfig _isn't_ in the package directory though, it's probably fine to memoize it
   // since it should just be a root level tsconfig
-  let { service, options, program } = await (normalizePath(configFileName) ===
+  let { options, program } = await (normalizePath(configFileName) ===
   normalizePath(path.join(dirname, "tsconfig.json"))
-    ? nonMemoizedGetService(typescript, configFileName)
-    : getService(typescript)(configFileName));
+    ? nonMemoizedGetProgram(typescript, configFileName)
+    : getProgram(typescript)(configFileName));
   let moduleResolutionCache = typescript.createModuleResolutionCache(
     dirname,
     (x) => x,
     options
   );
   let normalizedDirname = normalizePath(dirname);
+
+  const diagnosticsHost: import("typescript").FormatDiagnosticsHost = {
+    getCanonicalFileName: (x) =>
+      typescript.sys.useCaseSensitiveFileNames ? x : x.toLowerCase(),
+    getCurrentDirectory: () => projectDir,
+    getNewLine: () => EOL,
+  };
 
   return {
     getDeps: (entrypoints: Array<string>) => {
@@ -202,30 +197,57 @@ export async function createDeclarationCreator(
           },
         };
       }
-      let output = service.getEmitOutput(filename, true, true);
-      return output.outputFiles.reduce((emitted, { name, text }) => {
-        if (name.endsWith(".d.ts")) {
-          emitted.types = {
-            name: name.replace(
-              normalizedDirname,
-              normalizePath(path.join(dirname, "dist", "declarations"))
-            ),
-            content: text,
-          };
-        }
 
-        if (name.endsWith(".d.ts.map")) {
-          emitted.map = {
-            name: name.replace(
-              normalizedDirname,
-              normalizePath(path.join(dirname, "dist", "declarations"))
-            ),
-            content: text,
-          };
-        }
+      const sourceFile = program.getSourceFile(
+        typescript.sys.useCaseSensitiveFileNames
+          ? filename
+          : filename.toLowerCase()
+      );
+      if (!sourceFile) {
+        throw new Error(
+          `Could not find source file at ${filename} in TypeScript declaration generation, this is likely a bug in Preconstruct`
+        );
+      }
+      const emitted: Partial<EmittedDeclarationOutput> = {};
+      const { diagnostics } = program.emit(
+        sourceFile,
+        (name, text) => {
+          if (name.endsWith(".d.ts")) {
+            emitted.types = {
+              name: name.replace(
+                normalizedDirname,
+                normalizePath(path.join(dirname, "dist", "declarations"))
+              ),
+              content: text,
+            };
+          }
 
-        return emitted;
-      }, {} as EmittedDeclarationOutput);
+          if (name.endsWith(".d.ts.map")) {
+            emitted.map = {
+              name: name.replace(
+                normalizedDirname,
+                normalizePath(path.join(dirname, "dist", "declarations"))
+              ),
+              content: text,
+            };
+          }
+        },
+        undefined,
+        true
+      );
+
+      if (!emitted.types || diagnostics.length) {
+        throw new FatalError(
+          `Generating TypeScript declarations for ${normalizePath(
+            path.relative(projectDir, filename)
+          )} failed:\n${typescript.formatDiagnosticsWithColorAndContext(
+            diagnostics,
+            diagnosticsHost
+          )}`,
+          ""
+        );
+      }
+      return { types: emitted.types, map: emitted.map };
     },
   };
 }

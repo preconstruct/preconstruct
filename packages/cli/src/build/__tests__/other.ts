@@ -400,7 +400,7 @@ test("package resolvable but not in deps", async () => {
     await build(tmpPath);
   } catch (err) {
     expect(err.message).toMatchInlineSnapshot(
-      `"🎁  package-resolvable-but-not-in-deps \\"react\\" is imported by \\"src/index.js\\" but the package is not specified in dependencies or peerDependencies"`
+      `"🎁 package-resolvable-but-not-in-deps \\"react\\" is imported by \\"src/index.js\\" but the package is not specified in dependencies or peerDependencies"`
     );
     return;
   }
@@ -468,7 +468,7 @@ test("module imported outside package directory", async () => {
     await build(tmpPath);
   } catch (err) {
     expect(err.message).toMatchInlineSnapshot(
-      `"🎁  @imports-outside-pkg-dir/pkg-a all relative imports in a package should only import modules inside of their package directory but \\"src/index.js\\" is importing \\"../../some-file\\""`
+      `"🎁 @imports-outside-pkg-dir/pkg-a all relative imports in a package should only import modules inside of their package directory but \\"src/index.js\\" is importing \\"../../some-file\\""`
     );
     return;
   }
@@ -585,10 +585,10 @@ test("batches build errors", async () => {
     error = err;
   }
   expect(error).toMatchInlineSnapshot(`
-    [Error: 🎁  @errors/package-one "something-2" is imported by "src/index.js" but the package is not specified in dependencies or peerDependencies
-    🎁  @errors/package-one "something" is imported by "src/index.js" but the package is not specified in dependencies or peerDependencies
-    🎁  @errors/package-two "something-2" is imported by "src/index.js" but the package is not specified in dependencies or peerDependencies
-    🎁  @errors/package-two "something" is imported by "src/index.js" but the package is not specified in dependencies or peerDependencies]
+    [Error: 🎁 @errors/package-one "something-2" is imported by "src/index.js" but the package is not specified in dependencies or peerDependencies
+    🎁 @errors/package-one "something" is imported by "src/index.js" but the package is not specified in dependencies or peerDependencies
+    🎁 @errors/package-two "something-2" is imported by "src/index.js" but the package is not specified in dependencies or peerDependencies
+    🎁 @errors/package-two "something" is imported by "src/index.js" but the package is not specified in dependencies or peerDependencies]
   `);
 });
 
@@ -717,11 +717,11 @@ test("fails for source files containing top-level this", async () => {
     await build(dir);
   } catch (err) {
     expect(err.message).toMatchInlineSnapshot(`
-      "🎁  pkg \\"src/index.js\\" used \`this\` keyword at the top level of an ES module. You can read more about this at https://rollupjs.org/guide/en/#error-this-is-undefined and fix this issue that has happened here:
-      🎁  pkg
-      🎁  pkg 1: export default this;
-      🎁  pkg                   ^
-      🎁  pkg"
+      "🎁 pkg \\"src/index.js\\" used \`this\` keyword at the top level of an ES module. You can read more about this at https://rollupjs.org/guide/en/#error-this-is-undefined and fix this issue that has happened here:
+      🎁 pkg
+      🎁 pkg 1: export default this;
+      🎁 pkg                   ^
+      🎁 pkg"
     `);
     return;
   }

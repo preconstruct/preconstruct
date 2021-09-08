@@ -391,7 +391,7 @@ test("unexpected experimental flag throws, not removes", async () => {
   });
 
   await expect(fix(tmpPath)).rejects.toMatchInlineSnapshot(
-    `[Error: 🎁  pkg-a The experimental flag "thisDoesNotExist" in your config does not exist]`
+    `[Error: 🎁 pkg-a The experimental flag "thisDoesNotExist" in your config does not exist]`
   );
 });
 

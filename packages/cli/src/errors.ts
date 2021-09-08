@@ -14,7 +14,7 @@ export class BatchError extends Error {
     super(
       errors
         .map((x) => {
-          return format([x.message], "none", x.scope);
+          return format(x.message, "none", x.scope);
         })
         .join("\n")
     );

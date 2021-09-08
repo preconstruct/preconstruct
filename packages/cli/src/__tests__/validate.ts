@@ -586,7 +586,7 @@ test("non-existant entrypoint", async () => {
   });
 
   await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
-    `[Error: 🎁  pkg-a specifies a entrypoint "index.js" but the file does not exist, please create it or fix the config]`
+    `[Error: 🎁 pkg-a specifies a entrypoint "index.js" but the file does not exist, please create it or fix the config]`
   );
 });
 
@@ -603,6 +603,6 @@ test("negated entrypoint", async () => {
   });
 
   await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
-    `[Error: 🎁  pkg-a specifies a entrypoint "index.js" but it is negated in the same config so it should be removed or the config should be fixed]`
+    `[Error: 🎁 pkg-a specifies a entrypoint "index.js" but it is negated in the same config so it should be removed or the config should be fixed]`
   );
 });

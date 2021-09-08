@@ -11,6 +11,8 @@ import {
   repoNodeModules,
   js,
 } from "../../../test-utils";
+import { BatchError } from "../../errors";
+import stripAnsi from "strip-ansi";
 
 const f = fixturez(__dirname);
 
@@ -974,4 +976,65 @@ test("UMD build with process.env.NODE_ENV and typeof document", async () => {
           ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.umd.min.js.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
           {"version":3,"file":"scope-test.umd.min.js","sources":["../src/index.js"],"sourcesContent":["let x = typeof document;\\n\\nconst thing = () => {\\n  console.log(process.env.NODE_ENV);\\n};\\n\\nexport default thing;"],"names":["console","log"],"mappings":"wOAEc,KACZA,QAAQC"}
         `);
+});
+
+test("typescript declaration emit with unreferencable types emits diagnostic", async () => {
+  let dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "@scope/test",
+      main: "dist/scope-test.cjs.js",
+    }),
+    ".babelrc": JSON.stringify({
+      presets: [require.resolve("@babel/preset-typescript")],
+    }),
+    node_modules: {
+      kind: "symlink",
+      path: repoNodeModules,
+    },
+    "tsconfig.json": JSON.stringify(
+      {
+        compilerOptions: {
+          target: "esnext",
+          module: "esnext",
+          jsx: "react",
+          isolatedModules: true,
+          strict: true,
+          moduleResolution: "node",
+          esModuleInterop: true,
+          noEmit: true,
+        },
+      },
+      null,
+      2
+    ),
+    "src/index.ts": ts`
+                      import { x } from "./x";
+
+                      export const thing = x();
+                    `,
+    "src/x.ts": ts`
+                  class A {
+                    private a?: string;
+                  }
+
+                  export const x = () => new A();
+                `,
+  });
+  const error = await build(dir).catch((x) => x);
+  expect(error).toBeInstanceOf(BatchError);
+  expect(
+    stripAnsi(
+      error.message.replace(
+        /external module "[^"]+" but cannot be named/,
+        'external module "path-to-module-with-a" but cannot be named'
+      )
+    )
+  ).toMatchInlineSnapshot(`
+    "🎁 Generating TypeScript declarations for src/index.ts failed:
+    🎁 src/index.ts:3:14 - error TS4023: Exported variable 'thing' has or is using name 'A' from external module \\"path-to-module-with-a\\" but cannot be named.
+    🎁
+    🎁 3 export const thing = x();
+    🎁                ~~~~~
+    🎁"
+  `);
 });
