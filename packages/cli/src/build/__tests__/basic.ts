@@ -1030,11 +1030,11 @@ test("typescript declaration emit with unreferencable types emits diagnostic", a
       )
     )
   ).toMatchInlineSnapshot(`
-    "🎁  Generating TypeScript declarations for src/index.ts failed:
-    🎁  src/index.ts:3:14 - error TS4023: Exported variable 'thing' has or is using name 'A' from external module \\"path-to-module-with-a\\" but cannot be named.
-    🎁 
-    🎁  3 export const thing = x();
-    🎁                 ~~~~~
-    🎁 "
+    "🎁 Generating TypeScript declarations for src/index.ts failed:
+    🎁 src/index.ts:3:14 - error TS4023: Exported variable 'thing' has or is using name 'A' from external module \\"path-to-module-with-a\\" but cannot be named.
+    🎁
+    🎁 3 export const thing = x();
+    🎁                ~~~~~
+    🎁"
   `);
 });
