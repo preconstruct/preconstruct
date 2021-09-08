@@ -1,5 +1,4 @@
 import chalk from "chalk";
-import util from "util";
 
 export function format(
   message: string,
