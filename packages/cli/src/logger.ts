@@ -15,7 +15,7 @@ export function format(
   return message
     .split("\n")
     .map((line) => {
-      if (!line) {
+      if (!line.trim()) {
         return fullPrefix;
       }
       return `${fullPrefix} ${line}`;
