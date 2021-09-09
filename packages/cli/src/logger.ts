@@ -12,7 +12,7 @@ export function format(
     none: "",
   }[messageType];
   let fullPrefix = "🎁" + prefix + (scope ? " " + chalk.cyan(scope) : "");
-  return message
+  return String(message)
     .split("\n")
     .map((line) => {
       if (!line.trim()) {
