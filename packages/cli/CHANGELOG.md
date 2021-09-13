@@ -1,5 +1,11 @@
 # preconstruct
 
+## 2.1.3
+
+### Patch Changes
+
+- [`73d4838`](https://github.com/preconstruct/preconstruct/commit/73d483802254b8c9761b649654babc434426f4b8) [#413](https://github.com/preconstruct/preconstruct/pull/413) Thanks [@namjul](https://github.com/namjul)! - Fixed logger failing when an unexpected type is received
+
 ## 2.1.2
 
 ### Patch Changes
