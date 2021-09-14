@@ -1,5 +1,11 @@
 # preconstruct
 
+## 2.1.4
+
+### Patch Changes
+
+- [`7c730bd`](https://github.com/preconstruct/preconstruct/commit/7c730bd191f6262c901e6d8f4fb45d121f9c85c5) [#415](https://github.com/preconstruct/preconstruct/pull/415) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Fixed generating TypeScript declarations when a JSON file is imported from a TypeScript file.
+
 ## 2.1.3
 
 ### Patch Changes
