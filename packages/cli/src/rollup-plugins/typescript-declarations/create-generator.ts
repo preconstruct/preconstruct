@@ -170,12 +170,12 @@ export async function createDeclarationCreator(
               if (
                 !allDeps.has(resolvedModule.resolvedFileName) &&
                 !resolvedModule.isExternalLibraryImport &&
-                resolvedModule.resolvedFileName.includes(normalizedDirname) // &&
+                resolvedModule.resolvedFileName.includes(normalizedDirname) &&
                 // you can import a .json file if you have resolveJsonModule: true in your tsconfig
                 // but you can't generate declarations for it(which seems fine and good i think?)
                 // and just ignoring imports to them seems fine because from what i can tell
                 // typescript inlines the types for them if the json file import is used in the files exports
-                // !resolvedModule.resolvedFileName.endsWith(".json")
+                !resolvedModule.resolvedFileName.endsWith(".json")
               ) {
                 internalDeps.add(resolvedModule.resolvedFileName);
                 allDeps.add(resolvedModule.resolvedFileName);
