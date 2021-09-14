@@ -1038,3 +1038,77 @@ test("typescript declaration emit with unreferencable types emits diagnostic", a
     🎁"
   `);
 });
+
+test("typescript declaration emit with json import", async () => {
+  let dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "@scope/test",
+      main: "dist/scope-test.cjs.js",
+    }),
+    ".babelrc": JSON.stringify({
+      presets: [require.resolve("@babel/preset-typescript")],
+    }),
+    node_modules: {
+      kind: "symlink",
+      path: repoNodeModules,
+    },
+    "tsconfig.json": JSON.stringify(
+      {
+        compilerOptions: {
+          target: "esnext",
+          module: "esnext",
+          jsx: "react",
+          isolatedModules: true,
+          strict: true,
+          moduleResolution: "node",
+          esModuleInterop: true,
+          resolveJsonModule: true,
+          noEmit: true,
+        },
+      },
+      null,
+      2
+    ),
+    "src/index.ts": ts`
+                      import x from "./x.json";
+
+                      export const thing = x;
+                    `,
+    "src/x.json": JSON.stringify({ thing: true, other: "" }),
+  });
+  await build(dir);
+  expect(await getDist(dir)).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/index.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export declare const thing: {
+        thing: boolean;
+        other: string;
+    };
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export * from "./declarations/src/index";
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.cjs.dev.js, dist/scope-test.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    var x = {
+    	thing: true,
+    	other: ""
+    };
+
+    const thing = x;
+
+    exports.thing = thing;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./scope-test.cjs.prod.js");
+    } else {
+      module.exports = require("./scope-test.cjs.dev.js");
+    }
+
+  `);
+});

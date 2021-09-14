@@ -170,7 +170,12 @@ export async function createDeclarationCreator(
               if (
                 !allDeps.has(resolvedModule.resolvedFileName) &&
                 !resolvedModule.isExternalLibraryImport &&
-                resolvedModule.resolvedFileName.includes(normalizedDirname)
+                resolvedModule.resolvedFileName.includes(normalizedDirname) // &&
+                // you can import a .json file if you have resolveJsonModule: true in your tsconfig
+                // but you can't generate declarations for it(which seems fine and good i think?)
+                // and just ignoring imports to them seems fine because from what i can tell
+                // typescript inlines the types for them if the json file import is used in the files exports
+                // !resolvedModule.resolvedFileName.endsWith(".json")
               ) {
                 internalDeps.add(resolvedModule.resolvedFileName);
                 allDeps.add(resolvedModule.resolvedFileName);
@@ -209,6 +214,7 @@ export async function createDeclarationCreator(
         );
       }
       const emitted: Partial<EmittedDeclarationOutput> = {};
+      const otherEmitted: { name: string; text: string }[] = [];
       const { diagnostics } = program.emit(
         sourceFile,
         (name, text) => {
@@ -220,9 +226,7 @@ export async function createDeclarationCreator(
               ),
               content: text,
             };
-          }
-
-          if (name.endsWith(".d.ts.map")) {
+          } else if (name.endsWith(".d.ts.map")) {
             emitted.map = {
               name: name.replace(
                 normalizedDirname,
@@ -230,6 +234,8 @@ export async function createDeclarationCreator(
               ),
               content: text,
             };
+          } else {
+            otherEmitted.push({ name, text });
           }
         },
         undefined,
@@ -243,7 +249,13 @@ export async function createDeclarationCreator(
           )} failed:\n${typescript.formatDiagnosticsWithColorAndContext(
             diagnostics,
             diagnosticsHost
-          )}`,
+          )}${
+            otherEmitted.length
+              ? `\n\nTypeScript emitted other files when attempting to emit .d.ts files:\n${otherEmitted
+                  .map((x) => `${x.name}\n\n${x.text}`)
+                  .join("\n\n")}`
+              : ""
+          }`,
           ""
         );
       }
