@@ -2,7 +2,7 @@ import path from "path";
 import { FatalError } from "../../errors";
 import { Plugin } from "rollup";
 import { Package } from "../../package";
-import { createDeclarationCreator } from "./create-generator";
+import { getDeclarations } from "./get-declarations";
 import { overwriteDeclarationMapSourceRoot, tsTemplate } from "../../utils";
 import normalizePath from "normalize-path";
 
@@ -15,37 +15,40 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
   return {
     name: "typescript-declarations",
     async generateBundle(opts, bundle) {
-      let creator = await createDeclarationCreator(
+      let declarations = await getDeclarations(
         pkg.directory,
         pkg.name,
-        pkg.project.directory
+        pkg.project.directory,
+        pkg.entrypoints.map((x) => x.source)
       );
 
       let srcFilenameToDtsFilenameMap = new Map<string, string>();
 
-      let deps = creator.getDeps(pkg.entrypoints.map((x) => x.source));
       await Promise.all(
-        [...deps].map(async (dep) => {
-          let { types, map } = await creator.getDeclarationFiles(dep);
-
-          srcFilenameToDtsFilenameMap.set(normalizePath(dep), types.name);
+        [...declarations].map(async (output) => {
+          srcFilenameToDtsFilenameMap.set(
+            normalizePath(output.filename),
+            output.types.name
+          );
           this.emitFile({
             type: "asset",
-            fileName: path.relative(opts.dir!, types.name),
-            source: types.content,
+            fileName: path.relative(opts.dir!, output.types.name),
+            source: output.types.content,
           });
 
-          if (map) {
+          if (output.map) {
             const sourceRoot = normalizePath(
-              path.dirname(path.relative(path.dirname(map.name), dep))
+              path.dirname(
+                path.relative(path.dirname(output.map.name), output.filename)
+              )
             );
             const source = overwriteDeclarationMapSourceRoot(
-              map.content,
+              output.map.content,
               sourceRoot
             );
             this.emitFile({
               type: "asset",
-              fileName: path.relative(opts.dir!, map.name),
+              fileName: path.relative(opts.dir!, output.map.name),
               source,
             });
           }
