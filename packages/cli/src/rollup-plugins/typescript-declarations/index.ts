@@ -3,8 +3,9 @@ import { FatalError } from "../../errors";
 import { Plugin } from "rollup";
 import { Package } from "../../package";
 import { getDeclarations } from "./get-declarations";
-import { overwriteDeclarationMapSourceRoot, tsTemplate } from "../../utils";
+import { tsTemplate } from "../../utils";
 import normalizePath from "normalize-path";
+import { overwriteDeclarationMapSourceRoot } from "./common";
 
 export let isTsPath = (source: string) => /\.tsx?/.test(source);
 

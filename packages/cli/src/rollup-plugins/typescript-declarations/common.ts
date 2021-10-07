@@ -190,3 +190,12 @@ export const getDeclarationsForFile = async (
   }
   return { types: emitted.types, map: emitted.map, filename };
 };
+
+export function overwriteDeclarationMapSourceRoot(
+  content: string,
+  actualSourceRoot: string
+): string {
+  const src = JSON.parse(content);
+  src.sourceRoot = actualSourceRoot;
+  return JSON.stringify(src);
+}
