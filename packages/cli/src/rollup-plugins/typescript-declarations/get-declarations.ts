@@ -15,7 +15,7 @@ export async function getDeclarations(
   projectDir: string,
   entrypoints: string[]
 ): Promise<EmittedDeclarationOutput[]> {
-  const typescript = loadTypeScript(dirname, pkgName);
+  const typescript = loadTypeScript(dirname, projectDir, pkgName);
 
   const { program, options } = await getProgram(dirname, pkgName, typescript);
   let moduleResolutionCache = typescript.createModuleResolutionCache(

@@ -33,15 +33,26 @@ export function getDiagnosticsHost(
   };
 }
 
-export function loadTypeScript(dirname: string, pkgName: string): TS {
+export function loadTypeScript(
+  packageDir: string,
+  projectDir: string,
+  pkgName: string
+): TS {
   try {
-    return require(resolveFrom(dirname, "typescript"));
+    return require(resolveFrom(packageDir, "typescript"));
   } catch (err) {
     if (err.code === "MODULE_NOT_FOUND") {
-      throw new FatalError(
-        "an entrypoint source file ends with the .ts or .tsx extension but the typescript module could not be resolved from the project directory, please install it.",
-        pkgName
-      );
+      try {
+        // if people have typescript installed at the their project and they're using Yarn PnP,
+        // typescript won't be resolvable at the package level but it will be resolvable at the project level
+        // (note this will only happen with PnP)
+        return require(resolveFrom(projectDir, "typescript"));
+      } catch (err) {
+        throw new FatalError(
+          "an entrypoint source file ends with the .ts or .tsx extension but the typescript module could not be resolved from the project directory, please install it.",
+          pkgName
+        );
+      }
     }
     throw err;
   }
