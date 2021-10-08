@@ -1,5 +1,11 @@
 # preconstruct
 
+## 2.1.5
+
+### Patch Changes
+
+- [`ad15ffa`](https://github.com/preconstruct/preconstruct/commit/ad15ffa5c08f49781cb7932cc2dd6a17b73b8863) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Fixed resolving `typescript` package when using Yarn PnP and installing `typescript` at the root of a project
+
 ## 2.1.4
 
 ### Patch Changes
