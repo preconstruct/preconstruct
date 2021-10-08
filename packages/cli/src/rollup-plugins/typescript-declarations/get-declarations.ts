@@ -18,11 +18,6 @@ export async function getDeclarations(
   const typescript = loadTypeScript(dirname, pkgName);
 
   const { program, options } = await getProgram(dirname, pkgName, typescript);
-  // if the tsconfig is inside the package directory, let's not memoize getting the ts service
-  // since it'll only ever be used once
-  // and if we keep it, we could run out of memory for large projects
-  // if the tsconfig _isn't_ in the package directory though, it's probably fine to memoize it
-  // since it should just be a root level tsconfig
   let moduleResolutionCache = typescript.createModuleResolutionCache(
     dirname,
     (x) => x,
