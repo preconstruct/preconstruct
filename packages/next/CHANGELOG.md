@@ -1,5 +1,16 @@
 # @preconstruct/next
 
+## 3.0.1
+
+### Patch Changes
+
+- [#420](https://github.com/preconstruct/preconstruct/pull/420) [`9fc0cf5`](https://github.com/preconstruct/preconstruct/commit/9fc0cf5669a748be0628de70d006094e134096ec) Thanks [@bradbarrow](https://github.com/bradbarrow)! - Fixed support for Next.js 12. Note that in Next.js 11 and 12, Next will not read a Babel config from outside of the directory that the Next.js site is in. If you need it to to read your babel config, you will need to do something like this:
+
+  ```js
+  // site/babel.config.js
+  module.exports = require("../babel.config");
+  ```
+
 ## 3.0.0
 
 ### Major Changes
