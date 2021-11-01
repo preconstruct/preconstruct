@@ -18,16 +18,13 @@ module.exports = (nextConfig = {}) => {
         hasFoundRule = true;
         delete rule.include;
       }
+      if (rule.oneOf) {
+        rule.oneOf.forEach(foundRule)
+      }
     };
 
     // Look at top level rules
     webpackConfig.module.rules.forEach(foundRule);
-
-    // Look at rules nested under oneOf
-    const oneOfRule = webpackConfig.module.rules.find(rule => !!rule.oneOf);
-    const rules = oneOfRule ? oneOfRule.oneOf : [];
-
-    rules.forEach(foundRule);
 
     if (!hasFoundRule) {
       throw new Error(
