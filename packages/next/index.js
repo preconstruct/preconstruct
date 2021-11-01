@@ -19,7 +19,7 @@ module.exports = (nextConfig = {}) => {
         delete rule.include;
       }
       if (rule.oneOf) {
-        rule.oneOf.forEach(foundRule)
+        rule.oneOf.forEach(foundRule);
       }
     };
 
