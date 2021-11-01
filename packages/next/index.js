@@ -8,7 +8,8 @@ module.exports = (nextConfig = {}) => {
   nextConfig.webpack = (webpackConfig, options) => {
     let hasFoundRule = false;
     options.defaultLoaders.babel.options.rootMode = "upward-optional";
-    webpackConfig.module.rules.forEach((rule) => {
+
+    const foundRule = (rule) => {
       if (
         rule.use === options.defaultLoaders.babel ||
         (Array.isArray(rule.use) &&
@@ -17,7 +18,14 @@ module.exports = (nextConfig = {}) => {
         hasFoundRule = true;
         delete rule.include;
       }
-    });
+      if (rule.oneOf) {
+        rule.oneOf.forEach(foundRule);
+      }
+    };
+
+    // Look at top level rules
+    webpackConfig.module.rules.forEach(foundRule);
+
     if (!hasFoundRule) {
       throw new Error(
         "If you see this error, please open an issue with your Next.js version and @preconstruct/next version. The Next Babel loader could not be found"
