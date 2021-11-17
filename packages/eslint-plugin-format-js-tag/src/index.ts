@@ -21,8 +21,7 @@ export const rules = {
     defaultOptions: [],
     meta: {
       docs: {
-        category: "Stylistic Issues",
-        description: "",
+        description: "Stylistic Issues",
         recommended: "error",
       },
       messages,
