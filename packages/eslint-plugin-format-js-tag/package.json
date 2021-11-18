@@ -6,7 +6,7 @@
     "dist"
   ],
   "dependencies": {
-    "@typescript-eslint/experimental-utils": "^4.2.0"
+    "@typescript-eslint/experimental-utils": "^5.4.0"
   },
   "peerDependencies": {
     "prettier": "*"

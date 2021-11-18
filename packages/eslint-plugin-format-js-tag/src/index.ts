@@ -21,8 +21,7 @@ export const rules = {
     defaultOptions: [],
     meta: {
       docs: {
-        category: "Stylistic Issues",
-        description: "",
+        description: "Formats `js`, `ts` and `tsx` template tags with Prettier",
         recommended: "error",
       },
       messages,
