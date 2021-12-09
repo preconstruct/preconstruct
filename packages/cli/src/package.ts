@@ -26,7 +26,7 @@ function getFieldsUsedInEntrypoints(
   for (let descriptor of descriptors) {
     if (descriptor.contents !== undefined) {
       let parsed = jsonParse(descriptor.contents, descriptor.filename);
-      for (let field of ["module", "umd:main", "browser"] as const) {
+      for (let field of ["module", "umd:main", "browser", "worker"] as const) {
         if (parsed[field] !== undefined) {
           fields.add(field);
         }
@@ -47,7 +47,7 @@ function getPlainEntrypointContent(
     string | Record<string, string>
   >> = {};
   for (const field of fields) {
-    if (field === "browser") {
+    if (field === "browser" || field === "worker") {
       obj[field] = validFieldsFromPkg[field](
         pkg,
         fields.has("module"),
@@ -264,7 +264,9 @@ export class Package extends Item<{
     return pkg;
   }
 
-  setFieldOnEntrypoints(field: "main" | "browser" | "module" | "umd:main") {
+  setFieldOnEntrypoints(
+    field: "main" | "browser" | "module" | "umd:main" | "worker"
+  ) {
     this.entrypoints.forEach((entrypoint) => {
       entrypoint.json = setFieldInOrder(
         entrypoint.json,

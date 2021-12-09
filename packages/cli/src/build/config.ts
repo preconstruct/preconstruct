@@ -207,5 +207,40 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
     });
   }
 
+  let hasWorkerField = pkg.entrypoints[0].json.worker !== undefined;
+
+  if (hasWorkerField) {
+    configs.push({
+      config: getRollupConfig(
+        pkg,
+        pkg.entrypoints,
+        aliases,
+        "worker",
+        () => {}
+      ),
+      outputs: [
+        {
+          format: "cjs" as const,
+          entryFileNames: "[name].worker.cjs.js",
+          chunkFileNames: "dist/[name]-[hash].worker.cjs.js",
+          dir: pkg.directory,
+          exports: "named" as const,
+          interop,
+          plugins: cjsPlugins,
+        },
+        ...(hasModuleField
+          ? [
+              {
+                format: "es" as const,
+                entryFileNames: "[name].worker.esm.js",
+                chunkFileNames: "dist/[name]-[hash].worker.esm.js",
+                dir: pkg.directory,
+              },
+            ]
+          : []),
+      ],
+    });
+  }
+
   return configs;
 }

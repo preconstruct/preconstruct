@@ -218,6 +218,17 @@ unregister();
               );
             }
           }
+          if (entrypoint.json.worker) {
+            let workerField = validFields.worker(entrypoint);
+            for (let key of Object.keys(workerField)) {
+              promises.push(
+                fs.symlink(
+                  entrypoint.source,
+                  path.join(entrypoint.directory, workerField[key])
+                )
+              );
+            }
+          }
 
           return Promise.all(promises);
         })

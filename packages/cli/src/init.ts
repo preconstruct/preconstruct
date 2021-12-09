@@ -93,6 +93,30 @@ async function doInit(pkg: Package) {
     }
   }
 
+  let someEntrypointsHaveAWorkerField = pkg.entrypoints.some(
+    (entrypoint) => entrypoint.json.worker !== undefined
+  );
+
+  let someEntrypointsHaveAnInvalidWorkerField = pkg.entrypoints.some(
+    (entrypoint) => !isFieldValid.worker(entrypoint)
+  );
+  if (
+    someEntrypointsHaveAWorkerField &&
+    someEntrypointsHaveAnInvalidWorkerField
+  ) {
+    let shouldFixWorkerField = await confirms.fixWorkerField(pkg);
+    if (shouldFixWorkerField) {
+      pkg.setFieldOnEntrypoints("worker");
+    } else {
+      throw new FixableError(
+        errors.fieldMustExistInAllEntrypointsIfExistsDeclinedFixDuringInit(
+          "worker"
+        ),
+        pkg.name
+      );
+    }
+  }
+
   await Promise.all(pkg.entrypoints.map((x) => x.save()));
 }
 

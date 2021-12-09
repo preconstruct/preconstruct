@@ -25,6 +25,9 @@ export const isFieldValid = {
   browser(entrypoint: Entrypoint): boolean {
     return equal(entrypoint.json.browser, validFields.browser(entrypoint));
   },
+  worker(entrypoint: Entrypoint): boolean {
+    return equal(entrypoint.json.worker, validFields.worker(entrypoint));
+  },
 };
 
 export function isUmdNameSpecified(entrypoint: Entrypoint) {
@@ -38,7 +41,13 @@ function validateEntrypoint(entrypoint: Entrypoint, log: boolean) {
     logger.info(infos.validEntrypoint, entrypoint.name);
   }
   const fatalErrors: FatalError[] = [];
-  for (const field of ["main", "module", "umd:main", "browser"] as const) {
+  for (const field of [
+    "main",
+    "module",
+    "umd:main",
+    "browser",
+    "worker",
+  ] as const) {
     if (field !== "main" && entrypoint.json[field] === undefined) {
       continue;
     }
