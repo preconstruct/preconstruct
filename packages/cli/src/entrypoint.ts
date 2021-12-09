@@ -9,6 +9,7 @@ export class Entrypoint extends Item<{
   module?: JSONValue;
   "umd:main"?: JSONValue;
   browser?: JSONValue;
+  worker?: JSONValue;
   preconstruct: {
     source?: JSONValue;
     umdName?: JSONValue;

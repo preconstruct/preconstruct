@@ -15,6 +15,7 @@ export async function fixPackage(pkg: Package) {
     module: pkg.entrypoints.some((x) => x.json.module !== undefined),
     "umd:main": pkg.entrypoints.some((x) => x.json["umd:main"] !== undefined),
     browser: pkg.entrypoints.some((x) => x.json.browser !== undefined),
+    worker: pkg.entrypoints.some((x) => x.json.worker !== undefined),
   };
 
   keys(fields)
@@ -41,6 +42,7 @@ export function validatePackage(pkg: Package) {
     module: pkg.entrypoints[0].json.module !== undefined,
     "umd:main": pkg.entrypoints[0].json["umd:main"] !== undefined,
     browser: pkg.entrypoints[0].json.browser !== undefined,
+    worker: pkg.entrypoints[0].json.worker !== undefined,
   };
 
   pkg.entrypoints.forEach((entrypoint) => {

@@ -31,7 +31,12 @@ const makeExternalPredicate = (externalArr: string[]) => {
   return (id: string) => pattern.test(id);
 };
 
-export type RollupConfigType = "umd" | "browser" | "node-dev" | "node-prod";
+export type RollupConfigType =
+  | "umd"
+  | "browser"
+  | "node-dev"
+  | "node-prod"
+  | "worker";
 
 export let getRollupConfig = (
   pkg: Package,
@@ -190,6 +195,15 @@ export let getRollupConfig = (
           values: {
             ["typeof " + "document"]: JSON.stringify("object"),
             ["typeof " + "window"]: JSON.stringify("object"),
+          },
+          preventAssignment: true,
+        }),
+      type === "worker" &&
+        replace({
+          values: {
+            ["typeof " + "document"]: JSON.stringify("undefined"),
+            ["typeof " + "window"]: JSON.stringify("undefined"),
+            ["typeof " + "process"]: JSON.stringify("undefined"),
           },
           preventAssignment: true,
         }),

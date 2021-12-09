@@ -183,3 +183,9 @@ Example:
 The `browser` field specifies alias files exclusive to browsers. This allows you to create different bundles from your source code based on `typeof window` and `typeof document` checks - thanks to that you can, for example, remove server-only code (just for those bundles).
 
 **Note:** Those files are not meant to be consumed by browsers "as is". They just assume browser-like environment, but they still can contain for example references to `process.env.NODE_ENV` as that is meant to be replaced by a consuming bundler.
+
+### `worker`
+
+The `worker` field specifies alias files exclusive to DOM-less javascript environments like CloudFlare Workers. This allows you to create different bundles from your source code based on `typeof window` and `typeof document` and `typeof process` checks - thanks to that you can, for example, remove broser-only or Node.js-only code (just for those bundles).
+
+**Note:** Those files are not meant to be consumed by workers "as is". They just assume worker-like environment, but they still can contain for example references to `process.env.NODE_ENV` as that is meant to be replaced by a consuming bundler.

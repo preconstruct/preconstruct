@@ -15,11 +15,12 @@ let fields = [
   "module",
   "umd:main",
   "browser",
+  "worker",
 ];
 
 export function setFieldInOrder<
   Obj extends { [key: string]: any },
-  Key extends "main" | "module" | "umd:main" | "browser",
+  Key extends "main" | "module" | "umd:main" | "browser" | "worker",
   Val extends any
 >(obj: Obj, field: Key, value: Val): Obj & { [k in Key]: Val } {
   if (field in obj) {
@@ -153,6 +154,22 @@ export const validFieldsFromPkg = {
     }
     return obj;
   },
+  worker(
+    pkg: Package,
+    hasModuleBuild: boolean,
+    entrypointName: string,
+    forceStrategy?: DistFilenameStrategy
+  ) {
+    let safeName = getDistName(pkg, entrypointName, forceStrategy);
+
+    let obj = {
+      [`./dist/${safeName}.cjs.js`]: `./dist/${safeName}.worker.cjs.js`,
+    };
+    if (hasModuleBuild) {
+      obj[`./dist/${safeName}.esm.js`] = `./dist/${safeName}.worker.esm.js`;
+    }
+    return obj;
+  },
 };
 
 export const validFields = {
@@ -179,6 +196,14 @@ export const validFields = {
   },
   browser(entrypoint: Entrypoint, forceStrategy?: DistFilenameStrategy) {
     return validFieldsFromPkg.browser(
+      entrypoint.package,
+      entrypoint.json.module !== undefined,
+      entrypoint.name,
+      forceStrategy
+    );
+  },
+  worker(entrypoint: Entrypoint, forceStrategy?: DistFilenameStrategy) {
+    return validFieldsFromPkg.worker(
       entrypoint.package,
       entrypoint.json.module !== undefined,
       entrypoint.name,
