@@ -172,23 +172,23 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
       });
     });
 
-  let hasBrowserField = false;
-  let hasWorkerField = false;
+  let hasBrowserCondition = false;
+  let hasWorkerCondition = false;
   let hasExportsField = typeof pkg.entrypoints[0].json.exports == "object";
   if (hasExportsField) {
-    hasBrowserField = Object.values(pkg.entrypoints[0].json.exports!).some(
+    hasBrowserCondition = Object.values(pkg.entrypoints[0].json.exports!).some(
       (condition) =>
         typeof condition === "object" && condition.browser !== undefined
     );
-    hasWorkerField = Object.values(pkg.entrypoints[0].json.exports!).some(
+    hasWorkerCondition = Object.values(pkg.entrypoints[0].json.exports!).some(
       (condition) =>
         typeof condition === "object" && condition.worker !== undefined
     );
-  } else if (hasBrowserField === false) {
-    hasBrowserField = pkg.entrypoints[0].json.browser !== undefined;
   }
 
-  if (hasBrowserField) {
+  let hasBrowserField = pkg.entrypoints[0].json.browser !== undefined;
+
+  if (hasBrowserField || hasBrowserCondition) {
     configs.push({
       config: getRollupConfig(
         pkg,
@@ -221,7 +221,7 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
     });
   }
 
-  if (hasWorkerField) {
+  if (hasWorkerCondition) {
     configs.push({
       config: getRollupConfig(
         pkg,
