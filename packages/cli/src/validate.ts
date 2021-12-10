@@ -25,8 +25,17 @@ export const isFieldValid = {
   browser(entrypoint: Entrypoint): boolean {
     return equal(entrypoint.json.browser, validFields.browser(entrypoint));
   },
-  worker(entrypoint: Entrypoint): boolean {
-    return equal(entrypoint.json.worker, validFields.worker(entrypoint));
+  exports(entrypoint: Entrypoint): boolean {
+    const validExports = validFields.exports(entrypoint);
+    if (validExports === undefined) {
+      return false;
+    }
+    Object.keys(validExports).forEach((key) => {
+      if (!equal(validExports![key], entrypoint.json.exports![key])) {
+        return false;
+      }
+    });
+    return true;
   },
 };
 
@@ -46,7 +55,7 @@ function validateEntrypoint(entrypoint: Entrypoint, log: boolean) {
     "module",
     "umd:main",
     "browser",
-    "worker",
+    "exports",
   ] as const) {
     if (field !== "main" && entrypoint.json[field] === undefined) {
       continue;

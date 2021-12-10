@@ -93,24 +93,24 @@ async function doInit(pkg: Package) {
     }
   }
 
-  let someEntrypointsHaveAWorkerField = pkg.entrypoints.some(
-    (entrypoint) => entrypoint.json.worker !== undefined
+  let someEntrypointsHaveAExportsField = pkg.entrypoints.some(
+    (entrypoint) => entrypoint.json.exports !== undefined
   );
 
-  let someEntrypointsHaveAnInvalidWorkerField = pkg.entrypoints.some(
-    (entrypoint) => !isFieldValid.worker(entrypoint)
+  let someEntrypointsHaveAnInvalidExportsField = pkg.entrypoints.some(
+    (entrypoint) => !isFieldValid.exports(entrypoint)
   );
   if (
-    someEntrypointsHaveAWorkerField &&
-    someEntrypointsHaveAnInvalidWorkerField
+    someEntrypointsHaveAExportsField &&
+    someEntrypointsHaveAnInvalidExportsField
   ) {
-    let shouldFixWorkerField = await confirms.fixWorkerField(pkg);
+    let shouldFixWorkerField = await confirms.fixExportsField(pkg);
     if (shouldFixWorkerField) {
-      pkg.setFieldOnEntrypoints("worker");
+      pkg.setFieldOnEntrypoints("exports");
     } else {
       throw new FixableError(
         errors.fieldMustExistInAllEntrypointsIfExistsDeclinedFixDuringInit(
-          "worker"
+          "exports"
         ),
         pkg.name
       );

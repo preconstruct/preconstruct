@@ -4,12 +4,22 @@ import { Package } from "./package";
 import { JSONValue } from "./utils";
 import normalizePath from "normalize-path";
 
+export type ExportsConditions = {
+  module?: string;
+  default?: string;
+};
+
+export type ExportsItem = {
+  browser?: ExportsConditions | string;
+  worker?: ExportsConditions | string;
+} & ExportsConditions;
+
 export class Entrypoint extends Item<{
   main?: JSONValue;
   module?: JSONValue;
   "umd:main"?: JSONValue;
   browser?: JSONValue;
-  worker?: JSONValue;
+  exports?: Record<string, ExportsItem | string>;
   preconstruct: {
     source?: JSONValue;
     umdName?: JSONValue;
