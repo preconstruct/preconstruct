@@ -184,8 +184,25 @@ The `browser` field specifies alias files exclusive to browsers. This allows you
 
 **Note:** Those files are not meant to be consumed by browsers "as is". They just assume browser-like environment, but they still can contain for example references to `process.env.NODE_ENV` as that is meant to be replaced by a consuming bundler.
 
-### `worker`
+### `exports`
+The exports field allows you to specify custom conditional exports for various environments. You can use this to create custom builds targeted for these specific environments. Currently, only "browser" and "worker" conditionals are supported along with their "module" and "default" variants.
+Here is an example config using "browser" and "worker" conditionals:
 
-The `worker` field specifies alias files exclusive to DOM-less javascript environments like CloudFlare Workers. This allows you to create different bundles from your source code based on `typeof window` and `typeof document` and `typeof process` checks - thanks to that you can, for example, remove broser-only or Node.js-only code (just for those bundles).
-
-**Note:** Those files are not meant to be consumed by workers "as is". They just assume worker-like environment, but they still can contain for example references to `process.env.NODE_ENV` as that is meant to be replaced by a consuming bundler.
+```json
+{
+  "exports": {
+    ".": {
+      "worker": {
+        "module": "./dist/my-package.worker.esm.js",
+        "default": "./dist/my-package.worker.cjs.js"
+      },
+      "browser": {
+        "module": "./dist/my-package.browser.esm.js",
+        "default": "./dist/my-package.browser.cjs.js"
+      },
+      "module": "./dist/my-package.esm.js",
+      "default": "./dist/my-package.cjs.js"
+    }
+  }
+}
+```
