@@ -2,7 +2,7 @@ import { PKG_JSON_CONFIG_FIELD } from "./constants";
 import { createPromptConfirmLoader } from "./prompt";
 import chalk from "chalk";
 
-type Field = "main" | "module" | "browser" | "umd:main" | "worker";
+type Field = "main" | "module" | "browser" | "umd:main" | "exports";
 
 export let errors = {
   noSource: (source: string) =>
@@ -38,7 +38,7 @@ export let confirms = {
   fixBrowserField: createPromptConfirmLoader(
     "would you like to fix the browser build?"
   ),
-  fixWorkerField: createPromptConfirmLoader(
+  fixExportsField: createPromptConfirmLoader(
     "would you like to fix the worker build?"
   ),
   createEntrypointPkgJson: createPromptConfirmLoader(

@@ -1,5 +1,5 @@
 import normalizePath from "normalize-path";
-import { Entrypoint } from "./entrypoint";
+import { Entrypoint, ExportsConditions, ExportsItem } from "./entrypoint";
 import { Package } from "./package";
 import * as nodePath from "path";
 import { FatalError } from "./errors";
@@ -15,12 +15,12 @@ let fields = [
   "module",
   "umd:main",
   "browser",
-  "worker",
+  "exports",
 ];
 
 export function setFieldInOrder<
   Obj extends { [key: string]: any },
-  Key extends "main" | "module" | "umd:main" | "browser" | "worker",
+  Key extends "main" | "module" | "umd:main" | "browser" | "exports",
   Val extends any
 >(obj: Obj, field: Key, value: Val): Obj & { [k in Key]: Val } {
   if (field in obj) {
@@ -130,19 +130,143 @@ export const validFieldsFromPkg = {
     }
     return obj;
   },
+  exports(
+    pkg: Package,
+    hasModuleBuild: boolean,
+    hasBrowserField: boolean,
+    hasWorkerField: boolean,
+    entrypointName: string,
+    forceStrategy?: DistFilenameStrategy
+  ) {
+    let obj: Record<string, ExportsItem> = {
+      ".": exportsHelpers.root(
+        pkg,
+        hasModuleBuild,
+        entrypointName,
+        forceStrategy
+      ),
+    };
+    if (hasBrowserField) {
+      obj["."] = {
+        browser: exportsHelpers.browser(
+          pkg,
+          hasModuleBuild,
+          entrypointName,
+          forceStrategy
+        ),
+        ...obj["."],
+      };
+    }
+    if (hasWorkerField) {
+      obj["."] = {
+        worker: exportsHelpers.worker(
+          pkg,
+          hasModuleBuild,
+          entrypointName,
+          forceStrategy
+        ),
+        ...obj["."],
+      };
+    }
+    pkg.entrypoints.forEach((entrypoint) => {
+      if (entrypointName === entrypoint.name) {
+        return;
+      }
+      const entrypointPath = nodePath
+        .relative(pkg.directory, entrypoint.source)
+        .replace("src/", "")
+        .replace(/\.[tj]sx?$/, "");
+      let conditions: ExportsItem = exportsHelpers.root(
+        pkg,
+        entrypoint.json.module !== undefined,
+        entrypoint.name,
+        forceStrategy,
+        entrypointPath + "/"
+      );
+
+      if (hasBrowserField) {
+        conditions = {
+          browser: exportsHelpers.browser(
+            pkg,
+            hasModuleBuild,
+            entrypointName,
+            forceStrategy,
+            entrypointPath + "/"
+          ),
+          ...conditions,
+        };
+      }
+      if (hasWorkerField) {
+        conditions = {
+          worker: exportsHelpers.worker(
+            pkg,
+            hasModuleBuild,
+            entrypointName,
+            forceStrategy,
+            entrypointPath + "/"
+          ),
+          ...conditions,
+        };
+      }
+
+      obj[`./${entrypointPath}`] = conditions;
+    });
+    return obj;
+  },
+};
+
+const exportsHelpers = {
+  root(
+    pkg: Package,
+    hasModuleBuild: boolean,
+    entrypointName: string,
+    forceStrategy?: DistFilenameStrategy,
+    prefix: string = ""
+  ) {
+    let safeName = getDistName(pkg, entrypointName, forceStrategy);
+
+    let obj: ExportsConditions = {
+      default: `./${prefix}dist/${safeName}.cjs.js`,
+    };
+    if (hasModuleBuild) {
+      obj = {
+        module: `./${prefix}dist/${safeName}.esm.js`,
+        ...obj,
+      };
+    }
+    return obj;
+  },
+  browser(
+    pkg: Package,
+    hasModuleBuild: boolean,
+    entrypointName: string,
+    forceStrategy?: DistFilenameStrategy,
+    prefix: string = ""
+  ) {
+    let safeName = getDistName(pkg, entrypointName, forceStrategy);
+
+    let obj: ExportsConditions = {
+      default: `./${prefix}dist/${safeName}.browser.cjs.js`,
+    };
+    if (hasModuleBuild) {
+      obj = { module: `./${prefix}dist/${safeName}.browser.esm.js`, ...obj };
+    }
+    return obj;
+  },
   worker(
     pkg: Package,
     hasModuleBuild: boolean,
     entrypointName: string,
-    forceStrategy?: DistFilenameStrategy
+    forceStrategy?: DistFilenameStrategy,
+    prefix: string = ""
   ) {
     let safeName = getDistName(pkg, entrypointName, forceStrategy);
 
-    let obj = {
-      [`./dist/${safeName}.cjs.js`]: `./dist/${safeName}.worker.cjs.js`,
+    let obj: ExportsConditions = {
+      default: `./${prefix}dist/${safeName}.worker.cjs.js`,
     };
     if (hasModuleBuild) {
-      obj[`./dist/${safeName}.esm.js`] = `./dist/${safeName}.worker.esm.js`;
+      obj = { module: `./${prefix}dist/${safeName}.worker.esm.js`, ...obj };
     }
     return obj;
   },
@@ -165,10 +289,24 @@ export const validFields = {
       entrypoint.name
     );
   },
-  worker(entrypoint: Entrypoint, forceStrategy?: DistFilenameStrategy) {
-    return validFieldsFromPkg.worker(
+  exports(entrypoint: Entrypoint, forceStrategy?: DistFilenameStrategy) {
+    if (typeof entrypoint.json.exports === "undefined") {
+      return;
+    }
+    const conditions = Object.values(entrypoint.json.exports);
+    const hasBrowserField = conditions.some(
+      (condition) =>
+        typeof condition === "object" && condition.browser !== undefined
+    );
+    const hasWorkerField = conditions.some(
+      (condition) =>
+        typeof condition === "object" && condition.worker !== undefined
+    );
+    return validFieldsFromPkg.exports(
       entrypoint.package,
       entrypoint.json.module !== undefined,
+      hasBrowserField,
+      hasWorkerField,
       entrypoint.name,
       forceStrategy
     );

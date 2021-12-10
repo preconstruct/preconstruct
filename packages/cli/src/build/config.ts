@@ -172,7 +172,21 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
       });
     });
 
-  let hasBrowserField = pkg.entrypoints[0].json.browser !== undefined;
+  let hasBrowserField = false;
+  let hasWorkerField = false;
+  let hasExportsField = typeof pkg.entrypoints[0].json.exports == "object";
+  if (hasExportsField) {
+    hasBrowserField = Object.values(pkg.entrypoints[0].json.exports!).some(
+      (condition) =>
+        typeof condition === "object" && condition.browser !== undefined
+    );
+    hasWorkerField = Object.values(pkg.entrypoints[0].json.exports!).some(
+      (condition) =>
+        typeof condition === "object" && condition.worker !== undefined
+    );
+  } else if (hasBrowserField === false) {
+    hasBrowserField = pkg.entrypoints[0].json.browser !== undefined;
+  }
 
   if (hasBrowserField) {
     configs.push({
@@ -206,8 +220,6 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
       ],
     });
   }
-
-  let hasWorkerField = pkg.entrypoints[0].json.worker !== undefined;
 
   if (hasWorkerField) {
     configs.push({

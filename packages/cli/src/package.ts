@@ -4,7 +4,7 @@ import * as fs from "fs-extra";
 import nodePath from "path";
 import { Item } from "./item";
 import { BatchError, FatalError } from "./errors";
-import { Entrypoint } from "./entrypoint";
+import { Entrypoint, ExportsItem } from "./entrypoint";
 import jsonParse from "parse-json";
 
 import { errors, confirms } from "./messages";
@@ -22,35 +22,65 @@ import normalizePath from "normalize-path";
 function getFieldsUsedInEntrypoints(
   descriptors: { contents: string | undefined; filename: string }[]
 ) {
+  let hasBrowserField = false;
+  let hasWorkerField = false;
   const fields = new Set<keyof typeof validFields>(["main"]);
   for (let descriptor of descriptors) {
     if (descriptor.contents !== undefined) {
       let parsed = jsonParse(descriptor.contents, descriptor.filename);
-      for (let field of ["module", "umd:main", "browser", "worker"] as const) {
-        if (parsed[field] !== undefined) {
+      for (let field of ["module", "umd:main", "browser", "exports"] as const) {
+        const value = parsed[field];
+        if (value !== undefined) {
           fields.add(field);
+          if (field === "exports" && value["."]) {
+            const conditions: ExportsItem[] = Object.values(value["."]);
+            hasBrowserField =
+              hasBrowserField ||
+              conditions.some(
+                (condition) =>
+                  typeof condition === "object" &&
+                  condition.browser !== undefined
+              );
+            hasWorkerField =
+              hasWorkerField ||
+              conditions.some(
+                (condition) =>
+                  typeof condition === "object" &&
+                  condition.worker !== undefined
+              );
+          }
         }
       }
     }
   }
-  return fields;
+  return [fields, hasBrowserField, hasWorkerField];
 }
 
 function getPlainEntrypointContent(
   pkg: Package,
   fields: Set<keyof typeof validFields>,
   entrypointDir: string,
-  indent: string
+  indent: string,
+  hasBrowserField: boolean,
+  hasWorkerField: boolean
 ) {
   const obj: Partial<Record<
     keyof typeof validFields,
-    string | Record<string, string>
+    string | Record<string, string | ExportsItem>
   >> = {};
   for (const field of fields) {
-    if (field === "browser" || field === "worker") {
+    if (field === "browser") {
       obj[field] = validFieldsFromPkg[field](
         pkg,
         fields.has("module"),
+        getEntrypointName(pkg, entrypointDir)
+      );
+    } else if (field === "exports") {
+      obj[field] = validFieldsFromPkg[field](
+        pkg,
+        fields.has("module"),
+        hasBrowserField,
+        hasWorkerField,
         getEntrypointName(pkg, entrypointDir)
       );
     } else {
@@ -72,7 +102,9 @@ function createEntrypoints(
     sourceFile: string;
   }[]
 ) {
-  let fields = getFieldsUsedInEntrypoints(descriptors);
+  let [fields, hasBrowserField, hasWorkerField] = getFieldsUsedInEntrypoints(
+    descriptors
+  );
 
   return Promise.all(
     descriptors.map(async ({ filename, contents, hasAccepted, sourceFile }) => {
@@ -93,7 +125,9 @@ function createEntrypoints(
           pkg,
           fields,
           nodePath.dirname(filename),
-          pkg.indent
+          pkg.indent,
+          hasBrowserField,
+          hasWorkerField
         );
         await fs.outputFile(filename, contents);
       }
@@ -265,7 +299,7 @@ export class Package extends Item<{
   }
 
   setFieldOnEntrypoints(
-    field: "main" | "browser" | "module" | "umd:main" | "worker"
+    field: "main" | "browser" | "module" | "umd:main" | "exports"
   ) {
     this.entrypoints.forEach((entrypoint) => {
       entrypoint.json = setFieldInOrder(
