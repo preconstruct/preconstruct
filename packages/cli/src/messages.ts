@@ -39,7 +39,7 @@ export let confirms = {
     "would you like to fix the browser build?"
   ),
   fixExportsField: createPromptConfirmLoader(
-    "would you like to fix the worker build?"
+    "would you like to fix the exports build(s)?"
   ),
   createEntrypointPkgJson: createPromptConfirmLoader(
     "A package.json file does not exist for this entrypoint, would you like to create one automatically?"
