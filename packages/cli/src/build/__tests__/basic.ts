@@ -154,7 +154,7 @@ test("typescript declarationMap", async () => {
           //# sourceMappingURL=index.d.ts.map
           ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/index.d.ts.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
           {"version":3,"file":"index.d.ts","sourceRoot":"../../../src","sources":["index.ts"],"names":[],"mappings":"AAAA,eAAO,MAAM,KAAK,OAAiB,CAAC"}
-          ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript-declarationMap.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+          ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript-declarationMap.cjs.d.ts, dist/typescript-declarationMap.esm.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
           export * from "./declarations/src/index";
 
           ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript-declarationMap.cjs.dev.js, dist/typescript-declarationMap.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
@@ -175,10 +175,19 @@ test("typescript declarationMap", async () => {
             module.exports = require("./typescript-declarationMap.cjs.dev.js");
           }
 
-          ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript-declarationMap.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+          ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript-declarationMap.esm.dev.js, dist/typescript-declarationMap.esm.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
           const thing = "wow";
 
           export { thing };
+
+          ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript-declarationMap.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+          'use strict';
+
+          if (process.env.NODE_ENV === "production") {
+            module.exports = require("./typescript-declarationMap.esm.prod.js");
+          } else {
+            module.exports = require("./typescript-declarationMap.esm.dev.js");
+          }
 
         `);
 });
@@ -362,7 +371,7 @@ test("imports helpers from @babel/runtime without @babel/plugin-transform-runtim
       module.exports = require("./test.cjs.dev.js");
     }
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.esm.dev.js, dist/test.esm.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     import _classCallCheck from '@babel/runtime/helpers/esm/classCallCheck';
 
     var Other = function Other() {
@@ -374,6 +383,15 @@ test("imports helpers from @babel/runtime without @babel/plugin-transform-runtim
     };
 
     export { Other, Thing };
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./test.esm.prod.js");
+    } else {
+      module.exports = require("./test.esm.dev.js");
+    }
 
   `);
 });
@@ -423,7 +441,7 @@ test("imports helpers from @babel/runtime-corejs2 without @babel/plugin-transfor
       module.exports = require("./test.cjs.dev.js");
     }
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.esm.dev.js, dist/test.esm.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     import _classCallCheck from '@babel/runtime-corejs2/helpers/esm/classCallCheck';
 
     var Other = function Other() {
@@ -435,6 +453,15 @@ test("imports helpers from @babel/runtime-corejs2 without @babel/plugin-transfor
     };
 
     export { Other, Thing };
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./test.esm.prod.js");
+    } else {
+      module.exports = require("./test.esm.dev.js");
+    }
 
   `);
 });
@@ -484,7 +511,7 @@ test("imports helpers from @babel/runtime-corejs3 without @babel/plugin-transfor
       module.exports = require("./test.cjs.dev.js");
     }
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.esm.dev.js, dist/test.esm.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     import _classCallCheck from '@babel/runtime-corejs3/helpers/esm/classCallCheck';
 
     var Other = function Other() {
@@ -496,6 +523,15 @@ test("imports helpers from @babel/runtime-corejs3 without @babel/plugin-transfor
     };
 
     export { Other, Thing };
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./test.esm.prod.js");
+    } else {
+      module.exports = require("./test.esm.dev.js");
+    }
 
   `);
 });
@@ -852,10 +888,19 @@ test("new dist filenames", async () => {
             module.exports = require("./scope-test.cjs.dev.js");
           }
 
-          ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+          ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.esm.dev.js, dist/scope-test.esm.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
           var index = "something";
 
           export default index;
+
+          ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+          'use strict';
+
+          if (process.env.NODE_ENV === "production") {
+            module.exports = require("./scope-test.esm.prod.js");
+          } else {
+            module.exports = require("./scope-test.esm.dev.js");
+          }
 
         `);
 });

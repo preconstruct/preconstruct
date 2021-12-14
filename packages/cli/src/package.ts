@@ -4,7 +4,7 @@ import * as fs from "fs-extra";
 import nodePath from "path";
 import { Item } from "./item";
 import { BatchError, FatalError } from "./errors";
-import { Entrypoint, ExportsItem } from "./entrypoint";
+import { Entrypoint, ExportsConditions } from "./entrypoint";
 import jsonParse from "parse-json";
 
 import { errors, confirms } from "./messages";
@@ -21,7 +21,7 @@ import normalizePath from "normalize-path";
 
 function getFieldsUsedInEntrypoints(
   descriptors: { contents: string | undefined; filename: string }[]
-) {
+): [Set<keyof typeof validFields>, boolean, boolean] {
   let hasBrowserField = false;
   let hasWorkerField = false;
   const fields = new Set<keyof typeof validFields>(["main"]);
@@ -33,7 +33,7 @@ function getFieldsUsedInEntrypoints(
         if (value !== undefined) {
           fields.add(field);
           if (field === "exports" && value["."]) {
-            const conditions: ExportsItem[] = Object.values(value["."]);
+            const conditions: ExportsConditions[] = Object.values(value["."]);
             hasBrowserField =
               hasBrowserField ||
               conditions.some(
@@ -66,7 +66,7 @@ function getPlainEntrypointContent(
 ) {
   const obj: Partial<Record<
     keyof typeof validFields,
-    string | Record<string, string | ExportsItem>
+    string | Record<string, string | ExportsConditions>
   >> = {};
   for (const field of fields) {
     if (field === "browser") {

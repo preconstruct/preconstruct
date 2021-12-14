@@ -1,6 +1,38 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`browser no module: dist/browser-no-module.browser.cjs.dev.js 1`] = `
+"'use strict';
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+let thing = \\"wow\\";
+
+{
+  thing = \\"something\\";
+}
+
+{
+  thing += \\"other\\";
+}
+
+var thing$1 = thing;
+
+exports.default = thing$1;
+"
+`;
+
 exports[`browser no module: dist/browser-no-module.browser.cjs.js 1`] = `
+"'use strict';
+
+if (process.env.NODE_ENV === \\"production\\") {
+  module.exports = require(\\"./browser-no-module.browser.cjs.prod.js\\");
+} else {
+  module.exports = require(\\"./browser-no-module.browser.cjs.dev.js\\");
+}
+"
+`;
+
+exports[`browser no module: dist/browser-no-module.browser.cjs.prod.js 1`] = `
 "'use strict';
 
 Object.defineProperty(exports, '__esModule', { value: true });
@@ -223,7 +255,42 @@ exports.createStore = createStore;
 "
 `;
 
+exports[`typescript with forced dts emit: dist/typescript-force-dts-emit.esm.d.ts 1`] = `
+"export * from \\"./declarations/src/index\\";
+"
+`;
+
+exports[`typescript with forced dts emit: dist/typescript-force-dts-emit.esm.dev.js 1`] = `
+"import { combineReducers, configureStore } from '@reduxjs/toolkit';
+
+// @ts-ignore (installed during test)
+var rootReducer = combineReducers({
+  /* blah blah blah */
+});
+
+// @ts-ignore (installed during test)
+function createStore() {
+  return configureStore({
+    reducer: rootReducer
+  });
+}
+
+export { createStore };
+"
+`;
+
 exports[`typescript with forced dts emit: dist/typescript-force-dts-emit.esm.js 1`] = `
+"'use strict';
+
+if (process.env.NODE_ENV === \\"production\\") {
+  module.exports = require(\\"./typescript-force-dts-emit.esm.prod.js\\");
+} else {
+  module.exports = require(\\"./typescript-force-dts-emit.esm.dev.js\\");
+}
+"
+`;
+
+exports[`typescript with forced dts emit: dist/typescript-force-dts-emit.esm.prod.js 1`] = `
 "import { combineReducers, configureStore } from '@reduxjs/toolkit';
 
 // @ts-ignore (installed during test)
@@ -283,7 +350,29 @@ exports.default = Foo;
 "
 `;
 
+exports[`using external @babel/runtime helpers: dist/external-babel-runtime.esm.dev.js 1`] = `
+"import _classCallCheck from '@babel/runtime/helpers/esm/classCallCheck';
+
+var Foo = function Foo() {
+  _classCallCheck(this, Foo);
+};
+
+export default Foo;
+"
+`;
+
 exports[`using external @babel/runtime helpers: dist/external-babel-runtime.esm.js 1`] = `
+"'use strict';
+
+if (process.env.NODE_ENV === \\"production\\") {
+  module.exports = require(\\"./external-babel-runtime.esm.prod.js\\");
+} else {
+  module.exports = require(\\"./external-babel-runtime.esm.dev.js\\");
+}
+"
+`;
+
+exports[`using external @babel/runtime helpers: dist/external-babel-runtime.esm.prod.js 1`] = `
 "import _classCallCheck from '@babel/runtime/helpers/esm/classCallCheck';
 
 var Foo = function Foo() {

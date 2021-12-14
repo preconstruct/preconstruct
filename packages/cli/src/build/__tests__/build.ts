@@ -488,7 +488,7 @@ test("json", async () => {
       module.exports = require("./json-package.cjs.dev.js");
     }
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/json-package.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/json-package.esm.dev.js, dist/json-package.esm.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     var changesetsSchema = {
     	$schema: "http://json-schema.org/draft-07/schema#",
     	type: "object",
@@ -502,6 +502,15 @@ test("json", async () => {
     let schema = changesetsSchema;
 
     export { schema };
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/json-package.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./json-package.esm.prod.js");
+    } else {
+      module.exports = require("./json-package.esm.dev.js");
+    }
 
   `);
 });
