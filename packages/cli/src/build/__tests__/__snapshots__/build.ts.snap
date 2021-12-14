@@ -49,7 +49,35 @@ exports.something = a;
 "
 `;
 
+exports[`flow: flow.esm.dev.js 1`] = `
+"var a = \\"wow\\";
+
+function doSomething(arg) {
+  return \\"something\\" + arg;
+}
+
+export { doSomething, a as something };
+"
+`;
+
 exports[`flow: flow.esm.js 1`] = `
+"'use strict';
+
+if (process.env.NODE_ENV === \\"production\\") {
+  module.exports = require(\\"./flow.esm.prod.js\\");
+} else {
+  module.exports = require(\\"./flow.esm.dev.js\\");
+}
+"
+`;
+
+exports[`flow: flow.esm.js.flow 1`] = `
+"// @flow
+export * from \\"../src/index.js\\";
+"
+`;
+
+exports[`flow: flow.esm.prod.js 1`] = `
 "var a = \\"wow\\";
 
 function doSomething(arg) {
@@ -108,7 +136,36 @@ exports.doSomething = doSomething;
 "
 `;
 
+exports[`flow: flow-export-default.esm.dev.js 1`] = `
+"function doSomething(arg) {
+  return \\"something\\" + arg;
+}
+var index = \\"wow\\";
+
+export default index;
+export { doSomething };
+"
+`;
+
 exports[`flow: flow-export-default.esm.js 1`] = `
+"'use strict';
+
+if (process.env.NODE_ENV === \\"production\\") {
+  module.exports = require(\\"./flow-export-default.esm.prod.js\\");
+} else {
+  module.exports = require(\\"./flow-export-default.esm.dev.js\\");
+}
+"
+`;
+
+exports[`flow: flow-export-default.esm.js.flow 1`] = `
+"// @flow
+export * from \\"../src/index.js\\";
+export { default } from \\"../src/index.js\\";
+"
+`;
+
+exports[`flow: flow-export-default.esm.prod.js 1`] = `
 "function doSomething(arg) {
   return \\"something\\" + arg;
 }
@@ -152,7 +209,25 @@ exports.default = index;
 "
 `;
 
+exports[`monorepo single package: some-scope-package-two-single-package.esm.dev.js 1`] = `
+"var index = 2;
+
+export default index;
+"
+`;
+
 exports[`monorepo single package: some-scope-package-two-single-package.esm.js 1`] = `
+"'use strict';
+
+if (process.env.NODE_ENV === \\"production\\") {
+  module.exports = require(\\"./some-scope-package-two-single-package.esm.prod.js\\");
+} else {
+  module.exports = require(\\"./some-scope-package-two-single-package.esm.dev.js\\");
+}
+"
+`;
+
+exports[`monorepo single package: some-scope-package-two-single-package.esm.prod.js 1`] = `
 "var index = 2;
 
 export default index;
@@ -336,7 +411,25 @@ exports.default = index;
 "
 `;
 
+exports[`monorepo: some-scope-package-one.esm.dev.js 1`] = `
+"var index = 1;
+
+export default index;
+"
+`;
+
 exports[`monorepo: some-scope-package-one.esm.js 1`] = `
+"'use strict';
+
+if (process.env.NODE_ENV === \\"production\\") {
+  module.exports = require(\\"./some-scope-package-one.esm.prod.js\\");
+} else {
+  module.exports = require(\\"./some-scope-package-one.esm.dev.js\\");
+}
+"
+`;
+
+exports[`monorepo: some-scope-package-one.esm.prod.js 1`] = `
 "var index = 1;
 
 export default index;
@@ -376,7 +469,25 @@ exports.default = index;
 "
 `;
 
+exports[`monorepo: some-scope-package-two.esm.dev.js 1`] = `
+"var index = 2;
+
+export default index;
+"
+`;
+
 exports[`monorepo: some-scope-package-two.esm.js 1`] = `
+"'use strict';
+
+if (process.env.NODE_ENV === \\"production\\") {
+  module.exports = require(\\"./some-scope-package-two.esm.prod.js\\");
+} else {
+  module.exports = require(\\"./some-scope-package-two.esm.dev.js\\");
+}
+"
+`;
+
+exports[`monorepo: some-scope-package-two.esm.prod.js 1`] = `
 "var index = 2;
 
 export default index;

@@ -1,5 +1,5 @@
 import normalizePath from "normalize-path";
-import { Entrypoint, ExportsConditions, ExportsItem } from "./entrypoint";
+import { Entrypoint, ExportsConditions } from "./entrypoint";
 import { Package } from "./package";
 import * as nodePath from "path";
 import { FatalError } from "./errors";
@@ -161,37 +161,39 @@ export const validFieldsFromPkg = {
     hasWorkerField: boolean,
     entrypointName: string,
     forceStrategy?: DistFilenameStrategy
-  ) {
-    let obj: Record<string, ExportsItem> = {
-      ".": exportsHelpers.root(
-        pkg,
-        hasModuleBuild,
-        entrypointName,
-        forceStrategy
-      ),
-    };
+  ): Record<string, ExportsConditions | string> {
+    let output: Record<string, ExportsConditions> = {};
+    let obj: ExportsConditions = exportsHelpers.root(
+      pkg,
+      hasModuleBuild,
+      entrypointName,
+      forceStrategy
+    );
     if (hasBrowserField) {
-      obj["."] = {
-        browser: exportsHelpers.browser(
+      obj = {
+        browser: exportsHelpers.target(
           pkg,
           hasModuleBuild,
           entrypointName,
-          forceStrategy
+          forceStrategy,
+          "browser"
         ),
-        ...obj["."],
+        ...obj,
       };
     }
     if (hasWorkerField) {
-      obj["."] = {
-        worker: exportsHelpers.worker(
+      obj = {
+        worker: exportsHelpers.target(
           pkg,
           hasModuleBuild,
           entrypointName,
-          forceStrategy
+          forceStrategy,
+          "worker"
         ),
-        ...obj["."],
+        ...obj,
       };
     }
+    output["."] = obj;
     pkg.entrypoints.forEach((entrypoint) => {
       if (entrypointName === entrypoint.name) {
         return;
@@ -200,7 +202,8 @@ export const validFieldsFromPkg = {
         .relative(pkg.directory, entrypoint.source)
         .replace("src/", "")
         .replace(/\.[tj]sx?$/, "");
-      let conditions: ExportsItem = exportsHelpers.root(
+
+      let conditions: ExportsConditions = exportsHelpers.root(
         pkg,
         entrypoint.json.module !== undefined,
         entrypoint.name,
@@ -210,11 +213,12 @@ export const validFieldsFromPkg = {
 
       if (hasBrowserField) {
         conditions = {
-          browser: exportsHelpers.browser(
+          browser: exportsHelpers.target(
             pkg,
             hasModuleBuild,
-            entrypointName,
+            entrypoint.name,
             forceStrategy,
+            "browser",
             entrypointPath + "/"
           ),
           ...conditions,
@@ -222,20 +226,24 @@ export const validFieldsFromPkg = {
       }
       if (hasWorkerField) {
         conditions = {
-          worker: exportsHelpers.worker(
+          worker: exportsHelpers.target(
             pkg,
             hasModuleBuild,
-            entrypointName,
+            entrypoint.name,
             forceStrategy,
+            "worker",
             entrypointPath + "/"
           ),
           ...conditions,
         };
       }
-
-      obj[`./${entrypointPath}`] = conditions;
+      output[`./${entrypointPath}`] = conditions;
     });
-    return obj;
+    return {
+      "./package.json": "./package.json",
+      ...output,
+      "./": "./",
+    };
   },
 };
 
@@ -247,50 +255,79 @@ const exportsHelpers = {
     forceStrategy?: DistFilenameStrategy,
     prefix: string = ""
   ) {
+    return exportsHelpers.target(
+      pkg,
+      hasModuleBuild,
+      entrypointName,
+      forceStrategy,
+      "",
+      prefix
+    );
+  },
+  target(
+    pkg: Package,
+    hasModuleBuild: boolean,
+    entrypointName: string,
+    forceStrategy?: DistFilenameStrategy,
+    target: string = "",
+    prefix: string = ""
+  ) {
+    const obj = exportsHelpers.env(
+      pkg,
+      hasModuleBuild,
+      entrypointName,
+      forceStrategy,
+      "",
+      target,
+      prefix
+    );
+    const production = exportsHelpers.env(
+      pkg,
+      hasModuleBuild,
+      entrypointName,
+      forceStrategy,
+      "prod",
+      target,
+      prefix
+    );
+    const development = exportsHelpers.env(
+      pkg,
+      hasModuleBuild,
+      entrypointName,
+      forceStrategy,
+      "dev",
+      target,
+      prefix
+    );
+    return {
+      production,
+      development,
+      ...obj,
+    };
+  },
+  env(
+    pkg: Package,
+    hasModuleBuild: boolean,
+    entrypointName: string,
+    forceStrategy?: DistFilenameStrategy,
+    env: string = "",
+    target: string = "",
+    prefix: string = ""
+  ) {
     let safeName = getDistName(pkg, entrypointName, forceStrategy);
 
     let obj: ExportsConditions = {
-      default: `./${prefix}dist/${safeName}.cjs.js`,
+      default: `./${prefix}dist/${safeName}.${target ? `${target}.` : ""}cjs.${
+        env ? `${env}.` : ""
+      }js`,
     };
     if (hasModuleBuild) {
       obj = {
-        module: `./${prefix}dist/${safeName}.esm.js`,
+        module: `./${prefix}dist/${safeName}.${target ? `${target}.` : ""}esm.${
+          env ? `${env}.` : ""
+        }js`,
         ...obj,
       };
-    }
-    return obj;
-  },
-  browser(
-    pkg: Package,
-    hasModuleBuild: boolean,
-    entrypointName: string,
-    forceStrategy?: DistFilenameStrategy,
-    prefix: string = ""
-  ) {
-    let safeName = getDistName(pkg, entrypointName, forceStrategy);
-
-    let obj: ExportsConditions = {
-      default: `./${prefix}dist/${safeName}.browser.cjs.js`,
-    };
-    if (hasModuleBuild) {
-      obj = { module: `./${prefix}dist/${safeName}.browser.esm.js`, ...obj };
-    }
-    return obj;
-  },
-  worker(
-    pkg: Package,
-    hasModuleBuild: boolean,
-    entrypointName: string,
-    forceStrategy?: DistFilenameStrategy,
-    prefix: string = ""
-  ) {
-    let safeName = getDistName(pkg, entrypointName, forceStrategy);
-
-    let obj: ExportsConditions = {
-      default: `./${prefix}dist/${safeName}.worker.cjs.js`,
-    };
-    if (hasModuleBuild) {
-      obj = { module: `./${prefix}dist/${safeName}.worker.esm.js`, ...obj };
     }
     return obj;
   },

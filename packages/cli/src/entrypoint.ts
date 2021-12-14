@@ -5,21 +5,48 @@ import { JSONValue } from "./utils";
 import normalizePath from "normalize-path";
 
 export type ExportsConditions = {
+  worker?: {
+    production: {
+      module?: string;
+      default: string;
+    };
+    development: {
+      module?: string;
+      default: string;
+    };
+    module?: string;
+    default: string;
+  };
+  browser?: {
+    production: {
+      module?: string;
+      default: string;
+    };
+    development: {
+      module?: string;
+      default: string;
+    };
+    module?: string;
+    default: string;
+  };
+  production?: {
+    module?: string;
+    default: string;
+  };
+  development?: {
+    module?: string;
+    default: string;
+  };
   module?: string;
-  default?: string;
+  default: string;
 };
-
-export type ExportsItem = {
-  browser?: ExportsConditions | string;
-  worker?: ExportsConditions | string;
-} & ExportsConditions;
 
 export class Entrypoint extends Item<{
   main?: JSONValue;
   module?: JSONValue;
   "umd:main"?: JSONValue;
   browser?: JSONValue;
-  exports?: Record<string, ExportsItem | string>;
+  exports?: Record<string, ExportsConditions | string>;
   preconstruct: {
     source?: JSONValue;
     umdName?: JSONValue;

@@ -2,13 +2,7 @@
   "name": "@preconstruct/cli",
   "version": "2.1.5",
   "description": "Dev and build your code painlessly in monorepos",
-  "files": [
-    "bin.js",
-    "cli",
-    "worker",
-    "!**/*.d.ts",
-    "dist"
-  ],
+  "files": ["bin.js", "cli", "worker", "!**/*.d.ts", "dist"],
   "bin": {
     "preconstruct": "./bin.js"
   },
@@ -54,10 +48,7 @@
     "v8-compile-cache": "^2.1.1"
   },
   "preconstruct": {
-    "entrypoints": [
-      "cli",
-      "worker"
-    ]
+    "entrypoints": ["cli", "worker"]
   },
   "devDependencies": {
     "escape-string-regexp": "^4.0.0",

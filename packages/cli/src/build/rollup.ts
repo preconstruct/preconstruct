@@ -31,29 +31,27 @@ const makeExternalPredicate = (externalArr: string[]) => {
   return (id: string) => pattern.test(id);
 };
 
-export type RollupConfigType =
-  | "umd"
-  | "browser"
-  | "node-dev"
-  | "node-prod"
-  | "worker";
+export type RollupConfigEnvironment = "dev" | "prod" | "umd";
+
+export type RollupConfigType = "browser" | "node" | "node" | "worker";
 
 export let getRollupConfig = (
   pkg: Package,
   entrypoints: Array<Entrypoint>,
   aliases: Aliases,
   type: RollupConfigType,
+  env: RollupConfigEnvironment,
   reportTransformedFile: (filename: string) => void
 ): RollupOptions => {
   let external = [];
   if (pkg.json.peerDependencies) {
     external.push(...Object.keys(pkg.json.peerDependencies));
   }
-  if (pkg.json.dependencies && type !== "umd") {
+  if (pkg.json.dependencies && env !== "umd") {
     external.push(...Object.keys(pkg.json.dependencies));
   }
 
-  if (type === "node-dev" || type === "node-prod") {
+  if (type === "node") {
     external.push(...builtInModules);
   }
 
@@ -111,7 +109,7 @@ export let getRollupConfig = (
           }
         }
         case "THIS_IS_UNDEFINED": {
-          if (type === "umd") {
+          if (env === "umd") {
             return;
           }
           warnings.push(
@@ -145,8 +143,8 @@ export let getRollupConfig = (
           }
         },
       } as Plugin,
-      type === "node-prod" && flowAndNodeDevProdEntry(pkg, warnings),
-      type === "node-prod" && typescriptDeclarations(pkg),
+      env === "prod" && flowAndNodeDevProdEntry(pkg, warnings),
+      env === "prod" && typescriptDeclarations(pkg),
       babel({
         cwd: pkg.project.directory,
         reportTransformedFile,
@@ -163,7 +161,7 @@ export let getRollupConfig = (
           }
         })(),
       }),
-      type === "umd" &&
+      env === "umd" &&
         cjs({
           include: ["**/node_modules/**", "node_modules/**"],
         }),
@@ -172,25 +170,25 @@ export let getRollupConfig = (
       json({
         namedExports: false,
       }),
-      type === "umd" &&
+      env === "umd" &&
         alias({
           entries: aliases,
         }),
       resolve({
         extensions: EXTENSIONS,
-        browser: type === "umd",
+        browser: type === "browser" || type === "worker",
         customResolveOptions: {
-          moduleDirectory: type === "umd" ? "node_modules" : [],
+          moduleDirectory: env === "umd" ? "node_modules" : [],
         },
       }),
-      type === "umd" && inlineProcessEnvNodeEnv({ sourceMap: true }),
-      type === "umd" &&
+      env === "umd" && inlineProcessEnvNodeEnv({ sourceMap: true }),
+      env === "umd" &&
         terser({
           sourceMap: true,
           compress: true,
         }),
-      type === "node-prod" && inlineProcessEnvNodeEnv({ sourceMap: false }),
-      (type === "browser" || type === "umd") &&
+      env === "prod" && inlineProcessEnvNodeEnv({ sourceMap: false }),
+      type === "browser" &&
         replace({
           values: {
             ["typeof " + "document"]: JSON.stringify("object"),

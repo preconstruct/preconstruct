@@ -26,16 +26,7 @@ export const isFieldValid = {
     return equal(entrypoint.json.browser, validFields.browser(entrypoint));
   },
   exports(entrypoint: Entrypoint): boolean {
-    const validExports = validFields.exports(entrypoint);
-    if (validExports === undefined) {
-      return false;
-    }
-    Object.keys(validExports).forEach((key) => {
-      if (!equal(validExports![key], entrypoint.json.exports![key])) {
-        return false;
-      }
-    });
-    return true;
+    return equal(entrypoint.json.exports, validFields.exports(entrypoint));
   },
 };
 
