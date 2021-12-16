@@ -51,6 +51,10 @@ function validateEntrypoint(entrypoint: Entrypoint, log: boolean) {
     if (field !== "main" && entrypoint.json[field] === undefined) {
       continue;
     }
+    if (field === "exports" && !entrypoint.package.json.preconstruct.exports) {
+      // exports field is currently op-in
+      continue;
+    }
     if (!isFieldValid[field](entrypoint)) {
       let isUsingOldDistFilenames: boolean;
       let prevDistFilenameStrategy =

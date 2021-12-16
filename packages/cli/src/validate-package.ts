@@ -15,7 +15,9 @@ export async function fixPackage(pkg: Package) {
     module: pkg.entrypoints.some((x) => x.json.module !== undefined),
     "umd:main": pkg.entrypoints.some((x) => x.json["umd:main"] !== undefined),
     browser: pkg.entrypoints.some((x) => x.json.browser !== undefined),
-    exports: pkg.entrypoints.some((x) => x.json.exports !== undefined),
+    exports: pkg.json.preconstruct.exports
+      ? pkg.entrypoints.some((x) => x.json.exports !== undefined)
+      : false,
   };
 
   keys(fields)
@@ -42,6 +44,7 @@ export function validatePackage(pkg: Package) {
     module: pkg.entrypoints[0].json.module !== undefined,
     "umd:main": pkg.entrypoints[0].json["umd:main"] !== undefined,
     browser: pkg.entrypoints[0].json.browser !== undefined,
+    // "exports" is missing because it is not a requirement for other entrypoints to have an exports field.
   };
 
   pkg.entrypoints.forEach((entrypoint) => {

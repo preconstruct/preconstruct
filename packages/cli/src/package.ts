@@ -76,13 +76,15 @@ function getPlainEntrypointContent(
         getEntrypointName(pkg, entrypointDir)
       );
     } else if (field === "exports") {
-      obj[field] = validFieldsFromPkg[field](
-        pkg,
-        fields.has("module"),
-        hasBrowserField,
-        hasWorkerField,
-        getEntrypointName(pkg, entrypointDir)
-      );
+      if (pkg.json.preconstruct.exports) {
+        obj[field] = validFieldsFromPkg[field](
+          pkg,
+          fields.has("module"),
+          hasBrowserField,
+          hasWorkerField,
+          getEntrypointName(pkg, entrypointDir)
+        );
+      }
     } else {
       obj[field] = validFieldsFromPkg[field](
         pkg,
@@ -139,6 +141,7 @@ function createEntrypoints(
 export class Package extends Item<{
   name?: JSONValue;
   preconstruct: {
+    exports?: boolean | { extra?: Record<string, ExportsConditions | string> };
     entrypoints?: JSONValue;
   };
   dependencies?: Record<string, string>;

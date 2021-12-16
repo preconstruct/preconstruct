@@ -93,27 +93,30 @@ async function doInit(pkg: Package) {
     }
   }
 
-  let someEntrypointsHaveAExportsField = pkg.entrypoints.some(
-    (entrypoint) => entrypoint.json.exports !== undefined
-  );
+  // usage of package exports is currently opt-in
+  if (pkg.json.preconstruct.exports) {
+    let someEntrypointsHaveAExportsField = pkg.entrypoints.some(
+      (entrypoint) => entrypoint.json.exports !== undefined
+    );
 
-  let someEntrypointsHaveAnInvalidExportsField = pkg.entrypoints.some(
-    (entrypoint) => !isFieldValid.exports(entrypoint)
-  );
-  if (
-    someEntrypointsHaveAExportsField &&
-    someEntrypointsHaveAnInvalidExportsField
-  ) {
-    let shouldFixWorkerField = await confirms.fixExportsField(pkg);
-    if (shouldFixWorkerField) {
-      pkg.setFieldOnEntrypoints("exports");
-    } else {
-      throw new FixableError(
-        errors.fieldMustExistInAllEntrypointsIfExistsDeclinedFixDuringInit(
-          "exports"
-        ),
-        pkg.name
-      );
+    let someEntrypointsHaveAnInvalidExportsField = pkg.entrypoints.some(
+      (entrypoint) => !isFieldValid.exports(entrypoint)
+    );
+    if (
+      someEntrypointsHaveAExportsField &&
+      someEntrypointsHaveAnInvalidExportsField
+    ) {
+      let shouldFixWorkerField = await confirms.fixExportsField(pkg);
+      if (shouldFixWorkerField) {
+        pkg.setFieldOnEntrypoints("exports");
+      } else {
+        throw new FixableError(
+          errors.fieldMustExistInAllEntrypointsIfExistsDeclinedFixDuringInit(
+            "exports"
+          ),
+          pkg.name
+        );
+      }
     }
   }
 
