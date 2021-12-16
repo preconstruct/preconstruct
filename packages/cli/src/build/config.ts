@@ -193,16 +193,19 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
 
   let hasBrowserCondition = false;
   let hasWorkerCondition = false;
-  let hasExportsField = typeof pkg.entrypoints[0].json.exports == "object";
-  if (hasExportsField) {
-    hasBrowserCondition = Object.values(pkg.entrypoints[0].json.exports!).some(
-      (condition) =>
-        typeof condition === "object" && condition.browser !== undefined
-    );
-    hasWorkerCondition = Object.values(pkg.entrypoints[0].json.exports!).some(
-      (condition) =>
-        typeof condition === "object" && condition.worker !== undefined
-    );
+  if (pkg.json.preconstruct.exports) {
+    if (typeof pkg.entrypoints[0].json.exports == "object") {
+      hasBrowserCondition = Object.values(
+        pkg.entrypoints[0].json.exports!
+      ).some(
+        (condition) =>
+          typeof condition === "object" && condition.browser !== undefined
+      );
+      hasWorkerCondition = Object.values(pkg.entrypoints[0].json.exports!).some(
+        (condition) =>
+          typeof condition === "object" && condition.worker !== undefined
+      );
+    }
   }
 
   let hasBrowserField = pkg.entrypoints[0].json.browser !== undefined;

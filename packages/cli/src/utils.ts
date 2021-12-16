@@ -239,10 +239,16 @@ export const validFieldsFromPkg = {
       }
       output[`./${entrypointPath}`] = conditions;
     });
+    let extra: Record<string, ExportsConditions | string> | null = null;
+    if (typeof pkg.json.preconstruct?.exports === "object") {
+      if (pkg.json.preconstruct.exports.extra) {
+        extra = pkg.json.preconstruct.exports.extra;
+      }
+    }
     return {
       "./package.json": "./package.json",
       ...output,
-      "./": "./",
+      ...extra,
     };
   },
 };
@@ -364,26 +370,28 @@ export const validFields = {
     );
   },
   exports(entrypoint: Entrypoint, forceStrategy?: DistFilenameStrategy) {
-    if (typeof entrypoint.json.exports === "undefined") {
-      return;
+    if (entrypoint.package.json.preconstruct.exports) {
+      if (typeof entrypoint.json.exports === "undefined") {
+        return;
+      }
+      const conditions = Object.values(entrypoint.json.exports);
+      const hasBrowserField = conditions.some(
+        (condition) =>
+          typeof condition === "object" && condition.browser !== undefined
+      );
+      const hasWorkerField = conditions.some(
+        (condition) =>
+          typeof condition === "object" && condition.worker !== undefined
+      );
+      return validFieldsFromPkg.exports(
+        entrypoint.package,
+        entrypoint.json.module !== undefined,
+        hasBrowserField,
+        hasWorkerField,
+        entrypoint.name,
+        forceStrategy
+      );
     }
-    const conditions = Object.values(entrypoint.json.exports);
-    const hasBrowserField = conditions.some(
-      (condition) =>
-        typeof condition === "object" && condition.browser !== undefined
-    );
-    const hasWorkerField = conditions.some(
-      (condition) =>
-        typeof condition === "object" && condition.worker !== undefined
-    );
-    return validFieldsFromPkg.exports(
-      entrypoint.package,
-      entrypoint.json.module !== undefined,
-      hasBrowserField,
-      hasWorkerField,
-      entrypoint.name,
-      forceStrategy
-    );
   },
 };
 
