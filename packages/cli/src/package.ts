@@ -166,7 +166,7 @@ export type ExportsConditions = {
 export class Package extends Item<{
   name?: JSONValue;
   preconstruct: {
-    exports?: boolean | { extra?: Record<string, JSONValue> };
+    exports?: { extra?: Record<string, JSONValue> };
     entrypoints?: JSONValue;
   };
   exports?: Record<string, ExportsConditions | string>;
