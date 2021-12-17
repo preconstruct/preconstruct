@@ -1,6 +1,6 @@
 import normalizePath from "normalize-path";
-import { Entrypoint, ExportsConditions } from "./entrypoint";
-import { Package } from "./package";
+import { Entrypoint } from "./entrypoint";
+import { Package, ExportsConditions } from "./package";
 import * as nodePath from "path";
 import { FatalError } from "./errors";
 
@@ -215,10 +215,13 @@ export const validFieldsFromPkg = {
       }
       output[`./${entrypointPath}`] = conditions;
     });
-    let extra: Record<string, ExportsConditions | string> | null = null;
-    if (typeof pkg.json.preconstruct?.exports === "object") {
+    let extra: Record<string, unknown> | null = null;
+    if (
+      pkg.project.experimentalFlags.exports &&
+      typeof pkg.json.preconstruct.exports === "object"
+    ) {
       if (pkg.json.preconstruct.exports.extra) {
-        extra = pkg.json.preconstruct.exports.extra;
+        extra = pkg.json.preconstruct.exports.extra as Record<string, unknown>;
       }
     }
     return {
@@ -272,18 +275,8 @@ const exportsHelpers = {
       target,
       prefix
     );
-    const development = exportsHelpers.env(
-      pkg,
-      hasModuleBuild,
-      entrypointName,
-      forceStrategy,
-      "dev",
-      target,
-      prefix
-    );
     return {
       production,
-      development,
       ...obj,
     };
   },
@@ -304,9 +297,10 @@ const exportsHelpers = {
       }js`,
     };
     if (hasModuleBuild) {
+      // esm doesn't support conditional imports so if env is not set we default to dev version
       obj = {
         module: `./${prefix}dist/${safeName}.${target ? `${target}.` : ""}esm.${
-          env ? `${env}.` : ""
+          env ? `${env}.` : "dev."
         }js`,
         ...obj,
       };
@@ -332,29 +326,31 @@ export const validFields = {
       entrypoint.name
     );
   },
-  exports(entrypoint: Entrypoint, forceStrategy?: DistFilenameStrategy) {
-    if (entrypoint.package.json.preconstruct.exports) {
-      if (typeof entrypoint.json.exports === "undefined") {
-        return;
-      }
-      const conditions = Object.values(entrypoint.json.exports);
-      const hasBrowserField = conditions.some(
-        (condition) =>
-          typeof condition === "object" && condition.browser !== undefined
-      );
-      const hasWorkerField = conditions.some(
-        (condition) =>
-          typeof condition === "object" && condition.worker !== undefined
-      );
-      return validFieldsFromPkg.exports(
-        entrypoint.package,
-        entrypoint.json.module !== undefined,
-        hasBrowserField,
-        hasWorkerField,
-        entrypoint.name,
-        forceStrategy
-      );
+  exports(pkg: Package, forceStrategy?: DistFilenameStrategy) {
+    if (typeof pkg.json.exports === "undefined") {
+      return;
     }
+    const conditions = Object.values(pkg.json.exports);
+    const hasBrowserField = conditions.some(
+      (condition) =>
+        typeof condition === "object" && condition.browser !== undefined
+    );
+    const hasWorkerField = conditions.some(
+      (condition) =>
+        typeof condition === "object" && condition.worker !== undefined
+    );
+
+    const hasModuleField = pkg.entrypoints.some(
+      (entrypoint) => entrypoint.json.module !== undefined
+    );
+    return validFieldsFromPkg.exports(
+      pkg,
+      hasModuleField,
+      hasBrowserField,
+      hasWorkerField,
+      pkg.name,
+      forceStrategy
+    );
   },
 };
 

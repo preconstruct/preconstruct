@@ -70,6 +70,59 @@ test("set main and module field", async () => {
   `);
 });
 
+test("set exports field when opt-in", async () => {
+  let tmpPath = f.copy("package-exports");
+
+  await modifyPkg(tmpPath, (json) => {
+    json.exports = { ".": { browser: {}, worker: {} } };
+  });
+
+  await fix(tmpPath);
+
+  let pkg = await getPkg(tmpPath);
+
+  expect(pkg).toMatchInlineSnapshot(`
+    Object {
+      "exports": Object {
+        ".": Object {
+          "browser": Object {
+            "default": "./dist/package-exports.browser.cjs.js",
+            "module": "./dist/package-exports.browser.esm.dev.js",
+            "production": Object {
+              "default": "./dist/package-exports.browser.cjs.prod.js",
+              "module": "./dist/package-exports.browser.esm.prod.js",
+            },
+          },
+          "default": "./dist/package-exports.cjs.js",
+          "module": "./dist/package-exports.esm.dev.js",
+          "production": Object {
+            "default": "./dist/package-exports.cjs.prod.js",
+            "module": "./dist/package-exports.esm.prod.js",
+          },
+          "worker": Object {
+            "default": "./dist/package-exports.worker.cjs.js",
+            "module": "./dist/package-exports.worker.esm.dev.js",
+            "production": Object {
+              "default": "./dist/package-exports.worker.cjs.prod.js",
+              "module": "./dist/package-exports.worker.esm.prod.js",
+            },
+          },
+        },
+        "./package.json": "./package.json",
+      },
+      "license": "MIT",
+      "main": "dist/package-exports.cjs.js",
+      "module": "dist/package-exports.esm.js",
+      "name": "package-exports",
+      "preconstruct": Object {
+        "exports": true,
+      },
+      "private": true,
+      "version": "1.0.0",
+    }
+  `);
+});
+
 test("new dist filenames", async () => {
   let tmpPath = f.copy("basic-package");
 

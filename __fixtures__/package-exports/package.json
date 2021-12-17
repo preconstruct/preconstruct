@@ -1,0 +1,11 @@
+{
+  "name": "package-exports",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "private": true,
+  "module": "dist/package-exports.esm.js",
+  "preconstruct": {
+    "exports": true
+  }
+}

@@ -193,15 +193,13 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
 
   let hasBrowserCondition = false;
   let hasWorkerCondition = false;
-  if (pkg.json.preconstruct.exports) {
-    if (typeof pkg.entrypoints[0].json.exports == "object") {
-      hasBrowserCondition = Object.values(
-        pkg.entrypoints[0].json.exports!
-      ).some(
+  if (pkg.project.experimentalFlags.exports) {
+    if (typeof pkg.json.exports == "object") {
+      hasBrowserCondition = Object.values(pkg.json.exports!).some(
         (condition) =>
           typeof condition === "object" && condition.browser !== undefined
       );
-      hasWorkerCondition = Object.values(pkg.entrypoints[0].json.exports!).some(
+      hasWorkerCondition = Object.values(pkg.json.exports!).some(
         (condition) =>
           typeof condition === "object" && condition.worker !== undefined
       );

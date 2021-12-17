@@ -1,4 +1,5 @@
 import { Project } from "./project";
+import { Package } from "./package";
 import { Entrypoint } from "./entrypoint";
 import { errors, successes, infos } from "./messages";
 import { BatchError, FatalError, FixableError } from "./errors";
@@ -25,8 +26,8 @@ export const isFieldValid = {
   browser(entrypoint: Entrypoint): boolean {
     return equal(entrypoint.json.browser, validFields.browser(entrypoint));
   },
-  exports(entrypoint: Entrypoint): boolean {
-    return equal(entrypoint.json.exports, validFields.exports(entrypoint));
+  exports(pkg: Package): boolean {
+    return equal(pkg.json.exports, validFields.exports(pkg));
   },
 };
 
@@ -41,18 +42,8 @@ function validateEntrypoint(entrypoint: Entrypoint, log: boolean) {
     logger.info(infos.validEntrypoint, entrypoint.name);
   }
   const fatalErrors: FatalError[] = [];
-  for (const field of [
-    "main",
-    "module",
-    "umd:main",
-    "browser",
-    "exports",
-  ] as const) {
+  for (const field of ["main", "module", "umd:main", "browser"] as const) {
     if (field !== "main" && entrypoint.json[field] === undefined) {
-      continue;
-    }
-    if (field === "exports" && !entrypoint.package.json.preconstruct.exports) {
-      // exports field is currently op-in
       continue;
     }
     if (!isFieldValid[field](entrypoint)) {
@@ -123,6 +114,7 @@ export const FORMER_FLAGS_THAT_ARE_ENABLED_NOW = new Set<string>([
 ]);
 
 export const EXPERIMENTAL_FLAGS = new Set([
+  "exports",
   "logCompiledFiles",
   "typeScriptProxyFileWithImportEqualsRequireAndExportEquals",
   "keepDynamicImportAsDynamicImportInCommonJS",
