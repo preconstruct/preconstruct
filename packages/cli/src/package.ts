@@ -4,7 +4,7 @@ import * as fs from "fs-extra";
 import nodePath from "path";
 import { Item } from "./item";
 import { BatchError, FatalError } from "./errors";
-import { Entrypoint, ExportsConditions } from "./entrypoint";
+import { Entrypoint } from "./entrypoint";
 import jsonParse from "parse-json";
 
 import { errors, confirms } from "./messages";
@@ -76,7 +76,7 @@ function getPlainEntrypointContent(
         getEntrypointName(pkg, entrypointDir)
       );
     } else if (field === "exports") {
-      if (pkg.json.preconstruct.exports) {
+      if (pkg.project.experimentalFlags.exports) {
         obj[field] = validFieldsFromPkg[field](
           pkg,
           fields.has("module"),
@@ -138,12 +138,38 @@ function createEntrypoints(
   );
 }
 
+export type ExportsConditions = {
+  worker?: {
+    production: {
+      module?: string;
+      default: string;
+    };
+    module?: string;
+    default: string;
+  };
+  browser?: {
+    production: {
+      module?: string;
+      default: string;
+    };
+    module?: string;
+    default: string;
+  };
+  production?: {
+    module?: string;
+    default: string;
+  };
+  module?: string;
+  default: string;
+};
+
 export class Package extends Item<{
   name?: JSONValue;
   preconstruct: {
-    exports?: boolean | { extra?: Record<string, ExportsConditions | string> };
+    exports?: boolean | { extra?: Record<string, JSONValue> };
     entrypoints?: JSONValue;
   };
+  exports?: Record<string, ExportsConditions | string>;
   dependencies?: Record<string, string>;
   peerDependencies?: Record<string, string>;
 }> {
@@ -301,9 +327,7 @@ export class Package extends Item<{
     return pkg;
   }
 
-  setFieldOnEntrypoints(
-    field: "main" | "browser" | "module" | "umd:main" | "exports"
-  ) {
+  setFieldOnEntrypoints(field: "main" | "browser" | "module" | "umd:main") {
     this.entrypoints.forEach((entrypoint) => {
       entrypoint.json = setFieldInOrder(
         entrypoint.json,

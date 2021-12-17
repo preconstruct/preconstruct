@@ -207,23 +207,31 @@ unregister();
               )
             );
           }
-          if (entrypoint.json.exports) {
-            let exportsField = validFields.exports(entrypoint);
-            if (exportsField?.["."] && typeof exportsField["."] === "object") {
-              for (let key of Object.keys(exportsField["."])) {
-                if (["browser", "worker"].includes(key)) {
-                  for (let key2 of Object.keys(
-                    (exportsField["."] as any)[key]
-                  )) {
-                    promises.push(
-                      fs.symlink(
-                        entrypoint.source,
-                        path.join(
-                          entrypoint.directory,
-                          (exportsField["."] as any)[key][key2]
+          if (
+            pkg.project.experimentalFlags.exports &&
+            pkg.json.preconstruct.exports
+          ) {
+            if (entrypoint.json.exports) {
+              let exportsField = validFields.exports(pkg);
+              if (
+                exportsField?.["."] &&
+                typeof exportsField["."] === "object"
+              ) {
+                for (let key of Object.keys(exportsField["."])) {
+                  if (["browser", "worker"].includes(key)) {
+                    for (let key2 of Object.keys(
+                      (exportsField["."] as any)[key]
+                    )) {
+                      promises.push(
+                        fs.symlink(
+                          entrypoint.source,
+                          path.join(
+                            entrypoint.directory,
+                            (exportsField["."] as any)[key][key2]
+                          )
                         )
-                      )
-                    );
+                      );
+                    }
                   }
                 }
               }

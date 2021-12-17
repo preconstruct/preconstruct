@@ -1,45 +1,8 @@
 import nodePath from "path";
 import { Item } from "./item";
-import { Package } from "./package";
+import { Package, ExportsConditions } from "./package";
 import { JSONValue } from "./utils";
 import normalizePath from "normalize-path";
-
-export type ExportsConditions = {
-  worker?: {
-    production: {
-      module?: string;
-      default: string;
-    };
-    development: {
-      module?: string;
-      default: string;
-    };
-    module?: string;
-    default: string;
-  };
-  browser?: {
-    production: {
-      module?: string;
-      default: string;
-    };
-    development: {
-      module?: string;
-      default: string;
-    };
-    module?: string;
-    default: string;
-  };
-  production?: {
-    module?: string;
-    default: string;
-  };
-  development?: {
-    module?: string;
-    default: string;
-  };
-  module?: string;
-  default: string;
-};
 
 export class Entrypoint extends Item<{
   main?: JSONValue;

@@ -3,6 +3,8 @@ import resolveFrom from "resolve-from";
 import chalk from "chalk";
 import { errors } from "./messages";
 import { Package } from "./package";
+import { isFieldValid } from "./validate";
+import { validFields, setFieldInOrder } from "./utils";
 
 let keys: <Obj>(obj: Obj) => (keyof Obj)[] = Object.keys;
 
@@ -15,10 +17,9 @@ export async function fixPackage(pkg: Package) {
     module: pkg.entrypoints.some((x) => x.json.module !== undefined),
     "umd:main": pkg.entrypoints.some((x) => x.json["umd:main"] !== undefined),
     browser: pkg.entrypoints.some((x) => x.json.browser !== undefined),
-    exports: pkg.json.preconstruct.exports
-      ? pkg.entrypoints.some((x) => x.json.exports !== undefined)
-      : false,
   };
+
+  pkg.json = setFieldInOrder(pkg.json, "exports", validFields.exports(pkg));
 
   keys(fields)
     .filter((x) => fields[x])
@@ -44,8 +45,24 @@ export function validatePackage(pkg: Package) {
     module: pkg.entrypoints[0].json.module !== undefined,
     "umd:main": pkg.entrypoints[0].json["umd:main"] !== undefined,
     browser: pkg.entrypoints[0].json.browser !== undefined,
-    // "exports" is missing because it is not a requirement for other entrypoints to have an exports field.
+    // "exports" is missing because it is validated on the root package
   };
+
+  if (
+    pkg.project.experimentalFlags.exports &&
+    pkg.json.preconstruct.exports &&
+    pkg.json.exports &&
+    !isFieldValid.exports(pkg)
+  ) {
+    throw new FixableError(
+      errors.invalidField(
+        "exports",
+        pkg.json.exports,
+        validFields.exports(pkg)
+      ),
+      pkg.name
+    );
+  }
 
   pkg.entrypoints.forEach((entrypoint) => {
     keys(fields).forEach((field) => {
