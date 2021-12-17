@@ -184,7 +184,7 @@ The `browser` field specifies alias files exclusive to browsers. This allows you
 
 **Note:** Those files are not meant to be consumed by browsers "as is". They just assume browser-like environment, but they still can contain for example references to `process.env.NODE_ENV` as that is meant to be replaced by a consuming bundler.
 
-### `exports`
+### `exports` (experimental)
 The exports field allows you to specify custom conditional exports for various environments. You can use this to create custom builds targeted for these specific environments. Currently, only "browser" and "worker" conditionals are supported along with their "module" and "default" variants.
 Here is an example config using "browser" and "worker" conditionals:
 
@@ -202,6 +202,19 @@ Here is an example config using "browser" and "worker" conditionals:
       },
       "module": "./dist/my-package.esm.js",
       "default": "./dist/my-package.cjs.js"
+    }
+  }
+}
+```
+
+**Note:** This is currently an experimental feature and may change in the future. To opt in you can can add `___experimentalFlags_WILL_CHANGE_IN_PATCH.exports = true` in your project's preconstruct config.
+Here is an example of how to opt-in to this feature:
+
+```json
+{
+  "preconstruct": {
+    "___experimentalFlags_WILL_CHANGE_IN_PATCH": {
+      "exports": true,
     }
   }
 }
