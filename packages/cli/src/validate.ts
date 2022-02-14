@@ -27,7 +27,10 @@ export const isFieldValid = {
     return equal(entrypoint.json.browser, validFields.browser(entrypoint));
   },
   exports(pkg: Package): boolean {
-    return equal(pkg.json.exports, validFields.exports(pkg));
+    // we use JSON string compare and not `fast-deep-equal` function because we also need to assert that order of conditions is correct.
+    const currentExports = JSON.stringify(pkg.json.exports);
+    const generatedExports = JSON.stringify(validFields.exports(pkg));
+    return currentExports === generatedExports;
   },
 };
 

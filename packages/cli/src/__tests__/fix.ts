@@ -73,19 +73,21 @@ test("set main and module field", async () => {
 test("set exports field when opt-in", async () => {
   let tmpPath = f.copy("package-exports");
 
-  await modifyPkg(tmpPath, (json) => {
-    json.exports = { ".": { browser: {}, worker: {} } };
-  });
-
   await fix(tmpPath);
 
   let pkg = await getPkg(tmpPath);
 
   // Assert that the order of conditions are correct.
-  const conditionsOrder = Object.keys(pkg.exports['.']);
-  expect(conditionsOrder).toEqual(['worker', 'browser', 'production', 'module', 'default']);
-  const subConditionsOrder = Object.keys(pkg.exports['.'].browser);
-  expect(subConditionsOrder).toEqual(['production', 'module', 'default']);
+  const conditionsOrder = Object.keys(pkg.exports["."]);
+  expect(conditionsOrder).toEqual([
+    "worker",
+    "browser",
+    "production",
+    "module",
+    "default",
+  ]);
+  const subConditionsOrder = Object.keys(pkg.exports["."].browser);
+  expect(subConditionsOrder).toEqual(["production", "module", "default"]);
 
   // NOTE: The order of the conditions is important and JEST is sorting the keys alphabetically.
   // The tests above actually assert that the order is correct.
@@ -123,7 +125,14 @@ test("set exports field when opt-in", async () => {
       "module": "dist/package-exports.esm.js",
       "name": "package-exports",
       "preconstruct": Object {
-        "exports": true,
+        "___experimentalFlags_WILL_CHANGE_IN_PATCH": Object {
+          "exports": true,
+        },
+        "exports": Array [
+          "worker",
+          "browser",
+          "module",
+        ],
       },
       "private": true,
       "version": "1.0.0",

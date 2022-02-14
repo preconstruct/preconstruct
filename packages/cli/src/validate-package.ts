@@ -50,7 +50,7 @@ export function validatePackage(pkg: Package) {
 
   if (
     pkg.project.experimentalFlags.exports &&
-    pkg.json.exports &&
+    pkg.json.preconstruct.exports &&
     !isFieldValid.exports(pkg)
   ) {
     throw new FixableError(

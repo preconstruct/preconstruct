@@ -139,81 +139,81 @@ export const validFieldsFromPkg = {
     forceStrategy?: DistFilenameStrategy
   ): Record<string, ExportsConditions | string> {
     let output: Record<string, ExportsConditions> = {};
-    let obj: ExportsConditions = exportsHelpers.root(
-      pkg,
-      hasModuleBuild,
-      entrypointName,
-      forceStrategy
-    );
-    if (hasBrowserField) {
-      obj = {
-        browser: exportsHelpers.target(
-          pkg,
-          hasModuleBuild,
-          entrypointName,
-          forceStrategy,
-          "browser"
-        ),
-        ...obj,
-      };
-    }
-    if (hasWorkerField) {
-      obj = {
-        worker: exportsHelpers.target(
-          pkg,
-          hasModuleBuild,
-          entrypointName,
-          forceStrategy,
-          "worker"
-        ),
-        ...obj,
-      };
-    }
-    output["."] = obj;
     pkg.entrypoints.forEach((entrypoint) => {
       if (entrypointName === entrypoint.name) {
-        return;
-      }
-      const entrypointPath = nodePath
-        .relative(pkg.directory, entrypoint.source)
-        .replace("src/", "")
-        .replace(/\.[tj]sx?$/, "");
+        let obj: ExportsConditions = exportsHelpers.root(
+          pkg,
+          hasModuleBuild,
+          entrypointName,
+          forceStrategy
+        );
+        if (hasBrowserField) {
+          obj = {
+            browser: exportsHelpers.target(
+              pkg,
+              hasModuleBuild,
+              entrypointName,
+              forceStrategy,
+              "browser"
+            ),
+            ...obj,
+          };
+        }
+        if (hasWorkerField) {
+          obj = {
+            worker: exportsHelpers.target(
+              pkg,
+              hasModuleBuild,
+              entrypointName,
+              forceStrategy,
+              "worker"
+            ),
+            ...obj,
+          };
+        }
+        output["."] = obj;
+      } else {
+        const entrypointPath = nodePath
+          .relative(pkg.directory, entrypoint.source)
+          .replace("src/", "")
+          .replace(/\.[tj]sx?$/, "");
 
-      let conditions: ExportsConditions = exportsHelpers.root(
-        pkg,
-        entrypoint.json.module !== undefined,
-        entrypoint.name,
-        forceStrategy,
-        entrypointPath + "/"
-      );
+        let conditions: ExportsConditions = exportsHelpers.root(
+          pkg,
+          entrypoint.json.module !== undefined,
+          entrypoint.name,
+          forceStrategy,
+          entrypointPath + "/"
+        );
 
-      if (hasBrowserField) {
-        conditions = {
-          browser: exportsHelpers.target(
-            pkg,
-            hasModuleBuild,
-            entrypoint.name,
-            forceStrategy,
-            "browser",
-            entrypointPath + "/"
-          ),
-          ...conditions,
-        };
+        if (hasBrowserField) {
+          conditions = {
+            browser: exportsHelpers.target(
+              pkg,
+              hasModuleBuild,
+              entrypoint.name,
+              forceStrategy,
+              "browser",
+              entrypointPath + "/"
+            ),
+            ...conditions,
+          };
+        }
+        if (hasWorkerField) {
+          conditions = {
+            worker: exportsHelpers.target(
+              pkg,
+              hasModuleBuild,
+              entrypoint.name,
+              forceStrategy,
+              "worker",
+              entrypointPath + "/"
+            ),
+            ...conditions,
+          };
+        }
+        output[`./${entrypointPath}`] = conditions;
       }
-      if (hasWorkerField) {
-        conditions = {
-          worker: exportsHelpers.target(
-            pkg,
-            hasModuleBuild,
-            entrypoint.name,
-            forceStrategy,
-            "worker",
-            entrypointPath + "/"
-          ),
-          ...conditions,
-        };
-      }
-      output[`./${entrypointPath}`] = conditions;
     });
     let extra: Record<string, unknown> | null = null;
     if (
@@ -327,22 +327,27 @@ export const validFields = {
     );
   },
   exports(pkg: Package, forceStrategy?: DistFilenameStrategy) {
-    if (typeof pkg.json.exports === "undefined") {
+    // skip if not enabled for the project
+    if (!pkg.project.experimentalFlags.exports) {
       return;
     }
-    const conditions = Object.values(pkg.json.exports);
-    const hasBrowserField = conditions.some(
-      (condition) =>
-        typeof condition === "object" && condition.browser !== undefined
-    );
-    const hasWorkerField = conditions.some(
-      (condition) =>
-        typeof condition === "object" && condition.worker !== undefined
-    );
+    // skip if not enabled for the package
+    if (!pkg.json.preconstruct.exports) {
+      return;
+    }
 
-    const hasModuleField = pkg.entrypoints.some(
-      (entrypoint) => entrypoint.json.module !== undefined
-    );
+    // default values when `exports = true`;
+    let hasWorkerField = false;
+    let hasBrowserField = true;
+    let hasModuleField = true;
+
+    const conditions = pkg.json.preconstruct.exports;
+    if (Array.isArray(conditions)) {
+      hasWorkerField = conditions.includes("worker");
+      hasBrowserField = conditions.includes("browser");
+      hasModuleField = conditions.includes("module");
+    }
+
     return validFieldsFromPkg.exports(
       pkg,
       hasModuleField,
