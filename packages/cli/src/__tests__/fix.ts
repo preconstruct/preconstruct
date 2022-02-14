@@ -81,6 +81,14 @@ test("set exports field when opt-in", async () => {
 
   let pkg = await getPkg(tmpPath);
 
+  // Assert that the order of conditions are correct.
+  const conditionsOrder = Object.keys(pkg.exports['.']);
+  expect(conditionsOrder).toEqual(['worker', 'browser', 'production', 'module', 'default']);
+  const subConditionsOrder = Object.keys(pkg.exports['.'].browser);
+  expect(subConditionsOrder).toEqual(['production', 'module', 'default']);
+
+  // NOTE: The order of the conditions is important and JEST is sorting the keys alphabetically.
+  // The tests above actually assert that the order is correct.
   expect(pkg).toMatchInlineSnapshot(`
     Object {
       "exports": Object {
