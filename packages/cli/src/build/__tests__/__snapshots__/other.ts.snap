@@ -108,11 +108,11 @@ exports.default = thing$1;
 
 exports[`browser no module: package.json 1`] = `
 Object {
+  "name": "browser-no-module",
+  "main": "dist/browser-no-module.cjs.js",
   "browser": Object {
     "./dist/browser-no-module.cjs.js": "./dist/browser-no-module.browser.cjs.js",
   },
-  "main": "dist/browser-no-module.cjs.js",
-  "name": "browser-no-module",
 }
 `;
 
@@ -385,12 +385,12 @@ export default Foo;
 
 exports[`using external @babel/runtime helpers: package.json 1`] = `
 Object {
+  "name": "external-babel-runtime",
+  "main": "dist/external-babel-runtime.cjs.js",
+  "module": "dist/external-babel-runtime.esm.js",
   "dependencies": Object {
     "@babel/runtime": "^7.0.0",
   },
-  "main": "dist/external-babel-runtime.cjs.js",
-  "module": "dist/external-babel-runtime.esm.js",
-  "name": "external-babel-runtime",
 }
 `;
 

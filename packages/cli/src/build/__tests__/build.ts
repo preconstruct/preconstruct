@@ -220,21 +220,21 @@ test("umd with dep on other module", async () => {
   await snapshotDistFiles(tmpPath);
   expect(await getPkg(tmpPath)).toMatchInlineSnapshot(`
     Object {
-      "devDependencies": Object {
-        "react": "^16.6.3",
-      },
-      "main": "dist/umd-with-dep.cjs.js",
       "name": "umd-with-dep",
-      "peerDependencies": Object {
-        "react": "^16.6.3",
-      },
+      "main": "dist/umd-with-dep.cjs.js",
+      "umd:main": "dist/umd-with-dep.umd.min.js",
       "preconstruct": Object {
+        "umdName": "umdWithDep",
         "globals": Object {
           "react": "React",
         },
-        "umdName": "umdWithDep",
       },
-      "umd:main": "dist/umd-with-dep.umd.min.js",
+      "peerDependencies": Object {
+        "react": "^16.6.3",
+      },
+      "devDependencies": Object {
+        "react": "^16.6.3",
+      },
     }
   `);
 });
@@ -371,54 +371,54 @@ test("monorepo umd with dep on other module", async () => {
   expect(await getPkg(path.join(tmpPath, "packages", "package-one")))
     .toMatchInlineSnapshot(`
     Object {
-      "devDependencies": Object {
-        "react": "^16.6.3",
-      },
-      "main": "dist/some-scope-package-one-umd-with-dep.cjs.js",
       "name": "@some-scope/package-one-umd-with-dep",
-      "peerDependencies": Object {
-        "react": "^16.6.3",
-      },
+      "main": "dist/some-scope-package-one-umd-with-dep.cjs.js",
+      "umd:main": "dist/some-scope-package-one-umd-with-dep.umd.min.js",
       "preconstruct": Object {
         "umdName": "packageOne",
       },
-      "umd:main": "dist/some-scope-package-one-umd-with-dep.umd.min.js",
+      "peerDependencies": Object {
+        "react": "^16.6.3",
+      },
+      "devDependencies": Object {
+        "react": "^16.6.3",
+      },
     }
   `);
 
   expect(await getPkg(path.join(tmpPath, "packages", "package-two")))
     .toMatchInlineSnapshot(`
     Object {
-      "devDependencies": Object {
-        "react": "^16.6.3",
-      },
-      "main": "dist/some-scope-package-two-umd-with-dep.cjs.js",
       "name": "@some-scope/package-two-umd-with-dep",
-      "peerDependencies": Object {
-        "react": "^16.6.3",
-      },
+      "main": "dist/some-scope-package-two-umd-with-dep.cjs.js",
+      "umd:main": "dist/some-scope-package-two-umd-with-dep.umd.min.js",
       "preconstruct": Object {
         "umdName": "packageTwo",
       },
-      "umd:main": "dist/some-scope-package-two-umd-with-dep.umd.min.js",
+      "peerDependencies": Object {
+        "react": "^16.6.3",
+      },
+      "devDependencies": Object {
+        "react": "^16.6.3",
+      },
     }
   `);
 
   expect(await getPkg(tmpPath)).toMatchInlineSnapshot(`
     Object {
-      "main": "index.js",
       "name": "monorepo-umd-with-dep",
-      "preconstruct": Object {
-        "globals": Object {
-          "react": "React",
-        },
-        "packages": Array [
-          "packages/*",
-        ],
-      },
+      "main": "index.js",
       "workspaces": Array [
         "packages/*",
       ],
+      "preconstruct": Object {
+        "packages": Array [
+          "packages/*",
+        ],
+        "globals": Object {
+          "react": "React",
+        },
+      },
     }
   `);
 });

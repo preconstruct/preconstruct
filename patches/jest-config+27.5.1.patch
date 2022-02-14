@@ -1,0 +1,14 @@
+diff --git a/node_modules/jest-config/build/ValidConfig.js b/node_modules/jest-config/build/ValidConfig.js
+index fcd5815..5c1c988 100644
+--- a/node_modules/jest-config/build/ValidConfig.js
++++ b/node_modules/jest-config/build/ValidConfig.js
+@@ -150,7 +150,8 @@ const initialOptions = {
+   skipFilter: false,
+   skipNodeResolution: false,
+   slowTestThreshold: 5,
+-  snapshotFormat: _prettyFormat().DEFAULT_OPTIONS,
++  // enable `compareKeys` configuration, see https://github.com/facebook/jest/pull/12387
++  snapshotFormat: Object.assign({}, _prettyFormat().DEFAULT_OPTIONS, { compareKeys: () => 0 }),
+   snapshotResolver: '<rootDir>/snapshotResolver.js',
+   snapshotSerializers: ['my-serializer-module'],
+   testEnvironment: 'jest-environment-jsdom',

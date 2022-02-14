@@ -56,11 +56,11 @@ test("set only main field", async () => {
   let pkg = await getPkg(tmpPath);
   expect(pkg).toMatchInlineSnapshot(`
     Object {
-      "license": "MIT",
-      "main": "dist/basic-package.cjs.js",
       "name": "basic-package",
-      "private": true,
       "version": "1.0.0",
+      "main": "dist/basic-package.cjs.js",
+      "license": "MIT",
+      "private": true,
     }
   `);
 });
@@ -79,12 +79,12 @@ test("set main and module field", async () => {
 
   expect(pkg).toMatchInlineSnapshot(`
     Object {
-      "license": "MIT",
+      "name": "basic-package",
+      "version": "1.0.0",
       "main": "dist/basic-package.cjs.js",
       "module": "dist/basic-package.esm.js",
-      "name": "basic-package",
+      "license": "MIT",
       "private": true,
-      "version": "1.0.0",
     }
   `);
 });
@@ -116,12 +116,12 @@ test("scoped package", async () => {
 
   expect(pkg).toMatchInlineSnapshot(`
     Object {
-      "license": "MIT",
+      "name": "@some-scope/some-package",
+      "version": "1.0.0",
       "main": "dist/some-scope-some-package.cjs.js",
       "module": "dist/some-scope-some-package.esm.js",
-      "name": "@some-scope/some-package",
+      "license": "MIT",
       "private": true,
-      "version": "1.0.0",
     }
   `);
 });
@@ -152,23 +152,23 @@ test("monorepo", async () => {
 
   expect(pkg1).toMatchInlineSnapshot(`
     Object {
-      "license": "MIT",
+      "name": "@some-scope/package-one",
+      "version": "1.0.0",
       "main": "dist/some-scope-package-one.cjs.js",
       "module": "dist/some-scope-package-one.esm.js",
-      "name": "@some-scope/package-one",
+      "license": "MIT",
       "private": true,
-      "version": "1.0.0",
     }
   `);
 
   expect(pkg2).toMatchInlineSnapshot(`
     Object {
-      "license": "MIT",
+      "name": "@some-scope/package-two",
+      "version": "1.0.0",
       "main": "dist/some-scope-package-two.cjs.js",
       "module": "dist/some-scope-package-two.esm.js",
-      "name": "@some-scope/package-two",
+      "license": "MIT",
       "private": true,
-      "version": "1.0.0",
     }
   `);
 });
@@ -210,12 +210,12 @@ test("invalid fields", async () => {
 
   expect(pkg).toMatchInlineSnapshot(`
     Object {
-      "license": "MIT",
-      "main": "dist/invalid-fields.cjs.js",
-      "module": "dist/invalid-fields.esm.js",
       "name": "invalid-fields",
-      "private": true,
       "version": "1.0.0",
+      "main": "dist/invalid-fields.cjs.js",
+      "license": "MIT",
+      "private": true,
+      "module": "dist/invalid-fields.esm.js",
     }
   `);
 });
@@ -233,20 +233,20 @@ test("fix browser", async () => {
 
   expect(await getPkg(tmpPath)).toMatchInlineSnapshot(`
     Object {
+      "name": "valid-package",
+      "version": "1.0.0",
+      "main": "dist/valid-package.cjs.js",
+      "license": "MIT",
+      "private": true,
+      "module": "dist/valid-package.esm.js",
+      "umd:main": "dist/valid-package.umd.min.js",
+      "preconstruct": Object {
+        "umdName": "validPackage",
+      },
       "browser": Object {
         "./dist/valid-package.cjs.js": "./dist/valid-package.browser.cjs.js",
         "./dist/valid-package.esm.js": "./dist/valid-package.browser.esm.js",
       },
-      "license": "MIT",
-      "main": "dist/valid-package.cjs.js",
-      "module": "dist/valid-package.esm.js",
-      "name": "valid-package",
-      "preconstruct": Object {
-        "umdName": "validPackage",
-      },
-      "private": true,
-      "umd:main": "dist/valid-package.umd.min.js",
-      "version": "1.0.0",
     }
   `);
 });

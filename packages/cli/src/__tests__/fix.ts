@@ -60,12 +60,12 @@ test("set main and module field", async () => {
 
   expect(pkg).toMatchInlineSnapshot(`
     Object {
-      "license": "MIT",
-      "main": "dist/basic-package.cjs.js",
-      "module": "dist/basic-package.esm.js",
       "name": "basic-package",
-      "private": true,
       "version": "1.0.0",
+      "main": "dist/basic-package.cjs.js",
+      "license": "MIT",
+      "private": true,
+      "module": "dist/basic-package.esm.js",
     }
   `);
 });
@@ -83,42 +83,42 @@ test("set exports field when opt-in", async () => {
 
   expect(pkg).toMatchInlineSnapshot(`
     Object {
-      "exports": Object {
-        ".": Object {
-          "browser": Object {
-            "default": "./dist/package-exports.browser.cjs.js",
-            "module": "./dist/package-exports.browser.esm.dev.js",
-            "production": Object {
-              "default": "./dist/package-exports.browser.cjs.prod.js",
-              "module": "./dist/package-exports.browser.esm.prod.js",
-            },
-          },
-          "default": "./dist/package-exports.cjs.js",
-          "module": "./dist/package-exports.esm.dev.js",
-          "production": Object {
-            "default": "./dist/package-exports.cjs.prod.js",
-            "module": "./dist/package-exports.esm.prod.js",
-          },
-          "worker": Object {
-            "default": "./dist/package-exports.worker.cjs.js",
-            "module": "./dist/package-exports.worker.esm.dev.js",
-            "production": Object {
-              "default": "./dist/package-exports.worker.cjs.prod.js",
-              "module": "./dist/package-exports.worker.esm.prod.js",
-            },
-          },
-        },
-        "./package.json": "./package.json",
-      },
-      "license": "MIT",
-      "main": "dist/package-exports.cjs.js",
-      "module": "dist/package-exports.esm.js",
       "name": "package-exports",
+      "version": "1.0.0",
+      "main": "dist/package-exports.cjs.js",
+      "license": "MIT",
+      "private": true,
+      "module": "dist/package-exports.esm.js",
       "preconstruct": Object {
         "exports": true,
       },
-      "private": true,
-      "version": "1.0.0",
+      "exports": Object {
+        "./package.json": "./package.json",
+        ".": Object {
+          "worker": Object {
+            "production": Object {
+              "module": "./dist/package-exports.worker.esm.prod.js",
+              "default": "./dist/package-exports.worker.cjs.prod.js",
+            },
+            "module": "./dist/package-exports.worker.esm.dev.js",
+            "default": "./dist/package-exports.worker.cjs.js",
+          },
+          "browser": Object {
+            "production": Object {
+              "module": "./dist/package-exports.browser.esm.prod.js",
+              "default": "./dist/package-exports.browser.cjs.prod.js",
+            },
+            "module": "./dist/package-exports.browser.esm.dev.js",
+            "default": "./dist/package-exports.browser.cjs.js",
+          },
+          "production": Object {
+            "module": "./dist/package-exports.esm.prod.js",
+            "default": "./dist/package-exports.cjs.prod.js",
+          },
+          "module": "./dist/package-exports.esm.dev.js",
+          "default": "./dist/package-exports.cjs.js",
+        },
+      },
     }
   `);
 });
@@ -138,12 +138,12 @@ test("new dist filenames", async () => {
 
   expect(pkg).toMatchInlineSnapshot(`
     Object {
-      "license": "MIT",
-      "main": "dist/scope-something.cjs.js",
-      "module": "dist/scope-something.esm.js",
       "name": "@scope/something",
-      "private": true,
       "version": "1.0.0",
+      "main": "dist/scope-something.cjs.js",
+      "license": "MIT",
+      "private": true,
+      "module": "dist/scope-something.esm.js",
     }
   `);
 });
@@ -166,15 +166,15 @@ test("new dist filenames only-unscoped-package-name strategy", async () => {
 
   expect(pkg).toMatchInlineSnapshot(`
     Object {
-      "license": "MIT",
-      "main": "dist/something.cjs.js",
-      "module": "dist/something.esm.js",
       "name": "@scope/something",
+      "version": "1.0.0",
+      "main": "dist/something.cjs.js",
+      "license": "MIT",
+      "private": true,
       "preconstruct": Object {
         "distFilenameStrategy": "unscoped-package-name",
       },
-      "private": true,
-      "version": "1.0.0",
+      "module": "dist/something.esm.js",
     }
   `);
 });
@@ -195,23 +195,23 @@ test("monorepo", async () => {
 
   expect(pkg1).toMatchInlineSnapshot(`
     Object {
-      "license": "MIT",
-      "main": "dist/some-scope-package-one.cjs.js",
-      "module": "dist/some-scope-package-one.esm.js",
       "name": "@some-scope/package-one",
-      "private": true,
       "version": "1.0.0",
+      "main": "dist/some-scope-package-one.cjs.js",
+      "license": "MIT",
+      "private": true,
+      "module": "dist/some-scope-package-one.esm.js",
     }
   `);
 
   expect(pkg2).toMatchInlineSnapshot(`
     Object {
-      "license": "MIT",
-      "main": "dist/some-scope-package-two.cjs.js",
-      "module": "dist/some-scope-package-two.esm.js",
       "name": "@some-scope/package-two",
-      "private": true,
       "version": "1.0.0",
+      "main": "dist/some-scope-package-two.cjs.js",
+      "license": "MIT",
+      "private": true,
+      "module": "dist/some-scope-package-two.esm.js",
     }
   `);
 });
@@ -241,12 +241,12 @@ test("invalid fields", async () => {
 
   expect(pkg).toMatchInlineSnapshot(`
     Object {
-      "license": "MIT",
-      "main": "dist/invalid-fields.cjs.js",
-      "module": "dist/invalid-fields.esm.js",
       "name": "invalid-fields",
-      "private": true,
       "version": "1.0.0",
+      "main": "dist/invalid-fields.cjs.js",
+      "license": "MIT",
+      "private": true,
+      "module": "dist/invalid-fields.esm.js",
     }
   `);
 });
@@ -262,20 +262,20 @@ test("fix browser", async () => {
 
   expect(await getPkg(tmpPath)).toMatchInlineSnapshot(`
     Object {
+      "name": "valid-package",
+      "version": "1.0.0",
+      "main": "dist/valid-package.cjs.js",
+      "license": "MIT",
+      "private": true,
+      "module": "dist/valid-package.esm.js",
+      "umd:main": "dist/valid-package.umd.min.js",
+      "preconstruct": Object {
+        "umdName": "validPackage",
+      },
       "browser": Object {
         "./dist/valid-package.cjs.js": "./dist/valid-package.browser.cjs.js",
         "./dist/valid-package.esm.js": "./dist/valid-package.browser.esm.js",
       },
-      "license": "MIT",
-      "main": "dist/valid-package.cjs.js",
-      "module": "dist/valid-package.esm.js",
-      "name": "valid-package",
-      "preconstruct": Object {
-        "umdName": "validPackage",
-      },
-      "private": true,
-      "umd:main": "dist/valid-package.umd.min.js",
-      "version": "1.0.0",
     }
   `);
 });
@@ -314,12 +314,12 @@ testFix(
     expect(contents).toMatchInlineSnapshot(`
       Object {
         "": Object {
-          "main": "dist/something.cjs.js",
           "name": "something",
+          "main": "dist/something.cjs.js",
+          "umd:main": "dist/something.umd.min.js",
           "preconstruct": Object {
             "umdName": "somethingUmdName",
           },
-          "umd:main": "dist/something.umd.min.js",
         },
       }
     `);
@@ -371,20 +371,20 @@ test("create entrypoint", async () => {
 
   expect(await getPkg(tmpPath)).toMatchInlineSnapshot(`
     Object {
-      "license": "MIT",
-      "main": "dist/valid-package.cjs.js",
-      "module": "dist/valid-package.esm.js",
       "name": "valid-package",
+      "version": "1.0.0",
+      "main": "dist/valid-package.cjs.js",
+      "license": "MIT",
+      "private": true,
+      "module": "dist/valid-package.esm.js",
+      "umd:main": "dist/valid-package.umd.min.js",
       "preconstruct": Object {
+        "umdName": "validPackage",
         "entrypoints": Array [
           "index.js",
           "another.js",
         ],
-        "umdName": "validPackage",
       },
-      "private": true,
-      "umd:main": "dist/valid-package.umd.min.js",
-      "version": "1.0.0",
     }
   `);
 });
@@ -410,19 +410,19 @@ test("create entrypoint no umd/no prompts", async () => {
 
   expect(await getPkg(tmpPath)).toMatchInlineSnapshot(`
     Object {
-      "license": "MIT",
-      "main": "dist/valid-package.cjs.js",
-      "module": "dist/valid-package.esm.js",
       "name": "valid-package",
+      "version": "1.0.0",
+      "main": "dist/valid-package.cjs.js",
+      "license": "MIT",
+      "private": true,
+      "module": "dist/valid-package.esm.js",
       "preconstruct": Object {
+        "umdName": "validPackage",
         "entrypoints": Array [
           "index.js",
           "another.js",
         ],
-        "umdName": "validPackage",
       },
-      "private": true,
-      "version": "1.0.0",
     }
   `);
 });
