@@ -213,7 +213,9 @@ Additionally, you'll also need to enable the feature on each individual pacakge 
   "license": "MIT",
   "private": true,
   "preconstruct": {
-+   "exports": ["browser", "worker", "module"]
++   "exports": {
++     "conditions": ["worker", "browser", "module"]
++   },
   }
 }
 ```

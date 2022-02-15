@@ -8,8 +8,6 @@ import { validateIncludedFiles } from "./validate-included-files";
 import { FatalError } from "./errors";
 import { JSONValue } from "./utils";
 
-type ExportsCondition = "browser" | "worker" | "module" | "default";
-
 const allSettled = (promises: Promise<any>[]) =>
   Promise.all(
     promises.map((promise) =>
@@ -28,7 +26,7 @@ export class Project extends Item<{
     packages?: JSONValue;
     distFilenameStrategy?: JSONValue;
     ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
-      exports?: boolean | ExportsCondition[];
+      exports?: boolean;
       logCompiledFiles?: JSONValue;
       typeScriptProxyFileWithImportEqualsRequireAndExportEquals?: JSONValue;
       keepDynamicImportAsDynamicImportInCommonJS?: JSONValue;

@@ -163,10 +163,15 @@ export type ExportsConditions = {
   default: string;
 };
 
+export type ExportsCondition = "browser" | "worker" | "module" | "default";
+
 export class Package extends Item<{
   name?: JSONValue;
   preconstruct: {
-    exports?: { extra?: Record<string, JSONValue> };
+    exports?: {
+      extra?: Record<string, JSONValue>;
+      conditions?: ExportsConditions[];
+    };
     entrypoints?: JSONValue;
   };
   exports?: Record<string, ExportsConditions | string>;

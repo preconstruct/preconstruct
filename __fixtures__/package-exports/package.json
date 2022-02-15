@@ -6,7 +6,9 @@
   "private": true,
   "module": "dist/package-exports.esm.js",
   "preconstruct": {
-    "exports": ["worker", "browser", "module"],
+    "exports": {
+      "conditions": ["worker", "browser", "module"]
+    },
     "___experimentalFlags_WILL_CHANGE_IN_PATCH": {
       "exports": true
     }

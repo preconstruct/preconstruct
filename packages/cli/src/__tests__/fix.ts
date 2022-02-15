@@ -128,11 +128,13 @@ test("set exports field when opt-in", async () => {
         "___experimentalFlags_WILL_CHANGE_IN_PATCH": Object {
           "exports": true,
         },
-        "exports": Array [
-          "worker",
-          "browser",
-          "module",
-        ],
+        "exports": Object {
+          "conditions": Array [
+            "worker",
+            "browser",
+            "module",
+          ],
+        },
       },
       "private": true,
       "version": "1.0.0",

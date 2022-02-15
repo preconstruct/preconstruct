@@ -341,7 +341,7 @@ export const validFields = {
     let hasBrowserField = true;
     let hasModuleField = true;
 
-    const conditions = pkg.json.preconstruct.exports;
+    const conditions = pkg.json.preconstruct.exports.conditions;
     if (Array.isArray(conditions)) {
       hasWorkerField = conditions.includes("worker");
       hasBrowserField = conditions.includes("browser");
