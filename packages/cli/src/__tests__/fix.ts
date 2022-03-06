@@ -77,68 +77,56 @@ test("set exports field when opt-in", async () => {
 
   let pkg = await getPkg(tmpPath);
 
-  // Assert that the order of conditions are correct.
-  const conditionsOrder = Object.keys(pkg.exports["."]);
-  expect(conditionsOrder).toEqual([
-    "worker",
-    "browser",
-    "production",
-    "module",
-    "default",
-  ]);
-  const subConditionsOrder = Object.keys(pkg.exports["."].browser);
-  expect(subConditionsOrder).toEqual(["production", "module", "default"]);
-
   // NOTE: The order of the conditions is important and JEST is sorting the keys alphabetically.
   // The tests above actually assert that the order is correct.
-  expect(pkg).toMatchInlineSnapshot(`
-    Object {
-      "exports": Object {
-        ".": Object {
-          "browser": Object {
-            "default": "./dist/package-exports.browser.cjs.js",
-            "module": "./dist/package-exports.browser.esm.dev.js",
-            "production": Object {
-              "default": "./dist/package-exports.browser.cjs.prod.js",
-              "module": "./dist/package-exports.browser.esm.prod.js",
+  expect(JSON.stringify(pkg, null, 2)).toMatchInlineSnapshot(`
+    "{
+      \\"name\\": \\"package-exports\\",
+      \\"version\\": \\"1.0.0\\",
+      \\"main\\": \\"dist/package-exports.cjs.js\\",
+      \\"license\\": \\"MIT\\",
+      \\"private\\": true,
+      \\"module\\": \\"dist/package-exports.esm.js\\",
+      \\"exports\\": {
+        \\"./package.json\\": \\"./package.json\\",
+        \\".\\": {
+          \\"worker\\": {
+            \\"production\\": {
+              \\"module\\": \\"./dist/package-exports.worker.esm.prod.js\\",
+              \\"default\\": \\"./dist/package-exports.worker.cjs.prod.js\\"
             },
+            \\"module\\": \\"./dist/package-exports.worker.esm.dev.js\\",
+            \\"default\\": \\"./dist/package-exports.worker.cjs.js\\"
           },
-          "default": "./dist/package-exports.cjs.js",
-          "module": "./dist/package-exports.esm.dev.js",
-          "production": Object {
-            "default": "./dist/package-exports.cjs.prod.js",
-            "module": "./dist/package-exports.esm.prod.js",
-          },
-          "worker": Object {
-            "default": "./dist/package-exports.worker.cjs.js",
-            "module": "./dist/package-exports.worker.esm.dev.js",
-            "production": Object {
-              "default": "./dist/package-exports.worker.cjs.prod.js",
-              "module": "./dist/package-exports.worker.esm.prod.js",
+          \\"browser\\": {
+            \\"production\\": {
+              \\"module\\": \\"./dist/package-exports.browser.esm.prod.js\\",
+              \\"default\\": \\"./dist/package-exports.browser.cjs.prod.js\\"
             },
+            \\"module\\": \\"./dist/package-exports.browser.esm.dev.js\\",
+            \\"default\\": \\"./dist/package-exports.browser.cjs.js\\"
           },
-        },
-        "./package.json": "./package.json",
+          \\"production\\": {
+            \\"module\\": \\"./dist/package-exports.esm.prod.js\\",
+            \\"default\\": \\"./dist/package-exports.cjs.prod.js\\"
+          },
+          \\"module\\": \\"./dist/package-exports.esm.dev.js\\",
+          \\"default\\": \\"./dist/package-exports.cjs.js\\"
+        }
       },
-      "license": "MIT",
-      "main": "dist/package-exports.cjs.js",
-      "module": "dist/package-exports.esm.js",
-      "name": "package-exports",
-      "preconstruct": Object {
-        "___experimentalFlags_WILL_CHANGE_IN_PATCH": Object {
-          "exports": true,
+      \\"preconstruct\\": {
+        \\"exports\\": {
+          \\"conditions\\": [
+            \\"worker\\",
+            \\"browser\\",
+            \\"module\\"
+          ]
         },
-        "exports": Object {
-          "conditions": Array [
-            "worker",
-            "browser",
-            "module",
-          ],
-        },
-      },
-      "private": true,
-      "version": "1.0.0",
-    }
+        \\"___experimentalFlags_WILL_CHANGE_IN_PATCH\\": {
+          \\"exports\\": true
+        }
+      }
+    }"
   `);
 });
 
