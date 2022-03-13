@@ -33,7 +33,7 @@ const makeExternalPredicate = (externalArr: string[]) => {
 
 export type RollupConfigEnvironment = "dev" | "prod" | "umd";
 
-export type RollupConfigType = "browser" | "node" | "node" | "worker";
+export type RollupConfigType = "browser" | "node" | "worker";
 
 export let getRollupConfig = (
   pkg: Package,

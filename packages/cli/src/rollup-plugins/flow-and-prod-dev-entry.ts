@@ -81,6 +81,7 @@ export default function flowAndNodeDevProdEntry(
           continue;
         }
 
+
         let mainFieldPath = file.fileName.replace(/\.prod\.js$/, ".js");
         let relativeToSource = path.relative(
           path.dirname(path.join(opts.dir!, file.fileName)),
@@ -108,6 +109,15 @@ export default function flowAndNodeDevProdEntry(
               source: flowFileSource,
             });
           }
+        }
+
+        if (file.fileName.includes(".esm.")) {
+          this.emitFile({
+            type: "asset",
+            fileName: mainFieldPath,
+            source: `export * from "./${path.basename(getDevPath(mainFieldPath))}";`,
+          });
+          continue;
         }
 
         let mainEntrySource = `'use strict';

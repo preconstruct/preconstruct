@@ -159,16 +159,7 @@ export { sum };
 "
 `;
 
-exports[`two entrypoints with a common dependency: dist/common-dependency-two-entrypoints.esm.js 1`] = `
-"'use strict';
-
-if (process.env.NODE_ENV === \\"production\\") {
-  module.exports = require(\\"./common-dependency-two-entrypoints.esm.prod.js\\");
-} else {
-  module.exports = require(\\"./common-dependency-two-entrypoints.esm.dev.js\\");
-}
-"
-`;
+exports[`two entrypoints with a common dependency: dist/common-dependency-two-entrypoints.esm.js 1`] = `"export * from \\"./common-dependency-two-entrypoints.esm.dev.js\\";"`;
 
 exports[`two entrypoints with a common dependency: dist/common-dependency-two-entrypoints.esm.prod.js 1`] = `
 "import { i as identity } from './chunk-some-hash.esm.prod.js';
@@ -229,16 +220,7 @@ export { multiply };
 "
 `;
 
-exports[`two entrypoints with a common dependency: multiply/dist/common-dependency-two-entrypoints-multiply.esm.js 1`] = `
-"'use strict';
-
-if (process.env.NODE_ENV === \\"production\\") {
-  module.exports = require(\\"./common-dependency-two-entrypoints-multiply.esm.prod.js\\");
-} else {
-  module.exports = require(\\"./common-dependency-two-entrypoints-multiply.esm.dev.js\\");
-}
-"
-`;
+exports[`two entrypoints with a common dependency: multiply/dist/common-dependency-two-entrypoints-multiply.esm.js 1`] = `"export * from \\"./common-dependency-two-entrypoints-multiply.esm.dev.js\\";"`;
 
 exports[`two entrypoints with a common dependency: multiply/dist/common-dependency-two-entrypoints-multiply.esm.prod.js 1`] = `
 "import { i as identity } from '../../dist/chunk-some-hash.esm.prod.js';

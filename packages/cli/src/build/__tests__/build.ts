@@ -504,14 +504,7 @@ test("json", async () => {
     export { schema };
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/json-package.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    if (process.env.NODE_ENV === "production") {
-      module.exports = require("./json-package.esm.prod.js");
-    } else {
-      module.exports = require("./json-package.esm.dev.js");
-    }
-
+    export * from "./json-package.esm.dev.js";
   `);
 });
 

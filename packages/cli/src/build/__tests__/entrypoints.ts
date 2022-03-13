@@ -61,14 +61,7 @@ test("multiple entrypoints", async () => {
     export { sum };
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/multiple-entrypoints.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    if (process.env.NODE_ENV === "production") {
-      module.exports = require("./multiple-entrypoints.esm.prod.js");
-    } else {
-      module.exports = require("./multiple-entrypoints.esm.dev.js");
-    }
-
+    export * from "./multiple-entrypoints.esm.dev.js";
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ multiply/dist/multiple-entrypoints-multiply.cjs.dev.js, multiply/dist/multiple-entrypoints-multiply.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
@@ -93,14 +86,7 @@ test("multiple entrypoints", async () => {
     export { multiply };
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ multiply/dist/multiple-entrypoints-multiply.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    if (process.env.NODE_ENV === "production") {
-      module.exports = require("./multiple-entrypoints-multiply.esm.prod.js");
-    } else {
-      module.exports = require("./multiple-entrypoints-multiply.esm.dev.js");
-    }
-
+    export * from "./multiple-entrypoints-multiply.esm.dev.js";
   `);
 });
 
