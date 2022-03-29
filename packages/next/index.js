@@ -36,6 +36,13 @@ module.exports = (nextConfig = {}) => {
       use: hookLoader,
     });
 
+    if (options.isServer) {
+      webpackConfig.resolve.mainFields = [
+        "module",
+        ...webpackConfig.resolve.mainFields.filter((x) => x !== "module"),
+      ];
+    }
+
     return originalWebpack
       ? originalWebpack(webpackConfig, options)
       : webpackConfig;
