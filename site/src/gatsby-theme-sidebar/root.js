@@ -45,14 +45,16 @@ const MenuButton = (props) => (
   />
 );
 
-const Title = (props) => (
+const Title = ({ children, ...props }) => (
   <h1
     {...props}
     css={{
       margin: 0,
       fontSize: 16,
     }}
-  />
+  >
+    {children}
+  </h1>
 );
 
 const hamburger = (
@@ -68,11 +70,19 @@ const hamburger = (
 );
 
 let components = {
-  a: ({ href, ...props }) => {
+  a: ({ href, children, ...props }) => {
     if (href.startsWith("http")) {
-      return <a href={href} {...props} />;
+      return (
+        <a href={href} {...props}>
+          {children}
+        </a>
+      );
     }
-    return <Link to={href} {...props} />;
+    return (
+      <Link to={href} {...props}>
+        {children}
+      </Link>
+    );
   },
   blockquote: (props) => {
     return (
@@ -164,6 +174,7 @@ export default ({
               fontSize: 24,
               marginRight: 8,
             }}
+            aria-hidden
           >
             🎁
           </div>
