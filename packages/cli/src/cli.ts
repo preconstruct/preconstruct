@@ -105,7 +105,7 @@ class CommandNotFoundError extends Error {}
     );
   }
   info(
-    "If want to learn more about the above error, check https://preconstruct.tools/errors"
+    "If you want to learn more about the above error, check https://preconstruct.tools/errors"
   );
   info(
     "If the error is not there and you want to learn more about it, open an issue at https://github.com/preconstruct/preconstruct/issues/new"
