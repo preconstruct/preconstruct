@@ -1,5 +1,13 @@
 # preconstruct
 
+## 2.1.6
+
+### Patch Changes
+
+- [#461](https://github.com/preconstruct/preconstruct/pull/461) [`97e7ca0`](https://github.com/preconstruct/preconstruct/commit/97e7ca066f97b81ef986945e5363e95c6c1f867d) Thanks [@simonswiss](https://github.com/simonswiss)! - Fixed grammar in CLI info message about errors
+
+* [`f6f2e60`](https://github.com/preconstruct/preconstruct/commit/f6f2e605e74b18b84f6734ba8c7a58ce24703a34) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Fixed bigint usage causing an error
+
 ## 2.1.5
 
 ### Patch Changes
