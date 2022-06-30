@@ -163,7 +163,11 @@ let rollupPluginBabel = ({
           const ast = this.parse(x.code!, undefined);
           return {
             code: x.code,
-            ast: JSON.parse(JSON.stringify(ast)),
+            ast: JSON.parse(
+              JSON.stringify(ast, (_, value) =>
+                typeof value === "bigint" ? null : value
+              )
+            ),
             map: x.map,
             meta: {
               babel: { ast, codeAtBabelTime: x.code },
