@@ -140,22 +140,10 @@ function createEntrypoints(
 
 export type ExportsConditions = {
   worker?: {
-    production: {
-      module?: string;
-      default: string;
-    };
     module?: string;
     default: string;
   };
   browser?: {
-    production: {
-      module?: string;
-      default: string;
-    };
-    module?: string;
-    default: string;
-  };
-  production?: {
     module?: string;
     default: string;
   };
@@ -170,7 +158,7 @@ export class Package extends Item<{
   preconstruct: {
     exports?: {
       extra?: Record<string, JSONValue>;
-      conditions?: ExportsConditions[];
+      conditions?: ExportsCondition[];
     };
     entrypoints?: JSONValue;
   };

@@ -33,16 +33,7 @@ exports.default = index;
 "
 `;
 
-exports[`basic: valid-package.esm.dev.js 1`] = `
-"var index = \\"something\\";
-
-export default index;
-"
-`;
-
-exports[`basic: valid-package.esm.js 1`] = `"export * from \\"./valid-package.esm.dev.js\\";"`;
-
-exports[`basic: valid-package.esm.prod.js 1`] = `
+exports[`basic: valid-package.esm.js 1`] = `
 "var index = \\"something\\";
 
 export default index;
@@ -118,25 +109,7 @@ exports.thing = thing$1;
 "
 `;
 
-exports[`typescript thing: weird-typescript-thing.esm.d.ts 1`] = `
-"export * from \\"./declarations/src/index\\";
-"
-`;
-
-exports[`typescript thing: weird-typescript-thing.esm.dev.js 1`] = `
-"const thing = () => \\"wow\\";
-
-const makeThing = () => thing();
-
-const thing$1 = makeThing();
-
-export { thing$1 as thing };
-"
-`;
-
-exports[`typescript thing: weird-typescript-thing.esm.js 1`] = `"export * from \\"./weird-typescript-thing.esm.dev.js\\";"`;
-
-exports[`typescript thing: weird-typescript-thing.esm.prod.js 1`] = `
+exports[`typescript thing: weird-typescript-thing.esm.js 1`] = `
 "const thing = () => \\"wow\\";
 
 const makeThing = () => thing();

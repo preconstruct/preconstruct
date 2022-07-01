@@ -28,40 +28,11 @@ export const isFieldValid = {
   },
   exports(pkg: Package): boolean {
     const generated = validFields.exports(pkg);
-    if (!equal(pkg.json.exports, generated)) {
-      return false;
-    }
-    // make sure conditions are in proper order
-    if (pkg.json.exports) {
-      const packageNames = Object.keys(generated);
-      return packageNames.every((pkgName) => {
-        const generatedConditions = generated[pkgName];
-        if (typeof generatedConditions !== "object") {
-          return true;
-        }
-        return assertKeysAreInSameOrder(
-          generatedConditions,
-          pkg.json.exports[pkgName]
-        );
-      });
-    }
-    return true;
+
+    // JSON.stringify to make sure conditions are in proper order
+    return JSON.stringify(pkg.json.exports) === JSON.stringify(generated);
   },
 };
-
-function assertKeysAreInSameOrder(generated, origional) {
-  const generatedKeys = Object.keys(generated);
-  const origionalKeys = Object.keys(origional);
-  return generatedKeys.every((key, idx) => {
-    if (key !== origionalKeys[idx]) {
-      return false;
-    }
-    if (typeof generated[key] === "object") {
-      return assertKeysAreInSameOrder(generated[key], origional[key]);
-    }
-    return true;
-  });
-}
 
 export function isUmdNameSpecified(entrypoint: Entrypoint) {
   return typeof entrypoint.json.preconstruct.umdName === "string";

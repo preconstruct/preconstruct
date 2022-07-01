@@ -76,7 +76,7 @@ test("browser", async () => {
       module.exports = require("./browser.browser.cjs.dev.js");
     }
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/browser.browser.esm.dev.js, dist/browser.browser.esm.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/browser.browser.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     let thing = "wow";
 
     {
@@ -91,8 +91,6 @@ test("browser", async () => {
 
     export default thing$1;
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/browser.browser.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    export * from "./browser.browser.esm.dev.js";
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/browser.cjs.dev.js, dist/browser.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
@@ -121,7 +119,7 @@ test("browser", async () => {
       module.exports = require("./browser.cjs.dev.js");
     }
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/browser.esm.dev.js, dist/browser.esm.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/browser.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     let thing = "wow";
 
     if (typeof window !== "undefined") {
@@ -136,8 +134,6 @@ test("browser", async () => {
 
     export default thing$1;
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/browser.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    export * from "./browser.esm.dev.js";
   `);
 });
 
@@ -193,7 +189,7 @@ test("typescript", async () => {
     declare var obj: object;
 
     export { obj };
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.cjs.d.ts, dist/typescript.esm.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     export * from "./declarations/src/index";
     export { default } from "./declarations/src/index";
 
@@ -243,7 +239,7 @@ test("typescript", async () => {
       module.exports = require("./typescript.cjs.dev.js");
     }
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.esm.dev.js, dist/typescript.esm.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     import * as path from 'path';
     export { path };
 
@@ -254,8 +250,6 @@ test("typescript", async () => {
     export default thing;
     export { obj };
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    export * from "./typescript.esm.dev.js";
   `);
 });
 

@@ -117,8 +117,8 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
         ? [
             {
               format: "es" as const,
-              entryFileNames: "[name].esm.dev.js",
-              chunkFileNames: "dist/[name]-[hash].esm.dev.js",
+              entryFileNames: "[name].esm.js",
+              chunkFileNames: "dist/[name]-[hash].esm.js",
               dir: pkg.directory,
             },
           ]
@@ -145,16 +145,6 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
         interop,
         plugins: cjsPlugins,
       },
-      ...(hasModuleField
-        ? [
-            {
-              format: "es" as const,
-              entryFileNames: "[name].esm.prod.js",
-              chunkFileNames: "dist/[name]-[hash].esm.prod.js",
-              dir: pkg.directory,
-            },
-          ]
-        : []),
     ],
   });
 
@@ -232,8 +222,8 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
           ? [
               {
                 format: "es" as const,
-                entryFileNames: "[name].browser.esm.dev.js",
-                chunkFileNames: "dist/[name]-[hash].browser.esm.dev.js",
+                entryFileNames: "[name].browser.esm.js",
+                chunkFileNames: "dist/[name]-[hash].browser.esm.js",
                 dir: pkg.directory,
               },
             ]
@@ -259,16 +249,6 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
           interop,
           plugins: cjsPlugins,
         },
-        ...(hasModuleField
-          ? [
-              {
-                format: "es" as const,
-                entryFileNames: "[name].browser.esm.prod.js",
-                chunkFileNames: "dist/[name]-[hash].browser.esm.prod.js",
-                dir: pkg.directory,
-              },
-            ]
-          : []),
       ],
     });
   }

@@ -55,13 +55,11 @@ test("multiple entrypoints", async () => {
       module.exports = require("./multiple-entrypoints.cjs.dev.js");
     }
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/multiple-entrypoints.esm.dev.js, dist/multiple-entrypoints.esm.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/multiple-entrypoints.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     let sum = (a, b) => a + b;
 
     export { sum };
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/multiple-entrypoints.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    export * from "./multiple-entrypoints.esm.dev.js";
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ multiply/dist/multiple-entrypoints-multiply.cjs.dev.js, multiply/dist/multiple-entrypoints-multiply.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
@@ -80,13 +78,11 @@ test("multiple entrypoints", async () => {
       module.exports = require("./multiple-entrypoints-multiply.cjs.dev.js");
     }
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ multiply/dist/multiple-entrypoints-multiply.esm.dev.js, multiply/dist/multiple-entrypoints-multiply.esm.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ multiply/dist/multiple-entrypoints-multiply.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     let multiply = (a, b) => a * b;
 
     export { multiply };
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ multiply/dist/multiple-entrypoints-multiply.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    export * from "./multiple-entrypoints-multiply.esm.dev.js";
   `);
 });
 
