@@ -77,14 +77,7 @@ function getDistNameWithStrategy(
   return pkg.name.replace(/.*\//, "");
 }
 
-function getDistName(
-  pkg: Package,
-  entrypointName: string,
-  forceStrategy?: DistFilenameStrategy
-): string {
-  if (forceStrategy) {
-    return getDistNameWithStrategy(pkg, entrypointName, forceStrategy);
-  }
+function getDistName(pkg: Package, entrypointName: string): string {
   if ("distFilenameStrategy" in pkg.project.json.preconstruct) {
     if (
       pkg.project.json.preconstruct.distFilenameStrategy !== "full" &&
@@ -113,37 +106,20 @@ function getDistName(
 }
 
 export const validFieldsFromPkg = {
-  main(
-    pkg: Package,
-    entrypointName: string,
-    forceStrategy?: DistFilenameStrategy
-  ) {
-    let safeName = getDistName(pkg, entrypointName, forceStrategy);
+  main(pkg: Package, entrypointName: string) {
+    let safeName = getDistName(pkg, entrypointName);
     return `dist/${safeName}.cjs.js`;
   },
-  module(
-    pkg: Package,
-    entrypointName: string,
-    forceStrategy?: DistFilenameStrategy
-  ) {
-    let safeName = getDistName(pkg, entrypointName, forceStrategy);
+  module(pkg: Package, entrypointName: string) {
+    let safeName = getDistName(pkg, entrypointName);
     return `dist/${safeName}.esm.js`;
   },
-  "umd:main"(
-    pkg: Package,
-    entrypointName: string,
-    forceStrategy?: DistFilenameStrategy
-  ) {
-    let safeName = getDistName(pkg, entrypointName, forceStrategy);
+  "umd:main"(pkg: Package, entrypointName: string) {
+    let safeName = getDistName(pkg, entrypointName);
     return `dist/${safeName}.umd.min.js`;
   },
-  browser(
-    pkg: Package,
-    hasModuleBuild: boolean,
-    entrypointName: string,
-    forceStrategy?: DistFilenameStrategy
-  ) {
-    let safeName = getDistName(pkg, entrypointName, forceStrategy);
+  browser(pkg: Package, hasModuleBuild: boolean, entrypointName: string) {
+    let safeName = getDistName(pkg, entrypointName);
 
     let obj = {
       [`./dist/${safeName}.cjs.js`]: `./dist/${safeName}.browser.cjs.js`,
@@ -156,33 +132,20 @@ export const validFieldsFromPkg = {
 };
 
 export const validFields = {
-  main(entrypoint: Entrypoint, forceStrategy?: DistFilenameStrategy) {
-    return validFieldsFromPkg.main(
-      entrypoint.package,
-      entrypoint.name,
-      forceStrategy
-    );
+  main(entrypoint: Entrypoint) {
+    return validFieldsFromPkg.main(entrypoint.package, entrypoint.name);
   },
-  module(entrypoint: Entrypoint, forceStrategy?: DistFilenameStrategy) {
-    return validFieldsFromPkg.module(
-      entrypoint.package,
-      entrypoint.name,
-      forceStrategy
-    );
+  module(entrypoint: Entrypoint) {
+    return validFieldsFromPkg.module(entrypoint.package, entrypoint.name);
   },
-  "umd:main"(entrypoint: Entrypoint, forceStrategy?: DistFilenameStrategy) {
-    return validFieldsFromPkg["umd:main"](
-      entrypoint.package,
-      entrypoint.name,
-      forceStrategy
-    );
+  "umd:main"(entrypoint: Entrypoint) {
+    return validFieldsFromPkg["umd:main"](entrypoint.package, entrypoint.name);
   },
-  browser(entrypoint: Entrypoint, forceStrategy?: DistFilenameStrategy) {
+  browser(entrypoint: Entrypoint) {
     return validFieldsFromPkg.browser(
       entrypoint.package,
       entrypoint.json.module !== undefined,
-      entrypoint.name,
-      forceStrategy
+      entrypoint.name
     );
   },
 };

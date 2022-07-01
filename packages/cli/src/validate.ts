@@ -43,9 +43,23 @@ function validateEntrypoint(entrypoint: Entrypoint, log: boolean) {
       continue;
     }
     if (!isFieldValid[field](entrypoint)) {
-      let isUsingOldDistFilenames =
-        validFields[field](entrypoint, "unscoped-package-name") ===
-        entrypoint.json[field];
+      let isUsingOldDistFilenames: boolean;
+      let prevDistFilenameStrategy =
+        entrypoint.package.project.json.preconstruct.distFilenameStrategy;
+      try {
+        entrypoint.package.project.json.preconstruct.distFilenameStrategy =
+          "unscoped-package-name";
+        isUsingOldDistFilenames =
+          validFields[field](entrypoint) === entrypoint.json[field];
+      } finally {
+        if (prevDistFilenameStrategy === undefined) {
+          delete entrypoint.package.project.json.preconstruct
+            .distFilenameStrategy;
+        } else {
+          entrypoint.package.project.json.preconstruct.distFilenameStrategy = prevDistFilenameStrategy;
+        }
+      }
+
       if (
         isUsingOldDistFilenames &&
         !projectsShownOldDistNamesInfo.has(entrypoint.package.project)

@@ -606,3 +606,54 @@ test("negated entrypoint", async () => {
     `[Error: 🎁 pkg-a specifies a entrypoint "index.js" but it is negated in the same config so it should be removed or the config should be fixed]`
   );
 });
+
+test("old dist filenames", async () => {
+  let tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "@something/pkg-a",
+      main: "dist/pkg-a.cjs.js",
+    }),
+    "src/index.js": "",
+  });
+
+  await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
+    `[Error: main field is invalid, found \`"dist/pkg-a.cjs.js"\`, expected \`"dist/something-pkg-a.cjs.js"\`]`
+  );
+  expect(logMock.log.mock.calls).toMatchInlineSnapshot(`
+    Array [
+      Array [
+        "🎁 info @something/pkg-a a valid entry point exists.",
+      ],
+      Array [
+        "🎁 info it looks like you're using the dist filenames of Preconstruct v1, the default dist filename strategy has changed in v2",
+      ],
+      Array [
+        "🎁 info you can run preconstruct fix to use the new dist filenames",
+      ],
+      Array [
+        "🎁 info if you want to keep the dist filename strategy of v1, add \`\\"distFilenameStrategy\\": \\"unscoped-package-name\\"\` to the Preconstruct config in your root package.json",
+      ],
+    ]
+  `);
+});
+
+test("just wrong dist filenames doesn't report about the changed dist filename strategy", async () => {
+  let tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "@something/pkg-a",
+      main: "dist/pkg-a-blah.cjs.js",
+    }),
+    "src/index.js": "",
+  });
+
+  await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
+    `[Error: main field is invalid, found \`"dist/pkg-a-blah.cjs.js"\`, expected \`"dist/something-pkg-a.cjs.js"\`]`
+  );
+  expect(logMock.log.mock.calls).toMatchInlineSnapshot(`
+    Array [
+      Array [
+        "🎁 info @something/pkg-a a valid entry point exists.",
+      ],
+    ]
+  `);
+});
