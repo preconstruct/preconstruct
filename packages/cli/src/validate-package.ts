@@ -20,19 +20,17 @@ export async function fixPackage(pkg: Package) {
   };
 
   if (pkg.project.experimentalFlags.exports && pkg.json.preconstruct.exports) {
-    for (const condition of ["module", "browser"] as const) {
-      if (
-        fields[condition] ||
-        !!pkg.json.preconstruct.exports.conditions?.includes(condition)
-      ) {
-        if (!pkg.json.preconstruct.exports.conditions) {
-          pkg.json.preconstruct.exports.conditions = [];
-        }
-        if (!pkg.json.preconstruct.exports.conditions.includes(condition)) {
-          pkg.json.preconstruct.exports.conditions.push(condition);
-        }
-        fields[condition] = true;
+    if (
+      fields.browser ||
+      !!pkg.json.preconstruct.exports.envConditions?.includes("browser")
+    ) {
+      if (!pkg.json.preconstruct.exports.envConditions) {
+        pkg.json.preconstruct.exports.envConditions = [];
       }
+      if (!pkg.json.preconstruct.exports.envConditions.includes("browser")) {
+        pkg.json.preconstruct.exports.envConditions.push("browser");
+      }
+      fields.browser = true;
     }
   }
 
@@ -66,31 +64,35 @@ export function validatePackage(pkg: Package) {
   };
 
   if (pkg.project.experimentalFlags.exports && pkg.json.preconstruct.exports) {
-    for (const condition of ["module", "browser"] as const) {
-      const hasField = fields[condition];
-      const hasCondition = !!pkg.json.preconstruct.exports?.conditions?.includes(
-        condition
-      );
-      if (hasField && !hasCondition) {
-        throw new FixableError(
-          errors.missingConditionWithFieldPresent(condition),
-          pkg.name
-        );
-      }
-      if (!hasField && hasCondition) {
-        throw new FixableError(
-          errors.missingFieldWithConditionPresent(condition),
-          pkg.name
-        );
-      }
-    }
-
-    if (!isFieldValid.exports(pkg)) {
+    if (!fields.module) {
       throw new FixableError(
-        errors.invalidField("exports", pkg.json.exports, exportsField(pkg)),
+        errors.missingBrowserConditionWithFieldPresent,
         pkg.name
       );
     }
+    const hasField = fields["browser"];
+    const hasCondition = !!pkg.json.preconstruct.exports?.envConditions?.includes(
+      "browser"
+    );
+    if (hasField && !hasCondition) {
+      throw new FixableError(
+        errors.missingBrowserConditionWithFieldPresent,
+        pkg.name
+      );
+    }
+    if (!hasField && hasCondition) {
+      throw new FixableError(
+        errors.missingBrowserFieldWithConditionPresent,
+        pkg.name
+      );
+    }
+  }
+
+  if (!isFieldValid.exports(pkg)) {
+    throw new FixableError(
+      errors.invalidField("exports", pkg.json.exports, exportsField(pkg)),
+      pkg.name
+    );
   }
 
   pkg.entrypoints.forEach((entrypoint) => {

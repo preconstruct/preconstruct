@@ -103,23 +103,21 @@ function createEntrypoints(
   );
 }
 
-export type ExportsConditions =
-  | {
-      worker?: { module: string; default: string } | string;
-      browser?: { module: string; default: string } | string;
-      module?: string;
-      default: string;
-    }
-  | string;
+export type ExportsConditions = {
+  worker?: { module: string; default: string };
+  browser?: { module: string; default: string };
+  module: string;
+  default: string;
+};
 
-export type ExportsCondition = "browser" | "worker" | "module" | "default";
+export type EnvCondition = "browser" | "worker";
 
 export class Package extends Item<{
   name?: JSONValue;
   preconstruct: {
     exports?: {
       extra?: Record<string, JSONValue>;
-      conditions?: ExportsCondition[];
+      envConditions?: EnvCondition[];
     };
     entrypoints?: JSONValue;
   };

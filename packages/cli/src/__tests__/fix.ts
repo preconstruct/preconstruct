@@ -9,6 +9,7 @@ import {
   createPackageCheckTestCreator,
   testdir,
   js,
+  getFiles,
 } from "../../test-utils";
 import { promptInput as _promptInput } from "../prompt";
 import fs from "fs-extra";
@@ -71,50 +72,63 @@ test("set main and module field", async () => {
 });
 
 test("set exports field when opt-in", async () => {
-  let tmpPath = f.copy("package-exports");
+  let tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "package-exports",
+      main: "index.js",
+      module: "dist/package-exports.esm.js",
+      preconstruct: {
+        exports: {
+          envConditions: ["worker", "browser"],
+        },
+        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+          exports: true,
+        },
+      },
+    }),
+    "src/index.js": "",
+  });
 
   await fix(tmpPath);
 
-  let pkg = await getPkg(tmpPath);
-
-  // NOTE: The order of the conditions is important and JEST is sorting the keys alphabetically.
-  // The tests above actually assert that the order is correct.
-  expect(JSON.stringify(pkg, null, 2)).toMatchInlineSnapshot(`
-    "{
-      \\"name\\": \\"package-exports\\",
-      \\"version\\": \\"1.0.0\\",
-      \\"main\\": \\"dist/package-exports.cjs.js\\",
-      \\"license\\": \\"MIT\\",
-      \\"private\\": true,
-      \\"module\\": \\"dist/package-exports.esm.js\\",
-      \\"exports\\": {
-        \\"./package.json\\": \\"./package.json\\",
-        \\".\\": {
-          \\"browser\\": {
-            \\"module\\": \\"./dist/package-exports.browser.esm.js\\",
-            \\"default\\": \\"./dist/package-exports.browser.cjs.js\\"
+  expect(await getFiles(tmpPath, ["package.json"])).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {
+      "name": "package-exports",
+      "main": "dist/package-exports.cjs.js",
+      "module": "dist/package-exports.esm.js",
+      "browser": {
+        "./dist/package-exports.cjs.js": "./dist/package-exports.browser.cjs.js",
+        "./dist/package-exports.esm.js": "./dist/package-exports.browser.esm.js"
+      },
+      "exports": {
+        "./package.json": "./package.json",
+        ".": {
+          "browser": {
+            "module": "./dist/package-exports.browser.esm.js",
+            "default": "./dist/package-exports.browser.cjs.js"
           },
-          \\"worker\\": {
-            \\"module\\": \\"./dist/package-exports.worker.esm.js\\",
-            \\"default\\": \\"./dist/package-exports.worker.cjs.js\\"
+          "worker": {
+            "module": "./dist/package-exports.worker.esm.js",
+            "default": "./dist/package-exports.worker.cjs.js"
           },
-          \\"module\\": \\"./dist/package-exports.esm.js\\",
-          \\"default\\": \\"./dist/package-exports.cjs.js\\"
+          "module": "./dist/package-exports.esm.js",
+          "default": "./dist/package-exports.cjs.js"
         }
       },
-      \\"preconstruct\\": {
-        \\"exports\\": {
-          \\"conditions\\": [
-            \\"worker\\",
-            \\"browser\\",
-            \\"module\\"
+      "preconstruct": {
+        "exports": {
+          "envConditions": [
+            "worker",
+            "browser"
           ]
         },
-        \\"___experimentalFlags_WILL_CHANGE_IN_PATCH\\": {
-          \\"exports\\": true
+        "___experimentalFlags_WILL_CHANGE_IN_PATCH": {
+          "exports": true
         }
       }
-    }"
+    }
+
   `);
 });
 

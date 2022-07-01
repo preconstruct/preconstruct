@@ -141,25 +141,18 @@ export function exportsField(
   if (!pkg.json.preconstruct.exports) {
     return;
   }
-  const specifiedConditions: ("worker" | "browser" | "module")[] =
-    (pkg.json.preconstruct.exports?.conditions as any) ?? [];
-  let hasModuleBuild = specifiedConditions.includes("module");
+  const envConditions: ("worker" | "browser")[] =
+    pkg.json.preconstruct.exports?.envConditions ?? [];
 
   let output: Record<string, ExportsConditions> = {};
   pkg.entrypoints.forEach((entrypoint) => {
-    let exportConditions;
-    exportConditions = getExportConditions(
+    let exportConditions: ExportsConditions = getExportConditions(
       entrypoint,
-      hasModuleBuild,
       undefined
     );
-    for (const condition of ["worker", "browser"] as const) {
-      if (!specifiedConditions.includes(condition)) continue;
-      if (typeof exportConditions === "string") {
-        exportConditions = { default: exportConditions };
-      }
+    for (const env of envConditions) {
       exportConditions = {
-        [condition]: getExportConditions(entrypoint, hasModuleBuild, condition),
+        [env]: getExportConditions(entrypoint, env),
         ...exportConditions,
       };
     }
@@ -177,21 +170,14 @@ export function exportsField(
 
 function getExportConditions(
   entrypoint: Entrypoint,
-  hasModuleBuild: boolean,
-  target: "worker" | "browser" | undefined
-): { module: string; default: string } | string {
+  env: "worker" | "browser" | undefined
+) {
   const safeName = getDistName(entrypoint.package, entrypoint.name);
   const prefix = entrypoint.name.replace(entrypoint.package.name, "");
-  const defaultPath = `.${prefix}/dist/${safeName}.${
-    target ? `${target}.` : ""
-  }cjs.js`;
-  if (hasModuleBuild) {
-    return {
-      module: `.${prefix}/dist/${safeName}.${target ? `${target}.` : ""}esm.js`,
-      default: defaultPath,
-    };
-  }
-  return defaultPath;
+  return {
+    module: `.${prefix}/dist/${safeName}.${env ? `${env}.` : ""}esm.js`,
+    default: `.${prefix}/dist/${safeName}.${env ? `${env}.` : ""}cjs.js`,
+  };
 }
 
 export const validFieldsForEntrypoint = {

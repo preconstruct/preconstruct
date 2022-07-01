@@ -240,7 +240,7 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
 
   if (
     pkg.project.experimentalFlags.exports &&
-    pkg.json.preconstruct.exports?.conditions?.includes("worker")
+    pkg.json.preconstruct.exports?.envConditions?.includes("worker")
   ) {
     configs.push({
       config: getRollupConfig(
