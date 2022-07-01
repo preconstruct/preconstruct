@@ -135,8 +135,7 @@ export const validFieldsFromPkg = {
     hasModuleBuild: boolean,
     hasBrowserField: boolean,
     hasWorkerField: boolean,
-    entrypointName: string,
-    forceStrategy?: DistFilenameStrategy
+    entrypointName: string
   ): Record<string, ExportsConditions | string> {
     let output: Record<string, ExportsConditions> = {};
     pkg.entrypoints.forEach((entrypoint) => {
@@ -144,8 +143,7 @@ export const validFieldsFromPkg = {
         let obj: ExportsConditions = exportsHelpers.root(
           pkg,
           hasModuleBuild,
-          entrypointName,
-          forceStrategy
+          entrypointName
         );
         if (hasBrowserField) {
           obj = {
@@ -153,7 +151,6 @@ export const validFieldsFromPkg = {
               pkg,
               hasModuleBuild,
               entrypointName,
-              forceStrategy,
               "browser"
             ),
             ...obj,
@@ -165,7 +162,6 @@ export const validFieldsFromPkg = {
               pkg,
               hasModuleBuild,
               entrypointName,
-              forceStrategy,
               "worker"
             ),
             ...obj,
@@ -182,7 +178,6 @@ export const validFieldsFromPkg = {
           pkg,
           entrypoint.json.module !== undefined,
           entrypoint.name,
-          forceStrategy,
           entrypointPath + "/"
         );
 
@@ -192,7 +187,6 @@ export const validFieldsFromPkg = {
               pkg,
               hasModuleBuild,
               entrypoint.name,
-              forceStrategy,
               "browser",
               entrypointPath + "/"
             ),
@@ -205,7 +199,6 @@ export const validFieldsFromPkg = {
               pkg,
               hasModuleBuild,
               entrypoint.name,
-              forceStrategy,
               "worker",
               entrypointPath + "/"
             ),
@@ -228,14 +221,12 @@ const exportsHelpers = {
     pkg: Package,
     hasModuleBuild: boolean,
     entrypointName: string,
-    forceStrategy?: DistFilenameStrategy,
     prefix: string = ""
   ) {
     return exportsHelpers.target(
       pkg,
       hasModuleBuild,
       entrypointName,
-      forceStrategy,
       "",
       prefix
     );
@@ -244,7 +235,6 @@ const exportsHelpers = {
     pkg: Package,
     hasModuleBuild: boolean,
     entrypointName: string,
-    forceStrategy?: DistFilenameStrategy,
     target: string = "",
     prefix: string = ""
   ) {
@@ -252,7 +242,6 @@ const exportsHelpers = {
       pkg,
       hasModuleBuild,
       entrypointName,
-      forceStrategy,
       target,
       prefix
     );
@@ -261,11 +250,10 @@ const exportsHelpers = {
     pkg: Package,
     hasModuleBuild: boolean,
     entrypointName: string,
-    forceStrategy?: DistFilenameStrategy,
     target: string = "",
     prefix: string = ""
   ) {
-    let safeName = getDistName(pkg, entrypointName, forceStrategy);
+    let safeName = getDistName(pkg, entrypointName);
 
     let obj: ExportsConditions = {
       default: `./${prefix}dist/${safeName}.${
@@ -302,7 +290,7 @@ export const validFields = {
       entrypoint.name
     );
   },
-  exports(pkg: Package, forceStrategy?: DistFilenameStrategy) {
+  exports(pkg: Package) {
     // skip if not enabled for the project
     if (!pkg.project.experimentalFlags.exports) {
       return;
@@ -329,8 +317,7 @@ export const validFields = {
       hasModuleField,
       hasBrowserField,
       hasWorkerField,
-      pkg.name,
-      forceStrategy
+      pkg.name
     );
   },
 };
