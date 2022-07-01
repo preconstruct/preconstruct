@@ -19,6 +19,23 @@ export async function fixPackage(pkg: Package) {
     browser: pkg.entrypoints.some((x) => x.json.browser !== undefined),
   };
 
+  if (pkg.project.experimentalFlags.exports && pkg.json.preconstruct.exports) {
+    for (const condition of ["module", "browser"] as const) {
+      if (
+        fields[condition] ||
+        !!pkg.json.preconstruct.exports.conditions?.includes(condition)
+      ) {
+        if (!pkg.json.preconstruct.exports.conditions) {
+          pkg.json.preconstruct.exports.conditions = [];
+        }
+        if (!pkg.json.preconstruct.exports.conditions.includes(condition)) {
+          pkg.json.preconstruct.exports.conditions.push(condition);
+        }
+        fields[condition] = true;
+      }
+    }
+  }
+
   pkg.json = setFieldInOrder(pkg.json, "exports", exportsField(pkg));
 
   keys(fields)
@@ -48,15 +65,32 @@ export function validatePackage(pkg: Package) {
     // "exports" is missing because it is validated on the root package
   };
 
-  if (
-    pkg.project.experimentalFlags.exports &&
-    pkg.json.preconstruct.exports &&
-    !isFieldValid.exports(pkg)
-  ) {
-    throw new FixableError(
-      errors.invalidField("exports", pkg.json.exports, exportsField(pkg)),
-      pkg.name
-    );
+  if (pkg.project.experimentalFlags.exports && pkg.json.preconstruct.exports) {
+    for (const condition of ["module", "browser"] as const) {
+      const hasField = fields[condition];
+      const hasCondition = !!pkg.json.preconstruct.exports?.conditions?.includes(
+        condition
+      );
+      if (hasField && !hasCondition) {
+        throw new FixableError(
+          errors.missingConditionWithFieldPresent(condition),
+          pkg.name
+        );
+      }
+      if (!hasField && hasCondition) {
+        throw new FixableError(
+          errors.missingFieldWithConditionPresent(condition),
+          pkg.name
+        );
+      }
+    }
+
+    if (!isFieldValid.exports(pkg)) {
+      throw new FixableError(
+        errors.invalidField("exports", pkg.json.exports, exportsField(pkg)),
+        pkg.name
+      );
+    }
   }
 
   pkg.entrypoints.forEach((entrypoint) => {

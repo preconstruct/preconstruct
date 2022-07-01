@@ -20,6 +20,10 @@ export let errors = {
     "packages must have at least one entrypoint, this package has no entrypoints",
   fieldMustExistInAllEntrypointsIfExistsDeclinedFixDuringInit: (field: Field) =>
     `all entrypoints in a package must have the same fields and one entrypoint in this package has a ${field} field but you've declined the fix`,
+  missingConditionWithFieldPresent: (condition: "browser" | "module") =>
+    `the exports field is configured and the ${condition} field exists in this package but it is not specified in the preconstruct.exports.conditions field`,
+  missingFieldWithConditionPresent: (condition: "browser" | "module") =>
+    `the exports field is configured and the ${condition} condition exists is set in preconstruct.exports.conditions the field is not present at the top-level`,
 };
 
 export let confirms = {
