@@ -14,7 +14,11 @@ export async function fixPackage(pkg: Package) {
   }
   let fields = {
     main: true,
-    module: pkg.entrypoints.some((x) => x.json.module !== undefined),
+    module:
+      pkg.entrypoints.some((x) => x.json.module !== undefined) ||
+      !!(
+        pkg.project.experimentalFlags.exports && pkg.json.preconstruct.exports
+      ),
     "umd:main": pkg.entrypoints.some((x) => x.json["umd:main"] !== undefined),
     browser: pkg.entrypoints.some((x) => x.json.browser !== undefined),
   };
@@ -35,6 +39,8 @@ export async function fixPackage(pkg: Package) {
   }
 
   pkg.json = setFieldInOrder(pkg.json, "exports", exportsField(pkg));
+
+  await pkg.save();
 
   keys(fields)
     .filter((x) => fields[x])
