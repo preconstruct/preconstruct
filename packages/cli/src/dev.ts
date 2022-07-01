@@ -1,6 +1,11 @@
 import { Project } from "./project";
 import { success, info } from "./logger";
-import { tsTemplate, flowTemplate, validFieldsForEntrypoint } from "./utils";
+import {
+  tsTemplate,
+  flowTemplate,
+  validFieldsForEntrypoint,
+  getExportConditions,
+} from "./utils";
 import * as babel from "@babel/core";
 import * as fs from "fs-extra";
 import path from "path";
@@ -214,25 +219,29 @@ unregister();
             );
           }
 
-          // if (
-          //   pkg.project.experimentalFlags.exports &&
-          //   pkg.json.preconstruct.exports?.conditions?.includes("worker")
-          // ) {
-          //   promises.push(
-          //     fs.symlink(
-          //       entrypoint.source,
-          //       path.join(entrypoint.directory, browserField[key])
-          //     )
-          //   );
-          // }
-
-          if (entrypoint.json.browser) {
-            let browserField = validFieldsForEntrypoint.browser(entrypoint);
-            for (let key of Object.keys(browserField)) {
+          if (
+            pkg.project.experimentalFlags.exports &&
+            pkg.json.preconstruct.exports?.envConditions?.includes("worker")
+          ) {
+            for (const output of Object.values(
+              getExportConditions(entrypoint, "browser")
+            )) {
               promises.push(
                 fs.symlink(
                   entrypoint.source,
-                  path.join(entrypoint.directory, browserField[key])
+                  path.join(entrypoint.directory, output)
+                )
+              );
+            }
+          }
+
+          if (entrypoint.json.browser) {
+            let browserField = validFieldsForEntrypoint.browser(entrypoint);
+            for (let output of Object.values(browserField)) {
+              promises.push(
+                fs.symlink(
+                  entrypoint.source,
+                  path.join(entrypoint.directory, output)
                 )
               );
             }

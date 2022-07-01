@@ -135,10 +135,10 @@ export const validFieldsFromPkg = {
 export function exportsField(
   pkg: Package
 ): Record<string, ExportsConditions | string> | undefined {
-  if (!pkg.project.experimentalFlags.exports) {
-    return;
-  }
-  if (!pkg.json.preconstruct.exports) {
+  if (
+    !pkg.project.experimentalFlags.exports ||
+    !pkg.json.preconstruct.exports
+  ) {
     return;
   }
   const envConditions: ("worker" | "browser")[] =
@@ -168,7 +168,7 @@ export function exportsField(
   };
 }
 
-function getExportConditions(
+export function getExportConditions(
   entrypoint: Entrypoint,
   env: "worker" | "browser" | undefined
 ) {
