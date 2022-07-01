@@ -215,19 +215,10 @@ export const validFieldsFromPkg = {
         output[`./${entrypointPath}`] = conditions;
       }
     });
-    let extra: Record<string, unknown> | null = null;
-    if (
-      pkg.project.experimentalFlags.exports &&
-      typeof pkg.json.preconstruct.exports === "object"
-    ) {
-      if (pkg.json.preconstruct.exports.extra) {
-        extra = pkg.json.preconstruct.exports.extra as Record<string, unknown>;
-      }
-    }
     return {
       "./package.json": "./package.json",
       ...output,
-      ...extra,
+      ...pkg.json.preconstruct.exports?.extra,
     };
   },
 };
@@ -257,51 +248,36 @@ const exportsHelpers = {
     target: string = "",
     prefix: string = ""
   ) {
-    const obj = exportsHelpers.env(
+    return exportsHelpers.env(
       pkg,
       hasModuleBuild,
       entrypointName,
       forceStrategy,
-      "",
       target,
       prefix
     );
-    const production = exportsHelpers.env(
-      pkg,
-      hasModuleBuild,
-      entrypointName,
-      forceStrategy,
-      "prod",
-      target,
-      prefix
-    );
-    return {
-      production,
-      ...obj,
-    };
   },
   env(
     pkg: Package,
     hasModuleBuild: boolean,
     entrypointName: string,
     forceStrategy?: DistFilenameStrategy,
-    env: string = "",
     target: string = "",
     prefix: string = ""
   ) {
     let safeName = getDistName(pkg, entrypointName, forceStrategy);
 
     let obj: ExportsConditions = {
-      default: `./${prefix}dist/${safeName}.${target ? `${target}.` : ""}cjs.${
-        env ? `${env}.` : ""
-      }js`,
+      default: `./${prefix}dist/${safeName}.${
+        target ? `${target}.` : ""
+      }cjs.js`,
     };
     if (hasModuleBuild) {
       // esm doesn't support conditional imports so if env is not set we default to dev version
       obj = {
-        module: `./${prefix}dist/${safeName}.${target ? `${target}.` : ""}esm.${
-          env ? `${env}.` : "dev."
-        }js`,
+        module: `./${prefix}dist/${safeName}.${
+          target ? `${target}.` : ""
+        }esm.js`,
         ...obj,
       };
     }

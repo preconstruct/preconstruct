@@ -91,24 +91,12 @@ test("set exports field when opt-in", async () => {
         \\"./package.json\\": \\"./package.json\\",
         \\".\\": {
           \\"worker\\": {
-            \\"production\\": {
-              \\"module\\": \\"./dist/package-exports.worker.esm.prod.js\\",
-              \\"default\\": \\"./dist/package-exports.worker.cjs.prod.js\\"
-            },
             \\"module\\": \\"./dist/package-exports.worker.esm.dev.js\\",
             \\"default\\": \\"./dist/package-exports.worker.cjs.js\\"
           },
           \\"browser\\": {
-            \\"production\\": {
-              \\"module\\": \\"./dist/package-exports.browser.esm.prod.js\\",
-              \\"default\\": \\"./dist/package-exports.browser.cjs.prod.js\\"
-            },
             \\"module\\": \\"./dist/package-exports.browser.esm.dev.js\\",
             \\"default\\": \\"./dist/package-exports.browser.cjs.js\\"
-          },
-          \\"production\\": {
-            \\"module\\": \\"./dist/package-exports.esm.prod.js\\",
-            \\"default\\": \\"./dist/package-exports.cjs.prod.js\\"
           },
           \\"module\\": \\"./dist/package-exports.esm.dev.js\\",
           \\"default\\": \\"./dist/package-exports.cjs.js\\"
