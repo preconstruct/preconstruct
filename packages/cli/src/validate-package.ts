@@ -4,7 +4,7 @@ import chalk from "chalk";
 import { errors } from "./messages";
 import { Package } from "./package";
 import { isFieldValid } from "./validate";
-import { validFields, setFieldInOrder } from "./utils";
+import { setFieldInOrder, exportsField } from "./utils";
 
 let keys: <Obj>(obj: Obj) => (keyof Obj)[] = Object.keys;
 
@@ -19,7 +19,7 @@ export async function fixPackage(pkg: Package) {
     browser: pkg.entrypoints.some((x) => x.json.browser !== undefined),
   };
 
-  pkg.json = setFieldInOrder(pkg.json, "exports", validFields.exports(pkg));
+  pkg.json = setFieldInOrder(pkg.json, "exports", exportsField(pkg));
 
   keys(fields)
     .filter((x) => fields[x])
@@ -54,11 +54,7 @@ export function validatePackage(pkg: Package) {
     !isFieldValid.exports(pkg)
   ) {
     throw new FixableError(
-      errors.invalidField(
-        "exports",
-        pkg.json.exports,
-        validFields.exports(pkg)
-      ),
+      errors.invalidField("exports", pkg.json.exports, exportsField(pkg)),
       pkg.name
     );
   }

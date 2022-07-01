@@ -11,7 +11,7 @@ import { errors, confirms } from "./messages";
 import { Project } from "./project";
 import { getUselessGlobsThatArentReallyGlobsForNewEntrypoints } from "./glob-thing";
 import {
-  validFields,
+  validFieldsForEntrypoint,
   validFieldsFromPkg,
   JSONValue,
   getEntrypointName,
@@ -21,51 +21,30 @@ import normalizePath from "normalize-path";
 
 function getFieldsUsedInEntrypoints(
   descriptors: { contents: string | undefined; filename: string }[]
-): [Set<keyof typeof validFields>, boolean, boolean] {
-  let hasBrowserField = false;
-  let hasWorkerField = false;
-  const fields = new Set<keyof typeof validFields>(["main"]);
+): Set<keyof typeof validFieldsForEntrypoint> {
+  const fields = new Set<keyof typeof validFieldsForEntrypoint>(["main"]);
   for (let descriptor of descriptors) {
     if (descriptor.contents !== undefined) {
       let parsed = jsonParse(descriptor.contents, descriptor.filename);
-      for (let field of ["module", "umd:main", "browser", "exports"] as const) {
+      for (let field of ["module", "umd:main", "browser"] as const) {
         const value = parsed[field];
         if (value !== undefined) {
           fields.add(field);
-          if (field === "exports" && value["."]) {
-            const conditions: ExportsConditions[] = Object.values(value["."]);
-            hasBrowserField =
-              hasBrowserField ||
-              conditions.some(
-                (condition) =>
-                  typeof condition === "object" &&
-                  condition.browser !== undefined
-              );
-            hasWorkerField =
-              hasWorkerField ||
-              conditions.some(
-                (condition) =>
-                  typeof condition === "object" &&
-                  condition.worker !== undefined
-              );
-          }
         }
       }
     }
   }
-  return [fields, hasBrowserField, hasWorkerField];
+  return fields;
 }
 
 function getPlainEntrypointContent(
   pkg: Package,
-  fields: Set<keyof typeof validFields>,
+  fields: Set<keyof typeof validFieldsForEntrypoint>,
   entrypointDir: string,
-  indent: string,
-  hasBrowserField: boolean,
-  hasWorkerField: boolean
+  indent: string
 ) {
   const obj: Partial<Record<
-    keyof typeof validFields,
+    keyof typeof validFieldsForEntrypoint,
     string | Record<string, string | ExportsConditions>
   >> = {};
   for (const field of fields) {
@@ -75,16 +54,6 @@ function getPlainEntrypointContent(
         fields.has("module"),
         getEntrypointName(pkg, entrypointDir)
       );
-    } else if (field === "exports") {
-      if (pkg.project.experimentalFlags.exports) {
-        obj[field] = validFieldsFromPkg[field](
-          pkg,
-          fields.has("module"),
-          hasBrowserField,
-          hasWorkerField,
-          getEntrypointName(pkg, entrypointDir)
-        );
-      }
     } else {
       obj[field] = validFieldsFromPkg[field](
         pkg,
@@ -104,9 +73,7 @@ function createEntrypoints(
     sourceFile: string;
   }[]
 ) {
-  let [fields, hasBrowserField, hasWorkerField] = getFieldsUsedInEntrypoints(
-    descriptors
-  );
+  let fields = getFieldsUsedInEntrypoints(descriptors);
 
   return Promise.all(
     descriptors.map(async ({ filename, contents, hasAccepted, sourceFile }) => {
@@ -127,9 +94,7 @@ function createEntrypoints(
           pkg,
           fields,
           nodePath.dirname(filename),
-          pkg.indent,
-          hasBrowserField,
-          hasWorkerField
+          pkg.indent
         );
         await fs.outputFile(filename, contents);
       }
@@ -138,18 +103,14 @@ function createEntrypoints(
   );
 }
 
-export type ExportsConditions = {
-  worker?: {
-    module?: string;
-    default: string;
-  };
-  browser?: {
-    module?: string;
-    default: string;
-  };
-  module?: string;
-  default: string;
-};
+export type ExportsConditions =
+  | {
+      worker?: { module: string; default: string } | string;
+      browser?: { module: string; default: string } | string;
+      module?: string;
+      default: string;
+    }
+  | string;
 
 export type ExportsCondition = "browser" | "worker" | "module" | "default";
 
@@ -325,7 +286,7 @@ export class Package extends Item<{
       entrypoint.json = setFieldInOrder(
         entrypoint.json,
         field,
-        validFields[field](entrypoint)
+        validFieldsForEntrypoint[field](entrypoint)
       );
     });
   }

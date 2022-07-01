@@ -1,6 +1,6 @@
 import { Project } from "./project";
 import { success, info } from "./logger";
-import { tsTemplate, flowTemplate, validFields } from "./utils";
+import { tsTemplate, flowTemplate, validFieldsForEntrypoint } from "./utils";
 import * as babel from "@babel/core";
 import * as fs from "fs-extra";
 import path from "path";
@@ -69,7 +69,7 @@ export async function writeDevTSFile(
   entrypointSourceContent: string
 ) {
   let cjsDistPath = path
-    .join(entrypoint.directory, validFields.main(entrypoint))
+    .join(entrypoint.directory, validFieldsForEntrypoint.main(entrypoint))
     .replace(/\.js$/, ".d.ts");
 
   let output = await (entrypoint.package.project.experimentalFlags
@@ -115,7 +115,7 @@ async function writeTypeSystemFile(
   if (typeSystem === undefined) return;
   let cjsDistPath = path.join(
     entrypoint.directory,
-    validFields.main(entrypoint)
+    validFieldsForEntrypoint.main(entrypoint)
   );
 
   if (typeSystem === "flow") {
@@ -166,7 +166,10 @@ export default async function dev(projectDir: string) {
           let promises = [
             writeTypeSystemFile(typeSystemPromise, entrypoint),
             fs.writeFile(
-              path.join(entrypoint.directory, validFields.main(entrypoint)),
+              path.join(
+                entrypoint.directory,
+                validFieldsForEntrypoint.main(entrypoint)
+              ),
               `"use strict";
 // this file might look strange and you might be wondering what it's for
 // it's lets you import your source files by importing this entrypoint
@@ -203,7 +206,10 @@ unregister();
             promises.push(
               fs.symlink(
                 entrypoint.source,
-                path.join(entrypoint.directory, validFields.module(entrypoint))
+                path.join(
+                  entrypoint.directory,
+                  validFieldsForEntrypoint.module(entrypoint)
+                )
               )
             );
           }
@@ -221,7 +227,7 @@ unregister();
           // }
 
           if (entrypoint.json.browser) {
-            let browserField = validFields.browser(entrypoint);
+            let browserField = validFieldsForEntrypoint.browser(entrypoint);
             for (let key of Object.keys(browserField)) {
               promises.push(
                 fs.symlink(

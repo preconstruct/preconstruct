@@ -3,7 +3,7 @@ import { Package } from "./package";
 import { Entrypoint } from "./entrypoint";
 import { errors, successes, infos } from "./messages";
 import { BatchError, FatalError, FixableError } from "./errors";
-import { validFields } from "./utils";
+import { exportsField, validFieldsForEntrypoint } from "./utils";
 import * as logger from "./logger";
 import equal from "fast-deep-equal";
 import { validatePackage } from "./validate-package";
@@ -15,20 +15,33 @@ import chalk from "chalk";
 
 export const isFieldValid = {
   main(entrypoint: Entrypoint) {
-    return entrypoint.json.main === validFields.main(entrypoint);
+    return entrypoint.json.main === validFieldsForEntrypoint.main(entrypoint);
   },
   module(entrypoint: Entrypoint) {
-    return entrypoint.json.module === validFields.module(entrypoint);
+    return (
+      entrypoint.json.module === validFieldsForEntrypoint.module(entrypoint)
+    );
   },
   "umd:main"(entrypoint: Entrypoint) {
-    return entrypoint.json["umd:main"] === validFields["umd:main"](entrypoint);
+    return (
+      entrypoint.json["umd:main"] ===
+      validFieldsForEntrypoint["umd:main"](entrypoint)
+    );
   },
   browser(entrypoint: Entrypoint): boolean {
-    return equal(entrypoint.json.browser, validFields.browser(entrypoint));
+    return equal(
+      entrypoint.json.browser,
+      validFieldsForEntrypoint.browser(entrypoint)
+    );
   },
   exports(pkg: Package): boolean {
-    const generated = validFields.exports(pkg);
-
+    if (
+      !pkg.project.experimentalFlags.exports ||
+      !pkg.json.preconstruct.exports
+    ) {
+      return true;
+    }
+    const generated = exportsField(pkg);
     // JSON.stringify to make sure conditions are in proper order
     return JSON.stringify(pkg.json.exports) === JSON.stringify(generated);
   },
@@ -57,7 +70,8 @@ function validateEntrypoint(entrypoint: Entrypoint, log: boolean) {
         entrypoint.package.project.json.preconstruct.distFilenameStrategy =
           "unscoped-package-name";
         isUsingOldDistFilenames =
-          validFields[field](entrypoint) === entrypoint.json[field];
+          validFieldsForEntrypoint[field](entrypoint) ===
+          entrypoint.json[field];
       } finally {
         if (prevDistFilenameStrategy === undefined) {
           delete entrypoint.package.project.json.preconstruct
@@ -90,7 +104,7 @@ function validateEntrypoint(entrypoint: Entrypoint, log: boolean) {
           errors.invalidField(
             field,
             entrypoint.json[field],
-            validFields[field](entrypoint)
+            validFieldsForEntrypoint[field](entrypoint)
           ),
           entrypoint.name
         )

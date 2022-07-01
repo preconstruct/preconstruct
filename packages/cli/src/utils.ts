@@ -130,150 +130,71 @@ export const validFieldsFromPkg = {
     }
     return obj;
   },
-  exports(
-    pkg: Package,
-    hasModuleBuild: boolean,
-    hasBrowserField: boolean,
-    hasWorkerField: boolean,
-    entrypointName: string
-  ): Record<string, ExportsConditions | string> {
-    let output: Record<string, ExportsConditions> = {};
-    pkg.entrypoints.forEach((entrypoint) => {
-      if (entrypointName === entrypoint.name) {
-        let obj: ExportsConditions = exportsHelpers.root(
-          pkg,
-          hasModuleBuild,
-          entrypointName
-        );
-        if (hasBrowserField) {
-          obj = {
-            browser: exportsHelpers.target(
-              pkg,
-              hasModuleBuild,
-              entrypointName,
-              "browser"
-            ),
-            ...obj,
-          };
-        }
-        if (hasWorkerField) {
-          obj = {
-            worker: exportsHelpers.target(
-              pkg,
-              hasModuleBuild,
-              entrypointName,
-              "worker"
-            ),
-            ...obj,
-          };
-        }
-        output["."] = obj;
-      } else {
-        const entrypointPath = nodePath
-          .relative(pkg.directory, entrypoint.source)
-          .replace("src/", "")
-          .replace(/\.[tj]sx?$/, "");
-
-        let conditions: ExportsConditions = exportsHelpers.root(
-          pkg,
-          entrypoint.json.module !== undefined,
-          entrypoint.name,
-          entrypointPath + "/"
-        );
-
-        if (hasBrowserField) {
-          conditions = {
-            browser: exportsHelpers.target(
-              pkg,
-              hasModuleBuild,
-              entrypoint.name,
-              "browser",
-              entrypointPath + "/"
-            ),
-            ...conditions,
-          };
-        }
-        if (hasWorkerField) {
-          conditions = {
-            worker: exportsHelpers.target(
-              pkg,
-              hasModuleBuild,
-              entrypoint.name,
-              "worker",
-              entrypointPath + "/"
-            ),
-            ...conditions,
-          };
-        }
-        output[`./${entrypointPath}`] = conditions;
-      }
-    });
-    return {
-      "./package.json": "./package.json",
-      ...output,
-      ...pkg.json.preconstruct.exports?.extra,
-    };
-  },
 };
 
-const exportsHelpers = {
-  root(
-    pkg: Package,
-    hasModuleBuild: boolean,
-    entrypointName: string,
-    prefix: string = ""
-  ) {
-    return exportsHelpers.target(
-      pkg,
-      hasModuleBuild,
-      entrypointName,
-      "",
-      prefix
-    );
-  },
-  target(
-    pkg: Package,
-    hasModuleBuild: boolean,
-    entrypointName: string,
-    target: string = "",
-    prefix: string = ""
-  ) {
-    return exportsHelpers.env(
-      pkg,
-      hasModuleBuild,
-      entrypointName,
-      target,
-      prefix
-    );
-  },
-  env(
-    pkg: Package,
-    hasModuleBuild: boolean,
-    entrypointName: string,
-    target: string = "",
-    prefix: string = ""
-  ) {
-    let safeName = getDistName(pkg, entrypointName);
+export function exportsField(
+  pkg: Package
+): Record<string, ExportsConditions | string> | undefined {
+  if (!pkg.project.experimentalFlags.exports) {
+    return;
+  }
+  if (!pkg.json.preconstruct.exports) {
+    return;
+  }
+  const specifiedConditions: ("worker" | "browser" | "module")[] =
+    (pkg.json.preconstruct.exports?.conditions as any) ?? [];
+  let hasModuleBuild = specifiedConditions.includes("module");
 
-    let obj: ExportsConditions = {
-      default: `./${prefix}dist/${safeName}.${
-        target ? `${target}.` : ""
-      }cjs.js`,
-    };
-    if (hasModuleBuild) {
-      // esm doesn't support conditional imports so if env is not set we default to dev version
-      obj = {
-        module: `./${prefix}dist/${safeName}.${
-          target ? `${target}.` : ""
-        }esm.js`,
-        ...obj,
+  let output: Record<string, ExportsConditions> = {};
+  pkg.entrypoints.forEach((entrypoint) => {
+    let exportConditions;
+    exportConditions = getExportConditions(
+      entrypoint,
+      hasModuleBuild,
+      undefined
+    );
+    for (const condition of ["worker", "browser"] as const) {
+      if (!specifiedConditions.includes(condition)) continue;
+      if (typeof exportConditions === "string") {
+        exportConditions = { default: exportConditions };
+      }
+      exportConditions = {
+        [condition]: getExportConditions(entrypoint, hasModuleBuild, condition),
+        ...exportConditions,
       };
     }
-    return obj;
-  },
-};
 
-export const validFields = {
+    output[
+      "." + entrypoint.name.replace(entrypoint.package.name, "")
+    ] = exportConditions;
+  });
+  return {
+    "./package.json": "./package.json",
+    ...output,
+    ...pkg.json.preconstruct.exports?.extra,
+  };
+}
+
+function getExportConditions(
+  entrypoint: Entrypoint,
+  hasModuleBuild: boolean,
+  target: "worker" | "browser" | undefined
+): { module: string; default: string } | string {
+  const safeName = getDistName(entrypoint.package, entrypoint.name);
+  const prefix = entrypoint.name.replace(entrypoint.package.name, "");
+  const defaultPath = `.${prefix}/dist/${safeName}.${
+    target ? `${target}.` : ""
+  }cjs.js`;
+  if (hasModuleBuild) {
+    return {
+      module: `.${prefix}/dist/${safeName}.${target ? `${target}.` : ""}esm.js`,
+      default: defaultPath,
+    };
+  }
+  return defaultPath;
+}
+
+export const validFieldsForEntrypoint = {
   main(entrypoint: Entrypoint) {
     return validFieldsFromPkg.main(entrypoint.package, entrypoint.name);
   },
@@ -288,36 +209,6 @@ export const validFields = {
       entrypoint.package,
       entrypoint.json.module !== undefined,
       entrypoint.name
-    );
-  },
-  exports(pkg: Package) {
-    // skip if not enabled for the project
-    if (!pkg.project.experimentalFlags.exports) {
-      return;
-    }
-    // skip if not enabled for the package
-    if (!pkg.json.preconstruct.exports) {
-      return;
-    }
-
-    // default values when `exports = true`;
-    let hasWorkerField = false;
-    let hasBrowserField = true;
-    let hasModuleField = true;
-
-    const conditions = pkg.json.preconstruct.exports.conditions;
-    if (Array.isArray(conditions)) {
-      hasWorkerField = conditions.includes("worker");
-      hasBrowserField = conditions.includes("browser");
-      hasModuleField = conditions.includes("module");
-    }
-
-    return validFieldsFromPkg.exports(
-      pkg,
-      hasModuleField,
-      hasBrowserField,
-      hasWorkerField,
-      pkg.name
     );
   },
 };
