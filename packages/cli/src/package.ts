@@ -298,4 +298,83 @@ export class Package extends Item<{
     }
     return this.json.name;
   }
+
+  exportsFieldConfig(): CanonicalExportsFieldConfig {
+    if (!this.project.experimentalFlags.exports) {
+      return;
+    }
+    return parseExportsFieldConfig(this.json.preconstruct.exports, this.name);
+  }
+}
+
+type CanonicalExportsFieldConfig =
+  | undefined
+  | {
+      envConditions: Set<"worker" | "browser">;
+      extra: Record<string, JSONValue>;
+    };
+
+function parseExportsFieldConfig(
+  config: unknown,
+  name: string
+): CanonicalExportsFieldConfig {
+  if (
+    (typeof config !== "boolean" &&
+      typeof config !== "object" &&
+      config !== undefined) ||
+    config === null
+  ) {
+    throw new FatalError(
+      'the "preconstruct.exports" field must be a boolean or an object',
+      name
+    );
+  }
+  if (config === false || config === undefined) {
+    return undefined;
+  }
+  const parsedConfig: CanonicalExportsFieldConfig = {
+    envConditions: new Set(),
+    extra: {},
+  };
+  if (config === true) {
+    return parsedConfig;
+  }
+  for (const [key, value] of Object.entries(config) as [string, unknown][]) {
+    if (key === "extra") {
+      if (typeof value === "object" && value !== null) {
+        parsedConfig.extra = value as Record<string, JSONValue>;
+      } else {
+        throw new FatalError(
+          'the "preconstruct.exports.extra" field must be an object if it is present',
+          name
+        );
+      }
+    } else if (key === "envConditions") {
+      if (
+        Array.isArray(value) &&
+        value.every(
+          (v): v is "worker" | "browser" => v === "worker" || v === "browser"
+        )
+      ) {
+        parsedConfig.envConditions = new Set(value);
+        if (parsedConfig.envConditions.size !== value.length) {
+          throw new FatalError(
+            'the "preconstruct.exports.envConditions" field must not have duplicates',
+            name
+          );
+        }
+      } else {
+        throw new FatalError(
+          'the "preconstruct.exports.envConditions" field must be an array containing zero or more of "worker" and "browser" if it is present',
+          name
+        );
+      }
+    } else {
+      throw new FatalError(
+        `the "preconstruct.exports" field contains an unknown key "${key}"`,
+        name
+      );
+    }
+  }
+  return parsedConfig;
 }

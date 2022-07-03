@@ -16,18 +16,18 @@ export async function fixPackage(pkg: Package) {
     main: true,
     module:
       pkg.entrypoints.some((x) => x.json.module !== undefined) ||
-      !!(
-        pkg.project.experimentalFlags.exports && pkg.json.preconstruct.exports
-      ),
+      !!(pkg.project.experimentalFlags.exports && pkg.exportsFieldConfig()),
     "umd:main": pkg.entrypoints.some((x) => x.json["umd:main"] !== undefined),
     browser: pkg.entrypoints.some((x) => x.json.browser !== undefined),
   };
 
-  if (pkg.project.experimentalFlags.exports && pkg.json.preconstruct.exports) {
-    if (
-      fields.browser ||
-      !!pkg.json.preconstruct.exports.envConditions?.includes("browser")
-    ) {
+  const exportsFieldConfig = pkg.exportsFieldConfig();
+
+  if (exportsFieldConfig) {
+    if (fields.browser || exportsFieldConfig.envConditions.has("browser")) {
+      if (typeof pkg.json.preconstruct.exports !== "object") {
+        pkg.json.preconstruct.exports = {};
+      }
       if (!pkg.json.preconstruct.exports.envConditions) {
         pkg.json.preconstruct.exports.envConditions = [];
       }
@@ -66,20 +66,17 @@ export function validatePackage(pkg: Package) {
     module: pkg.entrypoints[0].json.module !== undefined,
     "umd:main": pkg.entrypoints[0].json["umd:main"] !== undefined,
     browser: pkg.entrypoints[0].json.browser !== undefined,
-    // "exports" is missing because it is validated on the root package
+    // "exports" is not here because it is not like these fields, it exists on a package, not an entrypoint
   };
 
-  if (pkg.project.experimentalFlags.exports && pkg.json.preconstruct.exports) {
+  const exportsFieldConfig = pkg.exportsFieldConfig();
+
+  if (exportsFieldConfig) {
     if (!fields.module) {
-      throw new FixableError(
-        errors.missingBrowserConditionWithFieldPresent,
-        pkg.name
-      );
+      throw new FixableError(errors.noModuleFieldWithExportsField, pkg.name);
     }
-    const hasField = fields["browser"];
-    const hasCondition = !!pkg.json.preconstruct.exports?.envConditions?.includes(
-      "browser"
-    );
+    const hasField = fields.browser;
+    const hasCondition = exportsFieldConfig.envConditions.has("browser");
     if (hasField && !hasCondition) {
       throw new FixableError(
         errors.missingBrowserConditionWithFieldPresent,

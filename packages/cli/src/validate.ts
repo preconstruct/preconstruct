@@ -35,13 +35,10 @@ export const isFieldValid = {
     );
   },
   exports(pkg: Package): boolean {
-    if (
-      !pkg.project.experimentalFlags.exports ||
-      !pkg.json.preconstruct.exports
-    ) {
+    const generated = exportsField(pkg);
+    if (generated === undefined) {
       return true;
     }
-    const generated = exportsField(pkg);
     // JSON.stringify to make sure conditions are in proper order
     return JSON.stringify(pkg.json.exports) === JSON.stringify(generated);
   },

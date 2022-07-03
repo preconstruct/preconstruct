@@ -219,12 +219,9 @@ unregister();
             );
           }
 
-          if (
-            pkg.project.experimentalFlags.exports &&
-            pkg.json.preconstruct.exports?.envConditions?.includes("worker")
-          ) {
+          if (pkg.exportsFieldConfig()?.envConditions?.has("worker")) {
             for (const output of Object.values(
-              getExportConditions(entrypoint, "browser")
+              getExportConditions(entrypoint, "worker")
             )) {
               promises.push(
                 fs.symlink(

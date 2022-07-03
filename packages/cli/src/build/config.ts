@@ -238,10 +238,8 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
     });
   }
 
-  if (
-    pkg.project.experimentalFlags.exports &&
-    pkg.json.preconstruct.exports?.envConditions?.includes("worker")
-  ) {
+  const exportsFieldConfig = pkg.exportsFieldConfig();
+  if (exportsFieldConfig?.envConditions.has("worker")) {
     configs.push({
       config: getRollupConfig(
         pkg,

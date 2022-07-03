@@ -135,14 +135,10 @@ export const validFieldsFromPkg = {
 export function exportsField(
   pkg: Package
 ): Record<string, ExportsConditions | string> | undefined {
-  if (
-    !pkg.project.experimentalFlags.exports ||
-    !pkg.json.preconstruct.exports
-  ) {
+  const exportsFieldConfig = pkg.exportsFieldConfig();
+  if (!exportsFieldConfig) {
     return;
   }
-  const envConditions: ("worker" | "browser")[] =
-    pkg.json.preconstruct.exports?.envConditions ?? [];
 
   let output: Record<string, ExportsConditions> = {};
   pkg.entrypoints.forEach((entrypoint) => {
@@ -150,7 +146,7 @@ export function exportsField(
       entrypoint,
       undefined
     );
-    for (const env of envConditions) {
+    for (const env of exportsFieldConfig.envConditions) {
       exportConditions = {
         [env]: getExportConditions(entrypoint, env),
         ...exportConditions,
@@ -164,7 +160,7 @@ export function exportsField(
   return {
     "./package.json": "./package.json",
     ...output,
-    ...pkg.json.preconstruct.exports?.extra,
+    ...exportsFieldConfig.extra,
   };
 }
 
