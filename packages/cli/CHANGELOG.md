@@ -1,5 +1,11 @@
 # preconstruct
 
+## 2.1.7
+
+### Patch Changes
+
+- [`3f202fd`](https://github.com/preconstruct/preconstruct/commit/3f202fd78c233093c483b0bb8fc657ecde1a4df7) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Imports to `@babel/runtime/helpers/esm/*` will now be rewritten to `@babel/runtime/helpers/*` for CommonJS outputs. This fixes the CommonJS output in case you have `["@babel/plugin-transform-runtime", { "useESModules": true }]`) in your Babel config.
+
 ## 2.1.6
 
 ### Patch Changes
