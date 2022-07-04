@@ -38,7 +38,7 @@ jobs:
         run: yarn
 
       - name: "Create Pull Request or Publish to npm"
-        uses: changesets/action@master
+        uses: changesets/action@v1
         with:
           publish: yarn release --otp=1
         env:
