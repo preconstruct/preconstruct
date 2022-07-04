@@ -590,3 +590,69 @@ test("keepDynamicImportAsDynamicImportInCommonJS experimental flag", async () =>
 
   `);
 });
+
+test("using @babel/plugin-transform-runtime with useESModules: true", async () => {
+  let dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "test",
+      main: "dist/test.cjs.js",
+      module: "dist/test.esm.js",
+      dependencies: {
+        "@babel/runtime": "*",
+      },
+      preconstruct: {
+        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+          keepDynamicImportAsDynamicImportInCommonJS: true,
+        },
+      },
+    }),
+    "babel.config.json": JSON.stringify({
+      presets: [require.resolve("@babel/preset-env")],
+      plugins: [
+        [
+          require.resolve("@babel/plugin-transform-runtime"),
+          { useESModules: true },
+        ],
+      ],
+    }),
+    "src/index.js": js`
+                      export class Thing {}
+                    `,
+  });
+
+  await build(dir);
+
+  expect(await getDist(dir)).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.dev.js, dist/test.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    var _classCallCheck = require('@babel/runtime/helpers/classCallCheck');
+
+    var Thing = function Thing() {
+      _classCallCheck(this, Thing);
+    };
+
+    exports.Thing = Thing;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./test.cjs.prod.js");
+    } else {
+      module.exports = require("./test.cjs.dev.js");
+    }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    import _classCallCheck from '@babel/runtime/helpers/esm/classCallCheck';
+
+    var Thing = function Thing() {
+      _classCallCheck(this, Thing);
+    };
+
+    export { Thing };
+
+  `);
+});
