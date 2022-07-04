@@ -146,7 +146,9 @@ export function exportsField(
       entrypoint,
       undefined
     );
-    for (const env of exportsFieldConfig.envConditions) {
+    // not iterating over envConditions, just to make the ordering explicits
+    for (const env of ["worker", "browser"] as const) {
+      if (!exportsFieldConfig.envConditions.has(env)) continue;
       exportConditions = {
         [env]: getExportConditions(entrypoint, env),
         ...exportConditions,

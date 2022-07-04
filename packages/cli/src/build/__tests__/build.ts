@@ -656,3 +656,128 @@ test("using @babel/plugin-transform-runtime with useESModules: true", async () =
 
   `);
 });
+
+test("worker and browser build", async () => {
+  let dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "@scope/test",
+      main: "dist/scope-test.cjs.js",
+      module: "dist/scope-test.esm.js",
+      browser: {
+        "./dist/scope-test.esm.js": "./dist/scope-test.browser.esm.js",
+        "./dist/scope-test.cjs.js": "./dist/scope-test.browser.cjs.js",
+      },
+      exports: {
+        "./package.json": "./package.json",
+        ".": {
+          browser: {
+            module: "./dist/scope-test.browser.esm.js",
+            default: "./dist/scope-test.browser.cjs.js",
+          },
+          worker: {
+            module: "./dist/scope-test.worker.esm.js",
+            default: "./dist/scope-test.worker.cjs.js",
+          },
+          module: "./dist/scope-test.esm.js",
+          default: "./dist/scope-test.cjs.js",
+        },
+      },
+      preconstruct: {
+        exports: {
+          envConditions: ["browser", "worker"],
+        },
+        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+          exports: true,
+        },
+      },
+    }),
+    node_modules: {
+      kind: "symlink",
+      path: repoNodeModules,
+    },
+    "src/index.js": js`
+                      export const thing = typeof window;
+                    `,
+  });
+  await build(dir);
+  expect(await getDist(dir)).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.browser.cjs.dev.js, dist/scope-test.browser.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    const thing = "object";
+
+    exports.thing = thing;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.browser.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./scope-test.browser.cjs.prod.js");
+    } else {
+      module.exports = require("./scope-test.browser.cjs.dev.js");
+    }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.browser.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    const thing = "object";
+
+    export { thing };
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.cjs.dev.js, dist/scope-test.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    const thing = typeof window;
+
+    exports.thing = thing;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./scope-test.cjs.prod.js");
+    } else {
+      module.exports = require("./scope-test.cjs.dev.js");
+    }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    const thing = typeof window;
+
+    export { thing };
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.worker.cjs.dev.js, dist/scope-test.worker.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    const thing = "undefined";
+
+    exports.thing = thing;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.worker.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./scope-test.worker.cjs.prod.js");
+    } else {
+      module.exports = require("./scope-test.worker.cjs.dev.js");
+    }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.worker.esm.dev.js, dist/scope-test.worker.esm.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    const thing = "undefined";
+
+    export { thing };
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.worker.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./scope-test.worker.esm.prod.js");
+    } else {
+      module.exports = require("./scope-test.worker.esm.dev.js");
+    }
+
+  `);
+});
