@@ -392,6 +392,13 @@ export async function getDist(dir: string) {
 }
 
 async function readNormalizedFile(filePath: string): Promise<string> {
+  const stat = await fs.lstat(filePath);
+  if (stat.isSymbolicLink()) {
+    const targetPath = await fs.readlink(filePath);
+    return `symbolic link to ${normalizePath(
+      path.relative(path.dirname(filePath), targetPath)
+    )}`;
+  }
   let content = await fs.readFile(filePath, "utf8");
   // to normalise windows line endings
   content = content.replace(/\r\n/g, "\n");
