@@ -158,6 +158,20 @@ export class Package extends Item<{
       onlyFiles: true,
       absolute: true,
     });
+    // sorting the entrypoints is important since we want to have something consistent
+    // to write into the `exports` field and file systems don't guarantee an order
+    entrypoints = [
+      ...entrypoints.sort((a, b) => {
+        // shortest entrypoints first since shorter entrypoints
+        // are generally more commonly used
+        const comparison = a.length - b.length;
+        if (comparison !== 0) return comparison;
+        // then .sort's default behaviour because we just need something stable
+        if (a < b) return -1;
+        if (b > a) return 1;
+        return 0;
+      }),
+    ];
     if (!entrypoints.length) {
       let oldEntrypoints = await fastGlob(pkg.configEntrypoints, {
         cwd: pkg.directory,
