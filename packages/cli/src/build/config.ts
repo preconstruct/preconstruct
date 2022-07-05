@@ -92,8 +92,7 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
       pkg,
       pkg.entrypoints,
       aliases,
-      "node",
-      "dev",
+      "node-dev",
       pkg.project.experimentalFlags.logCompiledFiles
         ? (filename) => {
             logger.info(
@@ -131,8 +130,7 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
       pkg,
       pkg.entrypoints,
       aliases,
-      "node",
-      "prod",
+      "node-prod",
       () => {}
     ),
     outputs: [
@@ -154,14 +152,7 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
   if (pkg.entrypoints[0].json["umd:main"] !== undefined)
     pkg.entrypoints.forEach((entrypoint) => {
       configs.push({
-        config: getRollupConfig(
-          pkg,
-          [entrypoint],
-          aliases,
-          "browser",
-          "umd",
-          () => {}
-        ),
+        config: getRollupConfig(pkg, [entrypoint], aliases, "umd", () => {}),
         outputs: [
           {
             format: "umd" as const,
@@ -190,14 +181,13 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
         pkg.entrypoints,
         aliases,
         "browser",
-        "dev",
         () => {}
       ),
       outputs: [
         {
           format: "cjs" as const,
-          entryFileNames: "[name].browser.cjs.dev.js",
-          chunkFileNames: "dist/[name]-[hash].browser.cjs.dev.js",
+          entryFileNames: "[name].browser.cjs.js",
+          chunkFileNames: "dist/[name]-[hash].browser.cjs.js",
           dir: pkg.directory,
           exports: "named" as const,
           interop,
@@ -215,30 +205,10 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
           : []),
       ],
     });
-    configs.push({
-      config: getRollupConfig(
-        pkg,
-        pkg.entrypoints,
-        aliases,
-        "browser",
-        "prod",
-        () => {}
-      ),
-      outputs: [
-        {
-          format: "cjs" as const,
-          entryFileNames: "[name].browser.cjs.prod.js",
-          chunkFileNames: "dist/[name]-[hash].browser.cjs.prod.js",
-          dir: pkg.directory,
-          exports: "named" as const,
-          interop,
-          plugins: cjsPlugins,
-        },
-      ],
-    });
   }
 
   const exportsFieldConfig = pkg.exportsFieldConfig();
+  // note module builds always exist when using the exports field
   if (exportsFieldConfig?.envConditions.has("worker")) {
     configs.push({
       config: getRollupConfig(
@@ -246,60 +216,24 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
         pkg.entrypoints,
         aliases,
         "worker",
-        "dev",
         () => {}
       ),
       outputs: [
         {
           format: "cjs" as const,
-          entryFileNames: "[name].worker.cjs.dev.js",
-          chunkFileNames: "dist/[name]-[hash].worker.cjs.dev.js",
+          entryFileNames: "[name].worker.cjs.js",
+          chunkFileNames: "dist/[name]-[hash].worker.cjs.js",
           dir: pkg.directory,
           exports: "named" as const,
           interop,
           plugins: cjsPlugins,
         },
-        ...(hasModuleField
-          ? [
-              {
-                format: "es" as const,
-                entryFileNames: "[name].worker.esm.dev.js",
-                chunkFileNames: "dist/[name]-[hash].worker.esm.dev.js",
-                dir: pkg.directory,
-              },
-            ]
-          : []),
-      ],
-    });
-    configs.push({
-      config: getRollupConfig(
-        pkg,
-        pkg.entrypoints,
-        aliases,
-        "worker",
-        "prod",
-        () => {}
-      ),
-      outputs: [
         {
-          format: "cjs" as const,
-          entryFileNames: "[name].worker.cjs.prod.js",
-          chunkFileNames: "dist/[name]-[hash].worker.cjs.prod.js",
+          format: "es" as const,
+          entryFileNames: "[name].worker.esm.dev.js",
+          chunkFileNames: "dist/[name]-[hash].worker.esm.js",
           dir: pkg.directory,
-          exports: "named" as const,
-          interop,
-          plugins: cjsPlugins,
         },
-        ...(hasModuleField
-          ? [
-              {
-                format: "es" as const,
-                entryFileNames: "[name].worker.esm.prod.js",
-                chunkFileNames: "dist/[name]-[hash].worker.esm.prod.js",
-                dir: pkg.directory,
-              },
-            ]
-          : []),
       ],
     });
   }

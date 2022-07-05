@@ -31,27 +31,29 @@ const makeExternalPredicate = (externalArr: string[]) => {
   return (id: string) => pattern.test(id);
 };
 
-export type RollupConfigEnvironment = "dev" | "prod" | "umd";
-
-export type RollupConfigType = "browser" | "node" | "worker";
+export type RollupConfigType =
+  | "umd"
+  | "browser"
+  | "worker"
+  | "node-dev"
+  | "node-prod";
 
 export let getRollupConfig = (
   pkg: Package,
   entrypoints: Array<Entrypoint>,
   aliases: Aliases,
   type: RollupConfigType,
-  env: RollupConfigEnvironment,
   reportTransformedFile: (filename: string) => void
 ): RollupOptions => {
   let external = [];
   if (pkg.json.peerDependencies) {
     external.push(...Object.keys(pkg.json.peerDependencies));
   }
-  if (pkg.json.dependencies && env !== "umd") {
+  if (pkg.json.dependencies && type !== "umd") {
     external.push(...Object.keys(pkg.json.dependencies));
   }
 
-  if (type === "node") {
+  if (type === "node-dev" || type === "node-prod") {
     external.push(...builtInModules);
   }
 
@@ -109,7 +111,7 @@ export let getRollupConfig = (
           }
         }
         case "THIS_IS_UNDEFINED": {
-          if (env === "umd") {
+          if (type === "umd") {
             return;
           }
           warnings.push(
@@ -143,8 +145,8 @@ export let getRollupConfig = (
           }
         },
       } as Plugin,
-      env === "prod" && flowAndNodeDevProdEntry(pkg, warnings),
-      env === "prod" && typescriptDeclarations(pkg),
+      type === "node-prod" && flowAndNodeDevProdEntry(pkg, warnings),
+      type === "node-prod" && typescriptDeclarations(pkg),
       babel({
         cwd: pkg.project.directory,
         reportTransformedFile,
@@ -161,7 +163,7 @@ export let getRollupConfig = (
           }
         })(),
       }),
-      env === "umd" &&
+      type === "umd" &&
         cjs({
           include: ["**/node_modules/**", "node_modules/**"],
         }),
@@ -170,24 +172,25 @@ export let getRollupConfig = (
       json({
         namedExports: false,
       }),
-      env === "umd" &&
+      type === "umd" &&
         alias({
           entries: aliases,
         }),
       resolve({
         extensions: EXTENSIONS,
-        browser: type === "browser" || type === "worker",
+        // only umd builds will actually load dependencies which is where this browser flag actually makes a difference
+        browser: type === "umd",
         customResolveOptions: {
-          moduleDirectory: env === "umd" ? "node_modules" : [],
+          moduleDirectory: type === "umd" ? "node_modules" : [],
         },
       }),
-      env === "umd" && inlineProcessEnvNodeEnv({ sourceMap: true }),
-      env === "umd" &&
+      type === "umd" && inlineProcessEnvNodeEnv({ sourceMap: true }),
+      type === "umd" &&
         terser({
           sourceMap: true,
           compress: true,
         }),
-      env === "prod" && inlineProcessEnvNodeEnv({ sourceMap: false }),
+      type === "node-prod" && inlineProcessEnvNodeEnv({ sourceMap: false }),
       type === "browser" &&
         replace({
           values: {
