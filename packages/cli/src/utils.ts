@@ -142,15 +142,21 @@ export function exportsField(
 
   let output: Record<string, ExportsConditions> = {};
   pkg.entrypoints.forEach((entrypoint) => {
-    let exportConditions: ExportsConditions = getExportConditions(
+    let exportConditions: ExportsConditions = getModuleTypeExportConditions(
       entrypoint,
       undefined
     );
-    // not iterating over envConditions, just to make the ordering explicits
-    for (const env of ["worker", "browser"] as const) {
-      if (!exportsFieldConfig.envConditions.has(env)) continue;
+    if (exportsFieldConfig.envConditions.has("browser")) {
       exportConditions = {
-        [env]: getExportConditions(entrypoint, env),
+        browser: getModuleTypeExportConditions(entrypoint, "browser"),
+        ...exportConditions,
+      };
+    }
+    if (exportsFieldConfig.envConditions.has("worker")) {
+      exportConditions = {
+        worker: {
+          module: getModuleTypeExportConditions(entrypoint, "worker").module,
+        },
         ...exportConditions,
       };
     }
@@ -166,7 +172,7 @@ export function exportsField(
   };
 }
 
-export function getExportConditions(
+export function getModuleTypeExportConditions(
   entrypoint: Entrypoint,
   env: "worker" | "browser" | undefined
 ) {

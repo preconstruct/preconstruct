@@ -4,7 +4,7 @@ import {
   tsTemplate,
   flowTemplate,
   validFieldsForEntrypoint,
-  getExportConditions,
+  getModuleTypeExportConditions,
 } from "./utils";
 import * as babel from "@babel/core";
 import * as fs from "fs-extra";
@@ -221,7 +221,7 @@ unregister();
 
           if (pkg.exportsFieldConfig()?.envConditions?.has("worker")) {
             for (const output of Object.values(
-              getExportConditions(entrypoint, "worker")
+              getModuleTypeExportConditions(entrypoint, "worker")
             )) {
               promises.push(
                 fs.symlink(

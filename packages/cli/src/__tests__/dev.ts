@@ -317,7 +317,6 @@ test("exports field with worker condition", async () => {
         ".": {
           worker: {
             module: "./dist/something-blah.worker.esm.js",
-            default: "./dist/something-blah.worker.cjs.js",
           },
           module: "./dist/something-blah.esm.js",
           default: "./dist/something-blah.cjs.js",

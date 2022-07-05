@@ -220,15 +220,6 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
       ),
       outputs: [
         {
-          format: "cjs" as const,
-          entryFileNames: "[name].worker.cjs.js",
-          chunkFileNames: "dist/[name]-[hash].worker.cjs.js",
-          dir: pkg.directory,
-          exports: "named" as const,
-          interop,
-          plugins: cjsPlugins,
-        },
-        {
           format: "es" as const,
           entryFileNames: "[name].worker.esm.js",
           chunkFileNames: "dist/[name]-[hash].worker.esm.js",
