@@ -1,38 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`browser no module: dist/browser-no-module.browser.cjs.dev.js 1`] = `
-"'use strict';
-
-Object.defineProperty(exports, '__esModule', { value: true });
-
-let thing = \\"wow\\";
-
-{
-  thing = \\"something\\";
-}
-
-{
-  thing += \\"other\\";
-}
-
-var thing$1 = thing;
-
-exports.default = thing$1;
-"
-`;
-
 exports[`browser no module: dist/browser-no-module.browser.cjs.js 1`] = `
-"'use strict';
-
-if (process.env.NODE_ENV === \\"production\\") {
-  module.exports = require(\\"./browser-no-module.browser.cjs.prod.js\\");
-} else {
-  module.exports = require(\\"./browser-no-module.browser.cjs.dev.js\\");
-}
-"
-`;
-
-exports[`browser no module: dist/browser-no-module.browser.cjs.prod.js 1`] = `
 "'use strict';
 
 Object.defineProperty(exports, '__esModule', { value: true });

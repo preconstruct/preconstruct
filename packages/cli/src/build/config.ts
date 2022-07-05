@@ -230,7 +230,7 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
         },
         {
           format: "es" as const,
-          entryFileNames: "[name].worker.esm.dev.js",
+          entryFileNames: "[name].worker.esm.js",
           chunkFileNames: "dist/[name]-[hash].worker.esm.js",
           dir: pkg.directory,
         },
