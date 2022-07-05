@@ -402,7 +402,7 @@ async function readNormalizedFile(filePath: string): Promise<string> {
     ]);
     return `symbolic link to ${normalizePath(
       path.relative(path.dirname(realFilePath), targetPath)
-    )}`;
+    )}. ${JSON.stringify({ targetPath, realFilePath }, null, 2)}`;
   }
   let content = await fs.readFile(filePath, "utf8");
   // to normalise windows line endings
