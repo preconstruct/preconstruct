@@ -191,7 +191,7 @@ export let getRollupConfig = (
           compress: true,
         }),
       type === "node-prod" && inlineProcessEnvNodeEnv({ sourceMap: false }),
-      type === "browser" &&
+      (type === "browser" || type === "umd") &&
         replace({
           values: {
             ["typeof " + "document"]: JSON.stringify("object"),
