@@ -750,4 +750,26 @@ describe("exports field config", () => {
       });
     }
   });
+  describe("false", () => {
+    const configsEquivalentToFalse = [false, undefined];
+    for (const config of configsEquivalentToFalse) {
+      test(`${JSON.stringify(config)}`, async () => {
+        const tmpPath = await testdir({
+          "package.json": JSON.stringify({
+            name: "pkg-a",
+            main: "dist/pkg-a.cjs.js",
+            module: "dist/pkg-a.esm.js",
+            preconstruct: {
+              exports: config,
+              ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+                exports: true,
+              },
+            },
+          }),
+          "src/index.js": "",
+        });
+        await validate(tmpPath);
+      });
+    }
+  });
 });
