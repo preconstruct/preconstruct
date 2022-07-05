@@ -1,6 +1,7 @@
 import build from "../";
 import fixturez from "fixturez";
 import path from "path";
+import fs from "fs-extra";
 import {
   initBasic,
   getPkg,
@@ -12,9 +13,11 @@ import {
   repoNodeModules,
   basicPkgJson,
   getFiles,
+  ts,
 } from "../../../test-utils";
 import { doPromptInput as _doPromptInput } from "../../prompt";
 import { confirms as _confirms } from "../../messages";
+import spawn from "spawndamnit";
 
 const f = fixturez(__dirname);
 
@@ -741,4 +744,97 @@ test("worker and browser build", async () => {
     export { thing };
 
   `);
+});
+
+test("typescript with nodenext module resolution", async () => {
+  let dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "@exports/repo",
+      preconstruct: {
+        packages: ["packages/pkg-a"],
+        ___experimentalFlags_WILL_CHANGE_IN_PATCH: { exports: true },
+      },
+    }),
+    "packages/pkg-a/package.json": JSON.stringify({
+      name: "pkg-a",
+      main: "dist/pkg-a.cjs.js",
+      module: "dist/pkg-a.esm.js",
+      exports: {
+        "./package.json": "./package.json",
+        ".": {
+          module: "./dist/pkg-a.esm.js",
+          default: "./dist/pkg-a.cjs.js",
+        },
+        "./something": {
+          module: "./something/dist/pkg-a-something.esm.js",
+          default: "./something/dist/pkg-a-something.cjs.js",
+        },
+      },
+      preconstruct: {
+        entrypoints: ["index.ts", "something.ts"],
+        exports: true,
+      },
+    }),
+    "packages/pkg-a/something/package.json": JSON.stringify({
+      main: "dist/pkg-a-something.cjs.js",
+      module: "dist/pkg-a-something.esm.js",
+    }),
+    "packages/pkg-a/src/index.ts": ts`
+                                     export const thing = "index";
+                                   `,
+    "packages/pkg-a/src/something.ts": ts`
+                                         export const something = "something";
+                                       `,
+    "packages/pkg-a/not-exported.ts": ts`
+                                        export const notExported = true;
+                                      `,
+
+    "packages/pkg-a/node_modules": {
+      kind: "symlink",
+      path: repoNodeModules,
+    },
+    "blah.ts": ts`
+                 import { thing } from "pkg-a";
+                 import { something } from "pkg-a/something";
+                 import { notExported } from "pkg-a/not-exported"; // should error
+
+                 function acceptThing<T>(x: T) {}
+
+                 acceptThing<"index">(thing);
+                 acceptThing<"something">(something);
+
+                 // this is to check that TypeScript is actually checking things
+                 acceptThing<"other">(thing); // should error
+                 acceptThing<"other">(something); // should error
+               `,
+    "tsconfig.json": JSON.stringify({
+      compilerOptions: {
+        module: "NodeNext",
+        moduleResolution: "nodenext",
+        strict: true,
+        declaration: true,
+      },
+    }),
+  });
+  await fs.ensureSymlink(
+    path.join(dir, "packages/pkg-a"),
+    path.join(dir, "node_modules/pkg-a")
+  );
+  await build(dir);
+  let { code, stdout, stderr } = await spawn(
+    path.join(
+      path.dirname(require.resolve("typescript/package.json")),
+      "bin/tsc"
+    ),
+    [],
+    { cwd: dir }
+  );
+  expect(code).toBe(2);
+  expect(stdout.toString("utf8")).toMatchInlineSnapshot(`
+    "blah.ts(3,29): error TS2307: Cannot find module 'pkg-a/not-exported' or its corresponding type declarations.
+    blah.ts(11,22): error TS2345: Argument of type '\\"index\\"' is not assignable to parameter of type '\\"other\\"'.
+    blah.ts(12,22): error TS2345: Argument of type '\\"something\\"' is not assignable to parameter of type '\\"other\\"'.
+    "
+  `);
+  expect(stderr.toString("utf8")).toMatchInlineSnapshot(`""`);
 });
