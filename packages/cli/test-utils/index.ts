@@ -394,9 +394,12 @@ export async function getDist(dir: string) {
 async function readNormalizedFile(filePath: string): Promise<string> {
   const stat = await fs.lstat(filePath);
   if (stat.isSymbolicLink()) {
-    const targetPath = await fs.readlink(filePath);
+    const [targetPath, realFilePath] = await Promise.all([
+      fs.readlink(filePath).then((x) => fs.realpath(x)),
+      fs.realpath(filePath),
+    ]);
     return `symbolic link to ${normalizePath(
-      path.relative(path.dirname(filePath), targetPath)
+      path.relative(path.dirname(realFilePath), targetPath)
     )}`;
   }
   let content = await fs.readFile(filePath, "utf8");

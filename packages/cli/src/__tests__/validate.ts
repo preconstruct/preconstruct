@@ -10,6 +10,7 @@ import {
   repoNodeModules,
 } from "../../test-utils";
 import { confirms as _confirms } from "../messages";
+import { JSONValue } from "../utils";
 
 const f = fixturez(__dirname);
 
@@ -656,4 +657,61 @@ test("just wrong dist filenames doesn't report about the changed dist filename s
       ],
     ]
   `);
+});
+
+describe("exports field config", () => {
+  const exportsFieldConfigTestDir = (config: JSONValue) => {
+    return testdir({
+      "package.json": JSON.stringify({
+        name: "pkg-a",
+        main: "dist/pkg-a.cjs.js",
+        module: "dist/pkg-a.esm.js",
+        exports: {
+          "./package.json": "./package.json",
+          ".": {
+            module: "./dist/pkg-a.esm.js",
+            default: "./dist/pkg-a.cjs.js",
+          },
+        },
+        preconstruct: {
+          exports: config,
+          ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+            exports: true,
+          },
+        },
+      }),
+      "src/index.js": "",
+    });
+  };
+  describe("invalid", () => {
+    test("null", async () => {
+      const tmpPath = await exportsFieldConfigTestDir(null);
+      await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
+        `[Error: the "preconstruct.exports" field must be a boolean or an object]`
+      );
+    });
+    test("some string", async () => {
+      const tmpPath = await exportsFieldConfigTestDir("blah");
+      await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
+        `[Error: the "preconstruct.exports" field must be a boolean or an object]`
+      );
+    });
+  });
+
+  describe("true", () => {
+    const configsEquivalentToTrue = [
+      {},
+      { envConditions: [] },
+      { envConditions: [], extra: {} },
+      { extra: {} },
+      {},
+      true,
+    ];
+    for (const config of configsEquivalentToTrue) {
+      test(`${JSON.stringify(config)}`, async () => {
+        const tmpPath = await exportsFieldConfigTestDir(config);
+        await validate(tmpPath);
+      });
+    }
+  });
 });
