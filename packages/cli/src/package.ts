@@ -322,7 +322,8 @@ function parseExportsFieldConfig(
     (typeof config !== "boolean" &&
       typeof config !== "object" &&
       config !== undefined) ||
-    config === null
+    config === null ||
+    Array.isArray(config)
   ) {
     throw new FatalError(
       'the "preconstruct.exports" field must be a boolean or an object',
@@ -341,7 +342,11 @@ function parseExportsFieldConfig(
   }
   for (const [key, value] of Object.entries(config) as [string, unknown][]) {
     if (key === "extra") {
-      if (typeof value === "object" && value !== null) {
+      if (
+        typeof value === "object" &&
+        value !== null &&
+        !Array.isArray(value)
+      ) {
         parsedConfig.extra = value as Record<string, JSONValue>;
       } else {
         throw new FatalError(

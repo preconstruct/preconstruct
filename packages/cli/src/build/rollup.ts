@@ -201,7 +201,6 @@ export let getRollupConfig = (
           values: {
             ["typeof " + "document"]: JSON.stringify("undefined"),
             ["typeof " + "window"]: JSON.stringify("undefined"),
-            ["typeof " + "process"]: JSON.stringify("undefined"),
           },
           preventAssignment: true,
         }),
