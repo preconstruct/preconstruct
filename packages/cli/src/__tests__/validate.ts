@@ -696,6 +696,42 @@ describe("exports field config", () => {
         `[Error: the "preconstruct.exports" field must be a boolean or an object]`
       );
     });
+    test("extra not object", async () => {
+      const tmpPath = await exportsFieldConfigTestDir({ extra: "blah" });
+      await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
+        `[Error: the "preconstruct.exports.extra" field must be an object if it is present]`
+      );
+    });
+    test("envConditions not array", async () => {
+      const tmpPath = await exportsFieldConfigTestDir({ envConditions: {} });
+      await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
+        `[Error: the "preconstruct.exports.envConditions" field must be an array containing zero or more of "worker" and "browser" if it is present]`
+      );
+    });
+    test("envConditions duplicates", async () => {
+      const tmpPath = await exportsFieldConfigTestDir({
+        envConditions: ["worker", "worker"],
+      });
+      await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
+        `[Error: the "preconstruct.exports.envConditions" field must not have duplicates]`
+      );
+    });
+    test("envConditions invalid condition", async () => {
+      const tmpPath = await exportsFieldConfigTestDir({
+        envConditions: ["worker", "asfdasfd"],
+      });
+      await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
+        `[Error: the "preconstruct.exports.envConditions" field must be an array containing zero or more of "worker" and "browser" if it is present]`
+      );
+    });
+    test("unknown key", async () => {
+      const tmpPath = await exportsFieldConfigTestDir({
+        something: true,
+      });
+      await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
+        `[Error: the "preconstruct.exports" field contains an unknown key "something"]`
+      );
+    });
   });
 
   describe("true", () => {

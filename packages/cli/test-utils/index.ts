@@ -396,7 +396,9 @@ async function readNormalizedFile(filePath: string): Promise<string> {
   if (stat.isSymbolicLink()) {
     const [targetPath, realFilePath] = await Promise.all([
       fs.readlink(filePath).then((x) => fs.realpath(x)),
-      fs.realpath(filePath),
+      fs
+        .realpath(path.dirname(filePath))
+        .then((x) => path.join(x, path.basename(filePath))),
     ]);
     return `symbolic link to ${normalizePath(
       path.relative(path.dirname(realFilePath), targetPath)
