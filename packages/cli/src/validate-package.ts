@@ -12,16 +12,17 @@ export async function fixPackage(pkg: Package) {
   if (pkg.entrypoints.length === 0) {
     throw new FatalError(errors.noEntrypoints, pkg.name);
   }
+
+  const exportsFieldConfig = pkg.exportsFieldConfig();
+
   let fields = {
     main: true,
     module:
       pkg.entrypoints.some((x) => x.json.module !== undefined) ||
-      !!(pkg.project.experimentalFlags.exports && pkg.exportsFieldConfig()),
+      !!exportsFieldConfig,
     "umd:main": pkg.entrypoints.some((x) => x.json["umd:main"] !== undefined),
     browser: pkg.entrypoints.some((x) => x.json.browser !== undefined),
   };
-
-  const exportsFieldConfig = pkg.exportsFieldConfig();
 
   if (exportsFieldConfig) {
     if (fields.browser || exportsFieldConfig.envConditions.has("browser")) {
