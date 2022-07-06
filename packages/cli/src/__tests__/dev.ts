@@ -347,7 +347,9 @@ test("exports field with worker condition", async () => {
     Object.keys(files).map(async (filename) => {
       const [realpathFromSymlink, realpath] = await Promise.all([
         fs.realpath(path.join(tmpPath, filename)),
-        fs.realpath(path.join(tmpPath, "src/index.js")),
+        fs
+          .realpath(path.join(tmpPath, "src/index.js"))
+          .then((x) => fs.realpath(x)),
       ]);
       expect(realpathFromSymlink).toEqual(realpath);
     })
