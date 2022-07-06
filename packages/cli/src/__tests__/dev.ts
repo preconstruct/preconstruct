@@ -343,14 +343,13 @@ test("exports field with worker condition", async () => {
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/something-blah.esm.js, dist/something-blah.worker.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     console.log(1)
   `);
-  const realpathOfDir = tmpPath;
   await Promise.all(
     Object.keys(files).map(async (filename) => {
-      const [realpathFromSymlink, realpath] = await Promise.all([
-        fs.readlink(path.join(realpathOfDir, filename)),
-        path.join(realpathOfDir, "src/index.js"),
-      ]);
-      expect(realpathFromSymlink).toEqual(realpath);
+      expect({
+        a: fs.readlinkSync(path.join(tmpPath, filename)),
+        b: fs.realpathSync(path.join(tmpPath, filename)),
+        c: path.join(tmpPath, "src/index.js"),
+      }).toEqual({});
     })
   );
 });
