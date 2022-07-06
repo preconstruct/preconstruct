@@ -331,13 +331,25 @@ test("exports field with worker condition", async () => {
         },
       },
     }),
-    "src/index.js": "",
+    "src/index.js": "console.log(1)",
   });
 
   await dev(tmpPath);
-  expect(await getFiles(tmpPath, ["dist/**", "!dist/something-blah.cjs.js"]))
-    .toMatchInlineSnapshot(`
+  const files = await getFiles(tmpPath, [
+    "dist/**",
+    "!dist/something-blah.cjs.js",
+  ]);
+  expect(files).toMatchInlineSnapshot(`
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/something-blah.esm.js, dist/something-blah.worker.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    symbolic link to ../src/index.js
+    console.log(1)
   `);
+  await Promise.all(
+    Object.keys(files).map(async (filename) => {
+      const [realpathFromSymlink, realpath] = await Promise.all([
+        fs.realpath(path.join(tmpPath, filename)),
+        fs.realpath(path.join(tmpPath, "src/index.js")),
+      ]);
+      expect(realpathFromSymlink).toEqual(realpath);
+    })
+  );
 });
