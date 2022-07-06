@@ -167,8 +167,8 @@ export function exportsField(
     ] = exportConditions;
   });
   return {
-    "./package.json": "./package.json",
     ...output,
+    "./package.json": "./package.json",
     ...exportsFieldConfig.extra,
   };
 }

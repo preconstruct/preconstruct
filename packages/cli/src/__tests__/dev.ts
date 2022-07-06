@@ -313,7 +313,6 @@ test("exports field with worker condition", async () => {
       main: "dist/something-blah.cjs.js",
       module: "dist/something-blah.esm.js",
       exports: {
-        "./package.json": "./package.json",
         ".": {
           module: {
             worker: "./dist/something-blah.worker.esm.js",
@@ -321,6 +320,7 @@ test("exports field with worker condition", async () => {
           },
           default: "./dist/something-blah.cjs.js",
         },
+        "./package.json": "./package.json",
       },
       preconstruct: {
         exports: {

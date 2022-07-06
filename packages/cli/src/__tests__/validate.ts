@@ -667,11 +667,11 @@ describe("exports field config", () => {
         main: "dist/pkg-a.cjs.js",
         module: "dist/pkg-a.esm.js",
         exports: {
-          "./package.json": "./package.json",
           ".": {
             module: "./dist/pkg-a.esm.js",
             default: "./dist/pkg-a.cjs.js",
           },
+          "./package.json": "./package.json",
         },
         preconstruct: {
           exports: config,
@@ -856,6 +856,6 @@ test("preconstruct.exports: true no exports field", async () => {
     "src/index.js": "",
   });
   await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
-    `[Error: exports field was not found, expected \`{"./package.json":"./package.json",".":{"module":"./dist/pkg-a.esm.js","default":"./dist/pkg-a.cjs.js"}}\`]`
+    `[Error: exports field was not found, expected \`{".":{"module":"./dist/pkg-a.esm.js","default":"./dist/pkg-a.cjs.js"},"./package.json":"./package.json"}\`]`
   );
 });

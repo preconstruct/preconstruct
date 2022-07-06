@@ -101,7 +101,6 @@ test("set exports field when opt-in", async () => {
         "./dist/package-exports.esm.js": "./dist/package-exports.browser.esm.js"
       },
       "exports": {
-        "./package.json": "./package.json",
         ".": {
           "module": {
             "worker": "./dist/package-exports.worker.esm.js",
@@ -109,7 +108,8 @@ test("set exports field when opt-in", async () => {
             "default": "./dist/package-exports.esm.js"
           },
           "default": "./dist/package-exports.cjs.js"
-        }
+        },
+        "./package.json": "./package.json"
       },
       "preconstruct": {
         "exports": {
@@ -157,7 +157,6 @@ test("set exports field when opt-in", async () => {
         "./dist/package-exports.esm.js": "./dist/package-exports.browser.esm.js"
       },
       "exports": {
-        "./package.json": "./package.json",
         ".": {
           "module": {
             "worker": "./dist/package-exports.worker.esm.js",
@@ -165,7 +164,8 @@ test("set exports field when opt-in", async () => {
             "default": "./dist/package-exports.esm.js"
           },
           "default": "./dist/package-exports.cjs.js"
-        }
+        },
+        "./package.json": "./package.json"
       },
       "preconstruct": {
         "exports": {
@@ -208,11 +208,11 @@ test("set exports field when opt-in with no env conditions", async () => {
       "main": "dist/package-exports.cjs.js",
       "module": "dist/package-exports.esm.js",
       "exports": {
-        "./package.json": "./package.json",
         ".": {
           "module": "./dist/package-exports.esm.js",
           "default": "./dist/package-exports.cjs.js"
-        }
+        },
+        "./package.json": "./package.json"
       },
       "preconstruct": {
         "exports": true,
@@ -278,7 +278,6 @@ test("set exports field with multiple entrypoints", async () => {
         "./dist/blah-something.esm.js": "./dist/blah-something.browser.esm.js"
       },
       "exports": {
-        "./package.json": "./package.json",
         ".": {
           "module": {
             "worker": "./dist/blah-something.worker.esm.js",
@@ -302,7 +301,8 @@ test("set exports field with multiple entrypoints", async () => {
             "default": "./deep/something/dist/blah-something-deep-something.esm.js"
           },
           "default": "./deep/something/dist/blah-something-deep-something.cjs.js"
-        }
+        },
+        "./package.json": "./package.json"
       },
       "preconstruct": {
         "entrypoints": [
@@ -378,7 +378,6 @@ test("set exports field without root entrypoint", async () => {
         }
       },
       "exports": {
-        "./package.json": "./package.json",
         "./other": {
           "module": {
             "worker": "./other/dist/blah-something-other.worker.esm.js",
@@ -386,7 +385,8 @@ test("set exports field without root entrypoint", async () => {
             "default": "./other/dist/blah-something-other.esm.js"
           },
           "default": "./other/dist/blah-something-other.cjs.js"
-        }
+        },
+        "./package.json": "./package.json"
       }
     }
 
@@ -766,11 +766,11 @@ test("no module field with exports field", async () => {
       "main": "dist/pkg-a.cjs.js",
       "module": "dist/pkg-a.esm.js",
       "exports": {
-        "./package.json": "./package.json",
         ".": {
           "module": "./dist/pkg-a.esm.js",
           "default": "./dist/pkg-a.cjs.js"
-        }
+        },
+        "./package.json": "./package.json"
       },
       "preconstruct": {
         "exports": true,
@@ -813,14 +813,14 @@ test("has browser field but no browser condition", async () => {
         "./dist/pkg-a.esm.js": "./dist/pkg-a.browser.esm.js"
       },
       "exports": {
-        "./package.json": "./package.json",
         ".": {
           "module": {
             "browser": "./dist/pkg-a.browser.esm.js",
             "default": "./dist/pkg-a.esm.js"
           },
           "default": "./dist/pkg-a.cjs.js"
-        }
+        },
+        "./package.json": "./package.json"
       },
       "preconstruct": {
         "exports": {
@@ -866,14 +866,14 @@ test("has browser condition but no browser field", async () => {
         "./dist/pkg-a.esm.js": "./dist/pkg-a.browser.esm.js"
       },
       "exports": {
-        "./package.json": "./package.json",
         ".": {
           "module": {
             "browser": "./dist/pkg-a.browser.esm.js",
             "default": "./dist/pkg-a.esm.js"
           },
           "default": "./dist/pkg-a.cjs.js"
-        }
+        },
+        "./package.json": "./package.json"
       },
       "preconstruct": {
         "exports": {
@@ -913,11 +913,11 @@ test("preconstruct.exports: true no exports field", async () => {
       "main": "dist/pkg-a.cjs.js",
       "module": "dist/pkg-a.esm.js",
       "exports": {
-        "./package.json": "./package.json",
         ".": {
           "module": "./dist/pkg-a.esm.js",
           "default": "./dist/pkg-a.cjs.js"
-        }
+        },
+        "./package.json": "./package.json"
       },
       "preconstruct": {
         "exports": true,

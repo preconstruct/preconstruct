@@ -670,7 +670,6 @@ test("worker and browser build", async () => {
         "./dist/exports-test.esm.js": "./dist/exports-test.browser.esm.js",
       },
       exports: {
-        "./package.json": "./package.json",
         ".": {
           module: {
             worker: "./dist/exports-test.worker.esm.js",
@@ -679,6 +678,7 @@ test("worker and browser build", async () => {
           },
           default: "./dist/exports-test.cjs.js",
         },
+        "./package.json": "./package.json",
       },
       preconstruct: {
         exports: {
@@ -749,7 +749,6 @@ test("typescript with nodenext module resolution", async () => {
       main: "dist/pkg-a.cjs.js",
       module: "dist/pkg-a.esm.js",
       exports: {
-        "./package.json": "./package.json",
         ".": {
           module: "./dist/pkg-a.esm.js",
           default: "./dist/pkg-a.cjs.js",
@@ -758,6 +757,7 @@ test("typescript with nodenext module resolution", async () => {
           module: "./something/dist/pkg-a-something.esm.js",
           default: "./something/dist/pkg-a-something.cjs.js",
         },
+        "./package.json": "./package.json",
       },
       preconstruct: {
         entrypoints: ["index.ts", "something.ts"],
