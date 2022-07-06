@@ -333,7 +333,7 @@ test("exports field with worker condition", async () => {
     }),
     "src/index.js": "console.log(1)",
   });
-
+  tmpPath = await fs.realpath(tmpPath);
   await dev(tmpPath);
   const files = await getFiles(tmpPath, [
     "dist/**",
@@ -343,7 +343,7 @@ test("exports field with worker condition", async () => {
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/something-blah.esm.js, dist/something-blah.worker.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     console.log(1)
   `);
-  const realpathOfDir = await fs.realpath(tmpPath);
+  const realpathOfDir = tmpPath;
   await Promise.all(
     Object.keys(files).map(async (filename) => {
       const [realpathFromSymlink, realpath] = await Promise.all([
