@@ -307,33 +307,34 @@ test("typescript with typeScriptProxyFileWithImportEqualsRequireAndExportEquals"
 });
 
 test("exports field with worker condition", async () => {
-  let tmpPath = await testdir({
-    "package.json": JSON.stringify({
-      name: "@something/blah",
-      main: "dist/something-blah.cjs.js",
-      module: "dist/something-blah.esm.js",
-      exports: {
-        ".": {
-          module: {
-            worker: "./dist/something-blah.worker.esm.js",
-            default: "./dist/something-blah.esm.js",
-          },
-          default: "./dist/something-blah.cjs.js",
-        },
-        "./package.json": "./package.json",
-      },
-      preconstruct: {
+  let tmpPath = realFs.realpathSync.native(
+    await testdir({
+      "package.json": JSON.stringify({
+        name: "@something/blah",
+        main: "dist/something-blah.cjs.js",
+        module: "dist/something-blah.esm.js",
         exports: {
-          envConditions: ["worker"],
+          ".": {
+            module: {
+              worker: "./dist/something-blah.worker.esm.js",
+              default: "./dist/something-blah.esm.js",
+            },
+            default: "./dist/something-blah.cjs.js",
+          },
+          "./package.json": "./package.json",
         },
-        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
-          exports: true,
+        preconstruct: {
+          exports: {
+            envConditions: ["worker"],
+          },
+          ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+            exports: true,
+          },
         },
-      },
-    }),
-    "src/index.js": "console.log(1)",
-  });
-  tmpPath = await fs.realpath(tmpPath);
+      }),
+      "src/index.js": "console.log(1)",
+    })
+  );
   await dev(tmpPath);
   const files = await getFiles(tmpPath, [
     "dist/**",
@@ -345,11 +346,9 @@ test("exports field with worker condition", async () => {
   `);
   await Promise.all(
     Object.keys(files).map(async (filename) => {
-      expect({
-        a: fs.readlinkSync(path.join(tmpPath, filename)),
-        b: fs.realpathSync(path.join(tmpPath, filename)),
-        c: path.join(tmpPath, "src/index.js"),
-      }).toEqual({});
+      expect(fs.realpathSync(path.join(tmpPath, filename))).toEqual(
+        path.join(tmpPath, "src/index.js")
+      );
     })
   );
 });
