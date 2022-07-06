@@ -349,6 +349,12 @@ test("exports field with worker condition", async () => {
         fs.realpath(path.join(tmpPath, filename)).then((x) => fs.realpath(x)),
         fs.realpath(path.join(tmpPath, "src/index.js")),
       ]);
+      expect({
+        realpathFromSymlink,
+        realpath,
+        notRealpath: path.join(tmpPath, "src/index.js"),
+        readlink: fs.readlink(path.join(tmpPath, filename)),
+      }).toEqual({});
       expect(realpathFromSymlink).toEqual(realpath);
     })
   );
