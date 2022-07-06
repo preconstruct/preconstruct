@@ -346,7 +346,7 @@ test("exports field with worker condition", async () => {
   `);
   await Promise.all(
     Object.keys(files).map(async (filename) => {
-      expect(fs.realpathSync(path.join(tmpPath, filename))).toEqual(
+      expect(await fs.realpath(path.join(tmpPath, filename))).toEqual(
         path.join(tmpPath, "src/index.js")
       );
     })
