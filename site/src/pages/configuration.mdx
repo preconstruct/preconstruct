@@ -147,14 +147,12 @@ The `exports` config allows you to specify opt-in to generating an `exports` fie
 Using the `exports` field enables a couple of things:
 
 - Importing non-root entrypoints in Node.js ESM
-- Disallowing importing modules that aren't explicitly specified in the `exports` field
+- Disallowing importing modules that aren't specified in the `exports` field
 - More specific builds for certain environments
 
 > Note that Preconstruct's support for the `exports` field does not currently include emitting ESM compatible with Node.js. While ESM builds are generated, they are targeting bundlers, not Node.js or browsers directly so they use the `module` condition, not the `import` condition.
 
-Note that adding an `exports` field can `arguably`
-
-conditional exports for various environments. You can use this to create custom builds targeted for these specific environments. Currently, only "browser", "worker", and "module" conditionals are supported.
+Note that adding an `exports` field can arguably be a breaking change, you may want to use the `extra` option to add more exports so that imports that worked previously still work or only add the `exports` field in a major version.
 
 To opt into this experimental feature, you must enable it in the root of your project by setting the `exports` experimental flag in your preconstruct config section of your `package.json` file to `true`.
 
@@ -188,7 +186,7 @@ Additionally, you'll also need to enable the feature on each individual pacakge.
 
 Specifying the `envConditions` option adds additional environments that Preconstruct will generate bundles for. This option is currently aimed at generating bundles with `typeof SOME_ENV_SPECIFIC_GLOBAL` replaced with what it would be in that environment. It may be expanded to provide the ability to have Preconstruct resolve a different file or etc. depending on the environment in the future.
 
-- `browser`: Generates a bundle targeting browsers. When this condition is used, the top-level `browser` field will also be set so that older bundlers that do not understand the `exports` field will be able to use the browser build. When building with this condition, `typeof document` and `typeof window` will be replaced with `"object"` and dead-code elimination will occur based on that.
+- `browser`: Generates a bundle targeting browsers. When this condition is used, the top-level `browser` field will also be set so that older bundlers that do not understand the `exports` field will be able to use the browser build though CommonJS browser builds will not exist. When building with this condition, `typeof document` and `typeof window` will be replaced with `"object"` and dead-code elimination will occur based on that.
 - `worker`: Generates a bundle targeting web workers/server-side JS runtimes that use web APIs. When building with this condition, `typeof document` and `typeof window` will be replaced with `"undefined"` and dead-code elimination will occur based on that.
 
 ```json
