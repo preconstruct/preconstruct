@@ -4,7 +4,7 @@ import {
   tsTemplate,
   flowTemplate,
   validFieldsForEntrypoint,
-  getModuleTypeExportConditions,
+  getExportsFieldOutputPath,
 } from "./utils";
 import * as babel from "@babel/core";
 import * as fs from "fs-extra";
@@ -220,16 +220,15 @@ unregister();
           }
 
           if (pkg.exportsFieldConfig()?.envConditions?.has("worker")) {
-            for (const output of Object.values(
-              getModuleTypeExportConditions(entrypoint, "worker")
-            )) {
-              promises.push(
-                fs.symlink(
-                  entrypoint.source,
-                  path.join(entrypoint.directory, output)
+            promises.push(
+              fs.symlink(
+                entrypoint.source,
+                path.join(
+                  pkg.directory,
+                  getExportsFieldOutputPath(entrypoint, "worker")
                 )
-              );
-            }
+              )
+            );
           }
 
           if (entrypoint.json.browser) {

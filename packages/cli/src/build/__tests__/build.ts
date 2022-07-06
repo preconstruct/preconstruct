@@ -668,17 +668,15 @@ test("worker and browser build", async () => {
       module: "dist/exports-test.esm.js",
       browser: {
         "./dist/exports-test.esm.js": "./dist/exports-test.browser.esm.js",
-        "./dist/exports-test.cjs.js": "./dist/exports-test.browser.cjs.js",
       },
       exports: {
         "./package.json": "./package.json",
         ".": {
-          worker: { module: "./dist/exports-test.worker.esm.js" },
-          browser: {
-            module: "./dist/exports-test.browser.esm.js",
-            default: "./dist/exports-test.browser.cjs.js",
+          module: {
+            worker: "./dist/exports-test.worker.esm.js",
+            browser: "./dist/exports-test.browser.esm.js",
+            default: "./dist/exports-test.esm.js",
           },
-          module: "./dist/exports-test.esm.js",
           default: "./dist/exports-test.cjs.js",
         },
       },
@@ -701,15 +699,6 @@ test("worker and browser build", async () => {
   });
   await build(dir);
   expect(await getDist(dir)).toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/exports-test.browser.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    Object.defineProperty(exports, '__esModule', { value: true });
-
-    const thing = "object";
-
-    exports.thing = thing;
-
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/exports-test.browser.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     const thing = "object";
 

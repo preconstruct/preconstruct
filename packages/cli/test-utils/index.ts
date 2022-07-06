@@ -395,14 +395,14 @@ async function readNormalizedFile(filePath: string): Promise<string> {
   const stat = await fs.lstat(filePath);
   if (stat.isSymbolicLink()) {
     const [targetPath, realFilePath] = await Promise.all([
-      fs.readlink(filePath).then((x) => fs.realpath(x)),
+      fs.realpath(filePath),
       fs
         .realpath(path.dirname(filePath))
         .then((x) => path.join(x, path.basename(filePath))),
     ]);
     return `symbolic link to ${normalizePath(
       path.relative(path.dirname(realFilePath), targetPath)
-    )}. ${JSON.stringify({ targetPath, realFilePath }, null, 2)}`;
+    )}`;
   }
   let content = await fs.readFile(filePath, "utf8");
   // to normalise windows line endings

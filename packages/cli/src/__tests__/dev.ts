@@ -315,10 +315,10 @@ test("exports field with worker condition", async () => {
       exports: {
         "./package.json": "./package.json",
         ".": {
-          worker: {
-            module: "./dist/something-blah.worker.esm.js",
+          module: {
+            worker: "./dist/something-blah.worker.esm.js",
+            default: "./dist/something-blah.esm.js",
           },
-          module: "./dist/something-blah.esm.js",
           default: "./dist/something-blah.cjs.js",
         },
       },
@@ -335,10 +335,9 @@ test("exports field with worker condition", async () => {
   });
 
   await dev(tmpPath);
-
   expect(await getFiles(tmpPath, ["dist/**", "!dist/something-blah.cjs.js"]))
     .toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/something-blah.esm.js, dist/something-blah.worker.cjs.js, dist/something-blah.worker.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/something-blah.esm.js, dist/something-blah.worker.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     symbolic link to ../src/index.js
   `);
 });

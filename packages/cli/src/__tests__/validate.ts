@@ -812,9 +812,10 @@ test("has browser field but no browser condition", async () => {
     }),
     "src/index.js": "",
   });
-  await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
-    `[Error: the exports field is configured and the browser field exists in this package but it is not specified in the preconstruct.exports.envConditions field]`
-  );
+  await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(`
+          [Error: 🎁 pkg-a the exports field is configured and the browser field exists in this package but it is not specified in the preconstruct.exports.envConditions field
+          🎁 pkg-a browser field is invalid, found \`{"./dist/pkg-a.cjs.js":"./dist/pkg-a.browser.cjs.js","./dist/pkg-a.esm.js":"./dist/pkg-a.browser.esm.js"}\`, expected \`{"./dist/pkg-a.esm.js":"./dist/pkg-a.browser.esm.js"}\`]
+        `);
 });
 
 test("has browser condition but no browser field", async () => {

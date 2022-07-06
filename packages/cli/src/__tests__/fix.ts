@@ -98,20 +98,16 @@ test("set exports field when opt-in", async () => {
       "main": "dist/package-exports.cjs.js",
       "module": "dist/package-exports.esm.js",
       "browser": {
-        "./dist/package-exports.cjs.js": "./dist/package-exports.browser.cjs.js",
         "./dist/package-exports.esm.js": "./dist/package-exports.browser.esm.js"
       },
       "exports": {
         "./package.json": "./package.json",
         ".": {
-          "worker": {
-            "module": "./dist/package-exports.worker.esm.js"
+          "module": {
+            "worker": "./dist/package-exports.worker.esm.js",
+            "browser": "./dist/package-exports.browser.esm.js",
+            "default": "./dist/package-exports.esm.js"
           },
-          "browser": {
-            "module": "./dist/package-exports.browser.esm.js",
-            "default": "./dist/package-exports.browser.cjs.js"
-          },
-          "module": "./dist/package-exports.esm.js",
           "default": "./dist/package-exports.cjs.js"
         }
       },
@@ -158,20 +154,16 @@ test("set exports field when opt-in", async () => {
       "main": "dist/package-exports.cjs.js",
       "module": "dist/package-exports.esm.js",
       "browser": {
-        "./dist/package-exports.cjs.js": "./dist/package-exports.browser.cjs.js",
         "./dist/package-exports.esm.js": "./dist/package-exports.browser.esm.js"
       },
       "exports": {
         "./package.json": "./package.json",
         ".": {
-          "worker": {
-            "module": "./dist/package-exports.worker.esm.js"
+          "module": {
+            "worker": "./dist/package-exports.worker.esm.js",
+            "browser": "./dist/package-exports.browser.esm.js",
+            "default": "./dist/package-exports.esm.js"
           },
-          "browser": {
-            "module": "./dist/package-exports.browser.esm.js",
-            "default": "./dist/package-exports.browser.cjs.js"
-          },
-          "module": "./dist/package-exports.esm.js",
           "default": "./dist/package-exports.cjs.js"
         }
       },
@@ -264,7 +256,6 @@ test("set exports field with multiple entrypoints", async () => {
       "main": "dist/blah-something-deep-something.cjs.js",
       "module": "dist/blah-something-deep-something.esm.js",
       "browser": {
-        "./dist/blah-something-deep-something.cjs.js": "./dist/blah-something-deep-something.browser.cjs.js",
         "./dist/blah-something-deep-something.esm.js": "./dist/blah-something-deep-something.browser.esm.js"
       }
     }
@@ -274,7 +265,6 @@ test("set exports field with multiple entrypoints", async () => {
       "main": "dist/blah-something-other.cjs.js",
       "module": "dist/blah-something-other.esm.js",
       "browser": {
-        "./dist/blah-something-other.cjs.js": "./dist/blah-something-other.browser.cjs.js",
         "./dist/blah-something-other.esm.js": "./dist/blah-something-other.browser.esm.js"
       }
     }
@@ -285,42 +275,32 @@ test("set exports field with multiple entrypoints", async () => {
       "main": "dist/blah-something.cjs.js",
       "module": "dist/blah-something.esm.js",
       "browser": {
-        "./dist/blah-something.cjs.js": "./dist/blah-something.browser.cjs.js",
         "./dist/blah-something.esm.js": "./dist/blah-something.browser.esm.js"
       },
       "exports": {
         "./package.json": "./package.json",
         ".": {
-          "worker": {
-            "module": "./dist/blah-something.worker.esm.js"
+          "module": {
+            "worker": "./dist/blah-something.worker.esm.js",
+            "browser": "./dist/blah-something.browser.esm.js",
+            "default": "./dist/blah-something.esm.js"
           },
-          "browser": {
-            "module": "./dist/blah-something.browser.esm.js",
-            "default": "./dist/blah-something.browser.cjs.js"
-          },
-          "module": "./dist/blah-something.esm.js",
           "default": "./dist/blah-something.cjs.js"
         },
         "./other": {
-          "worker": {
-            "module": "./other/dist/blah-something-other.worker.esm.js"
+          "module": {
+            "worker": "./other/dist/blah-something-other.worker.esm.js",
+            "browser": "./other/dist/blah-something-other.browser.esm.js",
+            "default": "./other/dist/blah-something-other.esm.js"
           },
-          "browser": {
-            "module": "./other/dist/blah-something-other.browser.esm.js",
-            "default": "./other/dist/blah-something-other.browser.cjs.js"
-          },
-          "module": "./other/dist/blah-something-other.esm.js",
           "default": "./other/dist/blah-something-other.cjs.js"
         },
         "./deep/something": {
-          "worker": {
-            "module": "./deep/something/dist/blah-something-deep-something.worker.esm.js"
+          "module": {
+            "worker": "./deep/something/dist/blah-something-deep-something.worker.esm.js",
+            "browser": "./deep/something/dist/blah-something-deep-something.browser.esm.js",
+            "default": "./deep/something/dist/blah-something-deep-something.esm.js"
           },
-          "browser": {
-            "module": "./deep/something/dist/blah-something-deep-something.browser.esm.js",
-            "default": "./deep/something/dist/blah-something-deep-something.browser.cjs.js"
-          },
-          "module": "./deep/something/dist/blah-something-deep-something.esm.js",
           "default": "./deep/something/dist/blah-something-deep-something.cjs.js"
         }
       },
@@ -376,7 +356,6 @@ test("set exports field without root entrypoint", async () => {
       "main": "dist/blah-something-other.cjs.js",
       "module": "dist/blah-something-other.esm.js",
       "browser": {
-        "./dist/blah-something-other.cjs.js": "./dist/blah-something-other.browser.cjs.js",
         "./dist/blah-something-other.esm.js": "./dist/blah-something-other.browser.esm.js"
       }
     }
@@ -401,14 +380,11 @@ test("set exports field without root entrypoint", async () => {
       "exports": {
         "./package.json": "./package.json",
         "./other": {
-          "worker": {
-            "module": "./other/dist/blah-something-other.worker.esm.js"
+          "module": {
+            "worker": "./other/dist/blah-something-other.worker.esm.js",
+            "browser": "./other/dist/blah-something-other.browser.esm.js",
+            "default": "./other/dist/blah-something-other.esm.js"
           },
-          "browser": {
-            "module": "./other/dist/blah-something-other.browser.esm.js",
-            "default": "./other/dist/blah-something-other.browser.cjs.js"
-          },
-          "module": "./other/dist/blah-something-other.esm.js",
           "default": "./other/dist/blah-something-other.cjs.js"
         }
       }
@@ -834,17 +810,15 @@ test("has browser field but no browser condition", async () => {
       "main": "dist/pkg-a.cjs.js",
       "module": "dist/pkg-a.esm.js",
       "browser": {
-        "./dist/pkg-a.cjs.js": "./dist/pkg-a.browser.cjs.js",
         "./dist/pkg-a.esm.js": "./dist/pkg-a.browser.esm.js"
       },
       "exports": {
         "./package.json": "./package.json",
         ".": {
-          "browser": {
-            "module": "./dist/pkg-a.browser.esm.js",
-            "default": "./dist/pkg-a.browser.cjs.js"
+          "module": {
+            "browser": "./dist/pkg-a.browser.esm.js",
+            "default": "./dist/pkg-a.esm.js"
           },
-          "module": "./dist/pkg-a.esm.js",
           "default": "./dist/pkg-a.cjs.js"
         }
       },
@@ -889,17 +863,15 @@ test("has browser condition but no browser field", async () => {
       "main": "dist/pkg-a.cjs.js",
       "module": "dist/pkg-a.esm.js",
       "browser": {
-        "./dist/pkg-a.cjs.js": "./dist/pkg-a.browser.cjs.js",
         "./dist/pkg-a.esm.js": "./dist/pkg-a.browser.esm.js"
       },
       "exports": {
         "./package.json": "./package.json",
         ".": {
-          "browser": {
-            "module": "./dist/pkg-a.browser.esm.js",
-            "default": "./dist/pkg-a.browser.cjs.js"
+          "module": {
+            "browser": "./dist/pkg-a.browser.esm.js",
+            "default": "./dist/pkg-a.esm.js"
           },
-          "module": "./dist/pkg-a.esm.js",
           "default": "./dist/pkg-a.cjs.js"
         }
       },

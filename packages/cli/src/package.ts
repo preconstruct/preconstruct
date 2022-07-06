@@ -104,9 +104,7 @@ function createEntrypoints(
 }
 
 export type ExportsConditions = {
-  worker?: { module: string };
-  browser?: { module: string; default: string };
-  module: string;
+  module: string | { worker?: string; browser?: string; default: string };
   default: string;
 };
 
