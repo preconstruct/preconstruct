@@ -25,8 +25,9 @@ export class Project extends Item<{
     globals?: Record<string, string>;
     packages?: JSONValue;
     distFilenameStrategy?: JSONValue;
+    exports?: JSONValue;
     ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
-      exports?: boolean;
+      exports?: JSONValue;
       logCompiledFiles?: JSONValue;
       typeScriptProxyFileWithImportEqualsRequireAndExportEquals?: JSONValue;
       keepDynamicImportAsDynamicImportInCommonJS?: JSONValue;

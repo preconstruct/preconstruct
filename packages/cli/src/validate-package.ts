@@ -39,15 +39,16 @@ export async function fixPackage(pkg: Package) {
     }
   }
 
-  pkg.json = setFieldInOrder(pkg.json, "exports", exportsField(pkg));
-
-  await pkg.save();
-
   keys(fields)
     .filter((x) => fields[x])
     .forEach((field) => {
       pkg.setFieldOnEntrypoints(field);
     });
+
+  pkg.json = setFieldInOrder(pkg.json, "exports", exportsField(pkg));
+
+  await pkg.save();
+
   return (await Promise.all(pkg.entrypoints.map((x) => x.save()))).some(
     (x) => x
   );

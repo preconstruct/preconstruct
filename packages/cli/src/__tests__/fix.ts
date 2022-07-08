@@ -929,3 +929,56 @@ test("preconstruct.exports: true no exports field", async () => {
 
   `);
 });
+
+test("project level exports field config", async () => {
+  const tmpPath = await testdir({
+    "package.json": JSON.stringify(
+      {
+        name: "repo",
+        preconstruct: {
+          packages: ["packages/*"],
+          exports: true,
+          ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+            exports: true,
+          },
+        },
+      },
+      null,
+      2
+    ),
+    "packages/pkg-a/package.json": JSON.stringify({
+      name: "pkg-a",
+    }),
+    "packages/pkg-a/src/index.js": "",
+  });
+  await fix(tmpPath);
+  expect(await getFiles(tmpPath, ["**/package.json"])).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {
+      "name": "repo",
+      "preconstruct": {
+        "packages": [
+          "packages/*"
+        ],
+        "exports": true,
+        "___experimentalFlags_WILL_CHANGE_IN_PATCH": {
+          "exports": true
+        }
+      }
+    }
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {
+      "name": "pkg-a",
+      "main": "dist/pkg-a.cjs.js",
+      "module": "dist/pkg-a.esm.js",
+      "exports": {
+        ".": {
+          "module": "./dist/pkg-a.esm.js",
+          "default": "./dist/pkg-a.cjs.js"
+        },
+        "./package.json": "./package.json"
+      }
+    }
+
+  `);
+});

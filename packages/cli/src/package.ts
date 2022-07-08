@@ -315,7 +315,25 @@ export class Package extends Item<{
     if (!this.project.experimentalFlags.exports) {
       return;
     }
-    return parseExportsFieldConfig(this.json.preconstruct.exports, this.name);
+    let defaultExportsFieldEnabled = false;
+    if (this.project.directory !== this.directory) {
+      const exportsFieldConfig = this.project.json.preconstruct.exports;
+      if (exportsFieldConfig !== undefined) {
+        if (typeof exportsFieldConfig === "boolean") {
+          defaultExportsFieldEnabled = exportsFieldConfig;
+        } else {
+          throw new FatalError(
+            'the "preconstruct.exports" field must be a boolean at the project level',
+            this.project.name
+          );
+        }
+      }
+    }
+    return parseExportsFieldConfig(
+      this.json.preconstruct.exports,
+      defaultExportsFieldEnabled,
+      this.name
+    );
   }
 }
 
@@ -327,9 +345,14 @@ type CanonicalExportsFieldConfig =
     };
 
 function parseExportsFieldConfig(
-  config: unknown,
+  _config: unknown,
+  defaultExportsFieldEnabled: boolean,
   name: string
 ): CanonicalExportsFieldConfig {
+  // the seperate assignment vs declaration is so that TypeScript's
+  // control flow analysis does what we want
+  let config;
+  config = _config;
   if (
     (typeof config !== "boolean" &&
       typeof config !== "object" &&
@@ -338,11 +361,14 @@ function parseExportsFieldConfig(
     Array.isArray(config)
   ) {
     throw new FatalError(
-      'the "preconstruct.exports" field must be a boolean or an object',
+      'the "preconstruct.exports" field must be a boolean or an object at the package level',
       name
     );
   }
-  if (config === false || config === undefined) {
+  if (config === undefined) {
+    config = defaultExportsFieldEnabled;
+  }
+  if (config === false) {
     return undefined;
   }
   const parsedConfig: CanonicalExportsFieldConfig = {

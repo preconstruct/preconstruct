@@ -687,13 +687,13 @@ describe("exports field config", () => {
     test("null", async () => {
       const tmpPath = await exportsFieldConfigTestDir(null);
       await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
-        `[Error: the "preconstruct.exports" field must be a boolean or an object]`
+        `[Error: the "preconstruct.exports" field must be a boolean or an object at the package level]`
       );
     });
     test("some string", async () => {
       const tmpPath = await exportsFieldConfigTestDir("blah");
       await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
-        `[Error: the "preconstruct.exports" field must be a boolean or an object]`
+        `[Error: the "preconstruct.exports" field must be a boolean or an object at the package level]`
       );
     });
     test("extra not object", async () => {
