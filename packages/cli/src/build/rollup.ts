@@ -31,7 +31,12 @@ const makeExternalPredicate = (externalArr: string[]) => {
   return (id: string) => pattern.test(id);
 };
 
-export type RollupConfigType = "umd" | "browser" | "node-dev" | "node-prod";
+export type RollupConfigType =
+  | "umd"
+  | "browser"
+  | "worker"
+  | "node-dev"
+  | "node-prod";
 
 export let getRollupConfig = (
   pkg: Package,
@@ -173,6 +178,7 @@ export let getRollupConfig = (
         }),
       resolve({
         extensions: EXTENSIONS,
+        // only umd builds will actually load dependencies which is where this browser flag actually makes a difference
         browser: type === "umd",
         customResolveOptions: {
           moduleDirectory: type === "umd" ? "node_modules" : [],
@@ -190,6 +196,14 @@ export let getRollupConfig = (
           values: {
             ["typeof " + "document"]: JSON.stringify("object"),
             ["typeof " + "window"]: JSON.stringify("object"),
+          },
+          preventAssignment: true,
+        }),
+      type === "worker" &&
+        replace({
+          values: {
+            ["typeof " + "document"]: JSON.stringify("undefined"),
+            ["typeof " + "window"]: JSON.stringify("undefined"),
           },
           preventAssignment: true,
         }),

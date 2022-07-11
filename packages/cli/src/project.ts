@@ -25,7 +25,9 @@ export class Project extends Item<{
     globals?: Record<string, string>;
     packages?: JSONValue;
     distFilenameStrategy?: JSONValue;
+    exports?: JSONValue;
     ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+      exports?: JSONValue;
       logCompiledFiles?: JSONValue;
       typeScriptProxyFileWithImportEqualsRequireAndExportEquals?: JSONValue;
       keepDynamicImportAsDynamicImportInCommonJS?: JSONValue;
@@ -36,6 +38,7 @@ export class Project extends Item<{
     let config =
       this.json.preconstruct.___experimentalFlags_WILL_CHANGE_IN_PATCH || {};
     return {
+      exports: !!config.exports,
       logCompiledFiles: !!config.logCompiledFiles,
       typeScriptProxyFileWithImportEqualsRequireAndExportEquals: !!config.typeScriptProxyFileWithImportEqualsRequireAndExportEquals,
       keepDynamicImportAsDynamicImportInCommonJS: !!config.keepDynamicImportAsDynamicImportInCommonJS,

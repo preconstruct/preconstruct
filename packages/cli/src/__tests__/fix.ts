@@ -9,6 +9,7 @@ import {
   createPackageCheckTestCreator,
   testdir,
   js,
+  getFiles,
 } from "../../test-utils";
 import { promptInput as _promptInput } from "../prompt";
 import fs from "fs-extra";
@@ -67,6 +68,328 @@ test("set main and module field", async () => {
       "private": true,
       "version": "1.0.0",
     }
+  `);
+});
+
+test("set exports field when opt-in", async () => {
+  let tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "package-exports",
+      main: "index.js",
+      module: "dist/package-exports.esm.js",
+      preconstruct: {
+        exports: {
+          envConditions: ["worker", "browser"],
+        },
+        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+          exports: true,
+        },
+      },
+    }),
+    "src/index.js": "",
+  });
+
+  await fix(tmpPath);
+
+  expect(await getFiles(tmpPath, ["package.json"])).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {
+      "name": "package-exports",
+      "main": "dist/package-exports.cjs.js",
+      "module": "dist/package-exports.esm.js",
+      "browser": {
+        "./dist/package-exports.esm.js": "./dist/package-exports.browser.esm.js"
+      },
+      "exports": {
+        ".": {
+          "module": {
+            "worker": "./dist/package-exports.worker.esm.js",
+            "browser": "./dist/package-exports.browser.esm.js",
+            "default": "./dist/package-exports.esm.js"
+          },
+          "default": "./dist/package-exports.cjs.js"
+        },
+        "./package.json": "./package.json"
+      },
+      "preconstruct": {
+        "exports": {
+          "envConditions": [
+            "worker",
+            "browser"
+          ]
+        },
+        "___experimentalFlags_WILL_CHANGE_IN_PATCH": {
+          "exports": true
+        }
+      }
+    }
+
+  `);
+});
+
+test("set exports field when opt-in", async () => {
+  let tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "package-exports",
+      main: "index.js",
+      module: "dist/package-exports.esm.js",
+      preconstruct: {
+        exports: {
+          envConditions: ["worker", "browser"],
+        },
+        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+          exports: true,
+        },
+      },
+    }),
+    "src/index.js": "",
+  });
+
+  await fix(tmpPath);
+
+  expect(await getFiles(tmpPath, ["package.json"])).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {
+      "name": "package-exports",
+      "main": "dist/package-exports.cjs.js",
+      "module": "dist/package-exports.esm.js",
+      "browser": {
+        "./dist/package-exports.esm.js": "./dist/package-exports.browser.esm.js"
+      },
+      "exports": {
+        ".": {
+          "module": {
+            "worker": "./dist/package-exports.worker.esm.js",
+            "browser": "./dist/package-exports.browser.esm.js",
+            "default": "./dist/package-exports.esm.js"
+          },
+          "default": "./dist/package-exports.cjs.js"
+        },
+        "./package.json": "./package.json"
+      },
+      "preconstruct": {
+        "exports": {
+          "envConditions": [
+            "worker",
+            "browser"
+          ]
+        },
+        "___experimentalFlags_WILL_CHANGE_IN_PATCH": {
+          "exports": true
+        }
+      }
+    }
+
+  `);
+});
+
+test("set exports field when opt-in with no env conditions", async () => {
+  let tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "package-exports",
+      main: "index.js",
+      module: "dist/package-exports.esm.js",
+      preconstruct: {
+        exports: true,
+        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+          exports: true,
+        },
+      },
+    }),
+    "src/index.js": "",
+  });
+
+  await fix(tmpPath);
+
+  expect(await getFiles(tmpPath, ["package.json"])).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {
+      "name": "package-exports",
+      "main": "dist/package-exports.cjs.js",
+      "module": "dist/package-exports.esm.js",
+      "exports": {
+        ".": {
+          "module": "./dist/package-exports.esm.js",
+          "default": "./dist/package-exports.cjs.js"
+        },
+        "./package.json": "./package.json"
+      },
+      "preconstruct": {
+        "exports": true,
+        "___experimentalFlags_WILL_CHANGE_IN_PATCH": {
+          "exports": true
+        }
+      }
+    }
+
+  `);
+});
+
+test("set exports field with multiple entrypoints", async () => {
+  let tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "@blah/something",
+      main: "index.js",
+      module: "dist/package-exports.esm.js",
+      preconstruct: {
+        entrypoints: ["index.js", "other.js", "deep/something.js"],
+        exports: {
+          envConditions: ["worker", "browser"],
+        },
+        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+          exports: true,
+        },
+      },
+    }),
+    "other/package.json": JSON.stringify({}),
+    "deep/something/package.json": JSON.stringify({}),
+    "src/index.js": "",
+    "src/other.js": "",
+    "src/deep/something.js": "",
+  });
+
+  await fix(tmpPath);
+
+  expect(await getFiles(tmpPath, ["**/package.json"])).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ deep/something/package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {
+      "main": "dist/blah-something-deep-something.cjs.js",
+      "module": "dist/blah-something-deep-something.esm.js",
+      "browser": {
+        "./dist/blah-something-deep-something.esm.js": "./dist/blah-something-deep-something.browser.esm.js"
+      }
+    }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ other/package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {
+      "main": "dist/blah-something-other.cjs.js",
+      "module": "dist/blah-something-other.esm.js",
+      "browser": {
+        "./dist/blah-something-other.esm.js": "./dist/blah-something-other.browser.esm.js"
+      }
+    }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {
+      "name": "@blah/something",
+      "main": "dist/blah-something.cjs.js",
+      "module": "dist/blah-something.esm.js",
+      "browser": {
+        "./dist/blah-something.esm.js": "./dist/blah-something.browser.esm.js"
+      },
+      "exports": {
+        ".": {
+          "module": {
+            "worker": "./dist/blah-something.worker.esm.js",
+            "browser": "./dist/blah-something.browser.esm.js",
+            "default": "./dist/blah-something.esm.js"
+          },
+          "default": "./dist/blah-something.cjs.js"
+        },
+        "./other": {
+          "module": {
+            "worker": "./other/dist/blah-something-other.worker.esm.js",
+            "browser": "./other/dist/blah-something-other.browser.esm.js",
+            "default": "./other/dist/blah-something-other.esm.js"
+          },
+          "default": "./other/dist/blah-something-other.cjs.js"
+        },
+        "./deep/something": {
+          "module": {
+            "worker": "./deep/something/dist/blah-something-deep-something.worker.esm.js",
+            "browser": "./deep/something/dist/blah-something-deep-something.browser.esm.js",
+            "default": "./deep/something/dist/blah-something-deep-something.esm.js"
+          },
+          "default": "./deep/something/dist/blah-something-deep-something.cjs.js"
+        },
+        "./package.json": "./package.json"
+      },
+      "preconstruct": {
+        "entrypoints": [
+          "index.js",
+          "other.js",
+          "deep/something.js"
+        ],
+        "exports": {
+          "envConditions": [
+            "worker",
+            "browser"
+          ]
+        },
+        "___experimentalFlags_WILL_CHANGE_IN_PATCH": {
+          "exports": true
+        }
+      }
+    }
+
+  `);
+});
+
+test("set exports field without root entrypoint", async () => {
+  let tmpPath = await testdir({
+    "package.json":
+      JSON.stringify(
+        {
+          name: "@blah/something",
+          preconstruct: {
+            entrypoints: ["other.js"],
+            exports: {
+              envConditions: ["worker", "browser"],
+            },
+            ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+              exports: true,
+            },
+          },
+        },
+        null,
+        2
+      ) + "\n",
+    "other/package.json": JSON.stringify({}),
+    "src/other.js": "",
+  });
+
+  await fix(tmpPath);
+
+  expect(await getFiles(tmpPath, ["**/package.json"])).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ other/package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {
+      "main": "dist/blah-something-other.cjs.js",
+      "module": "dist/blah-something-other.esm.js",
+      "browser": {
+        "./dist/blah-something-other.esm.js": "./dist/blah-something-other.browser.esm.js"
+      }
+    }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {
+      "name": "@blah/something",
+      "preconstruct": {
+        "entrypoints": [
+          "other.js"
+        ],
+        "exports": {
+          "envConditions": [
+            "worker",
+            "browser"
+          ]
+        },
+        "___experimentalFlags_WILL_CHANGE_IN_PATCH": {
+          "exports": true
+        }
+      },
+      "exports": {
+        "./other": {
+          "module": {
+            "worker": "./other/dist/blah-something-other.worker.esm.js",
+            "browser": "./other/dist/blah-something-other.browser.esm.js",
+            "default": "./other/dist/blah-something-other.esm.js"
+          },
+          "default": "./other/dist/blah-something-other.cjs.js"
+        },
+        "./package.json": "./package.json"
+      }
+    }
+
   `);
 });
 
@@ -410,7 +733,252 @@ test("unexpected former experimental flag is removed", async () => {
                       export let x = true;
                     `,
   });
+  await fix(tmpPath);
+  expect(await getFiles(tmpPath, ["package.json"])).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {
+      "name": "pkg-a",
+      "main": "dist/pkg-a.cjs.js"
+    }
 
-  await expect(fix(tmpPath));
-  expect(getPkg(tmpPath)).toMatchInlineSnapshot(`Promise {}`);
+  `);
+});
+
+test("no module field with exports field", async () => {
+  const tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "pkg-a",
+      main: "dist/pkg-a.cjs.js",
+      preconstruct: {
+        exports: true,
+        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+          exports: true,
+        },
+      },
+    }),
+    "src/index.js": "",
+  });
+  await fix(tmpPath);
+  expect(await getFiles(tmpPath, ["package.json"])).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {
+      "name": "pkg-a",
+      "main": "dist/pkg-a.cjs.js",
+      "module": "dist/pkg-a.esm.js",
+      "exports": {
+        ".": {
+          "module": "./dist/pkg-a.esm.js",
+          "default": "./dist/pkg-a.cjs.js"
+        },
+        "./package.json": "./package.json"
+      },
+      "preconstruct": {
+        "exports": true,
+        "___experimentalFlags_WILL_CHANGE_IN_PATCH": {
+          "exports": true
+        }
+      }
+    }
+
+  `);
+});
+
+test("has browser field but no browser condition", async () => {
+  const tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "pkg-a",
+      main: "dist/pkg-a.cjs.js",
+      module: "dist/pkg-a.esm.js",
+      browser: {
+        "./dist/pkg-a.cjs.js": "./dist/pkg-a.browser.cjs.js",
+        "./dist/pkg-a.esm.js": "./dist/pkg-a.browser.esm.js",
+      },
+      preconstruct: {
+        exports: true,
+        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+          exports: true,
+        },
+      },
+    }),
+    "src/index.js": "",
+  });
+  await fix(tmpPath);
+  expect(await getFiles(tmpPath, ["package.json"])).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {
+      "name": "pkg-a",
+      "main": "dist/pkg-a.cjs.js",
+      "module": "dist/pkg-a.esm.js",
+      "browser": {
+        "./dist/pkg-a.esm.js": "./dist/pkg-a.browser.esm.js"
+      },
+      "exports": {
+        ".": {
+          "module": {
+            "browser": "./dist/pkg-a.browser.esm.js",
+            "default": "./dist/pkg-a.esm.js"
+          },
+          "default": "./dist/pkg-a.cjs.js"
+        },
+        "./package.json": "./package.json"
+      },
+      "preconstruct": {
+        "exports": {
+          "envConditions": [
+            "browser"
+          ]
+        },
+        "___experimentalFlags_WILL_CHANGE_IN_PATCH": {
+          "exports": true
+        }
+      }
+    }
+
+  `);
+});
+
+test("has browser condition but no browser field", async () => {
+  const tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "pkg-a",
+      main: "dist/pkg-a.cjs.js",
+      module: "dist/pkg-a.esm.js",
+      preconstruct: {
+        exports: {
+          envConditions: ["browser"],
+        },
+        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+          exports: true,
+        },
+      },
+    }),
+    "src/index.js": "",
+  });
+
+  await fix(tmpPath);
+  expect(await getFiles(tmpPath, ["package.json"])).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {
+      "name": "pkg-a",
+      "main": "dist/pkg-a.cjs.js",
+      "module": "dist/pkg-a.esm.js",
+      "browser": {
+        "./dist/pkg-a.esm.js": "./dist/pkg-a.browser.esm.js"
+      },
+      "exports": {
+        ".": {
+          "module": {
+            "browser": "./dist/pkg-a.browser.esm.js",
+            "default": "./dist/pkg-a.esm.js"
+          },
+          "default": "./dist/pkg-a.cjs.js"
+        },
+        "./package.json": "./package.json"
+      },
+      "preconstruct": {
+        "exports": {
+          "envConditions": [
+            "browser"
+          ]
+        },
+        "___experimentalFlags_WILL_CHANGE_IN_PATCH": {
+          "exports": true
+        }
+      }
+    }
+
+  `);
+});
+
+test("preconstruct.exports: true no exports field", async () => {
+  const tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "pkg-a",
+      main: "dist/pkg-a.cjs.js",
+      module: "dist/pkg-a.esm.js",
+      preconstruct: {
+        exports: true,
+        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+          exports: true,
+        },
+      },
+    }),
+    "src/index.js": "",
+  });
+  await fix(tmpPath);
+  expect(await getFiles(tmpPath, ["package.json"])).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {
+      "name": "pkg-a",
+      "main": "dist/pkg-a.cjs.js",
+      "module": "dist/pkg-a.esm.js",
+      "exports": {
+        ".": {
+          "module": "./dist/pkg-a.esm.js",
+          "default": "./dist/pkg-a.cjs.js"
+        },
+        "./package.json": "./package.json"
+      },
+      "preconstruct": {
+        "exports": true,
+        "___experimentalFlags_WILL_CHANGE_IN_PATCH": {
+          "exports": true
+        }
+      }
+    }
+
+  `);
+});
+
+test("project level exports field config", async () => {
+  const tmpPath = await testdir({
+    "package.json": JSON.stringify(
+      {
+        name: "repo",
+        preconstruct: {
+          packages: ["packages/*"],
+          exports: true,
+          ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+            exports: true,
+          },
+        },
+      },
+      null,
+      2
+    ),
+    "packages/pkg-a/package.json": JSON.stringify({
+      name: "pkg-a",
+    }),
+    "packages/pkg-a/src/index.js": "",
+  });
+  await fix(tmpPath);
+  expect(await getFiles(tmpPath, ["**/package.json"])).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {
+      "name": "repo",
+      "preconstruct": {
+        "packages": [
+          "packages/*"
+        ],
+        "exports": true,
+        "___experimentalFlags_WILL_CHANGE_IN_PATCH": {
+          "exports": true
+        }
+      }
+    }
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {
+      "name": "pkg-a",
+      "main": "dist/pkg-a.cjs.js",
+      "module": "dist/pkg-a.esm.js",
+      "exports": {
+        ".": {
+          "module": "./dist/pkg-a.esm.js",
+          "default": "./dist/pkg-a.cjs.js"
+        },
+        "./package.json": "./package.json"
+      }
+    }
+
+  `);
 });

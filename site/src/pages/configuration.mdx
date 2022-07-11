@@ -132,6 +132,97 @@ Packages map 1:1 with npm packages. Along with specifying the `entrypoints` opti
 }
 ```
 
+### `exports` (experimental)
+
+```ts
+| boolean
+| {
+    envConditions?: ("browser" | "worker")[];
+    extra?: Record<string, JSONValue>;
+  };
+```
+
+The `exports` config allows you to opt-in to generating an `exports` field.
+
+Using the `exports` field enables a couple of things:
+
+- Importing non-root entrypoints in Node.js ESM
+- Disallowing importing modules that aren't specified in the `exports` field
+- More specific builds for certain environments
+
+> Note that Preconstruct's support for the `exports` field does not currently include generating ESM compatible with Node.js. While ESM builds are generated, they are targeting bundlers, not Node.js or browsers directly so they use the `module` condition, not the `import` condition.
+
+Note that adding an `exports` field can arguably be a breaking change, you may want to use the `extra` option to add more exports so that imports that worked previously still work or only add the `exports` field in a major version.
+
+To opt into this experimental feature, you must enable it in the root of your project by setting the `exports` experimental flag in your preconstruct config section of your `package.json` file to `true`.
+
+```diff
+{
+  "name": "@sample/repo",
+  "version": "0.0.0",
+  "preconstruct": {
++    "___experimentalFlags_WILL_CHANGE_IN_PATCH": {
++      "exports": true
++    },
+  }
+}
+```
+
+The `exports` field feature then needs to be enabled, you can do this at the project or package level like this. The `envConditions` and `extra` options can only be configured at a package level.
+
+```diff
+{
+  "name": "@sample/package",
+  "version": "1.0.0",
+  "preconstruct": {
++   "exports": true
+  }
+}
+```
+
+#### `envConditions`
+
+`Array<"browser" | "worker">`
+
+Specifying the `envConditions` option adds additional environments that Preconstruct will generate bundles for. This option is currently aimed at generating bundles with `typeof SOME_ENV_SPECIFIC_GLOBAL` replaced with what it would be in that environment. It may be expanded to provide the ability to have Preconstruct resolve a different file or etc. depending on the environment in the future.
+
+Builds
+
+- `browser`: Generates a bundle targeting browsers. When this condition is used, the top-level `browser` field will also be set so that older bundlers that do not understand the `exports` field will be able to use the browser build (though when using the exports field, browser CommonJS builds will not be built). When building with this condition, `typeof document` and `typeof window` will be replaced with `"object"` and dead-code elimination will occur based on that.
+- `worker`: Generates a bundle targeting web workers/server-side JS runtimes that use web APIs. When building with this condition, `typeof document` and `typeof window` will be replaced with `"undefined"` and dead-code elimination will occur based on that.
+
+```json
+{
+  "name": "@sample/package",
+  "version": "1.0.0",
+  "preconstruct": {
+    "exports": {
+      "envConditions": ["browser", "worker"]
+    }
+  }
+}
+```
+
+#### `extra`
+
+`Record<string, JSONValue>`
+
+Preconstruct will enforce that the `exports` field that is written can is directly a function of your config, this means that extra properties are not allowed to be written directly in the `exports` field. If you want to add extra entries to the `exports` field, you can use the `extra` option in `preconstruct.exports` and then `preconstruct fix` will add add them to the actual `exports` field.
+
+```json
+{
+  "name": "@sample/package",
+  "version": "1.0.0",
+  "preconstruct": {
+    "exports": {
+      "extra": {
+        "./something": "./something.js"
+      }
+    }
+  }
+}
+```
+
 ## Entrypoints
 
 Entrypoints are the lowest level configuration point and describe a set of bundles for a particular entrypoint. They are configured by the `package.json` in the folder of the entrypoint. We also have a guide on [adding a second entrypoint](/guides/adding-a-second-entrypoint)

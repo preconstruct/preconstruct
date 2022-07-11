@@ -172,6 +172,8 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
       });
     });
 
+  const exportsFieldConfig = pkg.exportsFieldConfig();
+
   let hasBrowserField = pkg.entrypoints[0].json.browser !== undefined;
 
   if (hasBrowserField) {
@@ -184,7 +186,7 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
         () => {}
       ),
       outputs: [
-        {
+        !exportsFieldConfig && {
           format: "cjs" as const,
           entryFileNames: "[name].browser.cjs.js",
           chunkFileNames: "dist/[name]-[hash].browser.cjs.js",
@@ -193,16 +195,35 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
           interop,
           plugins: cjsPlugins,
         },
-        ...(hasModuleField
-          ? [
-              {
-                format: "es" as const,
-                entryFileNames: "[name].browser.esm.js",
-                chunkFileNames: "dist/[name]-[hash].browser.esm.js",
-                dir: pkg.directory,
-              },
-            ]
-          : []),
+        hasModuleField && {
+          format: "es" as const,
+          entryFileNames: "[name].browser.esm.js",
+          chunkFileNames: "dist/[name]-[hash].browser.esm.js",
+          dir: pkg.directory,
+        },
+      ].filter(
+        (value): value is Exclude<typeof value, false> => value !== false
+      ),
+    });
+  }
+
+  // note module builds always exist when using the exports field
+  if (exportsFieldConfig?.envConditions.has("worker")) {
+    configs.push({
+      config: getRollupConfig(
+        pkg,
+        pkg.entrypoints,
+        aliases,
+        "worker",
+        () => {}
+      ),
+      outputs: [
+        {
+          format: "es" as const,
+          entryFileNames: "[name].worker.esm.js",
+          chunkFileNames: "dist/[name]-[hash].worker.esm.js",
+          dir: pkg.directory,
+        },
       ],
     });
   }

@@ -3,6 +3,8 @@ import resolveFrom from "resolve-from";
 import chalk from "chalk";
 import { errors } from "./messages";
 import { Package } from "./package";
+import { isFieldValid } from "./validate";
+import { setFieldInOrder, exportsField } from "./utils";
 
 let keys: <Obj>(obj: Obj) => (keyof Obj)[] = Object.keys;
 
@@ -10,18 +12,43 @@ export async function fixPackage(pkg: Package) {
   if (pkg.entrypoints.length === 0) {
     throw new FatalError(errors.noEntrypoints, pkg.name);
   }
+
+  const exportsFieldConfig = pkg.exportsFieldConfig();
+
   let fields = {
     main: true,
-    module: pkg.entrypoints.some((x) => x.json.module !== undefined),
+    module:
+      pkg.entrypoints.some((x) => x.json.module !== undefined) ||
+      !!exportsFieldConfig,
     "umd:main": pkg.entrypoints.some((x) => x.json["umd:main"] !== undefined),
     browser: pkg.entrypoints.some((x) => x.json.browser !== undefined),
   };
+
+  if (exportsFieldConfig) {
+    if (fields.browser || exportsFieldConfig.envConditions.has("browser")) {
+      if (typeof pkg.json.preconstruct.exports !== "object") {
+        pkg.json.preconstruct.exports = {};
+      }
+      if (!pkg.json.preconstruct.exports.envConditions) {
+        pkg.json.preconstruct.exports.envConditions = [];
+      }
+      if (!pkg.json.preconstruct.exports.envConditions.includes("browser")) {
+        pkg.json.preconstruct.exports.envConditions.push("browser");
+      }
+      fields.browser = true;
+    }
+  }
 
   keys(fields)
     .filter((x) => fields[x])
     .forEach((field) => {
       pkg.setFieldOnEntrypoints(field);
     });
+
+  pkg.json = setFieldInOrder(pkg.json, "exports", exportsField(pkg));
+
+  await pkg.save();
+
   return (await Promise.all(pkg.entrypoints.map((x) => x.save()))).some(
     (x) => x
   );
@@ -41,7 +68,37 @@ export function validatePackage(pkg: Package) {
     module: pkg.entrypoints[0].json.module !== undefined,
     "umd:main": pkg.entrypoints[0].json["umd:main"] !== undefined,
     browser: pkg.entrypoints[0].json.browser !== undefined,
+    // "exports" is not here because it is not like these fields, it exists on a package, not an entrypoint
   };
+
+  const exportsFieldConfig = pkg.exportsFieldConfig();
+
+  if (exportsFieldConfig) {
+    if (!fields.module) {
+      throw new FixableError(errors.noModuleFieldWithExportsField, pkg.name);
+    }
+    const hasField = fields.browser;
+    const hasCondition = exportsFieldConfig.envConditions.has("browser");
+    if (hasField && !hasCondition) {
+      throw new FixableError(
+        errors.missingBrowserConditionWithFieldPresent,
+        pkg.name
+      );
+    }
+    if (!hasField && hasCondition) {
+      throw new FixableError(
+        errors.missingBrowserFieldWithConditionPresent,
+        pkg.name
+      );
+    }
+  }
+
+  if (!isFieldValid.exports(pkg)) {
+    throw new FixableError(
+      errors.invalidField("exports", pkg.json.exports, exportsField(pkg)),
+      pkg.name
+    );
+  }
 
   pkg.entrypoints.forEach((entrypoint) => {
     keys(fields).forEach((field) => {

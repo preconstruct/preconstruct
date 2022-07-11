@@ -2,7 +2,7 @@ import spawn from "spawndamnit";
 import path from "path";
 import * as fs from "fs-extra";
 import * as realFs from "fs";
-import { js, testdir, typescriptFixture } from "../../test-utils";
+import { getFiles, js, testdir, typescriptFixture } from "../../test-utils";
 import dev from "../dev";
 import normalizePath from "normalize-path";
 import escapeStringRegexp from "escape-string-regexp";
@@ -304,4 +304,51 @@ test("typescript with typeScriptProxyFileWithImportEqualsRequireAndExportEquals"
           export = mod;
           "
         `);
+});
+
+test("exports field with worker condition", async () => {
+  let tmpPath = realFs.realpathSync.native(
+    await testdir({
+      "package.json": JSON.stringify({
+        name: "@something/blah",
+        main: "dist/something-blah.cjs.js",
+        module: "dist/something-blah.esm.js",
+        exports: {
+          ".": {
+            module: {
+              worker: "./dist/something-blah.worker.esm.js",
+              default: "./dist/something-blah.esm.js",
+            },
+            default: "./dist/something-blah.cjs.js",
+          },
+          "./package.json": "./package.json",
+        },
+        preconstruct: {
+          exports: {
+            envConditions: ["worker"],
+          },
+          ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+            exports: true,
+          },
+        },
+      }),
+      "src/index.js": "console.log(1)",
+    })
+  );
+  await dev(tmpPath);
+  const files = await getFiles(tmpPath, [
+    "dist/**",
+    "!dist/something-blah.cjs.js",
+  ]);
+  expect(files).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/something-blah.esm.js, dist/something-blah.worker.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    console.log(1)
+  `);
+  await Promise.all(
+    Object.keys(files).map(async (filename) => {
+      expect(await fs.realpath(path.join(tmpPath, filename))).toEqual(
+        path.join(tmpPath, "src/index.js")
+      );
+    })
+  );
 });

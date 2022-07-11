@@ -1,6 +1,6 @@
 import normalizePath from "normalize-path";
 import { Entrypoint } from "./entrypoint";
-import { Package } from "./package";
+import { Package, ExportsConditions } from "./package";
 import * as nodePath from "path";
 import { FatalError } from "./errors";
 
@@ -15,11 +15,12 @@ let fields = [
   "module",
   "umd:main",
   "browser",
+  "exports",
 ];
 
 export function setFieldInOrder<
   Obj extends { [key: string]: any },
-  Key extends "main" | "module" | "umd:main" | "browser",
+  Key extends "main" | "module" | "umd:main" | "browser" | "exports",
   Val extends any
 >(obj: Obj, field: Key, value: Val): Obj & { [k in Key]: Val } {
   if (field in obj) {
@@ -121,17 +122,70 @@ export const validFieldsFromPkg = {
   browser(pkg: Package, hasModuleBuild: boolean, entrypointName: string) {
     let safeName = getDistName(pkg, entrypointName);
 
-    let obj = {
-      [`./dist/${safeName}.cjs.js`]: `./dist/${safeName}.browser.cjs.js`,
+    const moduleBuild = {
+      [`./dist/${safeName}.esm.js`]: `./dist/${safeName}.browser.esm.js`,
     };
-    if (hasModuleBuild) {
-      obj[`./dist/${safeName}.esm.js`] = `./dist/${safeName}.browser.esm.js`;
+    if (pkg.exportsFieldConfig()) {
+      return moduleBuild;
     }
-    return obj;
+
+    return {
+      [`./dist/${safeName}.cjs.js`]: `./dist/${safeName}.browser.cjs.js`,
+      ...(hasModuleBuild && moduleBuild),
+    };
   },
 };
 
-export const validFields = {
+export function exportsField(
+  pkg: Package
+): Record<string, ExportsConditions | string> | undefined {
+  const exportsFieldConfig = pkg.exportsFieldConfig();
+  if (!exportsFieldConfig) {
+    return;
+  }
+
+  let output: Record<string, ExportsConditions> = {};
+  pkg.entrypoints.forEach((entrypoint) => {
+    const esmBuild = getExportsFieldOutputPath(entrypoint, "esm");
+    const exportConditions = {
+      module: exportsFieldConfig.envConditions.size
+        ? {
+            ...(exportsFieldConfig.envConditions.has("worker") && {
+              worker: getExportsFieldOutputPath(entrypoint, "worker"),
+            }),
+            ...(exportsFieldConfig.envConditions.has("browser") && {
+              browser: getExportsFieldOutputPath(entrypoint, "browser"),
+            }),
+            default: esmBuild,
+          }
+        : esmBuild,
+      default: getExportsFieldOutputPath(entrypoint, "cjs"),
+    };
+
+    output[
+      "." + entrypoint.name.replace(entrypoint.package.name, "")
+    ] = exportConditions;
+  });
+  return {
+    ...output,
+    "./package.json": "./package.json",
+    ...exportsFieldConfig.extra,
+  };
+}
+
+export function getExportsFieldOutputPath(
+  entrypoint: Entrypoint,
+  type: "cjs" | "esm" | "worker" | "browser"
+) {
+  const safeName = getDistName(entrypoint.package, entrypoint.name);
+  const format = type === "cjs" ? "cjs" : "esm";
+  const env = type === "worker" || type === "browser" ? type : undefined;
+
+  const prefix = entrypoint.name.replace(entrypoint.package.name, "");
+  return `.${prefix}/dist/${safeName}.${env ? `${env}.` : ""}${format}.js`;
+}
+
+export const validFieldsForEntrypoint = {
   main(entrypoint: Entrypoint) {
     return validFieldsFromPkg.main(entrypoint.package, entrypoint.name);
   },

@@ -11,7 +11,7 @@ import { errors, confirms } from "./messages";
 import { Project } from "./project";
 import { getUselessGlobsThatArentReallyGlobsForNewEntrypoints } from "./glob-thing";
 import {
-  validFields,
+  validFieldsForEntrypoint,
   validFieldsFromPkg,
   JSONValue,
   getEntrypointName,
@@ -21,13 +21,14 @@ import normalizePath from "normalize-path";
 
 function getFieldsUsedInEntrypoints(
   descriptors: { contents: string | undefined; filename: string }[]
-) {
-  const fields = new Set<keyof typeof validFields>(["main"]);
+): Set<keyof typeof validFieldsForEntrypoint> {
+  const fields = new Set<keyof typeof validFieldsForEntrypoint>(["main"]);
   for (let descriptor of descriptors) {
     if (descriptor.contents !== undefined) {
       let parsed = jsonParse(descriptor.contents, descriptor.filename);
       for (let field of ["module", "umd:main", "browser"] as const) {
-        if (parsed[field] !== undefined) {
+        const value = parsed[field];
+        if (value !== undefined) {
           fields.add(field);
         }
       }
@@ -38,13 +39,13 @@ function getFieldsUsedInEntrypoints(
 
 function getPlainEntrypointContent(
   pkg: Package,
-  fields: Set<keyof typeof validFields>,
+  fields: Set<keyof typeof validFieldsForEntrypoint>,
   entrypointDir: string,
   indent: string
 ) {
   const obj: Partial<Record<
-    keyof typeof validFields,
-    string | Record<string, string>
+    keyof typeof validFieldsForEntrypoint,
+    string | Record<string, string | ExportsConditions>
   >> = {};
   for (const field of fields) {
     if (field === "browser") {
@@ -102,11 +103,23 @@ function createEntrypoints(
   );
 }
 
+export type ExportsConditions = {
+  module: string | { worker?: string; browser?: string; default: string };
+  default: string;
+};
+
+export type EnvCondition = "browser" | "worker";
+
 export class Package extends Item<{
   name?: JSONValue;
   preconstruct: {
+    exports?: {
+      extra?: Record<string, JSONValue>;
+      envConditions?: EnvCondition[];
+    };
     entrypoints?: JSONValue;
   };
+  exports?: Record<string, ExportsConditions | string>;
   dependencies?: Record<string, string>;
   peerDependencies?: Record<string, string>;
 }> {
@@ -143,6 +156,20 @@ export class Package extends Item<{
       onlyFiles: true,
       absolute: true,
     });
+    // sorting the entrypoints is important since we want to have something consistent
+    // to write into the `exports` field and file systems don't guarantee an order
+    entrypoints = [
+      ...entrypoints.sort((a, b) => {
+        // shortest entrypoints first since shorter entrypoints
+        // are generally more commonly used
+        const comparison = a.length - b.length;
+        if (comparison !== 0) return comparison;
+        // then .sort's default behaviour because we just need something stable
+        if (a < b) return -1;
+        if (b > a) return 1;
+        return 0;
+      }),
+    ];
     if (!entrypoints.length) {
       let oldEntrypoints = await fastGlob(pkg.configEntrypoints, {
         cwd: pkg.directory,
@@ -269,7 +296,7 @@ export class Package extends Item<{
       entrypoint.json = setFieldInOrder(
         entrypoint.json,
         field,
-        validFields[field](entrypoint)
+        validFieldsForEntrypoint[field](entrypoint)
       );
     });
   }
@@ -283,4 +310,114 @@ export class Package extends Item<{
     }
     return this.json.name;
   }
+
+  exportsFieldConfig(): CanonicalExportsFieldConfig {
+    if (!this.project.experimentalFlags.exports) {
+      return;
+    }
+    let defaultExportsFieldEnabled = false;
+    if (this.project.directory !== this.directory) {
+      const exportsFieldConfig = this.project.json.preconstruct.exports;
+      if (exportsFieldConfig !== undefined) {
+        if (typeof exportsFieldConfig === "boolean") {
+          defaultExportsFieldEnabled = exportsFieldConfig;
+        } else {
+          throw new FatalError(
+            'the "preconstruct.exports" field must be a boolean at the project level',
+            this.project.name
+          );
+        }
+      }
+    }
+    return parseExportsFieldConfig(
+      this.json.preconstruct.exports,
+      defaultExportsFieldEnabled,
+      this.name
+    );
+  }
+}
+
+type CanonicalExportsFieldConfig =
+  | undefined
+  | {
+      envConditions: Set<"worker" | "browser">;
+      extra: Record<string, JSONValue>;
+    };
+
+function parseExportsFieldConfig(
+  _config: unknown,
+  defaultExportsFieldEnabled: boolean,
+  name: string
+): CanonicalExportsFieldConfig {
+  // the seperate assignment vs declaration is so that TypeScript's
+  // control flow analysis does what we want
+  let config;
+  config = _config;
+  if (
+    (typeof config !== "boolean" &&
+      typeof config !== "object" &&
+      config !== undefined) ||
+    config === null ||
+    Array.isArray(config)
+  ) {
+    throw new FatalError(
+      'the "preconstruct.exports" field must be a boolean or an object at the package level',
+      name
+    );
+  }
+  if (config === undefined) {
+    config = defaultExportsFieldEnabled;
+  }
+  if (config === false) {
+    return undefined;
+  }
+  const parsedConfig: CanonicalExportsFieldConfig = {
+    envConditions: new Set(),
+    extra: {},
+  };
+  if (config === true) {
+    return parsedConfig;
+  }
+  for (const [key, value] of Object.entries(config) as [string, unknown][]) {
+    if (key === "extra") {
+      if (
+        typeof value === "object" &&
+        value !== null &&
+        !Array.isArray(value)
+      ) {
+        parsedConfig.extra = value as Record<string, JSONValue>;
+      } else {
+        throw new FatalError(
+          'the "preconstruct.exports.extra" field must be an object if it is present',
+          name
+        );
+      }
+    } else if (key === "envConditions") {
+      if (
+        Array.isArray(value) &&
+        value.every(
+          (v): v is "worker" | "browser" => v === "worker" || v === "browser"
+        )
+      ) {
+        parsedConfig.envConditions = new Set(value);
+        if (parsedConfig.envConditions.size !== value.length) {
+          throw new FatalError(
+            'the "preconstruct.exports.envConditions" field must not have duplicates',
+            name
+          );
+        }
+      } else {
+        throw new FatalError(
+          'the "preconstruct.exports.envConditions" field must be an array containing zero or more of "worker" and "browser" if it is present',
+          name
+        );
+      }
+    } else {
+      throw new FatalError(
+        `the "preconstruct.exports" field contains an unknown key "${key}"`,
+        name
+      );
+    }
+  }
+  return parsedConfig;
 }

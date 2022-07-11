@@ -10,6 +10,7 @@ import {
   repoNodeModules,
 } from "../../test-utils";
 import { confirms as _confirms } from "../messages";
+import { JSONValue } from "../utils";
 
 const f = fixturez(__dirname);
 
@@ -656,4 +657,205 @@ test("just wrong dist filenames doesn't report about the changed dist filename s
       ],
     ]
   `);
+});
+
+describe("exports field config", () => {
+  const exportsFieldConfigTestDir = (config: JSONValue) => {
+    return testdir({
+      "package.json": JSON.stringify({
+        name: "pkg-a",
+        main: "dist/pkg-a.cjs.js",
+        module: "dist/pkg-a.esm.js",
+        exports: {
+          ".": {
+            module: "./dist/pkg-a.esm.js",
+            default: "./dist/pkg-a.cjs.js",
+          },
+          "./package.json": "./package.json",
+        },
+        preconstruct: {
+          exports: config,
+          ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+            exports: true,
+          },
+        },
+      }),
+      "src/index.js": "",
+    });
+  };
+  describe("invalid", () => {
+    test("null", async () => {
+      const tmpPath = await exportsFieldConfigTestDir(null);
+      await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
+        `[Error: the "preconstruct.exports" field must be a boolean or an object at the package level]`
+      );
+    });
+    test("some string", async () => {
+      const tmpPath = await exportsFieldConfigTestDir("blah");
+      await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
+        `[Error: the "preconstruct.exports" field must be a boolean or an object at the package level]`
+      );
+    });
+    test("extra not object", async () => {
+      const tmpPath = await exportsFieldConfigTestDir({ extra: "blah" });
+      await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
+        `[Error: the "preconstruct.exports.extra" field must be an object if it is present]`
+      );
+    });
+    test("envConditions not array", async () => {
+      const tmpPath = await exportsFieldConfigTestDir({ envConditions: {} });
+      await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
+        `[Error: the "preconstruct.exports.envConditions" field must be an array containing zero or more of "worker" and "browser" if it is present]`
+      );
+    });
+    test("envConditions duplicates", async () => {
+      const tmpPath = await exportsFieldConfigTestDir({
+        envConditions: ["worker", "worker"],
+      });
+      await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
+        `[Error: the "preconstruct.exports.envConditions" field must not have duplicates]`
+      );
+    });
+    test("envConditions invalid condition", async () => {
+      const tmpPath = await exportsFieldConfigTestDir({
+        envConditions: ["worker", "asfdasfd"],
+      });
+      await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
+        `[Error: the "preconstruct.exports.envConditions" field must be an array containing zero or more of "worker" and "browser" if it is present]`
+      );
+    });
+    test("unknown key", async () => {
+      const tmpPath = await exportsFieldConfigTestDir({
+        something: true,
+      });
+      await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
+        `[Error: the "preconstruct.exports" field contains an unknown key "something"]`
+      );
+    });
+  });
+
+  describe("true", () => {
+    const configsEquivalentToTrue = [
+      {},
+      { envConditions: [] },
+      { envConditions: [], extra: {} },
+      { extra: {} },
+      {},
+      true,
+    ];
+    for (const config of configsEquivalentToTrue) {
+      test(`${JSON.stringify(config)}`, async () => {
+        const tmpPath = await exportsFieldConfigTestDir(config);
+        await validate(tmpPath);
+      });
+    }
+  });
+  describe("false", () => {
+    const configsEquivalentToFalse = [false, undefined];
+    for (const config of configsEquivalentToFalse) {
+      test(`${JSON.stringify(config)}`, async () => {
+        const tmpPath = await testdir({
+          "package.json": JSON.stringify({
+            name: "pkg-a",
+            main: "dist/pkg-a.cjs.js",
+            module: "dist/pkg-a.esm.js",
+            preconstruct: {
+              exports: config,
+              ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+                exports: true,
+              },
+            },
+          }),
+          "src/index.js": "",
+        });
+        await validate(tmpPath);
+      });
+    }
+  });
+});
+
+test("no module field with exports field", async () => {
+  const tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "pkg-a",
+      main: "dist/pkg-a.cjs.js",
+      preconstruct: {
+        exports: true,
+        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+          exports: true,
+        },
+      },
+    }),
+    "src/index.js": "",
+  });
+  await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
+    `[Error: when using the exports field, the module field must also be specified]`
+  );
+});
+
+test("has browser field but no browser condition", async () => {
+  const tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "pkg-a",
+      main: "dist/pkg-a.cjs.js",
+      module: "dist/pkg-a.esm.js",
+      browser: {
+        "./dist/pkg-a.cjs.js": "./dist/pkg-a.browser.cjs.js",
+        "./dist/pkg-a.esm.js": "./dist/pkg-a.browser.esm.js",
+      },
+      preconstruct: {
+        exports: true,
+        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+          exports: true,
+        },
+      },
+    }),
+    "src/index.js": "",
+  });
+  await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(`
+          [Error: 🎁 pkg-a the exports field is configured and the browser field exists in this package but it is not specified in the preconstruct.exports.envConditions field
+          🎁 pkg-a browser field is invalid, found \`{"./dist/pkg-a.cjs.js":"./dist/pkg-a.browser.cjs.js","./dist/pkg-a.esm.js":"./dist/pkg-a.browser.esm.js"}\`, expected \`{"./dist/pkg-a.esm.js":"./dist/pkg-a.browser.esm.js"}\`]
+        `);
+});
+
+test("has browser condition but no browser field", async () => {
+  const tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "pkg-a",
+      main: "dist/pkg-a.cjs.js",
+      module: "dist/pkg-a.esm.js",
+      preconstruct: {
+        exports: {
+          envConditions: ["browser"],
+        },
+        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+          exports: true,
+        },
+      },
+    }),
+    "src/index.js": "",
+  });
+  await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
+    `[Error: the exports field is configured and the browser condition is set in preconstruct.exports.envConditions but the field is not present at the top-level]`
+  );
+});
+
+test("preconstruct.exports: true no exports field", async () => {
+  const tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "pkg-a",
+      main: "dist/pkg-a.cjs.js",
+      module: "dist/pkg-a.esm.js",
+      preconstruct: {
+        exports: true,
+        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+          exports: true,
+        },
+      },
+    }),
+    "src/index.js": "",
+  });
+  await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
+    `[Error: exports field was not found, expected \`{".":{"module":"./dist/pkg-a.esm.js","default":"./dist/pkg-a.cjs.js"},"./package.json":"./package.json"}\`]`
+  );
 });
