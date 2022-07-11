@@ -1,5 +1,11 @@
 # preconstruct
 
+## 2.1.8
+
+### Patch Changes
+
+- [#435](https://github.com/preconstruct/preconstruct/pull/435) [`014038b`](https://github.com/preconstruct/preconstruct/commit/014038b1049be52a8755c37723d931997b13da04) Thanks [@nicksrandall](https://github.com/nicksrandall)! - Added experimental `exports` flag. See the docs at the `exports` section of https://preconstruct.tools/configuration.
+
 ## 2.1.7
 
 ### Patch Changes
