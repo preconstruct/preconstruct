@@ -1,6 +1,7 @@
 import path from "path";
 import { FatalError } from "../../errors";
 import { Plugin } from "rollup";
+import fs from "fs-extra";
 import { Package } from "../../package";
 import { getDeclarations } from "./get-declarations";
 import { tsTemplate } from "../../utils";
@@ -10,13 +11,37 @@ import { overwriteDeclarationMapSourceRoot } from "./common";
 export let isTsPath = (source: string) => /\.tsx?/.test(source);
 
 export default function typescriptDeclarations(pkg: Package): Plugin {
-  if (!pkg.entrypoints.some(({ source }) => isTsPath(source))) {
-    return { name: "typescript-declarations" };
-  }
   return {
     name: "typescript-declarations",
     async generateBundle(opts, bundle) {
-      let declarations = await getDeclarations(
+      // we want do a naive check first and go into
+      // so that we can avoid some extra fs operations if there is say some .ts entrypoints
+      // and some .js entrypoints with a .d.ts
+      if (!pkg.entrypoints.some(({ source }) => isTsPath(source))) {
+        const hasSomeDtsEntrypoints = (
+          await Promise.all(
+            pkg.entrypoints.map(async ({ source }) => {
+              try {
+                await fs.stat(source.replace(/\.jsx?/, ".d.ts"));
+              } catch (err) {
+                if (err.code === "ENOENT") {
+                  return false;
+                }
+                throw err;
+              }
+              return true;
+            })
+          )
+        ).some((hasDtsForEntrypoint) => hasDtsForEntrypoint);
+        if (!hasSomeDtsEntrypoints) {
+          return;
+        }
+      }
+
+      const {
+        declarations,
+        entrypointSourceToTypeScriptSource,
+      } = await getDeclarations(
         pkg.directory,
         pkg.name,
         pkg.project.directory,
@@ -67,13 +92,26 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
         }
         const facadeModuleId = file.facadeModuleId;
 
-        let dtsFilename = srcFilenameToDtsFilenameMap.get(
+        const typeScriptSource = entrypointSourceToTypeScriptSource.get(
           normalizePath(facadeModuleId)
         );
 
-        if (!dtsFilename) {
+        if (!typeScriptSource) {
+          // a user should never be able to cause this to happen
           throw new FatalError(
-            `no .d.ts file was found for the entrypoint at ${facadeModuleId}`,
+            `no TypeScript source file was found for the entrypoint at ${facadeModuleId}`,
+            pkg.name
+          );
+        }
+
+        let dtsFilename = srcFilenameToDtsFilenameMap.get(
+          normalizePath(typeScriptSource)
+        );
+
+        if (!dtsFilename) {
+          // a user should never be able to cause this to happen
+          throw new FatalError(
+            `no .d.ts file was found for the source at ${typeScriptSource}`,
             pkg.name
           );
         }

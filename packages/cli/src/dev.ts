@@ -15,20 +15,36 @@ import { validateProject } from "./validate";
 
 let tsExtensionPattern = /tsx?$/;
 
-async function getTypeSystem(
-  entrypoint: Entrypoint
-): Promise<[undefined | "flow" | "typescript", string]> {
-  let content = await fs.readFile(entrypoint.source, "utf8");
+type TypeSystemInfo = {
+  flow: boolean;
+  typescript: false | string;
+};
 
+async function getTypeSystem(entrypoint: Entrypoint): Promise<TypeSystemInfo> {
+  let sourceContents = await fs.readFile(entrypoint.source, "utf8");
+  const ret: TypeSystemInfo = {
+    flow: false,
+    typescript: false,
+  };
   if (tsExtensionPattern.test(entrypoint.source)) {
-    return ["typescript", content];
+    ret.typescript = sourceContents;
+  } else {
+    try {
+      let tsSourceContents = await fs.readFile(
+        entrypoint.source.replace(/\.jsx?/, ".d.ts"),
+        "utf8"
+      );
+      ret.typescript = tsSourceContents;
+    } catch (err) {
+      if (err.code !== "ENOENT") {
+        throw err;
+      }
+    }
   }
-  // TODO: maybe we should write the flow symlink even if there isn't an @flow
-  // comment so that if someone adds an @flow comment they don't have to run preconstruct dev again
-  if (content.includes("@flow")) {
-    return ["flow", content];
+  if (sourceContents.includes("@flow")) {
+    ret.flow = true;
   }
-  return [undefined, content];
+  return ret;
 }
 
 async function entrypointHasDefaultExport(
@@ -112,43 +128,30 @@ export async function writeDevTSFile(
   await fs.outputFile(cjsDistPath, output);
 }
 
-async function writeTypeSystemFile(
-  typeSystemPromise: Promise<[undefined | "flow" | "typescript", string]>,
-  entrypoint: Entrypoint
-) {
-  let [typeSystem, content] = await typeSystemPromise;
-  if (typeSystem === undefined) return;
+async function writeDevFlowFile(entrypoint: Entrypoint) {
+  // so...
+  // you might have noticed that this passes
+  // hasExportDefault=false
+  // and be thinking that default exports
+  // but flow seems to be
+  // then you might ask, if re-exporting the default
+  // export isn't necessary, why do it for actual builds?
+  // the reason is is that if preconstruct dev breaks because
+  // of a new version of flow that changes this, that's mostly okay
+  // because preconstruct dev can be fixed, a consumer can upgrade it
+  // and then everything is fine but if a production build is broken
+  // a consumer would have to do a new release and that's not ideal
   let cjsDistPath = path.join(
     entrypoint.directory,
     validFieldsForEntrypoint.main(entrypoint)
   );
-
-  if (typeSystem === "flow") {
-    // so...
-    // you might have noticed that this passes
-    // hasExportDefault=false
-    // and be thinking that default exports
-    // but flow seems to be
-    // then you might ask, if re-exporting the default
-    // export isn't necessary, why do it for actual builds?
-    // the reason is is that if preconstruct dev breaks because
-    // of a new version of flow that changes this, that's mostly okay
-    // because preconstruct dev can be fixed, a consumer can upgrade it
-    // and then everything is fine but if a production build is broken
-    // a consumer would have to do a new release and that's not ideal
-    await fs.writeFile(
-      cjsDistPath + ".flow",
-      flowTemplate(
-        false,
-        normalizePath(
-          path.relative(path.dirname(cjsDistPath), entrypoint.source)
-        )
-      )
-    );
-  }
-  if (typeSystem === "typescript") {
-    await writeDevTSFile(entrypoint, content);
-  }
+  await fs.writeFile(
+    cjsDistPath + ".flow",
+    flowTemplate(
+      false,
+      normalizePath(path.relative(path.dirname(cjsDistPath), entrypoint.source))
+    )
+  );
 }
 
 export default async function dev(projectDir: string) {
@@ -169,7 +172,18 @@ export default async function dev(projectDir: string) {
           await fs.ensureDir(distDirectory);
 
           let promises = [
-            writeTypeSystemFile(typeSystemPromise, entrypoint),
+            typeSystemPromise.then((typeSystemInfo) => {
+              let promises = [];
+              if (typeSystemInfo.flow) {
+                promises.push(writeDevFlowFile(entrypoint));
+              }
+              if (typeSystemInfo.typescript !== false) {
+                promises.push(
+                  writeDevTSFile(entrypoint, typeSystemInfo.typescript)
+                );
+              }
+              return Promise.all(promises);
+            }),
             fs.writeFile(
               path.join(
                 entrypoint.directory,

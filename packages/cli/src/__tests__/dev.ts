@@ -2,7 +2,7 @@ import spawn from "spawndamnit";
 import path from "path";
 import * as fs from "fs-extra";
 import * as realFs from "fs";
-import { getFiles, js, testdir, typescriptFixture } from "../../test-utils";
+import { getFiles, js, testdir, ts, typescriptFixture } from "../../test-utils";
 import dev from "../dev";
 import normalizePath from "normalize-path";
 import escapeStringRegexp from "escape-string-regexp";
@@ -351,4 +351,47 @@ test("exports field with worker condition", async () => {
       );
     })
   );
+});
+
+test("flow and .d.ts", async () => {
+  let tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "pkg",
+      main: "dist/pkg.cjs.js",
+      module: "dist/pkg.esm.js",
+    }),
+    "src/index.js": js`
+                      // @flow
+
+                      export const x = "hello";
+                    `,
+    "src/index.d.ts": ts`
+                        export const x: string;
+                      `,
+  });
+  await dev(tmpPath);
+  const files = await getFiles(tmpPath, ["dist/**", "!dist/pkg.cjs.js"]);
+  expect(files).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    // are you seeing an error that a default export doesn't exist but your source file has a default export?
+    // you should run \`yarn\` or \`yarn preconstruct dev\` if preconstruct dev isn't in your postinstall hook
+
+    // curious why you need to?
+    // this file exists so that you can import from the entrypoint normally
+    // except that it points to your source file and you don't need to run build constantly
+    // which means we need to re-export all of the modules from your source file
+    // and since export * doesn't include default exports, we need to read your source file
+    // to check for a default export and re-export it if it exists
+    // it's not ideal, but it works pretty well ¯\\_(ツ)_/¯
+    export * from "../src/index.js";
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.js.flow ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    // @flow
+    export * from "../src/index.js";
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    // @flow
+
+    export const x = "hello";
+  `);
 });

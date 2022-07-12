@@ -9,6 +9,7 @@ import {
   ts,
   repoNodeModules,
   typescriptFixture,
+  getFiles,
 } from "../../../test-utils";
 import { doPromptInput } from "../../prompt";
 
@@ -726,4 +727,53 @@ test("fails for source files containing top-level this", async () => {
     return;
   }
   expect(true).toBe(false);
+});
+
+test(".d.ts", async () => {
+  const dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "pkg",
+      main: "dist/pkg.cjs.js",
+      module: "dist/pkg.esm.js",
+    }),
+    "src/index.js": js`
+                      export const x = "hello";
+                    `,
+    "src/index.d.ts": ts`
+                        export const x: string;
+                      `,
+    node_modules: { kind: "symlink", path: repoNodeModules },
+    "tsconfig.json": typescriptFixture["tsconfig.json"],
+  });
+  await build(dir);
+  expect(await getFiles(dir, ["dist/**"])).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/index.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export const x: string;
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export * from "./declarations/src/index";
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.dev.js, dist/pkg.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    const x = "hello";
+
+    exports.x = x;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./pkg.cjs.prod.js");
+    } else {
+      module.exports = require("./pkg.cjs.dev.js");
+    }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    const x = "hello";
+
+    export { x };
+
+  `);
 });
