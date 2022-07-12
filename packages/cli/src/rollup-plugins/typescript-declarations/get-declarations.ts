@@ -14,7 +14,10 @@ export async function getDeclarations(
   pkgName: string,
   projectDir: string,
   entrypoints: string[]
-): Promise<EmittedDeclarationOutput[]> {
+): Promise<{
+  entrypointSourceToTypeScriptSource: ReadonlyMap<string, string>;
+  declarations: EmittedDeclarationOutput[];
+}> {
   const typescript = loadTypeScript(dirname, projectDir, pkgName);
 
   const { program, options } = await getProgram(dirname, pkgName, typescript);
@@ -25,22 +28,28 @@ export async function getDeclarations(
   );
   let normalizedDirname = normalizePath(dirname);
 
-  let resolvedEntrypointPaths = entrypoints.map((x) => {
-    let { resolvedModule } = typescript.resolveModuleName(
-      path.join(path.dirname(x), path.basename(x, path.extname(x))),
-      dirname,
-      options,
-      typescript.sys,
-      moduleResolutionCache
-    );
-    if (!resolvedModule) {
-      throw new Error(
-        "This is an internal error, please open an issue if you see this: ts could not resolve module"
+  // these will be distinct when using .d.ts files
+  const entrypointSourceToTypeScriptSource: ReadonlyMap<
+    string,
+    string
+  > = new Map(
+    entrypoints.map((x) => {
+      let { resolvedModule } = typescript.resolveModuleName(
+        path.join(path.dirname(x), path.basename(x, path.extname(x))),
+        dirname,
+        options,
+        typescript.sys,
+        moduleResolutionCache
       );
-    }
-    return resolvedModule.resolvedFileName;
-  });
-  let allDeps = new Set<string>(resolvedEntrypointPaths);
+      if (!resolvedModule) {
+        throw new Error(
+          "This is an internal error, please open an issue if you see this: ts could not resolve module"
+        );
+      }
+      return [normalizePath(x), resolvedModule.resolvedFileName];
+    })
+  );
+  let allDeps = new Set<string>(entrypointSourceToTypeScriptSource.values());
 
   function searchDeps(deps: Set<string>) {
     for (let dep of deps) {
@@ -79,20 +88,23 @@ export async function getDeclarations(
       searchDeps(internalDeps);
     }
   }
-  searchDeps(new Set(resolvedEntrypointPaths));
+  searchDeps(new Set(entrypointSourceToTypeScriptSource.values()));
 
   const diagnosticsHost = getDiagnosticsHost(typescript, projectDir);
 
-  return Promise.all(
-    [...allDeps].map((filename) => {
-      return getDeclarationsForFile(
-        filename,
-        typescript,
-        program,
-        normalizedDirname,
-        projectDir,
-        diagnosticsHost
-      );
-    })
-  );
+  return {
+    entrypointSourceToTypeScriptSource,
+    declarations: await Promise.all(
+      [...allDeps].map((filename) => {
+        return getDeclarationsForFile(
+          filename,
+          typescript,
+          program,
+          normalizedDirname,
+          projectDir,
+          diagnosticsHost
+        );
+      })
+    ),
+  };
 }
