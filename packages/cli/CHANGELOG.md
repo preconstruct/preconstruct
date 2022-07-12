@@ -1,5 +1,11 @@
 # preconstruct
 
+## 2.2.0
+
+### Minor Changes
+
+- [#474](https://github.com/preconstruct/preconstruct/pull/474) [`a05414d`](https://github.com/preconstruct/preconstruct/commit/a05414d064e0bda75da47c9d3eaed9d713bae8f1) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - `.d.ts` files can now be written next to `.js` entrypoints and they will be appropriately written to the dist.
+
 ## 2.1.8
 
 ### Patch Changes
