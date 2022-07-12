@@ -2,14 +2,7 @@ import spawn from "spawndamnit";
 import path from "path";
 import * as fs from "fs-extra";
 import * as realFs from "fs";
-import {
-  flowAndDtsPackage,
-  getFiles,
-  js,
-  testdir,
-  ts,
-  typescriptFixture,
-} from "../../test-utils";
+import { getFiles, js, testdir, ts, typescriptFixture } from "../../test-utils";
 import dev from "../dev";
 import normalizePath from "normalize-path";
 import escapeStringRegexp from "escape-string-regexp";
