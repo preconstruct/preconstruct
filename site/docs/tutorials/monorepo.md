@@ -1,10 +1,14 @@
+---
+sidebar_position: 3
+---
+
 # Building a Monorepo
 
 > **Note:** this tutorial builds upon knowledge in [the Getting Started tutorial](/tutorials) so if you haven't gone through it, you should do that first.
 
 We're going to setup a monorepo that uses Preconstruct to build its packages. We're also going to use [Yarn Workspaces](https://yarnpkg.com/en/docs/workspaces) for linking. Yarn Workspaces isn't the only monorepo linking tool that you can use with Preconstruct, [Lerna](https://github.com/lerna/lerna), [Bolt](https://github.com/boltpkg/bolt) and any other tool that does this will also work.
 
-We have our `a-random-number` package from the [the Getting Started guide](/getting-started) which is awesome but we want to create a new set of packages with some other numbers, `the-number-one` and `the-number-two`. We're going to use a monorepo to manage it because we want to be able to manage all our packages together.
+We have our `a-random-number` package from the [the Getting Started guide](/tutorials) which is awesome but we want to create a new set of packages with some other numbers, `the-number-one` and `the-number-two`. We're going to use a monorepo to manage it because we want to be able to manage all our packages together.
 
 ## Setting up Yarn Workspaces
 
@@ -99,7 +103,7 @@ yarn add -W @babel/core @babel/preset-env
 
 ```jsx
 module.exports = {
-  presets: ["@babel/preset-env"]
+  presets: ["@babel/preset-env"],
 };
 ```
 

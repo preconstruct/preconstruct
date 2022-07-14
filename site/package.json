@@ -1,29 +1,37 @@
 {
-  "private": true,
   "name": "@preconstruct/site",
-  "version": "1.0.0",
+  "version": "0.0.0",
+  "private": true,
   "scripts": {
-    "clean": "rm -rf node_modules .cache public",
-    "start": "gatsby develop",
-    "build": "gatsby build"
+    "start": "docusaurus start",
+    "build": "docusaurus build",
+    "clear": "docusaurus clear",
+    "serve": "docusaurus serve",
+    "write-translations": "docusaurus write-translations",
+    "write-heading-ids": "docusaurus write-heading-ids"
   },
   "dependencies": {
-    "@mdx-js/mdx": "^1.5.1",
-    "@mdx-js/react": "^1.5.1",
-    "gatsby": "^2.17.7",
-    "gatsby-plugin-emotion": "^4.1.13",
-    "gatsby-plugin-google-analytics": "^2.1.23",
-    "gatsby-plugin-manifest": "^2.2.26",
-    "gatsby-plugin-mdx": "^1.0.55",
-    "gatsby-plugin-page-creator": "^2.1.28",
-    "gatsby-plugin-typography": "^2.3.15",
-    "gatsby-source-filesystem": "^2.1.35",
-    "gatsby-theme-sidebar": "^0.0.2",
-    "prism-react-renderer": "^1.0.2",
-    "react": "^16.11.0",
-    "react-dom": "^16.11.0",
-    "react-typography": "^0.16.19",
-    "typography": "^0.16.19"
+    "@docusaurus/core": "2.0.0-beta.22",
+    "@docusaurus/preset-classic": "2.0.0-beta.22",
+    "@mdx-js/react": "^1.6.22",
+    "prism-react-renderer": "^1.3.5",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2"
+  },
+  "browserslist": {
+    "production": [
+      ">0.5%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "engines": {
+    "node": ">=16.14"
   },
   "repository": "https://github.com/preconstruct/preconstruct/tree/main/site"
 }
