@@ -25,7 +25,7 @@ const config = {
           routeBasePath: "/",
           sidebarPath: require.resolve("./sidebars.js"),
           editUrl:
-            "https://github.com/preconstruct/preconstruct/tree/main/site/docs/",
+            "https://github.com/preconstruct/preconstruct/tree/main/site/",
         },
       }),
     ],
