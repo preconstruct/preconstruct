@@ -45,7 +45,7 @@ $ yarn preconstruct init
 🎁 success initialised project!
 ```
 
-## What did we just do?
+## What did we just do? {#what-did-we-just-do}
 
 `preconstruct init` added some things to your package.json so it'll probably look something like this.
 
@@ -80,7 +80,7 @@ The `module` field specifies what file newer bundlers like webpack should look a
 
 </details>
 
-## We need to compile our code with Babel
+## We need to compile our code with Babel {#we-need-to-compile-our-code-with-babel}
 
 If we run `yarn preconstruct build` now, we'll get a couple files but let's look at the ESM one.
 
@@ -116,7 +116,7 @@ export { random };
 
 Now it's using `var` and it'll work everywhere 🎉
 
-## Publishing
+## Publishing {#publishing}
 
 Now that our package is ready for people to use for all their random number needs we can publish it to npm.
 
@@ -131,7 +131,7 @@ We're going to add some package scripts to make it easier and make sure that we 
 
 So now we can run `yarn release` to do a release.
 
-## Going further
+## Going further {#going-further}
 
 Preconstruct can do a lot more than building a simple package like this. You can learn more about what Preconstruct can do by going through Preconstruct's other tutorials:
 

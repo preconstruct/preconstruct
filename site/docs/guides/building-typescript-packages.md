@@ -8,11 +8,11 @@ Preconstruct uses Babel to compile code so you have to [configure Babel](/guides
 }
 ```
 
-## Generating TypeScript declarations
+## Generating TypeScript declarations {#generating-typescript-declarations}
 
 Preconstruct automatically generates TypeScript declarations for all entrypoints in a package. There's no work required to configure this other than having your entrypoint source file be a `.ts` or `.tsx` file and having a `tsconfig.json`.
 
-## Configuring TypeScript
+## Configuring TypeScript {#configuring-typescript}
 
 Because Preconstruct uses Babel to compile TypeScript packages, it is recommended to set the `isolatedModules` compiler option to ensure your TypeScript source can be built with Babel.
 

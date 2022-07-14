@@ -4,15 +4,15 @@ Preconstruct accepts configuration at three different configuration points; proj
 
 Projects map 1:1 with a version control repository. They specify global configuration that applies to all builds.
 
-## Projects
+## Projects {#projects}
 
-### `packages`
+### `packages` {#project-packages}
 
 `Array<string>`
 
 `packages` is an array of globs which specify which packages should be built with preconstruct.
 
-#### Default
+#### Default {#packages-default}
 
 > Note: this is the default value, if it's what you want, you don't need to specify it.
 
@@ -24,7 +24,7 @@ Projects map 1:1 with a version control repository. They specify global configur
 }
 ```
 
-#### Example
+#### Example {#packages-example}
 
 ```json
 {
@@ -34,13 +34,13 @@ Projects map 1:1 with a version control repository. They specify global configur
 }
 ```
 
-### `globals`
+### `globals` {#globals}
 
 `{ [packageName: string]: (umdName: string) }`
 
 `globals` specifies the UMD names of `peerDependencies` since `peerDependencies` aren't bundled in UMD builds. You **shouldn't** specify this option manually, preconstruct will prompt you for the UMD name of a package when it's necessary.
 
-#### Default
+#### Default {#globals-default}
 
 > Note: this is the default value, if it's what you want, you don't need to specify it.
 
@@ -52,7 +52,7 @@ Projects map 1:1 with a version control repository. They specify global configur
 }
 ```
 
-#### Example
+#### Example {#globals-example}
 
 ```json
 {
@@ -65,7 +65,7 @@ Projects map 1:1 with a version control repository. They specify global configur
 }
 ```
 
-### `distFilenameStrategy`
+### `distFilenameStrategy` {#distfilenamestrategy}
 
 `"full" | "unscoped-package-name"`
 
@@ -78,7 +78,7 @@ Projects map 1:1 with a version control repository. They specify global configur
 | `@scope/pkg` | `dist/scope-pkg.cjs.js` | `dist/pkg.cjs.js` |
 | `@scope/pkg/entrypoint` | `dist/scope-pkg-entrypoint.cjs.js` | `dist/pkg.cjs.js` |
 
-#### Default
+#### Default {#distfilenamestrategy-default}
 
 > Note: this is the default value, if it's what you want, you don't need to specify it.
 
@@ -90,7 +90,7 @@ Projects map 1:1 with a version control repository. They specify global configur
 }
 ```
 
-#### Example
+#### Example {#distfilenamestrategy-example}
 
 ```json
 {
@@ -100,17 +100,17 @@ Projects map 1:1 with a version control repository. They specify global configur
 }
 ```
 
-## Packages
+## Packages {#packages}
 
 Packages map 1:1 with npm packages. Along with specifying the `entrypoints` option described below, packages are also responsible for specifying dependencies which is necessary for bundling UMD bundles and ensuring that packages will have all of their required dependencies when installed through npm.
 
-### `entrypoints`
+### `entrypoints` {#entrypoints-config}
 
 `Array<string>`
 
 `entrypoints` is an array of globs which specify the entrypoints which consumers of your package should be able to import. They are resolved relative to the `src` directory of the package. To get the entrypoint directory from a source file, the extension is removed from the path relative to the `src` directory and if the last part is `index`, the `index` part is removed. For example, an entrypoint of `something.js` would create an entrypoint at `pkg-name/something` and `another/index.js` would create an entrypoint at `pkg-name/another`.
 
-#### Default
+#### Default {#entrypoints-default}
 
 > Note: this is the default value, if it's what you want, you don't need to specify it.
 
@@ -122,7 +122,7 @@ Packages map 1:1 with npm packages. Along with specifying the `entrypoints` opti
 }
 ```
 
-#### Example
+#### Example {#entrypoints-example}
 
 ```json
 {
@@ -132,7 +132,7 @@ Packages map 1:1 with npm packages. Along with specifying the `entrypoints` opti
 }
 ```
 
-### `exports` (experimental)
+### `exports` (experimental) {#exports}
 
 ```ts
 | boolean
@@ -180,7 +180,7 @@ The `exports` field feature then needs to be enabled, you can do this at the pro
 }
 ```
 
-#### `envConditions`
+#### `envConditions` {#envconditions}
 
 `Array<"browser" | "worker">`
 
@@ -203,7 +203,7 @@ Builds
 }
 ```
 
-#### `extra`
+#### `extra` {#extra}
 
 `Record<string, JSONValue>`
 
@@ -223,15 +223,15 @@ Preconstruct will enforce that the `exports` field that is written can is direct
 }
 ```
 
-## Entrypoints
+## Entrypoints {#entrypoints}
 
 Entrypoints are the lowest level configuration point and describe a set of bundles for a particular entrypoint. They are configured by the `package.json` in the folder of the entrypoint. We also have a guide on [adding a second entrypoint](/guides/adding-a-second-entrypoint)
 
-### Build types
+### Build types {#build-types}
 
 Build types specify what types of bundles Preconstruct should build. They are specified via the package.json fields which Node and bundlers like webpack look at to find bundles. It's important to note that **all** of the entrypoints in a package must have the same build types, this is necessary to ensure that common dependencies between entrypoints aren't duplicated.
 
-#### `main`
+#### `main` {#main}
 
 The `main` field specifies a CommonJS build. It is the only build type which is **required**. This bundle will work in Node and can work in bundlers like webpack but a ES Module build is recommended for bundlers like webpack.
 
@@ -245,7 +245,7 @@ Example:
 
 **Note:** This file actually just reexports either a production or a development bundle (respectively `dist/my-package.cjs.prod.js` or `dist/my-package.cjs.dev.js` in this example) based on the `process.env.NODE_ENV` value. This allows you to use `process.env.NODE_ENV` checks in your code so 2 distinct bundles are created but at runtime only one of them gets loaded.
 
-#### `module`
+#### `module` {#module}
 
 The `module` field specifies an ES Module build. This bundle is what bundlers like webpack will use.
 
@@ -257,7 +257,7 @@ Example:
 }
 ```
 
-#### `umd:main`
+#### `umd:main` {#umdmain}
 
 The `umd:main` field specifies a UMD build. This bundle can be used directly in a browser with a `<script>` tag.
 
@@ -269,7 +269,7 @@ Example:
 }
 ```
 
-### `browser`
+### `browser` {#browser}
 
 The `browser` field specifies alias files exclusive to browsers. This allows you to create different bundles from your source code based on `typeof window` and `typeof document` checks - thanks to that you can, for example, remove server-only code (just for those bundles).
 

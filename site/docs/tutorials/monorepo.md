@@ -10,7 +10,7 @@ We're going to setup a monorepo that uses Preconstruct to build its packages. We
 
 We have our `a-random-number` package from the [the Getting Started guide](/tutorials) which is awesome but we want to create a new set of packages with some other numbers, `the-number-one` and `the-number-two`. We're going to use a monorepo to manage it because we want to be able to manage all our packages together.
 
-## Setting up Yarn Workspaces
+## Setting up Yarn Workspaces {#setting-up-yarn-workspaces}
 
 Before we can use Preconstruct, we need to setup Yarn Workspaces and create our packages.
 
@@ -46,7 +46,7 @@ export default 1;
 export default 2;
 ```
 
-## Setting up Preconstruct to build all our packages
+## Setting up Preconstruct to build all our packages {#setting-up-preconstruct-to-build-all-our-packages}
 
 Now that we have Yarn workspaces and our packages setup, we can install and setup Preconstruct.
 
@@ -64,7 +64,7 @@ yarn preconstruct init
 
 Preconstruct has asked us some slightly different questions since it's detected that we're in a monorepo. We're going to explain exactly what all these questions mean in the future but for now, answering yes to everything will work fine (TODO: write things explaining that stuff)
 
-### Setting up `preconstruct dev`
+### Setting up `preconstruct dev` {#setting-up-preconstruct-dev}
 
 `preconstruct dev` is a command in Preconstruct that lets you import your packages without having to build them every time you make a change or alias the dist files to source files in another tool like webpack, see the [Using Preconstruct dev in a monorepo guide](/guides/using-preconstruct-dev-in-a-monorepo) for more info.
 
@@ -89,7 +89,7 @@ We're going to add it to a postinstall script so that yarn will run it after pac
 }
 ```
 
-### Adding Babel
+### Adding Babel {#adding-babel}
 
 We'll also want to add Babel so that we can use modern features when writing our code but consumers don't have problems using it like the building your first package tutorial.
 

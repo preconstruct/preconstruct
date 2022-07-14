@@ -1,5 +1,4 @@
 // @ts-check
-// Note: type annotations allow type checking and IDEs autocompletion
 
 const lightCodeTheme = require("prism-react-renderer/themes/github");
 const darkCodeTheme = require("prism-react-renderer/themes/dracula");
@@ -7,7 +6,6 @@ const darkCodeTheme = require("prism-react-renderer/themes/dracula");
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: "Preconstruct",
-  // tagline: "Dinosaurs are cool",
   url: "https://preconstruct.tools",
   baseUrl: "/",
   onBrokenLinks: "throw",
@@ -26,10 +24,8 @@ const config = {
         docs: {
           routeBasePath: "/",
           sidebarPath: require.resolve("./sidebars.js"),
-          // Please change this to your repo.
-          // Remove this to remove the "edit this page" links.
           editUrl:
-            "https://github.com/preconstruct/preconstruct/tree/main/packages/create-docusaurus/templates/shared/",
+            "https://github.com/preconstruct/preconstruct/tree/main/site/docs/",
         },
       }),
     ],

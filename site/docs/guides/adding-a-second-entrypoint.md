@@ -50,14 +50,14 @@ yarn preconstruct dev
 
 to get set up for development. Preconstruct's CLI will alert you to any problems you are still encountering and provide guides on how to resolve them.
 
-## Got stuck?
+## Got stuck? {#got-stuck}
 
 For further documentation, we recommend reading:
 
 - [the package configuration options](/configuration#packages)
 - [the entrypoint package.json configuration options](/configuration#entrypoints)
 
-### I don't have a `preconstruct` field in my package.json
+### I don't have a `preconstruct` field in my package.json {#i-dont-have-a-preconstruct-field-in-my-packagejson}
 
 That's fine! If you haven't needed to add this field yet, you can add it with just add the precontsruct field so your `package.json` looks like:
 
