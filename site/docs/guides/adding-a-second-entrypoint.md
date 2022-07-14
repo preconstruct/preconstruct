@@ -54,8 +54,8 @@ to get set up for development. Preconstruct's CLI will alert you to any problems
 
 For further documentation, we recommend reading:
 
-- [the package configuration options](/config/packages)
-- [the entrypoint package.json configuration options](/config/entrypoints)
+- [the package configuration options](/configuration#packages)
+- [the entrypoint package.json configuration options](/configuration#entrypoints)
 
 ### I don't have a `preconstruct` field in my package.json
 

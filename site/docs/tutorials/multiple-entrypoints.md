@@ -1,3 +1,7 @@
+---
+sidebar_position: 4
+---
+
 # Exporting Multiple Entrypoints
 
 > **Note:** this tutorial builds upon [the Getting Started tutorial](/tutorials) so if you haven't gone through it, you should do that first.

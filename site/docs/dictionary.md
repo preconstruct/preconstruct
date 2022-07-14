@@ -1,3 +1,7 @@
+---
+sidebar_position: 1
+---
+
 # Dictionary
 
 This page documents some common words and phrases that are used throughout this site and when discussing Preconstruct.

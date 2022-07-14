@@ -1,3 +1,7 @@
+---
+sidebar_position: 2
+---
+
 # Building your first package
 
 > A repository with the end result of this tutorial is available at https://github.com/preconstruct/a-random-number
