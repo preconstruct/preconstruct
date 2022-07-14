@@ -22,8 +22,10 @@ import { EXTENSIONS } from "../constants";
 import { inlineProcessEnvNodeEnv } from "../rollup-plugins/inline-process-env-node-env";
 import normalizePath from "normalize-path";
 
+type ExternalPredicate = (source: string) => boolean;
+
 // this makes sure nested imports of external packages are external
-const makeExternalPredicate = (externalArr: string[]) => {
+const makeExternalPredicate = (externalArr: string[]): ExternalPredicate => {
   if (externalArr.length === 0) {
     return () => false;
   }
@@ -53,8 +55,13 @@ export let getRollupConfig = (
     external.push(...Object.keys(pkg.json.dependencies));
   }
 
+  let wrapExternalPredicate = (inner: ExternalPredicate): ExternalPredicate =>
+    inner;
+
   if (type === "node-dev" || type === "node-prod") {
     external.push(...builtInModules);
+    wrapExternalPredicate = (inner) => (source) =>
+      source.startsWith("node:") || inner(source);
   }
 
   let input: Record<string, string> = {};
@@ -76,7 +83,7 @@ export let getRollupConfig = (
 
   const config: RollupOptions = {
     input,
-    external: makeExternalPredicate(external),
+    external: wrapExternalPredicate(makeExternalPredicate(external)),
     onwarn: (warning) => {
       if (typeof warning === "string") {
         warnings.push(

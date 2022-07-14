@@ -1155,3 +1155,45 @@ test("bigint usage", async () => {
 
   `);
 });
+
+test("node: is external", async () => {
+  let dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "@scope/test",
+      main: "dist/scope-test.cjs.js",
+      module: "dist/scope-test.esm.js",
+    }),
+    "src/index.js": ts`
+                      import fs from "node:fs";
+                      fs.writeFileSync("test.txt", "test");
+                    `,
+  });
+  await build(dir);
+  expect(await getDist(dir)).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.cjs.dev.js, dist/scope-test.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    var fs = require('node:fs');
+
+    function _interopDefault (e) { return e && e.__esModule ? e : { 'default': e }; }
+
+    var fs__default = /*#__PURE__*/_interopDefault(fs);
+
+    fs__default['default'].writeFileSync("test.txt", "test");
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./scope-test.cjs.prod.js");
+    } else {
+      module.exports = require("./scope-test.cjs.dev.js");
+    }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    import fs from 'node:fs';
+
+    fs.writeFileSync("test.txt", "test");
+
+  `);
+});
