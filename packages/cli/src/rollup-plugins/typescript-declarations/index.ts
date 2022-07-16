@@ -12,7 +12,11 @@ import {
   dtsDefaultForDmtsTemplate,
 } from "../../utils";
 import normalizePath from "normalize-path";
-import { overwriteDeclarationMapSourceRoot } from "./common";
+import {
+  getProgram,
+  loadTypeScript,
+  overwriteDeclarationMapSourceRoot,
+} from "./common";
 
 export let isTsPath = (source: string) => /\.tsx?/.test(source);
 
@@ -44,14 +48,65 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
         }
       }
 
-      const {
-        declarations,
-        entrypointSourceToTypeScriptSource,
-      } = await getDeclarations(
+      const typescript = loadTypeScript(
+        pkg.directory,
+        pkg.project.directory,
+        pkg.name
+      );
+
+      const { program, options } = await getProgram(
         pkg.directory,
         pkg.name,
+        typescript
+      );
+
+      let normalizedDirname = normalizePath(pkg.directory);
+
+      let moduleResolutionCache = typescript.createModuleResolutionCache(
+        normalizedDirname,
+        (x) => x,
+        options
+      );
+
+      const entrypointSourceToTypeScriptSource: ReadonlyMap<
+        string,
+        string
+      > = new Map(
+        pkg.entrypoints.map((entrypoint) => {
+          const x = entrypoint.source;
+          let { resolvedModule } = typescript.resolveModuleName(
+            path.join(path.dirname(x), path.basename(x, path.extname(x))),
+            pkg.directory,
+            options,
+            typescript.sys,
+            moduleResolutionCache
+          );
+          if (!resolvedModule) {
+            throw new Error(
+              "This is an internal error, please open an issue if you see this: ts could not resolve module"
+            );
+          }
+          return [normalizePath(x), resolvedModule.resolvedFileName];
+        })
+      );
+
+      const declarations = await getDeclarations(
+        typescript,
+        program,
+        normalizedDirname,
         pkg.project.directory,
-        pkg.entrypoints.map((x) => x.source)
+        pkg.name,
+        (moduleName, containingFile) => {
+          let { resolvedModule } = typescript.resolveModuleName(
+            moduleName,
+            containingFile,
+            options,
+            typescript.sys,
+            moduleResolutionCache
+          );
+          return resolvedModule;
+        },
+        [...entrypointSourceToTypeScriptSource.values()]
       );
 
       let srcFilenameToDtsFilenameMap = new Map<string, string>();
