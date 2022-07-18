@@ -408,6 +408,37 @@ test("package resolvable but not in deps", async () => {
   expect(true).toBe(false);
 });
 
+test("package with exports resolvable", async () => {
+  let tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "package-exports-resolvable-but-not-in-deps",
+      main: "dist/package-exports-resolvable-but-not-in-deps.cjs.js",
+      "umd:main": "dist/package-exports-resolvable-but-not-in-deps.umd.min.js",
+
+      preconstruct: {
+        umdName: "packageExportsResolvableButNotInDeps",
+      },
+
+      dependencies: {
+        "@atomico/hooks": "3.43.1",
+        atomico: "1.60.0",
+      },
+    }),
+
+    "src/index.js": js`
+                      import { useSlot } from "@atomico/hooks/use-slot";
+
+                      export default function useChildren(ref) {
+                        return useSlot(ref);
+                      }
+                    `,
+  });
+
+  await install(tmpPath);
+
+  await snapshotDirectory(tmpPath, { files: "all" });
+});
+
 test("entrypoint outside package directory", async () => {
   let tmpPath = await testdir({
     "package.json": JSON.stringify({
