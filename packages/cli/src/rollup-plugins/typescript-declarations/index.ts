@@ -17,6 +17,7 @@ import {
   loadTypeScript,
   overwriteDeclarationMapSourceRoot,
 } from "./common";
+import { getUsedDeclarations } from "./get-used-declarations";
 
 export let isTsPath = (source: string) => /\.tsx?/.test(source);
 
@@ -68,18 +69,26 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
         options
       );
 
+      const resolveModule = (moduleName: string, containingFile: string) => {
+        let { resolvedModule } = typescript.resolveModuleName(
+          moduleName,
+          containingFile,
+          options,
+          typescript.sys,
+          moduleResolutionCache
+        );
+        return resolvedModule;
+      };
+
       const entrypointSourceToTypeScriptSource: ReadonlyMap<
         string,
         string
       > = new Map(
         pkg.entrypoints.map((entrypoint) => {
           const x = entrypoint.source;
-          let { resolvedModule } = typescript.resolveModuleName(
+          let resolvedModule = resolveModule(
             path.join(path.dirname(x), path.basename(x, path.extname(x))),
-            pkg.directory,
-            options,
-            typescript.sys,
-            moduleResolutionCache
+            pkg.directory
           );
           if (!resolvedModule) {
             throw new Error(
@@ -90,24 +99,25 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
         })
       );
 
-      const declarations = await getDeclarations(
-        typescript,
-        program,
-        normalizedDirname,
-        pkg.project.directory,
-        pkg.name,
-        (moduleName, containingFile) => {
-          let { resolvedModule } = typescript.resolveModuleName(
-            moduleName,
-            containingFile,
-            options,
-            typescript.sys,
-            moduleResolutionCache
-          );
-          return resolvedModule;
-        },
-        [...entrypointSourceToTypeScriptSource.values()]
-      );
+      const declarations = await (pkg.project.experimentalFlags
+        .onlyEmitUsedTypeScriptDeclarations
+        ? getUsedDeclarations(
+            typescript,
+            program,
+            normalizedDirname,
+            pkg.project.directory,
+            resolveModule,
+            [...entrypointSourceToTypeScriptSource.values()]
+          )
+        : getDeclarations(
+            typescript,
+            program,
+            normalizedDirname,
+            pkg.project.directory,
+            pkg.name,
+            resolveModule,
+            [...entrypointSourceToTypeScriptSource.values()]
+          ));
 
       let srcFilenameToDtsFilenameMap = new Map<string, string>();
 
@@ -158,17 +168,8 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
         );
 
         if (!typeScriptSource) {
-          const moduleInfo = this.getModuleInfo(file.facadeModuleId);
-          // this will happen for "use client" modules where it's not
-          // an actual entrypoint but it is a Rollup entry
-          if (moduleInfo?.meta.directivePreservedFile) {
-            continue;
-          }
-          // otherwise, a user should never be able to cause this to happen
-          throw new FatalError(
-            `no TypeScript source file was found for the entrypoint at ${facadeModuleId}`,
-            pkg.name
-          );
+          // will happen when only some entrypoints are TypeScript
+          continue;
         }
 
         let dtsFilename = srcFilenameToDtsFilenameMap.get(
