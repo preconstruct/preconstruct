@@ -187,9 +187,7 @@ export let getRollupConfig = (
         extensions: EXTENSIONS,
         // only umd builds will actually load dependencies which is where this browser flag actually makes a difference
         browser: type === "umd",
-        customResolveOptions: {
-          moduleDirectory: type === "umd" ? "node_modules" : [],
-        },
+        moduleDirectories: type === "umd" ? ["node_modules"] : [],
       }),
       type === "umd" && inlineProcessEnvNodeEnv({ sourceMap: true }),
       type === "umd" &&
