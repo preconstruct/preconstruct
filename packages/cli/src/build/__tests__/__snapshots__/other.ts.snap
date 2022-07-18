@@ -98,29 +98,6 @@ if (typeof document !== undefined) {
 export default thing;"
 `;
 
-exports[`package with exports resolvable: package.json 1`] = `
-Object {
-  "dependencies": Object {
-    "@atomico/hooks": "3.43.1",
-    "atomico": "1.60.0",
-  },
-  "main": "dist/package-exports-resolvable-but-not-in-deps.cjs.js",
-  "name": "package-exports-resolvable-but-not-in-deps",
-  "preconstruct": Object {
-    "umdName": "packageExportsResolvableButNotInDeps",
-  },
-  "umd:main": "dist/package-exports-resolvable-but-not-in-deps.umd.min.js",
-}
-`;
-
-exports[`package with exports resolvable: src/index.js 1`] = `
-"import { useSlot } from \\"@atomico/hooks/use-slot\\";
-
-export default function useChildren(ref) {
-  return useSlot(ref);
-}"
-`;
-
 exports[`should lazily get globals: dist/umd-unused-peer-dep.cjs.dev.js 1`] = `
 "'use strict';
 
