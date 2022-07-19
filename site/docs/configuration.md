@@ -269,6 +269,20 @@ Example:
 }
 ```
 
+### `type` {#type}
+
+The `type` package.json field allows you to opt-in to ES Module-only builds by setting it to `"module"`.
+
+Example:
+
+```jsx
+{
+  "name": "@sample/package",
+  "version": "1.0.0",
+  "type": "module"
+}
+```
+
 ### `browser` {#browser}
 
 The `browser` field specifies alias files exclusive to browsers. This allows you to create different bundles from your source code based on `typeof window` and `typeof document` checks - thanks to that you can, for example, remove server-only code (just for those bundles).
