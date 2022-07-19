@@ -392,3 +392,117 @@ test("three entrypoints, no main, add main and fix browser", async () => {
 
   `);
 });
+
+test("fix incorrect main field for module type", async () => {
+  const dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "pkg-a",
+      type: "module",
+      main: "dist/pkg-a.cjs.js",
+    }),
+    "src/index.js": "",
+  });
+  confirms.writeMainField.mockReturnValue(Promise.resolve(true));
+
+  await init(dir);
+
+  expect(await getFiles(dir, ["**/package.json"])).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {
+      "name": "pkg-a",
+      "type": "module",
+      "main": "dist/pkg-a.esm.js"
+    }
+
+  `);
+});
+
+test("remove module field when module type", async () => {
+  const dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "pkg-a",
+      type: "module",
+      main: "dist/pkg-a.esm.js",
+      module: "dist/pkg-a.esm.js",
+    }),
+    "src/index.js": "",
+  });
+  confirms.writeMainField.mockReturnValue(Promise.resolve(true));
+  confirms.writeModuleField.mockReturnValue(Promise.resolve(true));
+
+  await init(dir);
+
+  expect(await getFiles(dir, ["**/package.json"])).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {
+      "name": "pkg-a",
+      "type": "module",
+      "main": "dist/pkg-a.esm.js"
+    }
+
+  `);
+});
+
+test("fix incorrect main field for commonjs type", async () => {
+  const dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "pkg-a",
+      main: "dist/pkg-a.esm.js",
+    }),
+    "src/index.js": "",
+  });
+  confirms.writeMainField.mockReturnValue(Promise.resolve(true));
+
+  await init(dir);
+
+  expect(await getFiles(dir, ["**/package.json"])).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {
+      "name": "pkg-a",
+      "main": "dist/pkg-a.cjs.js"
+    }
+
+  `);
+});
+
+test("module type with three entrypoints (no main, add main and module)", async () => {
+  const dir = await testdir({
+    ...basicThreeEntrypoints,
+    "package.json": JSON.stringify({
+      ...JSON.parse(basicThreeEntrypoints["package.json"]),
+      type: "module",
+    }),
+  });
+
+  confirms.writeMainField.mockReturnValue(Promise.resolve(true));
+  confirms.writeModuleField.mockReturnValue(Promise.resolve(true));
+
+  await init(dir);
+
+  expect(await getFiles(dir, ["**/package.json"])).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ one/package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {
+      "main": "dist/something-one.esm.js"
+    }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {
+      "name": "something",
+      "preconstruct": {
+        "entrypoints": [
+          "index.js",
+          "one.js",
+          "two.js"
+        ]
+      },
+      "type": "module",
+      "main": "dist/something.esm.js"
+    }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ two/package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {
+      "main": "dist/something-two.esm.js"
+    }
+
+  `);
+});

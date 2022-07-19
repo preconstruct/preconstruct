@@ -982,3 +982,109 @@ test("project level exports field config", async () => {
 
   `);
 });
+
+test("fix incorrect main field for module type", async () => {
+  const tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "pkg-a",
+      type: "module",
+      main: "dist/pkg-a.cjs.js",
+    }),
+    "src/index.js": "",
+  });
+  await fix(tmpPath);
+  expect(await getFiles(tmpPath, ["**/package.json"])).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {
+      "name": "pkg-a",
+      "type": "module",
+      "main": "dist/pkg-a.esm.js"
+    }
+
+  `);
+});
+
+test("remove module field when module type", async () => {
+  const tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "pkg-a",
+      type: "module",
+      main: "dist/pkg-a.esm.js",
+      module: "dist/pkg-a.esm.js",
+    }),
+    "src/index.js": "",
+  });
+  await fix(tmpPath);
+  expect(await getFiles(tmpPath, ["**/package.json"])).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {
+      "name": "pkg-a",
+      "type": "module",
+      "main": "dist/pkg-a.esm.js"
+    }
+
+  `);
+});
+
+test("fix incorrect main field for commonjs type", async () => {
+  const tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "pkg-a",
+      main: "dist/pkg-a.esm.js",
+    }),
+    "src/index.js": "",
+  });
+  await fix(tmpPath);
+  expect(await getFiles(tmpPath, ["**/package.json"])).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {
+      "name": "pkg-a",
+      "main": "dist/pkg-a.cjs.js"
+    }
+
+  `);
+});
+
+test("module type with three entrypoints (no main, add main and module)", async () => {
+  const tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "something",
+      type: "module",
+      preconstruct: {
+        entrypoints: ["index.js", "one.js", "two.js"],
+      },
+    }),
+    "src/index.js": "",
+    "src/one.js": "",
+    "src/two.js": "",
+    "one/package.json": JSON.stringify({}),
+    "two/package.json": JSON.stringify({}),
+  });
+  await fix(tmpPath);
+  expect(await getFiles(tmpPath, ["**/package.json"])).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ one/package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {
+      "main": "dist/something-one.esm.js"
+    }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {
+      "name": "something",
+      "type": "module",
+      "preconstruct": {
+        "entrypoints": [
+          "index.js",
+          "one.js",
+          "two.js"
+        ]
+      },
+      "main": "dist/something.esm.js"
+    }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ two/package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {
+      "main": "dist/something-two.esm.js"
+    }
+
+  `);
+});

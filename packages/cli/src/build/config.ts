@@ -214,7 +214,6 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
     });
   }
 
-  // TODO: Not sure this is the case anymore with `"type": "module"`
   // note module builds always exist when using the exports field
   if (exportsFieldConfig?.envConditions.has("worker")) {
     configs.push({

@@ -193,7 +193,6 @@ export function getExportsFieldOutputPath(
 
 export const validFieldsForEntrypoint = {
   main(entrypoint: Entrypoint) {
-    // add check for type for main
     return validFieldsFromPkg.main(entrypoint.package, entrypoint.name);
   },
   module(entrypoint: Entrypoint) {

@@ -23,8 +23,18 @@ async function doInit(pkg: Package) {
   let someEntrypointsAreNotValid = pkg.entrypoints.some(
     (entrypoint) => !isFieldValid.module(entrypoint)
   );
-  if (allEntrypointsAreMissingAModuleField || someEntrypointsAreNotValid) {
-    let canWriteModuleField = await confirms.writeModuleField(pkg);
+
+  let canWriteModuleField = await confirms.writeModuleField(pkg);
+  // Remove any `module` fields if package `type` is `"module"`
+  if (pkg.type === "module" && !allEntrypointsAreMissingAModuleField) {
+    if (canWriteModuleField) pkg.removeFieldOnEntrypoints("module");
+    else new FixableError(errors.moduleFieldWithModuleType, pkg.name);
+  }
+
+  if (
+    pkg.type !== "module" &&
+    (allEntrypointsAreMissingAModuleField || someEntrypointsAreNotValid)
+  ) {
     if (canWriteModuleField) {
       pkg.setFieldOnEntrypoints("module");
     } else if (!allEntrypointsAreMissingAModuleField) {

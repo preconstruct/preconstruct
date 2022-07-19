@@ -302,6 +302,12 @@ export class Package extends Item<{
     });
   }
 
+  removeFieldOnEntrypoints(field: "main" | "browser" | "module" | "umd:main") {
+    this.entrypoints.forEach((entrypoint) => {
+      entrypoint.json = setFieldInOrder(entrypoint.json, field, undefined);
+    });
+  }
+
   get name(): string {
     if (typeof this.json.name !== "string") {
       throw new FatalError(
