@@ -57,7 +57,7 @@ $ yarn preconstruct init
   "module": "dist/a-random-number.esm.js",
   "license": "MIT",
   "devDependencies": {
-    "preconstruct": "^0.0.68"
+    "@preconstruct/cli": "^2.1.5"
   }
 }
 ```

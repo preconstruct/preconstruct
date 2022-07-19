@@ -408,6 +408,53 @@ test("package resolvable but not in deps", async () => {
   expect(true).toBe(false);
 });
 
+test("package with exports resolvable", async () => {
+  let tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "package-exports-resolvable-but-not-in-deps",
+      main: "dist/package-exports-resolvable-but-not-in-deps.cjs.js",
+      "umd:main": "dist/package-exports-resolvable-but-not-in-deps.umd.min.js",
+      dependencies: {
+        "@atomico/hooks": "0.0.0",
+      },
+      preconstruct: {
+        umdName: "packageExportsResolvableButNotInDeps",
+      },
+    }),
+    "node_modules/@atomico/hooks/package.json": JSON.stringify({
+      name: "@atomico/hooks/use-slot",
+      exports: {
+        "./use-slot": "./something/use-slot.js",
+      },
+    }),
+    "node_modules/@atomico/hooks/something/use-slot.js": js`
+                                                           export function useSlot(ref) {
+                                                             console.log(ref);
+                                                           }
+                                                         `,
+    "src/index.js": js`
+                      import { useSlot } from "@atomico/hooks/use-slot";
+
+                      export default function useChildren(ref) {
+                        return useSlot(ref);
+                      }
+                    `,
+  });
+
+  await build(tmpPath);
+
+  expect(
+    await getFiles(tmpPath, [
+      "dist/package-exports-resolvable-but-not-in-deps.umd.min.js",
+    ])
+  ).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/package-exports-resolvable-but-not-in-deps.umd.min.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    !function(e,o){"object"==typeof exports&&"undefined"!=typeof module?module.exports=o():"function"==typeof define&&define.amd?define(o):(e="undefined"!=typeof globalThis?globalThis:e||self).packageExportsResolvableButNotInDeps=o()}(this,(function(){"use strict";return function(e){return function(e){console.log(e)}(e)}}));
+    //# sourceMappingURL=package-exports-resolvable-but-not-in-deps.umd.min.js.map
+
+  `);
+});
+
 test("entrypoint outside package directory", async () => {
   let tmpPath = await testdir({
     "package.json": JSON.stringify({
