@@ -109,6 +109,7 @@ function getDistName(pkg: Package, entrypointName: string): string {
 export const validFieldsFromPkg = {
   main(pkg: Package, entrypointName: string) {
     let safeName = getDistName(pkg, entrypointName);
+    if (pkg.type === "module") return `dist/${safeName}.esm.js`;
     return `dist/${safeName}.cjs.js`;
   },
   module(pkg: Package, entrypointName: string) {
@@ -125,7 +126,7 @@ export const validFieldsFromPkg = {
     const moduleBuild = {
       [`./dist/${safeName}.esm.js`]: `./dist/${safeName}.browser.esm.js`,
     };
-    if (pkg.exportsFieldConfig()) {
+    if (pkg.exportsFieldConfig() || pkg.type === "module") {
       return moduleBuild;
     }
 
@@ -144,22 +145,27 @@ export function exportsField(
     return;
   }
 
+  const hasModuleType = pkg.type === "module";
   let output: Record<string, ExportsConditions> = {};
   pkg.entrypoints.forEach((entrypoint) => {
     const esmBuild = getExportsFieldOutputPath(entrypoint, "esm");
+    let module: ExportsConditions["module"];
+    if (exportsFieldConfig.envConditions.size)
+      module = {
+        ...(exportsFieldConfig.envConditions.has("worker") && {
+          worker: getExportsFieldOutputPath(entrypoint, "worker"),
+        }),
+        ...(exportsFieldConfig.envConditions.has("browser") && {
+          browser: getExportsFieldOutputPath(entrypoint, "browser"),
+        }),
+        default: esmBuild,
+      };
+    else if (!hasModuleType) module = esmBuild;
     const exportConditions = {
-      module: exportsFieldConfig.envConditions.size
-        ? {
-            ...(exportsFieldConfig.envConditions.has("worker") && {
-              worker: getExportsFieldOutputPath(entrypoint, "worker"),
-            }),
-            ...(exportsFieldConfig.envConditions.has("browser") && {
-              browser: getExportsFieldOutputPath(entrypoint, "browser"),
-            }),
-            default: esmBuild,
-          }
-        : esmBuild,
-      default: getExportsFieldOutputPath(entrypoint, "cjs"),
+      ...(module ? { module } : {}),
+      default: hasModuleType
+        ? esmBuild
+        : getExportsFieldOutputPath(entrypoint, "cjs"),
     };
 
     output[
@@ -187,6 +193,7 @@ export function getExportsFieldOutputPath(
 
 export const validFieldsForEntrypoint = {
   main(entrypoint: Entrypoint) {
+    // add check for type for main
     return validFieldsFromPkg.main(entrypoint.package, entrypoint.name);
   },
   module(entrypoint: Entrypoint) {

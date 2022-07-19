@@ -22,7 +22,8 @@ export let errors = {
     `all entrypoints in a package must have the same fields and one entrypoint in this package has a ${field} field but you've declined the fix`,
   missingBrowserConditionWithFieldPresent: `the exports field is configured and the browser field exists in this package but it is not specified in the preconstruct.exports.envConditions field`,
   missingBrowserFieldWithConditionPresent: `the exports field is configured and the browser condition is set in preconstruct.exports.envConditions but the field is not present at the top-level`,
-  noModuleFieldWithExportsField: `when using the exports field, the module field must also be specified`,
+  noModuleFieldWithExportsField: `when using the exports field, the module field or type must also be specified`,
+  moduleFieldWithModuleType: `when \`"type": "module"\`, the module field is not allowed`,
 };
 
 export let confirms = {

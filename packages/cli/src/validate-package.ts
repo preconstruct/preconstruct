@@ -74,7 +74,7 @@ export function validatePackage(pkg: Package) {
   const exportsFieldConfig = pkg.exportsFieldConfig();
 
   if (exportsFieldConfig) {
-    if (!fields.module) {
+    if (!fields.module && pkg.type !== "module") {
       throw new FixableError(errors.noModuleFieldWithExportsField, pkg.name);
     }
     const hasField = fields.browser;

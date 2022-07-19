@@ -59,6 +59,12 @@ function validateEntrypoint(entrypoint: Entrypoint, log: boolean) {
     if (field !== "main" && entrypoint.json[field] === undefined) {
       continue;
     }
+    if (entrypoint.json.type === "module" && field === "module") {
+      fatalErrors.push(
+        new FixableError(errors.moduleFieldWithModuleType, entrypoint.name)
+      );
+      continue;
+    }
     if (!isFieldValid[field](entrypoint)) {
       let isUsingOldDistFilenames: boolean;
       let prevDistFilenameStrategy =

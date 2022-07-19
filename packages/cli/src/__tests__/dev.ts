@@ -118,22 +118,22 @@ test("all the build types", async () => {
     )
   ).toMatchInlineSnapshot(`
     "\\"use strict\\";
-    // this file might look strange and you might be wondering what it's for
-    // it's lets you import your source files by importing this entrypoint
-    // as you would import it if it was built with preconstruct build
-    // this file is slightly different to some others though
-    // it has a require hook which compiles your code with Babel
-    // this means that you don't have to set up @babel/register or anything like that
-    // but you can still require this module and it'll be compiled
-
-    // this bit of code imports the require hook and registers it
-    let unregister = require(\\"RELATIVE_PATH_TO_PRECONSTRUCT_HOOK\\").___internalHook(typeof __dirname === 'undefined' ? undefined : __dirname, \\"..\\", \\"..\\");
-
-    // this re-exports the source file
-    module.exports = require(\\"../src/index.js\\");
-
-    unregister();
-    "
+      // this file might look strange and you might be wondering what it's for
+      // it's lets you import your source files by importing this entrypoint
+      // as you would import it if it was built with preconstruct build
+      // this file is slightly different to some others though
+      // it has a require hook which compiles your code with Babel
+      // this means that you don't have to set up @babel/register or anything like that
+      // but you can still require this module and it'll be compiled
+      
+      // this bit of code imports the require hook and registers it
+      let unregister = require(\\"RELATIVE_PATH_TO_PRECONSTRUCT_HOOK\\").___internalHook(typeof __dirname === 'undefined' ? undefined : __dirname, \\"..\\", \\"..\\");
+      
+      // this re-exports the source file
+      module.exports = require(\\"../src/index.js\\");
+      
+      unregister();
+      "
   `);
 
   let shouldBeCjsThingsToSource = [
@@ -394,4 +394,51 @@ test("flow and .d.ts", async () => {
 
     export const x = "hello";
   `);
+});
+
+test("esm", async () => {
+  let tmpPath = realFs.realpathSync.native(
+    await testdir({
+      "package.json": JSON.stringify({
+        name: "all-the-build-types",
+        type: "module",
+        main: "dist/all-the-build-types.esm.js",
+        browser: {
+          "./dist/all-the-build-types.esm.js":
+            "./dist/all-the-build-types.browser.esm.js",
+        },
+      }),
+      "src/index.js": js`
+                        export default "some cool thing";
+                      `,
+    })
+  );
+
+  await dev(tmpPath);
+
+  let distPath = path.join(tmpPath, "dist");
+  expect(await fs.readdir(distPath)).toEqual([
+    "all-the-build-types.browser.esm.js",
+    "all-the-build-types.esm.js",
+  ]);
+
+  expect(
+    await fs.readFile(
+      path.join(distPath, "all-the-build-types.esm.js"),
+      "utf-8"
+    )
+  ).toMatchInlineSnapshot(`"export default \\"some cool thing\\";"`);
+
+  let shouldBeEsmThingsToSource = [
+    "all-the-build-types.esm.js",
+    "all-the-build-types.browser.esm.js",
+  ];
+
+  await Promise.all(
+    shouldBeEsmThingsToSource.map(async (filename) => {
+      expect(await fs.realpath(path.join(distPath, filename))).toBe(
+        path.join(tmpPath, "src/index.js")
+      );
+    })
+  );
 });
