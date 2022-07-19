@@ -66,7 +66,7 @@ Preconstruct has asked us some slightly different questions since it's detected 
 
 ### Setting up `preconstruct dev` {#setting-up-preconstruct-dev}
 
-`preconstruct dev` is a command in Preconstruct that lets you import your packages without having to build them every time you make a change or alias the dist files to source files in another tool like webpack, see the [Using Preconstruct dev in a monorepo guide](/guides/using-preconstruct-dev-in-a-monorepo) for more info.
+`preconstruct dev` is a command in Preconstruct that lets you import your packages without having to build them every time you make a change or alias the dist files to source files in another tool like webpack, see the [Using Preconstruct dev in a monorepo guide](/guides/using-preconstruct-dev-in-a-monorepo) for more info. If you are using Windows, you need to enable Developer Mode before using `preconstruct dev` by following the instructions [here](/guides/using-preconstruct-dev-in-a-monorepo#windows-developer-mode).
 
 We're going to add it to a postinstall script so that yarn will run it after packages are installed. Our package.json will now look like this.
 

@@ -15,3 +15,13 @@ A common use case in monorepos is that there are some packages which depend on e
 Once you add it to your package.json and run `yarn`, Preconstruct creates links from your source files to the appropriate source file. For the CommonJS dist file, Preconstruct creates a file which installs a require hook which compiles the package with Babel so that you can directly require the code in any Node code without having to do anything special to compile the package. For module builds, Preconstruct creates files that re-export the source files, so you have to compile the packages in your bundler. For example, if you're using webpack, you should use babel-loader. Preconstruct also creates files for Flow and TypeScript to resolve to the source files.
 
 > Note: The re-exports for module builds use CommonJS, this is done because ESM cannot re-export an entire module including default exports unless you know what the exports of the module are.
+
+## Windows Developer Mode {#windows-developer-mode}
+
+If you are using Windows and Developer Mode is not enabled, `preconstruct dev` will produce an error like
+
+```text
+EPERM: operation not permitted, symlink '...' -> '...'
+```
+
+You can enable Developer Mode in the Windows settings app. On Windows 11, this can be done by searching the start menu for "Developer settings" and then enabling the Developer Mode toggle switch.

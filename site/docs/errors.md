@@ -25,3 +25,7 @@ Preconstruct requires that all entrypoints in a package have the same fields so 
 ## '{export-a}' is not exported by {module-a}, imported by {module-b} {#export-a-is-not-exported-by-module-a-imported-by-module-b}
 
 If you are building a TypeScript package, chances are you're re-exporting a type in a way that's not compatible with `@babel/preset-typescript`. See [Building TypeScript packages](/guides/building-typescript-packages) for more information. To fix it, you should use [type-only imports and exports](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-8.html#type-only-imports-and-export)
+
+## EPERM: operation not permitted, symlink {file.ts} -> {file.js} {#operation-not-permitted-symlink}
+
+If you're on Windows, you need to [enable Developer Mode](/guides/using-preconstruct-dev-in-a-monorepo#windows-developer-mode) for `preconstruct dev` to work on Windows.
