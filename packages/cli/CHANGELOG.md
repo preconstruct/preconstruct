@@ -1,5 +1,13 @@
 # preconstruct
 
+## 2.2.1
+
+### Patch Changes
+
+- [#476](https://github.com/preconstruct/preconstruct/pull/476) [`3930466`](https://github.com/preconstruct/preconstruct/commit/3930466067f3ff03c332706fe8ab82beaec2235a) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Using `node:` to import Node builtins no longer triggers a "package is not specified in dependencies or peerDependencies" error
+
+* [#481](https://github.com/preconstruct/preconstruct/pull/481) [`76f0163`](https://github.com/preconstruct/preconstruct/commit/76f0163e833d1454dcd34bc378d7b6500f99d55b) Thanks [@efoken](https://github.com/efoken)! - Updated `@rollup/plugin-node-resolve` to `^11.2.1` in order to make direct imports resolveable, e.g. packages that use `exports` in their package.json
+
 ## 2.2.0
 
 ### Minor Changes
