@@ -244,6 +244,7 @@ Preconstruct's support for Node.js ESM is currently an experiment to see how Pre
 
 - The [`exports` field feature](#exports) must also be enabled.
 - There are no entrypoint `package.json`s, the entrypoints are only specified in the `exports` field
+- The dist files for all entrypoints are in the `dist` directory in the root of the package
 - No `main`, `module`, `browser` or `umd:main` fields are used
 - Module resolution internally follows [Node.js ESM module resolution](https://nodejs.org/api/esm.html#import-specifiers) which requires explicitly writing extensions in imports. This includes following `"moduleResolution": "nodenext"` in TypeScript which means writing `.js` to import a TypeScript file.
 - The default export of a CommonJS dependency(even if it provides ESM intended for bundlers) will be the whole exports object, not `exports.default` if `exports.__esModule` is set and otherwise the whole exports object which is the default behaviour in Preconstruct.
