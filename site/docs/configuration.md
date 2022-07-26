@@ -236,7 +236,7 @@ The `type` config being set to `"module"` allows you to generate ECMAScript modu
 You should likely only use this feature if you fit into one these categories:
 
 - You're interested in the state of modules in the JS ecosystem
-- You want to publish a package that synchronously imports a Node.js ESM only dependency
+- You want to publish a package that statically imports a Node.js ESM only dependency
 
 Node.js' implementation of ESM does not allow importing an ESM module from a CommonJS module synchronously. This means a given package only shipping Node.js ESM means that all of the packages that depend on it either need to use a dynamic `import()` call (which is asynchronous) to import it or only provide Node.js ESM and therefore enforce the same constraints on consumers.
 
