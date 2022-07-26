@@ -223,6 +223,44 @@ Preconstruct will enforce that the `exports` field that is written can is direct
 }
 ```
 
+### `type` (experimental) {#type}
+
+```ts
+"module" | "commonjs";
+```
+
+> If you're just thinking "I want to write code with the native ECMAScript import and export syntax and have my code work for most people", you likely should not use this feature. This feature allows you to build packages that import Node.js ESM only dependencies and therefore only support being imported from ESM in newer versions of Node.js and some bundlers.
+
+The `type` config being set to `"module"` allows you to generate ECMAScript modules(ESM) compatible with Node.js' implementation of ESM (Node.js ESM).
+
+You should likely only use this feature if you fit into one these categories:
+
+- You're interested in the state of modules in the JS ecosystem
+- You want to publish a package that synchronously imports a Node.js ESM only dependency
+
+Node.js' implementation of ESM does not allow importing an ESM module from a CommonJS module synchronously. This means a given package only shipping Node.js ESM means that all of the packages that depend on it either need to use a dynamic `import()` call (which is asynchronous) to import it or only provide Node.js ESM and therefore enforce the same constraints on consumers.
+
+Preconstruct's support for Node.js ESM is currently an experiment to see how Preconstruct would work if it followed Node.js' behaviour for ESM. Note this behaviour means the resulting package will not support tools that do not support newer features like the `exports` field.
+
+- The [`exports` field feature](#exports) must also be enabled.
+- There are no entrypoint `package.json`s, the entrypoints are only specified in the `exports` field
+- No `main`, `module`, `browser` or `umd:main` fields are used
+- Module resolution internally follows [Node.js ESM module resolution](https://nodejs.org/api/esm.html#import-specifiers) which requires using explicitly using extensions with imports. This includes following `"moduleResolution": "nodenext"` in TypeScript which means writing `.js` to import a TypeScript file.
+- The default export of a CommonJS dependency(even if it provides ESM intended for bundlers) will be the whole exports object, not `exports.default` if `exports.__esModule` is set and otherwise the whole exports object which is the default behaviour in Preconstruct.
+
+To use `"type": "module"`, you need to enable the experimental flags and the exports field feature.
+
+```json
+"type": "module",
+"preconstruct": {
+  "exports": true,
+  "___experimentalFlags_WILL_CHANGE_IN_PATCH": {
+    "exports": true,
+    "nodeESM": true
+  },
+}
+```
+
 ## Entrypoints {#entrypoints}
 
 Entrypoints are the lowest level configuration point and describe a set of bundles for a particular entrypoint. They are configured by the `package.json` in the folder of the entrypoint. We also have a guide on [adding a second entrypoint](/guides/adding-a-second-entrypoint)
