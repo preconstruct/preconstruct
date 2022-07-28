@@ -1197,3 +1197,20 @@ test("node: is external", async () => {
 
   `);
 });
+
+test("importing css fails with a nice error", async () => {
+  let dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "@scope/test",
+      main: "dist/scope-test.cjs.js",
+      module: "dist/scope-test.esm.js",
+    }),
+    "src/index.js": js`
+                      import "./blah.css";
+                    `,
+    "src/blah.css": "",
+  });
+  await expect(build(dir)).rejects.toMatchInlineSnapshot(
+    `[Error: 🎁 @scope/test only .ts, .tsx, .js, .jsx, and .json files can be imported but "./blah.css" is imported in "src/index.js"]`
+  );
+});
