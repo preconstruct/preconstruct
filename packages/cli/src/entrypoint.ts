@@ -28,6 +28,10 @@ export class Entrypoint extends Item<{
     this.source = source;
   }
 
+  get hasModuleField() {
+    return this.json.module !== undefined;
+  }
+
   get name(): string {
     return normalizePath(
       nodePath.join(
