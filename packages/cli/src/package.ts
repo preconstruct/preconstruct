@@ -309,15 +309,11 @@ export class Package extends Item<{
   get distFilenameStrategy(): DistFilenameStrategy {
     if ("distFilenameStrategy" in this.project.json.preconstruct) {
       const written = this.project.json.preconstruct.distFilenameStrategy;
-      if (
-        written !== "full" &&
-        written !== "unscoped-package-name" &&
-        written !== "full-in-package-dist"
-      ) {
+      if (written !== "full" && written !== "unscoped-package-name") {
         throw new FatalError(
           `distFilenameStrategy is defined in your Preconstruct config as ${JSON.stringify(
             written
-          )} but the only accepted values are "full", "full-in-package-dist" and "unscoped-package-name"`,
+          )} but the only accepted values are "full" and "unscoped-package-name"`,
           this.project.name
         );
       }

@@ -60,10 +60,7 @@ export function getEntrypointName(pkg: Package, entrypointDir: string) {
   );
 }
 
-export type DistFilenameStrategy =
-  | "full"
-  | "full-in-package-dist"
-  | "unscoped-package-name";
+export type DistFilenameStrategy = "full" | "unscoped-package-name";
 
 export type MinimalEntrypoint = {
   package: Package;
@@ -73,7 +70,7 @@ export type MinimalEntrypoint = {
 
 export function getBaseDistName(entrypoint: MinimalEntrypoint) {
   const strategy = entrypoint.package.distFilenameStrategy;
-  if (strategy === "full" || strategy === "full-in-package-dist") {
+  if (strategy === "full") {
     return entrypoint.name.replace("@", "").replace(/\//g, "-");
   }
   return entrypoint.package.name.replace(/.*\//, "");
