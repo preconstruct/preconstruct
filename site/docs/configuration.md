@@ -231,7 +231,7 @@ Preconstruct will enforce that the `exports` field that is written can is direct
 
 > If you're just thinking "I want to write code with the native ECMAScript import and export syntax and have my code work for most people", you likely should not use this feature. This feature allows you to build packages that import Node.js ESM only dependencies and therefore only support being imported from ESM in newer versions of Node.js and some bundlers.
 
-The `type` config being set to `"module"` allows you to generate ECMAScript modules(ESM) compatible with Node.js' implementation of ESM (Node.js ESM).
+The `type` config being set to `"module"` allows you to generate ECMAScript modules(ESM) compatible with Node.js' implementation of ESM (Node.js ESM), most modern bundlers, etc.
 
 You should likely only use this feature if you fit into one these categories:
 
