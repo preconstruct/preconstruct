@@ -153,6 +153,8 @@ export function getExportsFieldOutputPath(
 
 export const validFieldsForEntrypoint = {
   main(entrypoint: MinimalEntrypoint) {
+    if (entrypoint.package.type === "module")
+      return getDistFilename(entrypoint, "esm");
     return getDistFilename(entrypoint, "cjs");
   },
   module(entrypoint: MinimalEntrypoint) {
@@ -169,7 +171,10 @@ export const validFieldsForEntrypoint = {
       )}`,
     };
 
-    if (entrypoint.package.exportsFieldConfig()) {
+    if (
+      entrypoint.package.exportsFieldConfig() ||
+      entrypoint.package.type === "module"
+    ) {
       return moduleBuild;
     }
 

@@ -193,17 +193,18 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
         () => {}
       ),
       outputs: [
-        !exportsFieldConfig && hasModuleType && {
-          format: "cjs" as const,
-          entryFileNames: `[name].${getDistExtension("browser-cjs")}`,
-          chunkFileNames: `dist/[name]-[hash].${getDistExtension(
-            "browser-cjs"
-          )}`,
-          dir: pkg.directory,
-          exports: "named" as const,
-          interop,
-          plugins: cjsPlugins,
-        },
+        !exportsFieldConfig &&
+          !hasModuleType && {
+            format: "cjs" as const,
+            entryFileNames: `[name].${getDistExtension("browser-cjs")}`,
+            chunkFileNames: `dist/[name]-[hash].${getDistExtension(
+              "browser-cjs"
+            )}`,
+            dir: pkg.directory,
+            exports: "named" as const,
+            interop,
+            plugins: cjsPlugins,
+          },
         (hasModuleField || hasModuleType) && {
           format: "es" as const,
           entryFileNames: `[name].${getDistExtension("browser-esm")}`,
