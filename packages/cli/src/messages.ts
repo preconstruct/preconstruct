@@ -23,7 +23,7 @@ export let errors = {
   missingBrowserConditionWithFieldPresent: `the exports field is configured and the browser field exists in this package but it is not specified in the preconstruct.exports.envConditions field`,
   missingBrowserFieldWithConditionPresent: `the exports field is configured and the browser condition is set in preconstruct.exports.envConditions but the field is not present at the top-level`,
   noModuleFieldWithExportsField: `when using the exports field, the module field or type must also be specified`,
-  moduleFieldWithModuleType: `when \`"type": "module"\`, the module field is not allowed`,
+  moduleFieldWithModuleType: `when \`"type": "module"\`, the module field should be redundant, and thus it is not allowed`,
 };
 
 export let confirms = {
