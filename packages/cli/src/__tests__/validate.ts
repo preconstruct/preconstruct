@@ -851,7 +851,7 @@ test("module type with main and module fields", async () => {
     "src/index.js": "",
   });
   await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
-    `[Error: when \`"type": "module"\`, the module field is not allowed]`
+    `[Error: when \`"type": "module"\`, the module field should be redundant, and thus it is not allowed]`
   );
 });
 

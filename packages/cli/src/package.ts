@@ -316,7 +316,7 @@ export class Package extends Item<{
   get type() {
     return this.json.type;
   }
-  
+
   get distFilenameStrategy(): DistFilenameStrategy {
     if ("distFilenameStrategy" in this.project.json.preconstruct) {
       const written = this.project.json.preconstruct.distFilenameStrategy;
