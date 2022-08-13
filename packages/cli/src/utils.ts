@@ -2,11 +2,6 @@ import normalizePath from "normalize-path";
 import { Entrypoint } from "./entrypoint";
 import { Package, ExportsConditions } from "./package";
 import * as nodePath from "path";
-import { FatalError } from "./errors";
-
-export function getNameForDistForEntrypoint(entrypoint: Entrypoint): string {
-  return getDistName(entrypoint.package, entrypoint.name);
-}
 
 let fields = [
   "version",
@@ -65,77 +60,21 @@ export function getEntrypointName(pkg: Package, entrypointDir: string) {
   );
 }
 
-type DistFilenameStrategy = "full" | "unscoped-package-name";
+export type DistFilenameStrategy = "full" | "unscoped-package-name";
 
-function getDistNameWithStrategy(
-  pkg: Package,
-  entrypointName: string,
-  strategy: DistFilenameStrategy
-) {
-  if (strategy === "full") {
-    return entrypointName.replace("@", "").replace(/\//g, "-");
-  }
-  return pkg.name.replace(/.*\//, "");
-}
-
-function getDistName(pkg: Package, entrypointName: string): string {
-  if ("distFilenameStrategy" in pkg.project.json.preconstruct) {
-    if (
-      pkg.project.json.preconstruct.distFilenameStrategy !== "full" &&
-      pkg.project.json.preconstruct.distFilenameStrategy !==
-        "unscoped-package-name"
-    ) {
-      throw new FatalError(
-        `distFilenameStrategy is defined in your Preconstruct config as ${JSON.stringify(
-          pkg.project.json.preconstruct.distFilenameStrategy
-        )} but the only accepted values are "full" and "unscoped-package-name"`,
-        pkg.project.name
-      );
-    }
-    if (
-      pkg.project.json.preconstruct.distFilenameStrategy ===
-      "unscoped-package-name"
-    ) {
-      return getDistNameWithStrategy(
-        pkg,
-        entrypointName,
-        "unscoped-package-name"
-      );
-    }
-  }
-  return getDistNameWithStrategy(pkg, entrypointName, "full");
-}
-
-export const validFieldsFromPkg = {
-  main(pkg: Package, entrypointName: string) {
-    let safeName = getDistName(pkg, entrypointName);
-    if (pkg.type === "module") return `dist/${safeName}.esm.js`;
-    return `dist/${safeName}.cjs.js`;
-  },
-  module(pkg: Package, entrypointName: string) {
-    let safeName = getDistName(pkg, entrypointName);
-    return `dist/${safeName}.esm.js`;
-  },
-  "umd:main"(pkg: Package, entrypointName: string) {
-    let safeName = getDistName(pkg, entrypointName);
-    return `dist/${safeName}.umd.min.js`;
-  },
-  browser(pkg: Package, hasModuleBuild: boolean, entrypointName: string) {
-    let safeName = getDistName(pkg, entrypointName);
-
-    const moduleBuild = {
-      [`./dist/${safeName}.esm.js`]: `./dist/${safeName}.browser.esm.js`,
-    };
-    if (pkg.exportsFieldConfig() || pkg.type === "module") {
-      return moduleBuild;
-    }
-
-    return {
-      [`./dist/${safeName}.cjs.js`]: `./dist/${safeName}.browser.cjs.js`,
-      ...(hasModuleBuild && moduleBuild),
-    };
-  },
+export type MinimalEntrypoint = {
+  package: Package;
+  name: string;
+  hasModuleField: boolean;
 };
+
+export function getBaseDistName(entrypoint: MinimalEntrypoint) {
+  const strategy = entrypoint.package.distFilenameStrategy;
+  if (strategy === "full") {
+    return entrypoint.name.replace("@", "").replace(/\//g, "-");
+  }
+  return entrypoint.package.name.replace(/.*\//, "");
+}
 
 export function exportsField(
   pkg: Package
@@ -156,7 +95,7 @@ export function exportsField(
           worker: getExportsFieldOutputPath(entrypoint, "worker"),
         }),
         ...(exportsFieldConfig.envConditions.has("browser") && {
-          browser: getExportsFieldOutputPath(entrypoint, "browser"),
+          browser: getExportsFieldOutputPath(entrypoint, "browser-esm"),
         }),
         default: esmBuild,
       };
@@ -179,34 +118,68 @@ export function exportsField(
   };
 }
 
+export type BuildTarget =
+  | "cjs"
+  | "esm"
+  | "umd"
+  | "worker"
+  | "browser-cjs"
+  | "browser-esm";
+
+const buildTargetToExtensionPrefix: Record<BuildTarget, string> = {
+  cjs: "cjs",
+  esm: "esm",
+  "browser-cjs": "browser.cjs",
+  "browser-esm": "browser.esm",
+  worker: "worker.esm",
+  umd: "umd.min",
+};
+
+export function getDistExtension(target: BuildTarget) {
+  return `${buildTargetToExtensionPrefix[target]}.js`;
+}
+
+function getDistFilename(entrypoint: MinimalEntrypoint, target: BuildTarget) {
+  return `dist/${getBaseDistName(entrypoint)}.${getDistExtension(target)}`;
+}
+
 export function getExportsFieldOutputPath(
   entrypoint: Entrypoint,
-  type: "cjs" | "esm" | "worker" | "browser"
+  target: BuildTarget
 ) {
-  const safeName = getDistName(entrypoint.package, entrypoint.name);
-  const format = type === "cjs" ? "cjs" : "esm";
-  const env = type === "worker" || type === "browser" ? type : undefined;
-
   const prefix = entrypoint.name.replace(entrypoint.package.name, "");
-  return `.${prefix}/dist/${safeName}.${env ? `${env}.` : ""}${format}.js`;
+  return `.${prefix}/${getDistFilename(entrypoint, target)}`;
 }
 
 export const validFieldsForEntrypoint = {
-  main(entrypoint: Entrypoint) {
-    return validFieldsFromPkg.main(entrypoint.package, entrypoint.name);
+  main(entrypoint: MinimalEntrypoint) {
+    return getDistFilename(entrypoint, "cjs");
   },
-  module(entrypoint: Entrypoint) {
-    return validFieldsFromPkg.module(entrypoint.package, entrypoint.name);
+  module(entrypoint: MinimalEntrypoint) {
+    return getDistFilename(entrypoint, "esm");
   },
-  "umd:main"(entrypoint: Entrypoint) {
-    return validFieldsFromPkg["umd:main"](entrypoint.package, entrypoint.name);
+  "umd:main"(entrypoint: MinimalEntrypoint) {
+    return getDistFilename(entrypoint, "umd");
   },
-  browser(entrypoint: Entrypoint) {
-    return validFieldsFromPkg.browser(
-      entrypoint.package,
-      entrypoint.json.module !== undefined,
-      entrypoint.name
-    );
+  browser(entrypoint: MinimalEntrypoint) {
+    const moduleBuild = {
+      [`./${getDistFilename(entrypoint, "esm")}`]: `./${getDistFilename(
+        entrypoint,
+        "browser-esm"
+      )}`,
+    };
+
+    if (entrypoint.package.exportsFieldConfig()) {
+      return moduleBuild;
+    }
+
+    return {
+      [`./${getDistFilename(entrypoint, "cjs")}`]: `./${getDistFilename(
+        entrypoint,
+        "browser-cjs"
+      )}`,
+      ...(entrypoint.hasModuleField && moduleBuild),
+    };
   },
 };
 

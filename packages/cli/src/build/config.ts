@@ -8,6 +8,7 @@ import path from "path";
 import resolveFrom from "resolve-from";
 import * as logger from "../logger";
 import { Project } from "../project";
+import { getDistExtension } from "../utils";
 
 function getGlobal(project: Project, name: string) {
   if (
@@ -121,8 +122,8 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
         ? [
             {
               format: "es" as const,
-              entryFileNames: "[name].esm.js",
-              chunkFileNames: "dist/[name]-[hash].esm.js",
+              entryFileNames: `[name].${getDistExtension("esm")}`,
+              chunkFileNames: `dist/[name]-[hash].${getDistExtension("esm")}`,
               dir: pkg.directory,
             },
           ]
@@ -163,7 +164,7 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
           {
             format: "umd" as const,
             sourcemap: true,
-            entryFileNames: "[name].umd.min.js",
+            entryFileNames: `[name].${getDistExtension("umd")}`,
             name: entrypoint.json.preconstruct.umdName as string,
             dir: pkg.directory,
             interop,
@@ -192,20 +193,23 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
         () => {}
       ),
       outputs: [
-        !exportsFieldConfig &&
-          !hasModuleType && {
-            format: "cjs" as const,
-            entryFileNames: "[name].browser.cjs.js",
-            chunkFileNames: "dist/[name]-[hash].browser.cjs.js",
-            dir: pkg.directory,
-            exports: "named" as const,
-            interop,
-            plugins: cjsPlugins,
-          },
+        !exportsFieldConfig && hasModuleType && {
+          format: "cjs" as const,
+          entryFileNames: `[name].${getDistExtension("browser-cjs")}`,
+          chunkFileNames: `dist/[name]-[hash].${getDistExtension(
+            "browser-cjs"
+          )}`,
+          dir: pkg.directory,
+          exports: "named" as const,
+          interop,
+          plugins: cjsPlugins,
+        },
         (hasModuleField || hasModuleType) && {
           format: "es" as const,
-          entryFileNames: "[name].browser.esm.js",
-          chunkFileNames: "dist/[name]-[hash].browser.esm.js",
+          entryFileNames: `[name].${getDistExtension("browser-esm")}`,
+          chunkFileNames: `dist/[name]-[hash].${getDistExtension(
+            "browser-esm"
+          )}`,
           dir: pkg.directory,
         },
       ].filter(
@@ -227,8 +231,8 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
       outputs: [
         {
           format: "es" as const,
-          entryFileNames: "[name].worker.esm.js",
-          chunkFileNames: "dist/[name]-[hash].worker.esm.js",
+          entryFileNames: `[name].${getDistExtension("worker")}`,
+          chunkFileNames: `dist/[name]-[hash].${getDistExtension("worker")}`,
           dir: pkg.directory,
         },
       ],

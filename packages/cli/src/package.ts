@@ -12,10 +12,11 @@ import { Project } from "./project";
 import { getUselessGlobsThatArentReallyGlobsForNewEntrypoints } from "./glob-thing";
 import {
   validFieldsForEntrypoint,
-  validFieldsFromPkg,
   JSONValue,
   getEntrypointName,
   setFieldInOrder,
+  DistFilenameStrategy,
+  MinimalEntrypoint,
 } from "./utils";
 import normalizePath from "normalize-path";
 
@@ -47,19 +48,13 @@ function getPlainEntrypointContent(
     keyof typeof validFieldsForEntrypoint,
     string | Record<string, string | ExportsConditions>
   >> = {};
+  const minimalEntrypoint: MinimalEntrypoint = {
+    hasModuleField: fields.has("module"),
+    name: getEntrypointName(pkg, entrypointDir),
+    package: pkg,
+  };
   for (const field of fields) {
-    if (field === "browser") {
-      obj[field] = validFieldsFromPkg[field](
-        pkg,
-        fields.has("module"),
-        getEntrypointName(pkg, entrypointDir)
-      );
-    } else {
-      obj[field] = validFieldsFromPkg[field](
-        pkg,
-        getEntrypointName(pkg, entrypointDir)
-      );
-    }
+    obj[field] = validFieldsForEntrypoint[field](minimalEntrypoint);
   }
   return JSON.stringify(obj, null, indent) + "\n";
 }
@@ -320,6 +315,22 @@ export class Package extends Item<{
 
   get type() {
     return this.json.type;
+  }
+  
+  get distFilenameStrategy(): DistFilenameStrategy {
+    if ("distFilenameStrategy" in this.project.json.preconstruct) {
+      const written = this.project.json.preconstruct.distFilenameStrategy;
+      if (written !== "full" && written !== "unscoped-package-name") {
+        throw new FatalError(
+          `distFilenameStrategy is defined in your Preconstruct config as ${JSON.stringify(
+            written
+          )} but the only accepted values are "full" and "unscoped-package-name"`,
+          this.project.name
+        );
+      }
+      return written;
+    }
+    return "full";
   }
 
   exportsFieldConfig(): CanonicalExportsFieldConfig {

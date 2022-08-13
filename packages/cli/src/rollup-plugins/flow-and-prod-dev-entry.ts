@@ -8,14 +8,12 @@ import { FatalError } from "../errors";
 import * as fs from "fs-extra";
 import normalizePath from "normalize-path";
 
+const allowedExtensionRegex = /\.([tj]sx?|json)$/;
+
 export default function flowAndNodeDevProdEntry(
   pkg: Package,
   warnings: FatalError[]
 ): Plugin {
-  // let directorySourceFilesMustBeIn = pkg.project.experimentalFlags
-  //   .newEntrypoints
-  //   ? path.resolve(pkg.directory, "src")
-  //   : pkg.directory;
   return {
     name: "flow-and-prod-dev-entry",
     load(id) {
@@ -25,7 +23,7 @@ export default function flowAndNodeDevProdEntry(
       return null;
     },
     async resolveId(source, importer) {
-      let resolved = await this.resolve(source, importer!, {
+      let resolved = await this.resolve(source, importer, {
         skipSelf: true,
       });
       if (resolved === null) {
@@ -51,11 +49,24 @@ export default function flowAndNodeDevProdEntry(
         );
       }
 
-      if (
-        source.startsWith("\0") ||
-        resolved.id.startsWith("\0") ||
-        resolved.id.startsWith(pkg.directory)
-      ) {
+      if (source.startsWith("\0") || resolved.id.startsWith("\0")) {
+        return resolved;
+      }
+      if (resolved.id.startsWith(pkg.directory)) {
+        if (!resolved.external && !allowedExtensionRegex.test(resolved.id)) {
+          warnings.push(
+            new FatalError(
+              `only .ts, .tsx, .js, .jsx, and .json files can be imported but "${source}" is imported in ${
+                importer
+                  ? `"${normalizePath(path.relative(pkg.directory, importer))}"`
+                  : "a module"
+              }`,
+              pkg.name
+            )
+          );
+          return "could-not-resolve";
+        }
+
         return resolved;
       }
       warnings.push(
