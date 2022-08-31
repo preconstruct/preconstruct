@@ -43,7 +43,11 @@ export function resolveErrorsPlugin(
       if (resolved.id.startsWith(pkg.directory)) {
         if (!resolved.external && !allowedExtensionRegex.test(resolved.id)) {
           warnings.add(
-            `only .ts, .tsx, .js, .jsx, and .json files can be imported but "${source}" is imported in ${
+            `only .ts, .tsx, .js, .jsx, and .json files can be imported but "${
+              importer === undefined
+                ? source
+                : normalizePath(path.relative(path.dirname(importer), source))
+            }" is imported in ${
               importer
                 ? `"${normalizePath(path.relative(pkg.directory, importer))}"`
                 : "a module"
@@ -55,13 +59,15 @@ export function resolveErrorsPlugin(
         return resolved;
       }
       if (isUmd) return resolved;
-      warnings.add(
-        `all relative imports in a package should only import modules inside of their package directory but ${
-          importer
-            ? `"${normalizePath(path.relative(pkg.directory, importer))}"`
-            : "a module"
-        } is importing "${source}"`
-      );
+      if (resolved.id !== source) {
+        warnings.add(
+          `all relative imports in a package should only import modules inside of their package directory but ${
+            importer
+              ? `"${normalizePath(path.relative(pkg.directory, importer))}"`
+              : "a module"
+          } is importing "${source}"`
+        );
+      }
 
       return false;
     },

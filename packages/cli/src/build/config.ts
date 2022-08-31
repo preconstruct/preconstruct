@@ -63,7 +63,7 @@ function getGlobal(project: Project, name: string) {
 
 const babelHelperId = /@babel\/runtime(|-corejs[23])\/helpers\//;
 
-const interop = (id: string | null): "auto" | "default" =>
+const interop: OutputOptions["interop"] = (id) =>
   id && babelHelperId.test(id) ? "default" : "auto";
 
 export function getRollupConfigs(pkg: Package, aliases: Aliases) {
@@ -111,6 +111,7 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
         dir: pkg.directory,
         exports: "named" as const,
         interop,
+        esModule: true,
         plugins: cjsPlugins,
       },
       ...(hasModuleField
@@ -142,6 +143,7 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
         dir: pkg.directory,
         exports: "named",
         interop,
+        esModule: true,
         plugins: cjsPlugins,
       },
     ],
@@ -162,6 +164,7 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
             name: entrypoint.json.preconstruct.umdName as string,
             dir: pkg.directory,
             interop,
+            esModule: true,
             globals: (name: string) => {
               if (name === (entrypoint.json.preconstruct.umdName as string)) {
                 return name;
@@ -196,6 +199,7 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
           dir: pkg.directory,
           exports: "named" as const,
           interop,
+          esModule: true,
           plugins: cjsPlugins,
         },
         hasModuleField && {

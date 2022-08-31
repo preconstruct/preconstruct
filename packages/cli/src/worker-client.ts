@@ -1,4 +1,4 @@
-import Worker from "jest-worker";
+import { Worker } from "jest-worker";
 // @ts-ignore
 import isCI from "is-ci";
 

@@ -79,7 +79,7 @@ test("clears dist folder", async () => {
 
     var index = "something";
 
-    exports["default"] = index;
+    exports.default = index;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/already-has-things-in-dist.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';

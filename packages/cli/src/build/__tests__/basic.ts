@@ -292,37 +292,19 @@ test("does not duplicate babel helpers", async () => {
 
     Object.defineProperty(exports, '__esModule', { value: true });
 
-    function _toPrimitive(input, hint) {
-      if (typeof input !== "object" || input === null) return input;
-      var prim = input[Symbol.toPrimitive];
-      if (prim !== undefined) {
-        var res = prim.call(input, hint || "default");
-        if (typeof res !== "object") return res;
-        throw new TypeError("@@toPrimitive must return a primitive value.");
-      }
-      return (hint === "string" ? String : Number)(input);
-    }
-
-    function _toPropertyKey(arg) {
-      var key = _toPrimitive(arg, "string");
-      return typeof key === "symbol" ? key : String(key);
-    }
-
     function _defineProperties(target, props) {
       for (var i = 0; i < props.length; i++) {
         var descriptor = props[i];
         descriptor.enumerable = descriptor.enumerable || false;
         descriptor.configurable = true;
         if ("value" in descriptor) descriptor.writable = true;
-        Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor);
+        Object.defineProperty(target, descriptor.key, descriptor);
       }
     }
+
     function _createClass(Constructor, protoProps, staticProps) {
       if (protoProps) _defineProperties(Constructor.prototype, protoProps);
       if (staticProps) _defineProperties(Constructor, staticProps);
-      Object.defineProperty(Constructor, "prototype", {
-        writable: false
-      });
       return Constructor;
     }
 
@@ -567,7 +549,9 @@ test("does not duplicate babel helpers when using @babel/plugin-transform-runtim
 
     function _arrayLikeToArray(arr, len) {
       if (len == null || len > arr.length) len = arr.length;
+
       for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i];
+
       return arr2;
     }
 
@@ -576,17 +560,17 @@ test("does not duplicate babel helpers when using @babel/plugin-transform-runtim
       if (typeof o === "string") return _arrayLikeToArray(o, minLen);
       var n = Object.prototype.toString.call(o).slice(8, -1);
       if (n === "Object" && o.constructor) n = o.constructor.name;
-      if (n === "Map" || n === "Set") return Array.from(o);
+      if (n === "Map" || n === "Set") return Array.from(n);
       if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen);
     }
 
-    function _createForOfIteratorHelper(o, allowArrayLike) {
-      var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"];
-      if (!it) {
-        if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") {
-          if (it) o = it;
+    function _createForOfIteratorHelper(o) {
+      if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) {
+        if (Array.isArray(o) || (o = _unsupportedIterableToArray(o))) {
           var i = 0;
+
           var F = function () {};
+
           return {
             s: F,
             n: function () {
@@ -604,14 +588,17 @@ test("does not duplicate babel helpers when using @babel/plugin-transform-runtim
             f: F
           };
         }
+
         throw new TypeError("Invalid attempt to iterate non-iterable instance.\\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
       }
-      var normalCompletion = true,
-        didErr = false,
-        err;
+
+      var it,
+          normalCompletion = true,
+          didErr = false,
+          err;
       return {
         s: function () {
-          it = it.call(o);
+          it = o[Symbol.iterator]();
         },
         n: function () {
           var step = it.next();
@@ -633,7 +620,8 @@ test("does not duplicate babel helpers when using @babel/plugin-transform-runtim
     }
 
     var _iterator$1 = _createForOfIteratorHelper(something),
-      _step$1;
+        _step$1;
+
     try {
       for (_iterator$1.s(); !(_step$1 = _iterator$1.n()).done;) {
         var x$1 = _step$1.value;
@@ -645,7 +633,8 @@ test("does not duplicate babel helpers when using @babel/plugin-transform-runtim
     }
 
     var _iterator = _createForOfIteratorHelper(something),
-      _step;
+        _step;
+
     try {
       for (_iterator.s(); !(_step = _iterator.n()).done;) {
         var x = _step.value;
@@ -690,7 +679,9 @@ test("does not duplicate babel helpers when not using @babel/plugin-transform-ru
 
     function _arrayLikeToArray(arr, len) {
       if (len == null || len > arr.length) len = arr.length;
+
       for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i];
+
       return arr2;
     }
 
@@ -699,17 +690,17 @@ test("does not duplicate babel helpers when not using @babel/plugin-transform-ru
       if (typeof o === "string") return _arrayLikeToArray(o, minLen);
       var n = Object.prototype.toString.call(o).slice(8, -1);
       if (n === "Object" && o.constructor) n = o.constructor.name;
-      if (n === "Map" || n === "Set") return Array.from(o);
+      if (n === "Map" || n === "Set") return Array.from(n);
       if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen);
     }
 
-    function _createForOfIteratorHelper(o, allowArrayLike) {
-      var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"];
-      if (!it) {
-        if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") {
-          if (it) o = it;
+    function _createForOfIteratorHelper(o) {
+      if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) {
+        if (Array.isArray(o) || (o = _unsupportedIterableToArray(o))) {
           var i = 0;
+
           var F = function () {};
+
           return {
             s: F,
             n: function () {
@@ -727,14 +718,17 @@ test("does not duplicate babel helpers when not using @babel/plugin-transform-ru
             f: F
           };
         }
+
         throw new TypeError("Invalid attempt to iterate non-iterable instance.\\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
       }
-      var normalCompletion = true,
-        didErr = false,
-        err;
+
+      var it,
+          normalCompletion = true,
+          didErr = false,
+          err;
       return {
         s: function () {
-          it = it.call(o);
+          it = o[Symbol.iterator]();
         },
         n: function () {
           var step = it.next();
@@ -756,7 +750,8 @@ test("does not duplicate babel helpers when not using @babel/plugin-transform-ru
     }
 
     var _iterator$1 = _createForOfIteratorHelper(something),
-      _step$1;
+        _step$1;
+
     try {
       for (_iterator$1.s(); !(_step$1 = _iterator$1.n()).done;) {
         var x$1 = _step$1.value;
@@ -768,7 +763,8 @@ test("does not duplicate babel helpers when not using @babel/plugin-transform-ru
     }
 
     var _iterator = _createForOfIteratorHelper(something),
-      _step;
+        _step;
+
     try {
       for (_iterator.s(); !(_step = _iterator.n()).done;) {
         var x = _step.value;
@@ -814,7 +810,8 @@ test("imports helpers for a helper only available in a newer version of @babel/r
     var _createForOfIteratorHelper = require('@babel/runtime/helpers/createForOfIteratorHelper');
 
     var _iterator$1 = _createForOfIteratorHelper(something),
-      _step$1;
+        _step$1;
+
     try {
       for (_iterator$1.s(); !(_step$1 = _iterator$1.n()).done;) {
         var x$1 = _step$1.value;
@@ -826,7 +823,8 @@ test("imports helpers for a helper only available in a newer version of @babel/r
     }
 
     var _iterator = _createForOfIteratorHelper(something),
-      _step;
+        _step;
+
     try {
       for (_iterator.s(); !(_step = _iterator.n()).done;) {
         var x = _step.value;
@@ -869,7 +867,7 @@ test("new dist filenames", async () => {
 
     var index = "something";
 
-    exports["default"] = index;
+    exports.default = index;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
@@ -924,7 +922,7 @@ test("UMD with dep that uses process.env.NODE_ENV", async () => {
     console.log(somewhere.x);
     var index = "something";
 
-    exports["default"] = index;
+    exports.default = index;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
@@ -940,7 +938,7 @@ test("UMD with dep that uses process.env.NODE_ENV", async () => {
     //# sourceMappingURL=scope-test.umd.min.js.map
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.umd.min.js.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    {"version":3,"file":"scope-test.umd.min.js","sources":["../src/index.js","../node_modules/somewhere/index.js"],"sourcesContent":["import { x } from \\"somewhere\\";\\nconsole.log(x);\\nexport default \\"something\\";","export let x = process.env.NODE_ENV;"],"names":["console","log"],"mappings":"qOACAA,QAAQC,ICD2B,oBDEpB"}
+    {"version":3,"file":"scope-test.umd.min.js","sources":["../src/index.js","../node_modules/somewhere/index.js"],"sourcesContent":["import { x } from \\"somewhere\\";\\nconsole.log(x);\\nexport default \\"something\\";","export let x = process.env.NODE_ENV;"],"names":["console","log"],"mappings":"qOACAA,QAAQC,ICD2B,oBDEpB","x_google_ignoreList":[1]}
   `);
 });
 
@@ -975,7 +973,7 @@ test("UMD build with process.env.NODE_ENV and typeof document", async () => {
       console.log(process.env.NODE_ENV);
     };
 
-    exports["default"] = thing;
+    exports.default = thing;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
@@ -995,14 +993,14 @@ test("UMD build with process.env.NODE_ENV and typeof document", async () => {
       console.log(        "production");
     };
 
-    exports["default"] = thing;
+    exports.default = thing;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.umd.min.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     !function(e,o){"object"==typeof exports&&"undefined"!=typeof module?module.exports=o():"function"==typeof define&&define.amd?define(o):(e="undefined"!=typeof globalThis?globalThis:e||self).x=o()}(this,(function(){"use strict";return()=>{console.log("production")}}));
     //# sourceMappingURL=scope-test.umd.min.js.map
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.umd.min.js.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    {"version":3,"file":"scope-test.umd.min.js","sources":["../src/index.js"],"sourcesContent":["let x = typeof document;\\n\\nconst thing = () => {\\n  console.log(process.env.NODE_ENV);\\n};\\n\\nexport default thing;"],"names":["thing","console","log","process"],"mappings":"wOAEcA,KACZC,QAAQC,IAAIC,aAAqB"}
+    {"version":3,"file":"scope-test.umd.min.js","sources":["../src/index.js"],"sourcesContent":["let x = typeof document;\\n\\nconst thing = () => {\\n  console.log(process.env.NODE_ENV);\\n};\\n\\nexport default thing;"],"names":["console","log","process"],"mappings":"wOAEc,KACZA,QAAQC,IAAIC,aAAZ"}
   `);
 });
 
@@ -1207,11 +1205,11 @@ test("node: is external", async () => {
 
     var fs = require('node:fs');
 
-    function _interopDefault (e) { return e && e.__esModule ? e : { 'default': e }; }
+    function _interopDefault (e) { return e && e.__esModule ? e : { default: e }; }
 
     var fs__default = /*#__PURE__*/_interopDefault(fs);
 
-    fs__default["default"].writeFileSync("test.txt", "test");
+    fs__default.default.writeFileSync("test.txt", "test");
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
@@ -1243,7 +1241,7 @@ test("importing css fails with a nice error", async () => {
     "src/blah.css": "",
   });
   await expect(build(dir)).rejects.toMatchInlineSnapshot(
-    `[Error: 🎁 @scope/test only .ts, .tsx, .js, .jsx, and .json files can be imported but "./blah.css" is imported in "src/index.js"]`
+    `[Error: 🎁 @scope/test only .ts, .tsx, .js, .jsx, and .json files can be imported but "blah.css" is imported in "src/index.js"]`
   );
 });
 
@@ -1300,7 +1298,7 @@ test(".d.ts file with default export", async () => {
     const a = true;
 
     exports.a = a;
-    exports["default"] = a;
+    exports.default = a;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';

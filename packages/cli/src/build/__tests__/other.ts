@@ -56,24 +56,30 @@ test("browser", async () => {
     Object.defineProperty(exports, '__esModule', { value: true });
 
     let thing = "wow";
+
     {
       thing = "something";
     }
+
     {
       thing += "other";
     }
+
     var thing$1 = thing;
 
-    exports["default"] = thing$1;
+    exports.default = thing$1;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/browser.browser.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     let thing = "wow";
+
     {
       thing = "something";
     }
+
     {
       thing += "other";
     }
+
     var thing$1 = thing;
 
     export { thing$1 as default };
@@ -84,15 +90,18 @@ test("browser", async () => {
     Object.defineProperty(exports, '__esModule', { value: true });
 
     let thing = "wow";
+
     if (typeof window !== "undefined") {
       thing = "something";
     }
+
     if (typeof document !== undefined) {
       thing += "other";
     }
+
     var thing$1 = thing;
 
-    exports["default"] = thing$1;
+    exports.default = thing$1;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/browser.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
@@ -105,12 +114,15 @@ test("browser", async () => {
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/browser.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     let thing = "wow";
+
     if (typeof window !== "undefined") {
       thing = "something";
     }
+
     if (typeof document !== undefined) {
       thing += "other";
     }
+
     var thing$1 = thing;
 
     export { thing$1 as default };
@@ -199,7 +211,7 @@ test("typescript", async () => {
     			}
     		});
     	}
-    	n["default"] = e;
+    	n.default = e;
     	return Object.freeze(n);
     }
 
@@ -210,7 +222,7 @@ test("typescript", async () => {
     let thing = "something";
 
     exports.path = path__namespace;
-    exports["default"] = thing;
+    exports.default = thing;
     exports.obj = obj;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
@@ -652,7 +664,7 @@ test("builds package using eval", async () => {
       return eval(arg);
     }
 
-    exports["default"] = compute;
+    exports.default = compute;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
@@ -712,7 +724,7 @@ test("builds umd with a dependency containing top-level this in ESM", async () =
 
     var withTopLevelThisInEsm = require('with-top-level-this-in-esm');
 
-    function _interopDefault (e) { return e && e.__esModule ? e : { 'default': e }; }
+    function _interopDefault (e) { return e && e.__esModule ? e : { default: e }; }
 
     var withTopLevelThisInEsm__default = /*#__PURE__*/_interopDefault(withTopLevelThisInEsm);
 
@@ -720,7 +732,7 @@ test("builds umd with a dependency containing top-level this in ESM", async () =
 
     Object.defineProperty(exports, 'default', {
     	enumerable: true,
-    	get: function () { return withTopLevelThisInEsm__default["default"]; }
+    	get: function () { return withTopLevelThisInEsm__default.default; }
     });
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
@@ -737,7 +749,7 @@ test("builds umd with a dependency containing top-level this in ESM", async () =
     //# sourceMappingURL=pkg.umd.min.js.map
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.umd.min.js.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    {"version":3,"file":"pkg.umd.min.js","sources":["../node_modules/with-top-level-this-in-esm/index.js"],"sourcesContent":["// output transpiled by TS with inlined tslib helper\\nvar __assign =\\n  (this && this.__assign) ||\\n  function () {\\n    __assign =\\n      Object.assign ||\\n      function (t) {\\n        for (var s, i = 1, n = arguments.length; i < n; i++) {\\n          s = arguments[i];\\n          for (var p in s)\\n            if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];\\n        }\\n        return t;\\n      };\\n    return __assign.apply(this, arguments);\\n  };\\nvar foo = { bar: 42 };\\nexport default __assign({}, foo);"],"names":["__assign","Object","assign","t","s","i","n","arguments","length","p","prototype","hasOwnProperty","call","apply","this","bar"],"mappings":"oOACA,IAAIA,EAEF,WAWE,OAVAA,EACEC,OAAOC,QACP,SAAUC,GACR,IAAK,IAAIC,EAAGC,EAAI,EAAGC,EAAIC,UAAUC,OAAQH,EAAIC,EAAGD,IAE9C,IAAK,IAAII,KADTL,EAAIG,UAAUF,GAERJ,OAAOS,UAAUC,eAAeC,KAAKR,EAAGK,KAAIN,EAAEM,GAAKL,EAAEK,IAE7D,OAAON,CACf,EACWH,EAASa,MAAMC,KAAMP,UAChC,SAEeP,EAAS,CAAE,EADhB,CAAEe,IAAK"}
+    {"version":3,"file":"pkg.umd.min.js","sources":["../node_modules/with-top-level-this-in-esm/index.js"],"sourcesContent":["// output transpiled by TS with inlined tslib helper\\nvar __assign =\\n  (this && this.__assign) ||\\n  function () {\\n    __assign =\\n      Object.assign ||\\n      function (t) {\\n        for (var s, i = 1, n = arguments.length; i < n; i++) {\\n          s = arguments[i];\\n          for (var p in s)\\n            if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];\\n        }\\n        return t;\\n      };\\n    return __assign.apply(this, arguments);\\n  };\\nvar foo = { bar: 42 };\\nexport default __assign({}, foo);"],"names":["__assign","Object","assign","t","s","i","n","arguments","length","p","prototype","hasOwnProperty","call","apply","this","bar"],"mappings":"oOACA,IAAIA,EAEF,WAWE,OAVAA,EACEC,OAAOC,QACP,SAAUC,GACR,IAAK,IAAIC,EAAGC,EAAI,EAAGC,EAAIC,UAAUC,OAAQH,EAAIC,EAAGD,IAE9C,IAAK,IAAII,KADTL,EAAIG,UAAUF,GAERJ,OAAOS,UAAUC,eAAeC,KAAKR,EAAGK,KAAIN,EAAEM,GAAKL,EAAEK,IAE7D,OAAON,CACf,EACWH,EAASa,MAAMC,KAAMP,UAChC,SAEeP,EAAS,CAAE,EADhB,CAAEe,IAAK","x_google_ignoreList":[0]}
   `);
 });
 
@@ -753,7 +765,7 @@ test("fails for source files containing top-level this", async () => {
     await build(dir);
   } catch (err) {
     expect(err.message).toMatchInlineSnapshot(`
-      "🎁 pkg "src/index.js" used \`this\` keyword at the top level of an ES module. You can read more about this at https://rollupjs.org/guide/en/#error-this-is-undefined and fix this issue that has happened here:
+      "🎁 pkg "src/index.js" used \`this\` keyword at the top level of an ES module. You can read more about this at https://rollupjs.org/troubleshooting/#error-this-is-undefined and fix this issue that has happened here:
       🎁 pkg
       🎁 pkg 1: export default this;
       🎁 pkg                   ^

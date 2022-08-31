@@ -70,7 +70,7 @@ function doSomething(arg) {
 }
 var index = "wow";
 
-exports["default"] = index;
+exports.default = index;
 exports.doSomething = doSomething;
 "
 `;
@@ -103,7 +103,7 @@ function doSomething(arg) {
 }
 var index = "wow";
 
-exports["default"] = index;
+exports.default = index;
 exports.doSomething = doSomething;
 "
 `;
@@ -125,7 +125,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 var index = 2;
 
-exports["default"] = index;
+exports.default = index;
 "
 `;
 
@@ -147,7 +147,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 var index = 2;
 
-exports["default"] = index;
+exports.default = index;
 "
 `;
 
@@ -309,7 +309,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 var index = 1;
 
-exports["default"] = index;
+exports.default = index;
 "
 `;
 
@@ -331,7 +331,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 var index = 1;
 
-exports["default"] = index;
+exports.default = index;
 "
 `;
 
@@ -349,7 +349,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 var index = 2;
 
-exports["default"] = index;
+exports.default = index;
 "
 `;
 
@@ -371,7 +371,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 var index = 2;
 
-exports["default"] = index;
+exports.default = index;
 "
 `;
 
@@ -389,7 +389,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 var index = "this does not have a module build";
 
-exports["default"] = index;
+exports.default = index;
 "
 `;
 
@@ -411,7 +411,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 var index = "this does not have a module build";
 
-exports["default"] = index;
+exports.default = index;
 "
 `;
 
@@ -424,6 +424,7 @@ function thing() {
   if (process.env.NODE_ENV !== "production") {
     return "not prod";
   }
+
   return "prod";
 }
 
@@ -448,6 +449,7 @@ exports[`prod checks: prod-checks.cjs.prod.js 1`] = `
 Object.defineProperty(exports, '__esModule', { value: true });
 
 function thing() {
+
   return "prod";
 }
 

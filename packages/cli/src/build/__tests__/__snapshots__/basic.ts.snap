@@ -7,7 +7,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 var index = "something";
 
-exports["default"] = index;
+exports.default = index;
 "
 `;
 
@@ -29,7 +29,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 var index = "something";
 
-exports["default"] = index;
+exports.default = index;
 "
 `;
 

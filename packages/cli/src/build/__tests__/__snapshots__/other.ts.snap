@@ -6,15 +6,18 @@ exports[`browser no module: dist/browser-no-module.browser.cjs.js 1`] = `
 Object.defineProperty(exports, '__esModule', { value: true });
 
 let thing = "wow";
+
 {
   thing = "something";
 }
+
 {
   thing += "other";
 }
+
 var thing$1 = thing;
 
-exports["default"] = thing$1;
+exports.default = thing$1;
 "
 `;
 
@@ -24,15 +27,18 @@ exports[`browser no module: dist/browser-no-module.cjs.dev.js 1`] = `
 Object.defineProperty(exports, '__esModule', { value: true });
 
 let thing = "wow";
+
 if (typeof window !== "undefined") {
   thing = "something";
 }
+
 if (typeof document !== undefined) {
   thing += "other";
 }
+
 var thing$1 = thing;
 
-exports["default"] = thing$1;
+exports.default = thing$1;
 "
 `;
 
@@ -53,15 +59,18 @@ exports[`browser no module: dist/browser-no-module.cjs.prod.js 1`] = `
 Object.defineProperty(exports, '__esModule', { value: true });
 
 let thing = "wow";
+
 if (typeof window !== "undefined") {
   thing = "something";
 }
+
 if (typeof document !== undefined) {
   thing += "other";
 }
+
 var thing$1 = thing;
 
-exports["default"] = thing$1;
+exports.default = thing$1;
 "
 `;
 
@@ -96,7 +105,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 var index = "something";
 
-exports["default"] = index;
+exports.default = index;
 "
 `;
 
@@ -118,7 +127,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 var index = "something";
 
-exports["default"] = index;
+exports.default = index;
 "
 `;
 
@@ -251,7 +260,7 @@ var Foo = /*#__PURE__*/_createClass(function Foo() {
   _classCallCheck(this, Foo);
 });
 
-exports["default"] = Foo;
+exports.default = Foo;
 "
 `;
 
@@ -278,7 +287,7 @@ var Foo = /*#__PURE__*/_createClass(function Foo() {
   _classCallCheck(this, Foo);
 });
 
-exports["default"] = Foo;
+exports.default = Foo;
 "
 `;
 
