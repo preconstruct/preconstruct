@@ -72,16 +72,17 @@ function weakMemoize<Arg extends object, Return>(
   };
 }
 
-function memoize<V>(fn: (arg: string) => V): (arg: string) => V {
+function memoize<V>(fn: (configFileName: string, dirname: string) => V): (configFileName: string, dirname: string) => V {
   const cache: { [key: string]: V } = {};
 
-  return (arg: string) => {
-    if (cache[arg] === undefined) cache[arg] = fn(arg);
-    return cache[arg];
+  return (configFileName: string, dirname: string) => {
+    const cacheKey = `${configFileName}|${dirname}`;
+    if (cache[cacheKey] === undefined) cache[cacheKey] = fn(configFileName, dirname);
+    return cache[cacheKey];
   };
 }
 
-async function nonMemoizedGetProgram(typescript: TS, configFileName: string) {
+async function nonMemoizedGetProgram(typescript: TS, configFileName: string, dirname: string) {
   let configFileContents = await fs.readFile(configFileName, "utf8");
   const result = typescript.parseConfigFileTextToJson(
     configFileName,
@@ -91,7 +92,7 @@ async function nonMemoizedGetProgram(typescript: TS, configFileName: string) {
   let thing = typescript.parseJsonConfigFileContent(
     result.config,
     typescript.sys,
-    process.cwd(),
+    dirname,
     undefined,
     configFileName
   );
@@ -105,8 +106,8 @@ async function nonMemoizedGetProgram(typescript: TS, configFileName: string) {
 }
 
 let memoizedGetProgram = weakMemoize((typescript: TS) =>
-  memoize(async (configFileName: string) => {
-    return nonMemoizedGetProgram(typescript, configFileName);
+  memoize(async (configFileName: string, dirname: string) => {
+    return nonMemoizedGetProgram(typescript, configFileName, dirname);
   })
 );
 
@@ -125,8 +126,8 @@ export async function getProgram(dirname: string, pkgName: string, ts: TS) {
   // since it should just be a root level tsconfig
   return normalizePath(configFileName) ===
     normalizePath(path.join(dirname, "tsconfig.json"))
-    ? nonMemoizedGetProgram(ts, configFileName)
-    : memoizedGetProgram(ts)(configFileName);
+    ? nonMemoizedGetProgram(ts, configFileName, dirname)
+    : memoizedGetProgram(ts)(configFileName, dirname);
 }
 
 export const getDeclarationsForFile = async (
