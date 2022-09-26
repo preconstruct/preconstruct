@@ -91,7 +91,7 @@ async function nonMemoizedGetProgram(typescript: TS, configFileName: string) {
   let thing = typescript.parseJsonConfigFileContent(
     result.config,
     typescript.sys,
-    process.cwd(),
+    path.dirname(configFileName),
     undefined,
     configFileName
   );
