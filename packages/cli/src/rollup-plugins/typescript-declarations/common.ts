@@ -72,25 +72,17 @@ function weakMemoize<Arg extends object, Return>(
   };
 }
 
-function memoize<V>(
-  fn: (configFileName: string, dirname: string) => V
-): (configFileName: string, dirname: string) => V {
+function memoize<V>(fn: (configFileName: string, dirname: string) => V): (configFileName: string, dirname: string) => V {
   const cache: { [key: string]: V } = {};
 
   return (configFileName: string, dirname: string) => {
     const cacheKey = `${configFileName}|${dirname}`;
-    if (cache[cacheKey] === undefined)
-      cache[cacheKey] = fn(configFileName, dirname);
-
+    if (cache[cacheKey] === undefined) cache[cacheKey] = fn(configFileName, dirname);
     return cache[cacheKey];
   };
 }
 
-async function nonMemoizedGetProgram(
-  typescript: TS,
-  configFileName: string,
-  dirname: string
-) {
+async function nonMemoizedGetProgram(typescript: TS, configFileName: string, dirname: string) {
   let configFileContents = await fs.readFile(configFileName, "utf8");
   const result = typescript.parseConfigFileTextToJson(
     configFileName,
