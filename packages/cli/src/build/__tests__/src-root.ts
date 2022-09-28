@@ -31,7 +31,8 @@ test("monorepo with root src dir and typescript package", async () => {
     "compilerOptions": {
       "target": "esnext",
       "module": "commonjs",
-      "outDir": "./build"
+      "outDir": "./build/cjs",
+      "declarationDir": "./build/types",
       "isolatedModules": true,
       "esModuleInterop": true,
       "noEmit": true
@@ -48,13 +49,13 @@ test("monorepo with root src dir and typescript package", async () => {
 
   expect(await getDist(tmpPath + "/src/packages/my-package"))
     .toMatchInlineSnapshot(`
-  ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/build/index.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+  ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/index.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
   declare const _default: {};
   export default _default;
 
   ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/my-package.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-  export * from "./declarations/build/index";
-  export { default } from "./declarations/build/index";
+  export * from "./declarations/src/index";
+  export { default } from "./declarations/src/index";
 
   ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/my-package.cjs.dev.js, dist/my-package.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
   'use strict';

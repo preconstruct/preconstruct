@@ -96,6 +96,8 @@ async function nonMemoizedGetProgram(typescript: TS, configFileName: string) {
     configFileName
   );
 
+  thing.options.outDir = undefined;
+  thing.options.declarationDir = undefined;
   thing.options.declaration = true;
   thing.options.emitDeclarationOnly = true;
   thing.options.noEmit = false;
