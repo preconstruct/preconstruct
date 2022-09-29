@@ -1,5 +1,13 @@
 # preconstruct
 
+## 2.2.2
+
+### Patch Changes
+
+- [#495](https://github.com/preconstruct/preconstruct/pull/495) [`4e90c2b`](https://github.com/preconstruct/preconstruct/commit/4e90c2bb282663f29e739f9530a5efbcd8dfc694) Thanks [@mycroes](https://github.com/mycroes)! - The `outDir` and `declarationDir` tsconfig options are now ignored. These options are unnecessary for Preconstruct since it controls where the `.d.ts` files are emitted to. This fixes confusing errors if you had these options set.
+
+* [`eaa2fcc`](https://github.com/preconstruct/preconstruct/commit/eaa2fcc0924ccebb40bbb69a2a3a2eb6063552c7) Thanks [@mitchellhamilton](https://github.com/mitchellhamilton)! - Improved error when importing something with an extension that can't be imported
+
 ## 2.2.1
 
 ### Patch Changes
