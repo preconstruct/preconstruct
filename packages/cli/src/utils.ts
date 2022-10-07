@@ -84,22 +84,27 @@ export function exportsField(
     return;
   }
 
+  const hasModuleType = pkg.type === "module";
   let output: Record<string, ExportsConditions> = {};
   pkg.entrypoints.forEach((entrypoint) => {
     const esmBuild = getExportsFieldOutputPath(entrypoint, "esm");
+    let module: ExportsConditions["module"];
+    if (exportsFieldConfig.envConditions.size)
+      module = {
+        ...(exportsFieldConfig.envConditions.has("worker") && {
+          worker: getExportsFieldOutputPath(entrypoint, "worker"),
+        }),
+        ...(exportsFieldConfig.envConditions.has("browser") && {
+          browser: getExportsFieldOutputPath(entrypoint, "browser-esm"),
+        }),
+        default: esmBuild,
+      };
+    else if (!hasModuleType) module = esmBuild;
     const exportConditions = {
-      module: exportsFieldConfig.envConditions.size
-        ? {
-            ...(exportsFieldConfig.envConditions.has("worker") && {
-              worker: getExportsFieldOutputPath(entrypoint, "worker"),
-            }),
-            ...(exportsFieldConfig.envConditions.has("browser") && {
-              browser: getExportsFieldOutputPath(entrypoint, "browser-esm"),
-            }),
-            default: esmBuild,
-          }
-        : esmBuild,
-      default: getExportsFieldOutputPath(entrypoint, "cjs"),
+      ...(module ? { module } : {}),
+      default: hasModuleType
+        ? esmBuild
+        : getExportsFieldOutputPath(entrypoint, "cjs"),
     };
 
     output[
@@ -148,6 +153,8 @@ export function getExportsFieldOutputPath(
 
 export const validFieldsForEntrypoint = {
   main(entrypoint: MinimalEntrypoint) {
+    if (entrypoint.package.type === "module")
+      return getDistFilename(entrypoint, "esm");
     return getDistFilename(entrypoint, "cjs");
   },
   module(entrypoint: MinimalEntrypoint) {
@@ -164,7 +171,10 @@ export const validFieldsForEntrypoint = {
       )}`,
     };
 
-    if (entrypoint.package.exportsFieldConfig()) {
+    if (
+      entrypoint.package.exportsFieldConfig() ||
+      entrypoint.package.type === "module"
+    ) {
       return moduleBuild;
     }
 

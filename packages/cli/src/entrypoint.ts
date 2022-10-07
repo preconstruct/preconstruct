@@ -7,6 +7,7 @@ import normalizePath from "normalize-path";
 export class Entrypoint extends Item<{
   main?: JSONValue;
   module?: JSONValue;
+  type: "commonjs" | "module";
   "umd:main"?: JSONValue;
   browser?: JSONValue;
   exports?: Record<string, ExportsConditions | string>;

@@ -171,7 +171,7 @@ export default async function dev(projectDir: string) {
           await fs.remove(distDirectory);
           await fs.ensureDir(distDirectory);
 
-          let promises = [
+          let promises: Promise<void | void[]>[] = [
             typeSystemPromise.then((typeSystemInfo) => {
               let promises = [];
               if (typeSystemInfo.flow) {
@@ -184,44 +184,50 @@ export default async function dev(projectDir: string) {
               }
               return Promise.all(promises);
             }),
-            fs.writeFile(
-              path.join(
-                entrypoint.directory,
-                validFieldsForEntrypoint.main(entrypoint)
-              ),
-              `"use strict";
-// this file might look strange and you might be wondering what it's for
-// it's lets you import your source files by importing this entrypoint
-// as you would import it if it was built with preconstruct build
-// this file is slightly different to some others though
-// it has a require hook which compiles your code with Babel
-// this means that you don't have to set up @babel/register or anything like that
-// but you can still require this module and it'll be compiled
-
-// this bit of code imports the require hook and registers it
-let unregister = require(${JSON.stringify(
-                normalizePath(
-                  path.relative(
-                    distDirectory,
-                    path.dirname(require.resolve("@preconstruct/hook"))
-                  )
-                )
-              )}).___internalHook(typeof __dirname === 'undefined' ? undefined : __dirname, ${JSON.stringify(
-                normalizePath(path.relative(distDirectory, project.directory))
-              )}, ${JSON.stringify(
-                normalizePath(path.relative(distDirectory, pkg.directory))
-              )});
-
-// this re-exports the source file
-module.exports = require(${JSON.stringify(
-                normalizePath(path.relative(distDirectory, entrypoint.source))
-              )});
-
-unregister();
-`
-            ),
           ];
-          if (entrypoint.json.module) {
+
+          if (entrypoint.json.type !== "module") {
+            promises.push(
+              fs.writeFile(
+                path.join(
+                  entrypoint.directory,
+                  validFieldsForEntrypoint.main(entrypoint)
+                ),
+                `"use strict";
+  // this file might look strange and you might be wondering what it's for
+  // it's lets you import your source files by importing this entrypoint
+  // as you would import it if it was built with preconstruct build
+  // this file is slightly different to some others though
+  // it has a require hook which compiles your code with Babel
+  // this means that you don't have to set up @babel/register or anything like that
+  // but you can still require this module and it'll be compiled
+  
+  // this bit of code imports the require hook and registers it
+  let unregister = require(${JSON.stringify(
+    normalizePath(
+      path.relative(
+        distDirectory,
+        path.dirname(require.resolve("@preconstruct/hook"))
+      )
+    )
+  )}).___internalHook(typeof __dirname === 'undefined' ? undefined : __dirname, ${JSON.stringify(
+                  normalizePath(path.relative(distDirectory, project.directory))
+                )}, ${JSON.stringify(
+                  normalizePath(path.relative(distDirectory, pkg.directory))
+                )});
+  
+  // this re-exports the source file
+  module.exports = require(${JSON.stringify(
+    normalizePath(path.relative(distDirectory, entrypoint.source))
+  )});
+  
+  unregister();
+  `
+              )
+            );
+          }
+
+          if (entrypoint.json.module || entrypoint.json.type === "module") {
             promises.push(
               fs.symlink(
                 entrypoint.source,

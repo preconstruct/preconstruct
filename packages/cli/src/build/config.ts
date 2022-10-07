@@ -87,6 +87,7 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
     outputs: OutputOptions[];
   }> = [];
 
+  const hasModuleType = pkg.type === "module";
   let hasModuleField = pkg.entrypoints[0].json.module !== undefined;
   configs.push({
     config: getRollupConfig(
@@ -104,16 +105,20 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
         : () => {}
     ),
     outputs: [
-      {
-        format: "cjs" as const,
-        entryFileNames: "[name].cjs.dev.js",
-        chunkFileNames: "dist/[name]-[hash].cjs.dev.js",
-        dir: pkg.directory,
-        exports: "named" as const,
-        interop,
-        plugins: cjsPlugins,
-      },
-      ...(hasModuleField
+      ...(!hasModuleType
+        ? [
+            {
+              format: "cjs" as const,
+              entryFileNames: "[name].cjs.dev.js",
+              chunkFileNames: "dist/[name]-[hash].cjs.dev.js",
+              dir: pkg.directory,
+              exports: "named" as const,
+              interop,
+              plugins: cjsPlugins,
+            },
+          ]
+        : []),
+      ...(hasModuleField || hasModuleType
         ? [
             {
               format: "es" as const,
@@ -126,26 +131,27 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
     ],
   });
 
-  configs.push({
-    config: getRollupConfig(
-      pkg,
-      pkg.entrypoints,
-      aliases,
-      "node-prod",
-      () => {}
-    ),
-    outputs: [
-      {
-        format: "cjs",
-        entryFileNames: "[name].cjs.prod.js",
-        chunkFileNames: "dist/[name]-[hash].cjs.prod.js",
-        dir: pkg.directory,
-        exports: "named",
-        interop,
-        plugins: cjsPlugins,
-      },
-    ],
-  });
+  if (!hasModuleType)
+    configs.push({
+      config: getRollupConfig(
+        pkg,
+        pkg.entrypoints,
+        aliases,
+        "node-prod",
+        () => {}
+      ),
+      outputs: [
+        {
+          format: "cjs",
+          entryFileNames: "[name].cjs.prod.js",
+          chunkFileNames: "dist/[name]-[hash].cjs.prod.js",
+          dir: pkg.directory,
+          exports: "named",
+          interop,
+          plugins: cjsPlugins,
+        },
+      ],
+    });
 
   // umd builds are a bit special
   // we don't guarantee that shared modules are shared across umd builds
@@ -187,18 +193,19 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
         () => {}
       ),
       outputs: [
-        !exportsFieldConfig && {
-          format: "cjs" as const,
-          entryFileNames: `[name].${getDistExtension("browser-cjs")}`,
-          chunkFileNames: `dist/[name]-[hash].${getDistExtension(
-            "browser-cjs"
-          )}`,
-          dir: pkg.directory,
-          exports: "named" as const,
-          interop,
-          plugins: cjsPlugins,
-        },
-        hasModuleField && {
+        !exportsFieldConfig &&
+          !hasModuleType && {
+            format: "cjs" as const,
+            entryFileNames: `[name].${getDistExtension("browser-cjs")}`,
+            chunkFileNames: `dist/[name]-[hash].${getDistExtension(
+              "browser-cjs"
+            )}`,
+            dir: pkg.directory,
+            exports: "named" as const,
+            interop,
+            plugins: cjsPlugins,
+          },
+        (hasModuleField || hasModuleType) && {
           format: "es" as const,
           entryFileNames: `[name].${getDistExtension("browser-esm")}`,
           chunkFileNames: `dist/[name]-[hash].${getDistExtension(

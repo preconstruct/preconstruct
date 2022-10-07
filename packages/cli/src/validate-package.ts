@@ -47,6 +47,11 @@ export async function fixPackage(pkg: Package) {
 
   pkg.json = setFieldInOrder(pkg.json, "exports", exportsField(pkg));
 
+  // Remove any `module` fields if package `type` is `"module"`
+  if (pkg.type === "module" && fields.module) {
+    pkg.json = setFieldInOrder(pkg.json, "module", undefined);
+  }
+
   await pkg.save();
 
   return (await Promise.all(pkg.entrypoints.map((x) => x.save()))).some(
@@ -74,7 +79,7 @@ export function validatePackage(pkg: Package) {
   const exportsFieldConfig = pkg.exportsFieldConfig();
 
   if (exportsFieldConfig) {
-    if (!fields.module) {
+    if (!fields.module && pkg.type !== "module") {
       throw new FixableError(errors.noModuleFieldWithExportsField, pkg.name);
     }
     const hasField = fields.browser;

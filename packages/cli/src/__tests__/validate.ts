@@ -789,7 +789,95 @@ test("no module field with exports field", async () => {
     "src/index.js": "",
   });
   await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
-    `[Error: when using the exports field, the module field must also be specified]`
+    `[Error: when using the exports field, the module field or type must also be specified]`
+  );
+});
+
+test("module type with exports field", async () => {
+  const tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "pkg-a",
+      type: "module",
+      main: "dist/pkg-a.esm.js",
+      preconstruct: {
+        exports: true,
+        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+          exports: true,
+        },
+      },
+    }),
+    "src/index.js": "",
+  });
+  await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
+    `[Error: exports field was not found, expected \`{".":{"default":"./dist/pkg-a.esm.js"},"./package.json":"./package.json"}\`]`
+  );
+});
+
+test("module type but incorrect main field", async () => {
+  const tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "pkg-a",
+      type: "module",
+      main: "dist/pkg-a.cjs.js",
+    }),
+    "src/index.js": "",
+  });
+  await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
+    `[Error: main field is invalid, found \`"dist/pkg-a.cjs.js"\`, expected \`"dist/pkg-a.esm.js"\`]`
+  );
+});
+
+test("main field filename is module format without module type", async () => {
+  const tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "pkg-a",
+      main: "dist/pkg-a.esm.js",
+    }),
+    "src/index.js": "",
+  });
+  await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
+    `[Error: main field is invalid, found \`"dist/pkg-a.esm.js"\`, expected \`"dist/pkg-a.cjs.js"\`]`
+  );
+});
+
+test("module type with main and module fields", async () => {
+  const tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "pkg-a",
+      type: "module",
+      main: "dist/pkg-a.esm.js",
+      module: "dist/pkg-a.esm.js",
+    }),
+    "src/index.js": "",
+  });
+  await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
+    `[Error: when \`"type": "module"\`, the module field should be redundant, and thus it is not allowed]`
+  );
+});
+
+test("module type with cjs name in exports", async () => {
+  const tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "pkg-a",
+      type: "module",
+      main: "dist/pkg-a.esm.js",
+      exports: {
+        ".": {
+          default: "./dist/pkg-a.cjs.js",
+        },
+        "./package.json": "./package.json",
+      },
+      preconstruct: {
+        exports: true,
+        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+          exports: true,
+        },
+      },
+    }),
+    "src/index.js": "",
+  });
+  await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
+    `[Error: exports field is invalid, found \`{".":{"default":"./dist/pkg-a.cjs.js"},"./package.json":"./package.json"}\`, expected \`{".":{"default":"./dist/pkg-a.esm.js"},"./package.json":"./package.json"}\`]`
   );
 });
 

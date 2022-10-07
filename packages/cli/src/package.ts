@@ -99,7 +99,7 @@ function createEntrypoints(
 }
 
 export type ExportsConditions = {
-  module: string | { worker?: string; browser?: string; default: string };
+  module?: string | { worker?: string; browser?: string; default: string };
   default: string;
 };
 
@@ -114,6 +114,7 @@ export class Package extends Item<{
     };
     entrypoints?: JSONValue;
   };
+  type: "commonjs" | "module";
   exports?: Record<string, ExportsConditions | string>;
   dependencies?: Record<string, string>;
   peerDependencies?: Record<string, string>;
@@ -296,6 +297,12 @@ export class Package extends Item<{
     });
   }
 
+  removeFieldOnEntrypoints(field: "main" | "browser" | "module" | "umd:main") {
+    this.entrypoints.forEach((entrypoint) => {
+      entrypoint.json = setFieldInOrder(entrypoint.json, field, undefined);
+    });
+  }
+
   get name(): string {
     if (typeof this.json.name !== "string") {
       throw new FatalError(
@@ -304,6 +311,10 @@ export class Package extends Item<{
       );
     }
     return this.json.name;
+  }
+
+  get type() {
+    return this.json.type;
   }
 
   get distFilenameStrategy(): DistFilenameStrategy {

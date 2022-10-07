@@ -33,3 +33,7 @@ A file or group of files that Preconstruct outputs that is differentiated by its
 ## externals {#externals}
 
 Modules that shouldn't be bundled and should instead be left as imports
+
+## module format type {#module-format-type}
+
+The [`"type"`](https://nodejs.org/api/packages.html#type) field that defines the module format Node.js uses for files that have that package.json file as their nearest parent.
