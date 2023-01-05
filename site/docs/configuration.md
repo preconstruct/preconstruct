@@ -132,7 +132,7 @@ Packages map 1:1 with npm packages. Along with specifying the `entrypoints` opti
 }
 ```
 
-### `exports` (experimental) {#exports}
+### `exports` {#exports}
 
 ```ts
 | boolean
@@ -154,21 +154,7 @@ Using the `exports` field enables a couple of things:
 
 Note that adding an `exports` field can arguably be a breaking change, you may want to use the `extra` option to add more exports so that imports that worked previously still work or only add the `exports` field in a major version.
 
-To opt into this experimental feature, you must enable it in the root of your project by setting the `exports` experimental flag in your preconstruct config section of your `package.json` file to `true`.
-
-```diff
-{
-  "name": "@sample/repo",
-  "version": "0.0.0",
-  "preconstruct": {
-+    "___experimentalFlags_WILL_CHANGE_IN_PATCH": {
-+      "exports": true
-+    },
-  }
-}
-```
-
-The `exports` field feature then needs to be enabled, you can do this at the project or package level like this. The `envConditions` and `extra` options can only be configured at a package level.
+The `exports` field feature can be enabled at the project or package level like this. The `envConditions` and `extra` options can only be configured at a package level.
 
 ```diff
 {

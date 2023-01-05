@@ -81,9 +81,6 @@ test("set exports field when opt-in", async () => {
         exports: {
           envConditions: ["worker", "browser"],
         },
-        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
-          exports: true,
-        },
       },
     }),
     "src/index.js": "",
@@ -117,9 +114,6 @@ test("set exports field when opt-in", async () => {
             "worker",
             "browser"
           ]
-        },
-        "___experimentalFlags_WILL_CHANGE_IN_PATCH": {
-          "exports": true
         }
       }
     }
@@ -137,9 +131,6 @@ test("set exports field when opt-in", async () => {
         exports: {
           envConditions: ["worker", "browser"],
         },
-        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
-          exports: true,
-        },
       },
     }),
     "src/index.js": "",
@@ -173,9 +164,6 @@ test("set exports field when opt-in", async () => {
             "worker",
             "browser"
           ]
-        },
-        "___experimentalFlags_WILL_CHANGE_IN_PATCH": {
-          "exports": true
         }
       }
     }
@@ -191,9 +179,6 @@ test("set exports field when opt-in with no env conditions", async () => {
       module: "dist/package-exports.esm.js",
       preconstruct: {
         exports: true,
-        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
-          exports: true,
-        },
       },
     }),
     "src/index.js": "",
@@ -215,10 +200,7 @@ test("set exports field when opt-in with no env conditions", async () => {
         "./package.json": "./package.json"
       },
       "preconstruct": {
-        "exports": true,
-        "___experimentalFlags_WILL_CHANGE_IN_PATCH": {
-          "exports": true
-        }
+        "exports": true
       }
     }
 
@@ -235,9 +217,6 @@ test("set exports field with multiple entrypoints", async () => {
         entrypoints: ["index.js", "other.js", "deep/something.js"],
         exports: {
           envConditions: ["worker", "browser"],
-        },
-        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
-          exports: true,
         },
       },
     }),
@@ -315,9 +294,6 @@ test("set exports field with multiple entrypoints", async () => {
             "worker",
             "browser"
           ]
-        },
-        "___experimentalFlags_WILL_CHANGE_IN_PATCH": {
-          "exports": true
         }
       }
     }
@@ -335,9 +311,6 @@ test("set exports field without root entrypoint", async () => {
             entrypoints: ["other.js"],
             exports: {
               envConditions: ["worker", "browser"],
-            },
-            ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
-              exports: true,
             },
           },
         },
@@ -372,9 +345,6 @@ test("set exports field without root entrypoint", async () => {
             "worker",
             "browser"
           ]
-        },
-        "___experimentalFlags_WILL_CHANGE_IN_PATCH": {
-          "exports": true
         }
       },
       "exports": {
@@ -751,9 +721,6 @@ test("no module field with exports field", async () => {
       main: "dist/pkg-a.cjs.js",
       preconstruct: {
         exports: true,
-        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
-          exports: true,
-        },
       },
     }),
     "src/index.js": "",
@@ -773,10 +740,7 @@ test("no module field with exports field", async () => {
         "./package.json": "./package.json"
       },
       "preconstruct": {
-        "exports": true,
-        "___experimentalFlags_WILL_CHANGE_IN_PATCH": {
-          "exports": true
-        }
+        "exports": true
       }
     }
 
@@ -795,9 +759,6 @@ test("has browser field but no browser condition", async () => {
       },
       preconstruct: {
         exports: true,
-        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
-          exports: true,
-        },
       },
     }),
     "src/index.js": "",
@@ -827,9 +788,6 @@ test("has browser field but no browser condition", async () => {
           "envConditions": [
             "browser"
           ]
-        },
-        "___experimentalFlags_WILL_CHANGE_IN_PATCH": {
-          "exports": true
         }
       }
     }
@@ -847,9 +805,6 @@ test("has browser condition but no browser field", async () => {
         exports: {
           envConditions: ["browser"],
         },
-        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
-          exports: true,
-        },
       },
     }),
     "src/index.js": "",
@@ -880,9 +835,6 @@ test("has browser condition but no browser field", async () => {
           "envConditions": [
             "browser"
           ]
-        },
-        "___experimentalFlags_WILL_CHANGE_IN_PATCH": {
-          "exports": true
         }
       }
     }
@@ -898,9 +850,6 @@ test("preconstruct.exports: true no exports field", async () => {
       module: "dist/pkg-a.esm.js",
       preconstruct: {
         exports: true,
-        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
-          exports: true,
-        },
       },
     }),
     "src/index.js": "",
@@ -920,10 +869,7 @@ test("preconstruct.exports: true no exports field", async () => {
         "./package.json": "./package.json"
       },
       "preconstruct": {
-        "exports": true,
-        "___experimentalFlags_WILL_CHANGE_IN_PATCH": {
-          "exports": true
-        }
+        "exports": true
       }
     }
 
@@ -935,12 +881,54 @@ test("project level exports field config", async () => {
     "package.json": JSON.stringify(
       {
         name: "repo",
+        preconstruct: { packages: ["packages/*"], exports: true },
+      },
+      null,
+      2
+    ),
+    "packages/pkg-a/package.json": JSON.stringify({
+      name: "pkg-a",
+    }),
+    "packages/pkg-a/src/index.js": "",
+  });
+  await fix(tmpPath);
+  expect(await getFiles(tmpPath, ["**/package.json"])).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {
+      "name": "repo",
+      "preconstruct": {
+        "packages": [
+          "packages/*"
+        ],
+        "exports": true
+      }
+    }
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {
+      "name": "pkg-a",
+      "main": "dist/pkg-a.cjs.js",
+      "module": "dist/pkg-a.esm.js",
+      "exports": {
+        ".": {
+          "module": "./dist/pkg-a.esm.js",
+          "default": "./dist/pkg-a.cjs.js"
+        },
+        "./package.json": "./package.json"
+      }
+    }
+
+  `);
+});
+
+test("experimental exports flag is removed", async () => {
+  const tmpPath = await testdir({
+    "package.json": JSON.stringify(
+      {
+        name: "repo",
         preconstruct: {
           packages: ["packages/*"],
           exports: true,
-          ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
-            exports: true,
-          },
+          ___experimentalFlags_WILL_CHANGE_IN_PATCH: { exports: true },
         },
       },
       null,
@@ -960,12 +948,10 @@ test("project level exports field config", async () => {
         "packages": [
           "packages/*"
         ],
-        "exports": true,
-        "___experimentalFlags_WILL_CHANGE_IN_PATCH": {
-          "exports": true
-        }
+        "exports": true
       }
     }
+
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     {
       "name": "pkg-a",

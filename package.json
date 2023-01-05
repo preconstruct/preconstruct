@@ -2,6 +2,7 @@
   "name": "@preconstruct/monorepo",
   "version": "0.0.65",
   "description": "A smart build tool for libraries",
+  "packageManager": "yarn@1.22.19",
   "scripts": {
     "build": "yarn preconstruct build",
     "test": "jest",
