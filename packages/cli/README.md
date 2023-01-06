@@ -47,8 +47,3 @@ There are a number of tasks that become easier with preconstruct that lie slight
 - [Kye Hohenberger](https://github.com/tkh44) for thinking of the name preconstruct
 - Too many awesome people to name at [Thinkmill](https://thinkmill.com.au) who have given so much great feedback to make Preconstruct better and Thinkmill for sponsoring the development of Preconstruct 💝
 - all the people who wrote all the dependencies for this project!
-
-# Things that review would be good on
-
-- https://medium.com/@mitchell_hamilton/introducing-preconstruct-26996f23de2a
--
