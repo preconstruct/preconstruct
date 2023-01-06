@@ -684,9 +684,6 @@ test("worker and browser build", async () => {
         exports: {
           envConditions: ["browser", "worker"],
         },
-        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
-          exports: true,
-        },
       },
     }),
     node_modules: {
@@ -741,7 +738,6 @@ test("typescript with nodenext module resolution", async () => {
       name: "@exports/repo",
       preconstruct: {
         packages: ["packages/pkg-a"],
-        ___experimentalFlags_WILL_CHANGE_IN_PATCH: { exports: true },
       },
     }),
     "packages/pkg-a/package.json": JSON.stringify({

@@ -675,9 +675,6 @@ describe("exports field config", () => {
         },
         preconstruct: {
           exports: config,
-          ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
-            exports: true,
-          },
         },
       }),
       "src/index.js": "",
@@ -761,9 +758,6 @@ describe("exports field config", () => {
             module: "dist/pkg-a.esm.js",
             preconstruct: {
               exports: config,
-              ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
-                exports: true,
-              },
             },
           }),
           "src/index.js": "",
@@ -781,9 +775,6 @@ test("no module field with exports field", async () => {
       main: "dist/pkg-a.cjs.js",
       preconstruct: {
         exports: true,
-        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
-          exports: true,
-        },
       },
     }),
     "src/index.js": "",
@@ -805,9 +796,6 @@ test("has browser field but no browser condition", async () => {
       },
       preconstruct: {
         exports: true,
-        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
-          exports: true,
-        },
       },
     }),
     "src/index.js": "",
@@ -828,9 +816,6 @@ test("has browser condition but no browser field", async () => {
         exports: {
           envConditions: ["browser"],
         },
-        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
-          exports: true,
-        },
       },
     }),
     "src/index.js": "",
@@ -848,14 +833,44 @@ test("preconstruct.exports: true no exports field", async () => {
       module: "dist/pkg-a.esm.js",
       preconstruct: {
         exports: true,
-        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
-          exports: true,
-        },
       },
     }),
     "src/index.js": "",
   });
   await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
     `[Error: exports field was not found, expected \`{".":{"module":"./dist/pkg-a.esm.js","default":"./dist/pkg-a.cjs.js"},"./package.json":"./package.json"}\`]`
+  );
+});
+
+test("experimental exports flag is removed", async () => {
+  const tmpPath = await testdir({
+    "package.json": JSON.stringify(
+      {
+        name: "repo",
+        preconstruct: {
+          packages: ["packages/*"],
+          exports: true,
+          ___experimentalFlags_WILL_CHANGE_IN_PATCH: { exports: true },
+        },
+      },
+      null,
+      2
+    ),
+    "packages/pkg-a/package.json": JSON.stringify({
+      name: "pkg-a",
+      main: "dist/pkg-a.cjs.js",
+      module: "dist/pkg-a.esm.js",
+      exports: {
+        ".": {
+          module: "./dist/pkg-a.esm.js",
+          default: "./dist/pkg-a.cjs.js",
+        },
+        "./package.json": "./package.json",
+      },
+    }),
+    "packages/pkg-a/src/index.js": "",
+  });
+  await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
+    `[Error: The behaviour from the experimental flag "exports" is the current behaviour now, the flag should be removed]`
   );
 });

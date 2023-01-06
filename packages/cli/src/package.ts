@@ -323,9 +323,6 @@ export class Package extends Item<{
   }
 
   exportsFieldConfig(): CanonicalExportsFieldConfig {
-    if (!this.project.experimentalFlags.exports) {
-      return;
-    }
     let defaultExportsFieldEnabled = false;
     if (this.project.directory !== this.directory) {
       const exportsFieldConfig = this.project.json.preconstruct.exports;

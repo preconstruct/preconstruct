@@ -327,9 +327,6 @@ test("exports field with worker condition", async () => {
           exports: {
             envConditions: ["worker"],
           },
-          ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
-            exports: true,
-          },
         },
       }),
       "src/index.js": "console.log(1)",
