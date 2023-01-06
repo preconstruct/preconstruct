@@ -1,5 +1,15 @@
 # preconstruct
 
+## 2.3.0
+
+### Minor Changes
+
+- [#508](https://github.com/preconstruct/preconstruct/pull/508) [`36e3d51`](https://github.com/preconstruct/preconstruct/commit/36e3d51bd1e2619cfecc3af53dcb19b2d0fbcb08) Thanks [@emmatown](https://github.com/emmatown)! - [Support for the exports field](https://preconstruct.tools/configuration#exports) has been stabilised. If you were using the experimental flag, you should remove it.
+
+### Patch Changes
+
+- [#512](https://github.com/preconstruct/preconstruct/pull/512) [`09784cd`](https://github.com/preconstruct/preconstruct/commit/09784cd5741c27593433b393faae6e3dc64d63b1) Thanks [@emmatown](https://github.com/emmatown)! - Removed `typeScriptProxyFileWithImportEqualsRequireAndExportEquals` experimental flag.
+
 ## 2.2.2
 
 ### Patch Changes
