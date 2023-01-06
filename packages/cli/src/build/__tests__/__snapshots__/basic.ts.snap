@@ -5,7 +5,7 @@ exports[`basic: valid-package.cjs.dev.js 1`] = `
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-var index = \\"something\\";
+var index = "something";
 
 exports.default = index;
 "
@@ -14,10 +14,10 @@ exports.default = index;
 exports[`basic: valid-package.cjs.js 1`] = `
 "'use strict';
 
-if (process.env.NODE_ENV === \\"production\\") {
-  module.exports = require(\\"./valid-package.cjs.prod.js\\");
+if (process.env.NODE_ENV === "production") {
+  module.exports = require("./valid-package.cjs.prod.js");
 } else {
-  module.exports = require(\\"./valid-package.cjs.dev.js\\");
+  module.exports = require("./valid-package.cjs.dev.js");
 }
 "
 `;
@@ -27,44 +27,44 @@ exports[`basic: valid-package.cjs.prod.js 1`] = `
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-var index = \\"something\\";
+var index = "something";
 
 exports.default = index;
 "
 `;
 
 exports[`basic: valid-package.esm.js 1`] = `
-"var index = \\"something\\";
+"var index = "something";
 
 export default index;
 "
 `;
 
 exports[`basic: valid-package.umd.min.js 1`] = `
-"!function(e,n){\\"object\\"==typeof exports&&\\"undefined\\"!=typeof module?module.exports=n():\\"function\\"==typeof define&&define.amd?define(n):(e=\\"undefined\\"!=typeof globalThis?globalThis:e||self).validPackage=n()}(this,(function(){\\"use strict\\";return\\"something\\"}));
+"!function(e,n){"object"==typeof exports&&"undefined"!=typeof module?module.exports=n():"function"==typeof define&&define.amd?define(n):(e="undefined"!=typeof globalThis?globalThis:e||self).validPackage=n()}(this,(function(){"use strict";return"something"}));
 //# sourceMappingURL=valid-package.umd.min.js.map
 "
 `;
 
-exports[`basic: valid-package.umd.min.js.map 1`] = `"{\\"version\\":3,\\"file\\":\\"valid-package.umd.min.js\\",\\"sources\\":[\\"../src/index.js\\"],\\"sourcesContent\\":[\\"export default \\\\\\"something\\\\\\";\\\\n\\"],\\"names\\":[],\\"mappings\\":\\"mPAAe\\"}"`;
+exports[`basic: valid-package.umd.min.js.map 1`] = `"{"version":3,"file":"valid-package.umd.min.js","sources":["../src/index.js"],"sourcesContent":["export default \\"something\\";\\n"],"names":[],"mappings":"mPAAe"}"`;
 
 exports[`typescript thing: declarations/src/index.d.ts 1`] = `
-"export declare const thing: \\"wow\\";
+"export declare const thing: "wow";
 "
 `;
 
 exports[`typescript thing: declarations/src/other.d.ts 1`] = `
-"export declare const thing: () => \\"wow\\";
+"export declare const thing: () => "wow";
 "
 `;
 
 exports[`typescript thing: declarations/src/thing.d.ts 1`] = `
-"export declare const makeThing: () => \\"wow\\";
+"export declare const makeThing: () => "wow";
 "
 `;
 
 exports[`typescript thing: weird-typescript-thing.cjs.d.ts 1`] = `
-"export * from \\"./declarations/src/index\\";
+"export * from "./declarations/src/index";
 "
 `;
 
@@ -73,7 +73,7 @@ exports[`typescript thing: weird-typescript-thing.cjs.dev.js 1`] = `
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-const thing = () => \\"wow\\";
+const thing = () => "wow";
 
 const makeThing = () => thing();
 
@@ -86,10 +86,10 @@ exports.thing = thing$1;
 exports[`typescript thing: weird-typescript-thing.cjs.js 1`] = `
 "'use strict';
 
-if (process.env.NODE_ENV === \\"production\\") {
-  module.exports = require(\\"./weird-typescript-thing.cjs.prod.js\\");
+if (process.env.NODE_ENV === "production") {
+  module.exports = require("./weird-typescript-thing.cjs.prod.js");
 } else {
-  module.exports = require(\\"./weird-typescript-thing.cjs.dev.js\\");
+  module.exports = require("./weird-typescript-thing.cjs.dev.js");
 }
 "
 `;
@@ -99,7 +99,7 @@ exports[`typescript thing: weird-typescript-thing.cjs.prod.js 1`] = `
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-const thing = () => \\"wow\\";
+const thing = () => "wow";
 
 const makeThing = () => thing();
 
@@ -110,7 +110,7 @@ exports.thing = thing$1;
 `;
 
 exports[`typescript thing: weird-typescript-thing.esm.js 1`] = `
-"const thing = () => \\"wow\\";
+"const thing = () => "wow";
 
 const makeThing = () => thing();
 

@@ -222,17 +222,17 @@ test("umd with dep on other module", async () => {
 
   await snapshotDistFiles(tmpPath);
   expect(await getPkg(tmpPath)).toMatchInlineSnapshot(`
-    Object {
-      "devDependencies": Object {
+    {
+      "devDependencies": {
         "react": "^16.6.3",
       },
       "main": "dist/umd-with-dep.cjs.js",
       "name": "umd-with-dep",
-      "peerDependencies": Object {
+      "peerDependencies": {
         "react": "^16.6.3",
       },
-      "preconstruct": Object {
-        "globals": Object {
+      "preconstruct": {
+        "globals": {
           "react": "React",
         },
         "umdName": "umdWithDep",
@@ -373,16 +373,16 @@ test("monorepo umd with dep on other module", async () => {
 
   expect(await getPkg(path.join(tmpPath, "packages", "package-one")))
     .toMatchInlineSnapshot(`
-    Object {
-      "devDependencies": Object {
+    {
+      "devDependencies": {
         "react": "^16.6.3",
       },
       "main": "dist/some-scope-package-one-umd-with-dep.cjs.js",
       "name": "@some-scope/package-one-umd-with-dep",
-      "peerDependencies": Object {
+      "peerDependencies": {
         "react": "^16.6.3",
       },
-      "preconstruct": Object {
+      "preconstruct": {
         "umdName": "packageOne",
       },
       "umd:main": "dist/some-scope-package-one-umd-with-dep.umd.min.js",
@@ -391,16 +391,16 @@ test("monorepo umd with dep on other module", async () => {
 
   expect(await getPkg(path.join(tmpPath, "packages", "package-two")))
     .toMatchInlineSnapshot(`
-    Object {
-      "devDependencies": Object {
+    {
+      "devDependencies": {
         "react": "^16.6.3",
       },
       "main": "dist/some-scope-package-two-umd-with-dep.cjs.js",
       "name": "@some-scope/package-two-umd-with-dep",
-      "peerDependencies": Object {
+      "peerDependencies": {
         "react": "^16.6.3",
       },
-      "preconstruct": Object {
+      "preconstruct": {
         "umdName": "packageTwo",
       },
       "umd:main": "dist/some-scope-package-two-umd-with-dep.umd.min.js",
@@ -408,18 +408,18 @@ test("monorepo umd with dep on other module", async () => {
   `);
 
   expect(await getPkg(tmpPath)).toMatchInlineSnapshot(`
-    Object {
+    {
       "main": "index.js",
       "name": "monorepo-umd-with-dep",
-      "preconstruct": Object {
-        "globals": Object {
+      "preconstruct": {
+        "globals": {
           "react": "React",
         },
-        "packages": Array [
+        "packages": [
           "packages/*",
         ],
       },
-      "workspaces": Array [
+      "workspaces": [
         "packages/*",
       ],
     }
@@ -817,8 +817,8 @@ test("typescript with nodenext module resolution", async () => {
   expect(code).toBe(2);
   expect(stdout.toString("utf8")).toMatchInlineSnapshot(`
     "blah.ts(3,29): error TS2307: Cannot find module 'pkg-a/not-exported' or its corresponding type declarations.
-    blah.ts(11,22): error TS2345: Argument of type '\\"index\\"' is not assignable to parameter of type '\\"other\\"'.
-    blah.ts(12,22): error TS2345: Argument of type '\\"something\\"' is not assignable to parameter of type '\\"other\\"'.
+    blah.ts(11,22): error TS2345: Argument of type '"index"' is not assignable to parameter of type '"other"'.
+    blah.ts(12,22): error TS2345: Argument of type '"something"' is not assignable to parameter of type '"other"'.
     "
   `);
   expect(stderr.toString("utf8")).toMatchInlineSnapshot(`""`);

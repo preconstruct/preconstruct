@@ -60,7 +60,7 @@ test("set main and module field", async () => {
   let pkg = await getPkg(tmpPath);
 
   expect(pkg).toMatchInlineSnapshot(`
-    Object {
+    {
       "license": "MIT",
       "main": "dist/basic-package.cjs.js",
       "module": "dist/basic-package.esm.js",
@@ -377,7 +377,7 @@ test("new dist filenames", async () => {
   let pkg = await getPkg(tmpPath);
 
   expect(pkg).toMatchInlineSnapshot(`
-    Object {
+    {
       "license": "MIT",
       "main": "dist/scope-something.cjs.js",
       "module": "dist/scope-something.esm.js",
@@ -405,12 +405,12 @@ test("new dist filenames only-unscoped-package-name strategy", async () => {
   let pkg = await getPkg(tmpPath);
 
   expect(pkg).toMatchInlineSnapshot(`
-    Object {
+    {
       "license": "MIT",
       "main": "dist/something.cjs.js",
       "module": "dist/something.esm.js",
       "name": "@scope/something",
-      "preconstruct": Object {
+      "preconstruct": {
         "distFilenameStrategy": "unscoped-package-name",
       },
       "private": true,
@@ -434,7 +434,7 @@ test("monorepo", async () => {
   let pkg2 = await getPkg(path.join(tmpPath, "packages", "package-two"));
 
   expect(pkg1).toMatchInlineSnapshot(`
-    Object {
+    {
       "license": "MIT",
       "main": "dist/some-scope-package-one.cjs.js",
       "module": "dist/some-scope-package-one.esm.js",
@@ -445,7 +445,7 @@ test("monorepo", async () => {
   `);
 
   expect(pkg2).toMatchInlineSnapshot(`
-    Object {
+    {
       "license": "MIT",
       "main": "dist/some-scope-package-two.cjs.js",
       "module": "dist/some-scope-package-two.esm.js",
@@ -464,8 +464,8 @@ test("does not modify if already valid", async () => {
   let current = await getPkg(tmpPath);
   expect(original).toEqual(current);
   expect(logMock.log.mock.calls).toMatchInlineSnapshot(`
-    Array [
-      Array [
+    [
+      [
         "🎁 success project already valid!",
       ],
     ]
@@ -480,7 +480,7 @@ test("invalid fields", async () => {
   let pkg = await getPkg(tmpPath);
 
   expect(pkg).toMatchInlineSnapshot(`
-    Object {
+    {
       "license": "MIT",
       "main": "dist/invalid-fields.cjs.js",
       "module": "dist/invalid-fields.esm.js",
@@ -501,8 +501,8 @@ test("fix browser", async () => {
   await fix(tmpPath);
 
   expect(await getPkg(tmpPath)).toMatchInlineSnapshot(`
-    Object {
-      "browser": Object {
+    {
+      "browser": {
         "./dist/valid-package.cjs.js": "./dist/valid-package.browser.cjs.js",
         "./dist/valid-package.esm.js": "./dist/valid-package.browser.esm.js",
       },
@@ -510,7 +510,7 @@ test("fix browser", async () => {
       "main": "dist/valid-package.cjs.js",
       "module": "dist/valid-package.esm.js",
       "name": "valid-package",
-      "preconstruct": Object {
+      "preconstruct": {
         "umdName": "validPackage",
       },
       "private": true,
@@ -525,8 +525,8 @@ test("monorepo single package", async () => {
 
   await fix(tmpPath);
   expect(logMock.log.mock.calls).toMatchInlineSnapshot(`
-    Array [
-      Array [
+    [
+      [
         "🎁 success project already valid!",
       ],
     ]
@@ -552,11 +552,11 @@ testFix(
     let contents = await run();
 
     expect(contents).toMatchInlineSnapshot(`
-      Object {
-        "": Object {
+      {
+        "": {
           "main": "dist/something.cjs.js",
           "name": "something",
-          "preconstruct": Object {
+          "preconstruct": {
             "umdName": "somethingUmdName",
           },
           "umd:main": "dist/something.umd.min.js",
@@ -599,24 +599,24 @@ test("create entrypoint", async () => {
     await fs.readFile(path.join(tmpPath, "another", "package.json"), "utf8")
   ).toMatchInlineSnapshot(`
     "{
-      \\"main\\": \\"dist/valid-package-another.cjs.js\\",
-      \\"module\\": \\"dist/valid-package-another.esm.js\\",
-      \\"umd:main\\": \\"dist/valid-package-another.umd.min.js\\",
-      \\"preconstruct\\": {
-        \\"umdName\\": \\"another\\"
+      "main": "dist/valid-package-another.cjs.js",
+      "module": "dist/valid-package-another.esm.js",
+      "umd:main": "dist/valid-package-another.umd.min.js",
+      "preconstruct": {
+        "umdName": "another"
       }
     }
     "
   `);
 
   expect(await getPkg(tmpPath)).toMatchInlineSnapshot(`
-    Object {
+    {
       "license": "MIT",
       "main": "dist/valid-package.cjs.js",
       "module": "dist/valid-package.esm.js",
       "name": "valid-package",
-      "preconstruct": Object {
-        "entrypoints": Array [
+      "preconstruct": {
+        "entrypoints": [
           "index.js",
           "another.js",
         ],
@@ -642,20 +642,20 @@ test("create entrypoint no umd/no prompts", async () => {
   await fix(tmpPath);
 
   expect(await getPkg(path.join(tmpPath, "another"))).toMatchInlineSnapshot(`
-    Object {
+    {
       "main": "dist/valid-package-another.cjs.js",
       "module": "dist/valid-package-another.esm.js",
     }
   `);
 
   expect(await getPkg(tmpPath)).toMatchInlineSnapshot(`
-    Object {
+    {
       "license": "MIT",
       "main": "dist/valid-package.cjs.js",
       "module": "dist/valid-package.esm.js",
       "name": "valid-package",
-      "preconstruct": Object {
-        "entrypoints": Array [
+      "preconstruct": {
+        "entrypoints": [
           "index.js",
           "another.js",
         ],

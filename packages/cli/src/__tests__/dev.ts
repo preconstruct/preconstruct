@@ -114,10 +114,11 @@ test("all the build types", async () => {
           path.dirname(require.resolve("@preconstruct/hook"))
         )
       ),
+
       "RELATIVE_PATH_TO_PRECONSTRUCT_HOOK"
     )
   ).toMatchInlineSnapshot(`
-    "\\"use strict\\";
+    ""use strict";
     // this file might look strange and you might be wondering what it's for
     // it's lets you import your source files by importing this entrypoint
     // as you would import it if it was built with preconstruct build
@@ -127,10 +128,10 @@ test("all the build types", async () => {
     // but you can still require this module and it'll be compiled
 
     // this bit of code imports the require hook and registers it
-    let unregister = require(\\"RELATIVE_PATH_TO_PRECONSTRUCT_HOOK\\").___internalHook(typeof __dirname === 'undefined' ? undefined : __dirname, \\"..\\", \\"..\\");
+    let unregister = require("RELATIVE_PATH_TO_PRECONSTRUCT_HOOK").___internalHook(typeof __dirname === 'undefined' ? undefined : __dirname, "..", "..");
 
     // this re-exports the source file
-    module.exports = require(\\"../src/index.js\\");
+    module.exports = require("../src/index.js");
 
     unregister();
     "
@@ -299,11 +300,11 @@ test("typescript with typeScriptProxyFileWithImportEqualsRequireAndExportEquals"
   await expect(
     fs.readFile(path.join(tmpPath, "dist", "typescript.cjs.d.ts"), "utf8")
   ).resolves.toMatchInlineSnapshot(`
-          "import mod = require(\\"../src/index\\");
+    "import mod = require("../src/index");
 
-          export = mod;
-          "
-        `);
+    export = mod;
+    "
+  `);
 });
 
 test("exports field with worker condition", async () => {
