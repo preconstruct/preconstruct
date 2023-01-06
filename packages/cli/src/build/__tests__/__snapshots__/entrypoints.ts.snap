@@ -14,10 +14,10 @@ exports.identity = identity;
 exports[`two entrypoints where one requires the other entrypoint: dist/importing-another-entrypoint.cjs.js 1`] = `
 "'use strict';
 
-if (process.env.NODE_ENV === \\"production\\") {
-  module.exports = require(\\"./importing-another-entrypoint.cjs.prod.js\\");
+if (process.env.NODE_ENV === "production") {
+  module.exports = require("./importing-another-entrypoint.cjs.prod.js");
 } else {
-  module.exports = require(\\"./importing-another-entrypoint.cjs.dev.js\\");
+  module.exports = require("./importing-another-entrypoint.cjs.dev.js");
 }
 "
 `;
@@ -49,10 +49,10 @@ exports.multiply = multiply;
 exports[`two entrypoints where one requires the other entrypoint: multiply/dist/importing-another-entrypoint-multiply.cjs.js 1`] = `
 "'use strict';
 
-if (process.env.NODE_ENV === \\"production\\") {
-  module.exports = require(\\"./importing-another-entrypoint-multiply.cjs.prod.js\\");
+if (process.env.NODE_ENV === "production") {
+  module.exports = require("./importing-another-entrypoint-multiply.cjs.prod.js");
 } else {
-  module.exports = require(\\"./importing-another-entrypoint-multiply.cjs.dev.js\\");
+  module.exports = require("./importing-another-entrypoint-multiply.cjs.dev.js");
 }
 "
 `;
@@ -73,7 +73,7 @@ exports.multiply = multiply;
 exports[`two entrypoints where one requires the other entrypoint: src/index.js 1`] = `"export let identity = (x) => x;"`;
 
 exports[`two entrypoints where one requires the other entrypoint: src/multiply.js 1`] = `
-"import { identity } from \\"./index\\";
+"import { identity } from "./index";
 
 export let multiply = (a, b) => identity(a * b);"
 `;
@@ -120,10 +120,10 @@ exports.sum = sum;
 exports[`two entrypoints with a common dependency: dist/common-dependency-two-entrypoints.cjs.js 1`] = `
 "'use strict';
 
-if (process.env.NODE_ENV === \\"production\\") {
-  module.exports = require(\\"./common-dependency-two-entrypoints.cjs.prod.js\\");
+if (process.env.NODE_ENV === "production") {
+  module.exports = require("./common-dependency-two-entrypoints.cjs.prod.js");
 } else {
-  module.exports = require(\\"./common-dependency-two-entrypoints.cjs.dev.js\\");
+  module.exports = require("./common-dependency-two-entrypoints.cjs.dev.js");
 }
 "
 `;
@@ -169,10 +169,10 @@ exports.multiply = multiply;
 exports[`two entrypoints with a common dependency: multiply/dist/common-dependency-two-entrypoints-multiply.cjs.js 1`] = `
 "'use strict';
 
-if (process.env.NODE_ENV === \\"production\\") {
-  module.exports = require(\\"./common-dependency-two-entrypoints-multiply.cjs.prod.js\\");
+if (process.env.NODE_ENV === "production") {
+  module.exports = require("./common-dependency-two-entrypoints-multiply.cjs.prod.js");
 } else {
-  module.exports = require(\\"./common-dependency-two-entrypoints-multiply.cjs.dev.js\\");
+  module.exports = require("./common-dependency-two-entrypoints-multiply.cjs.dev.js");
 }
 "
 `;
@@ -204,7 +204,7 @@ export { multiply };
 exports[`two entrypoints with a common dependency: src/identity.js 1`] = `"export let identity = (x) => x;"`;
 
 exports[`two entrypoints with a common dependency: src/index.js 1`] = `
-"import { identity } from \\"./identity\\";
+"import { identity } from "./identity";
 
 export let sum = (a, b) => identity(a + b);
 
@@ -212,7 +212,7 @@ export { identity };"
 `;
 
 exports[`two entrypoints with a common dependency: src/multiply.js 1`] = `
-"import { identity } from \\"./identity\\";
+"import { identity } from "./identity";
 
 export let multiply = (a, b) => identity(a * b);
 

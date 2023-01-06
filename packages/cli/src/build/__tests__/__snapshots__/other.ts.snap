@@ -5,14 +5,14 @@ exports[`browser no module: dist/browser-no-module.browser.cjs.js 1`] = `
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-let thing = \\"wow\\";
+let thing = "wow";
 
 {
-  thing = \\"something\\";
+  thing = "something";
 }
 
 {
-  thing += \\"other\\";
+  thing += "other";
 }
 
 var thing$1 = thing;
@@ -26,14 +26,14 @@ exports[`browser no module: dist/browser-no-module.cjs.dev.js 1`] = `
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-let thing = \\"wow\\";
+let thing = "wow";
 
-if (typeof window !== \\"undefined\\") {
-  thing = \\"something\\";
+if (typeof window !== "undefined") {
+  thing = "something";
 }
 
 if (typeof document !== undefined) {
-  thing += \\"other\\";
+  thing += "other";
 }
 
 var thing$1 = thing;
@@ -45,10 +45,10 @@ exports.default = thing$1;
 exports[`browser no module: dist/browser-no-module.cjs.js 1`] = `
 "'use strict';
 
-if (process.env.NODE_ENV === \\"production\\") {
-  module.exports = require(\\"./browser-no-module.cjs.prod.js\\");
+if (process.env.NODE_ENV === "production") {
+  module.exports = require("./browser-no-module.cjs.prod.js");
 } else {
-  module.exports = require(\\"./browser-no-module.cjs.dev.js\\");
+  module.exports = require("./browser-no-module.cjs.dev.js");
 }
 "
 `;
@@ -58,14 +58,14 @@ exports[`browser no module: dist/browser-no-module.cjs.prod.js 1`] = `
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-let thing = \\"wow\\";
+let thing = "wow";
 
-if (typeof window !== \\"undefined\\") {
-  thing = \\"something\\";
+if (typeof window !== "undefined") {
+  thing = "something";
 }
 
 if (typeof document !== undefined) {
-  thing += \\"other\\";
+  thing += "other";
 }
 
 var thing$1 = thing;
@@ -75,8 +75,8 @@ exports.default = thing$1;
 `;
 
 exports[`browser no module: package.json 1`] = `
-Object {
-  "browser": Object {
+{
+  "browser": {
     "./dist/browser-no-module.cjs.js": "./dist/browser-no-module.browser.cjs.js",
   },
   "main": "dist/browser-no-module.cjs.js",
@@ -85,14 +85,14 @@ Object {
 `;
 
 exports[`browser no module: src/index.js 1`] = `
-"let thing = \\"wow\\";
+"let thing = "wow";
 
-if (typeof window !== \\"undefined\\") {
-  thing = \\"something\\";
+if (typeof window !== "undefined") {
+  thing = "something";
 }
 
 if (typeof document !== undefined) {
-  thing += \\"other\\";
+  thing += "other";
 }
 
 export default thing;"
@@ -103,7 +103,7 @@ exports[`should lazily get globals: dist/umd-unused-peer-dep.cjs.dev.js 1`] = `
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-var index = \\"something\\";
+var index = "something";
 
 exports.default = index;
 "
@@ -112,10 +112,10 @@ exports.default = index;
 exports[`should lazily get globals: dist/umd-unused-peer-dep.cjs.js 1`] = `
 "'use strict';
 
-if (process.env.NODE_ENV === \\"production\\") {
-  module.exports = require(\\"./umd-unused-peer-dep.cjs.prod.js\\");
+if (process.env.NODE_ENV === "production") {
+  module.exports = require("./umd-unused-peer-dep.cjs.prod.js");
 } else {
-  module.exports = require(\\"./umd-unused-peer-dep.cjs.dev.js\\");
+  module.exports = require("./umd-unused-peer-dep.cjs.dev.js");
 }
 "
 `;
@@ -125,33 +125,33 @@ exports[`should lazily get globals: dist/umd-unused-peer-dep.cjs.prod.js 1`] = `
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-var index = \\"something\\";
+var index = "something";
 
 exports.default = index;
 "
 `;
 
 exports[`should lazily get globals: dist/umd-unused-peer-dep.umd.min.js 1`] = `
-"!function(e,n){\\"object\\"==typeof exports&&\\"undefined\\"!=typeof module?module.exports=n():\\"function\\"==typeof define&&define.amd?define(n):(e=\\"undefined\\"!=typeof globalThis?globalThis:e||self).validPackage=n()}(this,(function(){\\"use strict\\";return\\"something\\"}));
+"!function(e,n){"object"==typeof exports&&"undefined"!=typeof module?module.exports=n():"function"==typeof define&&define.amd?define(n):(e="undefined"!=typeof globalThis?globalThis:e||self).validPackage=n()}(this,(function(){"use strict";return"something"}));
 //# sourceMappingURL=umd-unused-peer-dep.umd.min.js.map
 "
 `;
 
-exports[`should lazily get globals: src/index.js 1`] = `"export default \\"something\\";"`;
+exports[`should lazily get globals: src/index.js 1`] = `"export default "something";"`;
 
 exports[`typescript with forced dts emit: dist/declarations/src/create-store.d.ts 1`] = `
-"import { Action } from \\"@reduxjs/toolkit\\";
-import { ThunkAction } from \\"redux-thunk\\";
-import { RootState } from \\"./root-reducer\\";
+"import { Action } from "@reduxjs/toolkit";
+import { ThunkAction } from "redux-thunk";
+import { RootState } from "./root-reducer";
 export declare type AppThunk = ThunkAction<void, RootState, unknown, Action<string>>;
 export declare function createStore(): any;
 "
 `;
 
 exports[`typescript with forced dts emit: dist/declarations/src/index.d.ts 1`] = `
-"export { createStore } from \\"./create-store\\";
-export type { AppThunk } from \\"./create-store\\";
-export type { RootState } from \\"./root-reducer\\";
+"export { createStore } from "./create-store";
+export type { AppThunk } from "./create-store";
+export type { RootState } from "./root-reducer";
 "
 `;
 
@@ -162,7 +162,7 @@ export declare type RootState = ReturnType<typeof rootReducer>;
 `;
 
 exports[`typescript with forced dts emit: dist/typescript-force-dts-emit.cjs.d.ts 1`] = `
-"export * from \\"./declarations/src/index\\";
+"export * from "./declarations/src/index";
 "
 `;
 
@@ -192,10 +192,10 @@ exports.createStore = createStore;
 exports[`typescript with forced dts emit: dist/typescript-force-dts-emit.cjs.js 1`] = `
 "'use strict';
 
-if (process.env.NODE_ENV === \\"production\\") {
-  module.exports = require(\\"./typescript-force-dts-emit.cjs.prod.js\\");
+if (process.env.NODE_ENV === "production") {
+  module.exports = require("./typescript-force-dts-emit.cjs.prod.js");
 } else {
-  module.exports = require(\\"./typescript-force-dts-emit.cjs.dev.js\\");
+  module.exports = require("./typescript-force-dts-emit.cjs.dev.js");
 }
 "
 `;
@@ -260,10 +260,10 @@ exports.default = Foo;
 exports[`using external @babel/runtime helpers: dist/external-babel-runtime.cjs.js 1`] = `
 "'use strict';
 
-if (process.env.NODE_ENV === \\"production\\") {
-  module.exports = require(\\"./external-babel-runtime.cjs.prod.js\\");
+if (process.env.NODE_ENV === "production") {
+  module.exports = require("./external-babel-runtime.cjs.prod.js");
 } else {
-  module.exports = require(\\"./external-babel-runtime.cjs.dev.js\\");
+  module.exports = require("./external-babel-runtime.cjs.dev.js");
 }
 "
 `;
@@ -295,8 +295,8 @@ export default Foo;
 `;
 
 exports[`using external @babel/runtime helpers: package.json 1`] = `
-Object {
-  "dependencies": Object {
+{
+  "dependencies": {
     "@babel/runtime": "^7.0.0",
   },
   "main": "dist/external-babel-runtime.cjs.js",

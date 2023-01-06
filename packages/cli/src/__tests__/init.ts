@@ -55,7 +55,7 @@ test("set only main field", async () => {
 
   let pkg = await getPkg(tmpPath);
   expect(pkg).toMatchInlineSnapshot(`
-    Object {
+    {
       "license": "MIT",
       "main": "dist/basic-package.cjs.js",
       "name": "basic-package",
@@ -78,7 +78,7 @@ test("set main and module field", async () => {
   let pkg = await getPkg(tmpPath);
 
   expect(pkg).toMatchInlineSnapshot(`
-    Object {
+    {
       "license": "MIT",
       "main": "dist/basic-package.cjs.js",
       "module": "dist/basic-package.esm.js",
@@ -115,7 +115,7 @@ test("scoped package", async () => {
   let pkg = await getPkg(tmpPath);
 
   expect(pkg).toMatchInlineSnapshot(`
-    Object {
+    {
       "license": "MIT",
       "main": "dist/some-scope-some-package.cjs.js",
       "module": "dist/some-scope-some-package.esm.js",
@@ -140,7 +140,7 @@ test("monorepo", async () => {
   let pkg2 = await getPkg(path.join(tmpPath, "packages", "package-two"));
 
   expect(Object.keys(pkg1)).toMatchInlineSnapshot(`
-    Array [
+    [
       "name",
       "version",
       "main",
@@ -151,7 +151,7 @@ test("monorepo", async () => {
   `);
 
   expect(pkg1).toMatchInlineSnapshot(`
-    Object {
+    {
       "license": "MIT",
       "main": "dist/some-scope-package-one.cjs.js",
       "module": "dist/some-scope-package-one.esm.js",
@@ -162,7 +162,7 @@ test("monorepo", async () => {
   `);
 
   expect(pkg2).toMatchInlineSnapshot(`
-    Object {
+    {
       "license": "MIT",
       "main": "dist/some-scope-package-two.cjs.js",
       "module": "dist/some-scope-package-two.esm.js",
@@ -181,14 +181,14 @@ test("does not prompt or modify if already valid", async () => {
   let current = await getPkg(tmpPath);
   expect(original).toEqual(current);
   expect(logMock.log.mock.calls).toMatchInlineSnapshot(`
-    Array [
-      Array [
+    [
+      [
         "🎁 info valid-package main field is valid",
       ],
-      Array [
+      [
         "🎁 info valid-package module field is valid",
       ],
-      Array [
+      [
         "🎁 success initialised project!",
       ],
     ]
@@ -209,7 +209,7 @@ test("invalid fields", async () => {
   let pkg = await getPkg(tmpPath);
 
   expect(pkg).toMatchInlineSnapshot(`
-    Object {
+    {
       "license": "MIT",
       "main": "dist/invalid-fields.cjs.js",
       "module": "dist/invalid-fields.esm.js",
@@ -232,8 +232,8 @@ test("fix browser", async () => {
   await init(tmpPath);
 
   expect(await getPkg(tmpPath)).toMatchInlineSnapshot(`
-    Object {
-      "browser": Object {
+    {
+      "browser": {
         "./dist/valid-package.cjs.js": "./dist/valid-package.browser.cjs.js",
         "./dist/valid-package.esm.js": "./dist/valid-package.browser.esm.js",
       },
@@ -241,7 +241,7 @@ test("fix browser", async () => {
       "main": "dist/valid-package.cjs.js",
       "module": "dist/valid-package.esm.js",
       "name": "valid-package",
-      "preconstruct": Object {
+      "preconstruct": {
         "umdName": "validPackage",
       },
       "private": true,

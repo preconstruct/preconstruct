@@ -27,20 +27,20 @@ test("reports correct result on valid package", async () => {
 
   await validate(tmpPath);
   expect(logMock.log.mock.calls).toMatchInlineSnapshot(`
-    Array [
-      Array [
+    [
+      [
         "🎁 info valid-package a valid entry point exists.",
       ],
-      Array [
+      [
         "🎁 info valid-package main field is valid",
       ],
-      Array [
+      [
         "🎁 info valid-package module field is valid",
       ],
-      Array [
+      [
         "🎁 info valid-package umd:main field is valid",
       ],
-      Array [
+      [
         "🎁 success project is valid!",
       ],
     ]
@@ -79,14 +79,14 @@ test("no module", async () => {
 
   await validate(tmpPath);
   expect(logMock.log.mock.calls).toMatchInlineSnapshot(`
-    Array [
-      Array [
+    [
+      [
         "🎁 info no-module a valid entry point exists.",
       ],
-      Array [
+      [
         "🎁 info no-module main field is valid",
       ],
-      Array [
+      [
         "🎁 success project is valid!",
       ],
     ]
@@ -116,23 +116,23 @@ test("valid browser", async () => {
 
   await validate(tmpPath);
   expect(logMock.log.mock.calls).toMatchInlineSnapshot(`
-    Array [
-      Array [
+    [
+      [
         "🎁 info valid-package a valid entry point exists.",
       ],
-      Array [
+      [
         "🎁 info valid-package main field is valid",
       ],
-      Array [
+      [
         "🎁 info valid-package module field is valid",
       ],
-      Array [
+      [
         "🎁 info valid-package umd:main field is valid",
       ],
-      Array [
+      [
         "🎁 info valid-package browser field is valid",
       ],
-      Array [
+      [
         "🎁 success project is valid!",
       ],
     ]
@@ -144,14 +144,14 @@ test("monorepo single package", async () => {
 
   await validate(tmpPath);
   expect(logMock.log.mock.calls).toMatchInlineSnapshot(`
-    Array [
-      Array [
+    [
+      [
         "🎁 info @some-scope/package-two-single-package a valid entry point exists.",
       ],
-      Array [
+      [
         "🎁 info @some-scope/package-two-single-package main field is valid",
       ],
-      Array [
+      [
         "🎁 success project is valid!",
       ],
     ]
@@ -231,7 +231,7 @@ test("create package.json for an entrypoint", async () => {
   expect(confirms.createEntrypointPkgJson).toBeCalledTimes(1);
 
   expect(await getPkg(path.join(tmpPath, "other"))).toMatchInlineSnapshot(`
-    Object {
+    {
       "main": "dist/entrypoint-pkg-json-missing-other.cjs.js",
       "module": "dist/entrypoint-pkg-json-missing-other.esm.js",
     }
@@ -621,18 +621,18 @@ test("old dist filenames", async () => {
     `[Error: main field is invalid, found \`"dist/pkg-a.cjs.js"\`, expected \`"dist/something-pkg-a.cjs.js"\`]`
   );
   expect(logMock.log.mock.calls).toMatchInlineSnapshot(`
-    Array [
-      Array [
+    [
+      [
         "🎁 info @something/pkg-a a valid entry point exists.",
       ],
-      Array [
+      [
         "🎁 info it looks like you're using the dist filenames of Preconstruct v1, the default dist filename strategy has changed in v2",
       ],
-      Array [
+      [
         "🎁 info you can run preconstruct fix to use the new dist filenames",
       ],
-      Array [
-        "🎁 info if you want to keep the dist filename strategy of v1, add \`\\"distFilenameStrategy\\": \\"unscoped-package-name\\"\` to the Preconstruct config in your root package.json",
+      [
+        "🎁 info if you want to keep the dist filename strategy of v1, add \`"distFilenameStrategy": "unscoped-package-name"\` to the Preconstruct config in your root package.json",
       ],
     ]
   `);
@@ -651,8 +651,8 @@ test("just wrong dist filenames doesn't report about the changed dist filename s
     `[Error: main field is invalid, found \`"dist/pkg-a-blah.cjs.js"\`, expected \`"dist/something-pkg-a.cjs.js"\`]`
   );
   expect(logMock.log.mock.calls).toMatchInlineSnapshot(`
-    Array [
-      Array [
+    [
+      [
         "🎁 info @something/pkg-a a valid entry point exists.",
       ],
     ]

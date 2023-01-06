@@ -364,7 +364,8 @@ export async function testdir(dir: Fixture) {
 }
 
 expect.addSnapshotSerializer({
-  print(val: Record<string, string>, serialize, indent) {
+  print(_val) {
+    const val = _val as Record<string, string>;
     const contentsByFilename: Record<string, string[]> = {};
     Object.entries(val).forEach(([filename, contents]) => {
       if (contentsByFilename[contents] === undefined) {
