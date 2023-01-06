@@ -282,31 +282,6 @@ test("typescript", async () => {
   ).toMatchSnapshot();
 });
 
-test("typescript with typeScriptProxyFileWithImportEqualsRequireAndExportEquals", async () => {
-  let tmpPath = await testdir({
-    ...typescriptFixture,
-    "package.json": JSON.stringify({
-      ...JSON.parse(typescriptFixture["package.json"]),
-      preconstruct: {
-        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
-          typeScriptProxyFileWithImportEqualsRequireAndExportEquals: true,
-        },
-      },
-    }),
-  });
-
-  await dev(tmpPath);
-
-  await expect(
-    fs.readFile(path.join(tmpPath, "dist", "typescript.cjs.d.ts"), "utf8")
-  ).resolves.toMatchInlineSnapshot(`
-    "import mod = require("../src/index");
-
-    export = mod;
-    "
-  `);
-});
-
 test("exports field with worker condition", async () => {
   let tmpPath = realFs.realpathSync.native(
     await testdir({

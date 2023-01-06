@@ -28,7 +28,6 @@ export class Project extends Item<{
     exports?: JSONValue;
     ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
       logCompiledFiles?: JSONValue;
-      typeScriptProxyFileWithImportEqualsRequireAndExportEquals?: JSONValue;
       keepDynamicImportAsDynamicImportInCommonJS?: JSONValue;
     };
   };
@@ -38,7 +37,6 @@ export class Project extends Item<{
       this.json.preconstruct.___experimentalFlags_WILL_CHANGE_IN_PATCH || {};
     return {
       logCompiledFiles: !!config.logCompiledFiles,
-      typeScriptProxyFileWithImportEqualsRequireAndExportEquals: !!config.typeScriptProxyFileWithImportEqualsRequireAndExportEquals,
       keepDynamicImportAsDynamicImportInCommonJS: !!config.keepDynamicImportAsDynamicImportInCommonJS,
     };
   }
