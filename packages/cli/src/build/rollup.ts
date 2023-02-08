@@ -21,6 +21,7 @@ import { getBaseDistName } from "../utils";
 import { EXTENSIONS } from "../constants";
 import { inlineProcessEnvNodeEnv } from "../rollup-plugins/inline-process-env-node-env";
 import normalizePath from "normalize-path";
+import { serverComponentsPlugin } from "../rollup-plugins/server-components";
 
 type ExternalPredicate = (source: string) => boolean;
 
@@ -175,6 +176,7 @@ export let getRollupConfig = (
       json({
         namedExports: false,
       }),
+      serverComponentsPlugin({ sourceMap: type === "umd" }),
       type === "umd" &&
         alias({
           entries: aliases,
