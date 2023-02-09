@@ -11,7 +11,7 @@ export function serverComponentsPlugin({
     name: "server-components",
 
     transform(code, id) {
-      if (code.includes("'use client'") || code.includes('"use client"')) {
+      if (/['"]use client['"]/.test(code)) {
         const ast: Program = (() => {
           const babelMeta = this.getModuleInfo(id)!.meta.babel;
           if (babelMeta?.codeAtBabelTime === code) {
