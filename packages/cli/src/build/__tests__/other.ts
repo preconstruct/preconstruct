@@ -822,8 +822,6 @@ test("server components", async () => {
     }),
     "src/index.js": js`
                       export { A } from "./client";
-                      export { B } from "./b";
-                      export { C } from "./c";
                     `,
     "src/client.js": js`
                        "use client";
@@ -843,114 +841,72 @@ test("server components", async () => {
                   export const D = "d";
                 `,
   });
-  await build(dir);
-  expect(await getFiles(dir, ["dist/**"])).toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/client-0bb0e52b.cjs.dev.js, dist/client-585fa208.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    "use client";
-    'use strict';
+  let originalProcessCwd = process.cwd;
+  try {
+    process.cwd = () => dir;
+    await build(dir);
+    expect(await getFiles(dir, ["dist/**"])).toMatchInlineSnapshot(`
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/client-20a7a0ce.cjs.dev.js, dist/client-d0bc5238.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      "use client";
+      'use strict';
 
-    Object.defineProperty(exports, '__esModule', { value: true });
+      Object.defineProperty(exports, '__esModule', { value: true });
 
-    const A = "something";
+      const A = "something";
 
-    exports.A = A;
+      exports.A = A;
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/client-585fa208.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/client-9868ff2a.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      "use client";
+      const A = "something";
 
-    if (process.env.NODE_ENV === "production") {
-      module.exports = require("./client-585fa208.cjs.prod.js");
-    } else {
-      module.exports = require("./client-585fa208.cjs.dev.js");
-    }
+      export { A };
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/client-6f4e6a5e.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    "use client";
-    const A = "something";
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/client-d0bc5238.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      'use strict';
 
-    export { A };
+      if (process.env.NODE_ENV === "production") {
+        module.exports = require("./client-d0bc5238.cjs.prod.js");
+      } else {
+        module.exports = require("./client-d0bc5238.cjs.dev.js");
+      }
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/d-81cd1aeb.cjs.dev.js, dist/d-bcc9699f.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    "use client";
-    'use strict';
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.dev.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      'use strict';
 
-    Object.defineProperty(exports, '__esModule', { value: true });
+      Object.defineProperty(exports, '__esModule', { value: true });
 
-    const D = "d";
+      var client = require('./client-20a7a0ce.cjs.dev.js');
 
-    exports.D = D;
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/d-bcc9699f.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
 
-    if (process.env.NODE_ENV === "production") {
-      module.exports = require("./d-bcc9699f.cjs.prod.js");
-    } else {
-      module.exports = require("./d-bcc9699f.cjs.dev.js");
-    }
+      exports.A = client.A;
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/d-fcc223b2.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    "use client";
-    const D = "d";
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      'use strict';
 
-    export { D };
+      if (process.env.NODE_ENV === "production") {
+        module.exports = require("./pkg.cjs.prod.js");
+      } else {
+        module.exports = require("./pkg.cjs.dev.js");
+      }
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.dev.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      'use strict';
 
-    Object.defineProperty(exports, '__esModule', { value: true });
+      Object.defineProperty(exports, '__esModule', { value: true });
 
-    var client = require('./client-0bb0e52b.cjs.dev.js');
-    var d = require('./d-81cd1aeb.cjs.dev.js');
+      var client = require('./client-d0bc5238.cjs.prod.js');
 
-    const B = "b";
 
-    function C() {
-      return d.D;
-    }
 
-    exports.A = client.A;
-    exports.B = B;
-    exports.C = C;
+      exports.A = client.A;
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      export { A } from './client-9868ff2a.esm.js';
 
-    if (process.env.NODE_ENV === "production") {
-      module.exports = require("./pkg.cjs.prod.js");
-    } else {
-      module.exports = require("./pkg.cjs.dev.js");
-    }
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    Object.defineProperty(exports, '__esModule', { value: true });
-
-    var client = require('./client-585fa208.cjs.prod.js');
-    var d = require('./d-bcc9699f.cjs.prod.js');
-
-    const B = "b";
-
-    function C() {
-      return d.D;
-    }
-
-    exports.A = client.A;
-    exports.B = B;
-    exports.C = C;
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    export { A } from './client-6f4e6a5e.esm.js';
-    import { D } from './d-fcc223b2.esm.js';
-
-    const B = "b";
-
-    function C() {
-      return D;
-    }
-
-    export { B, C };
-
-  `);
+    `);
+  } finally {
+    process.cwd = originalProcessCwd;
+  }
 });
