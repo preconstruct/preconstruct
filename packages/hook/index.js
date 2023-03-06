@@ -1,12 +1,33 @@
+"use strict";
 const { addHook } = require("pirates");
 const babel = require("@babel/core");
 const sourceMapSupport = require("source-map-support");
 const path = require("path");
+const url = require("url");
 
 let EXTENSIONS = [".js", ".jsx", ".ts", ".tsx"];
 
 let babelPlugins = [
   require.resolve("@babel/plugin-transform-modules-commonjs"),
+  {
+    visitor: {
+      MemberExpression(path, state) {
+        if (
+          path.node.object.type === "MetaProperty" &&
+          path.node.object.meta.name === "import" &&
+          path.node.object.property.name === "meta" &&
+          !path.node.computed &&
+          path.node.property.name === "url"
+        ) {
+          path.replaceWith(
+            babel.types.stringLiteral(
+              url.pathToFileURL(state.filename).toString()
+            )
+          );
+        }
+      },
+    },
+  },
 ];
 
 exports.___internalHook = (distDir, relativeToRoot, relativeToPkgDir) => {

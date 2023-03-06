@@ -1,6 +1,7 @@
 import spawn from "spawndamnit";
 import path from "path";
 import * as fs from "fs-extra";
+import { pathToFileURL } from "url";
 import * as realFs from "fs";
 import { getFiles, js, testdir, ts, typescriptFixture } from "../../test-utils";
 import dev from "../dev";
@@ -367,4 +368,29 @@ test("flow and .d.ts", async () => {
 
     export const x = "hello";
   `);
+});
+
+test("import.meta.url", async () => {
+  let tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "pkg",
+      main: "dist/pkg.cjs.js",
+      module: "dist/pkg.esm.js",
+    }),
+    "src/index.js": js`
+                      console.log(import.meta.url);
+                    `,
+  });
+  await dev(tmpPath);
+  // i would require it but i don't want jest to do magical things
+  let { code, stdout, stderr } = await spawn("node", [tmpPath], {
+    env: {
+      PATH: process.env.PATH,
+    },
+  });
+  expect(stderr.toString()).toBe("");
+  expect(code).toBe(0);
+  expect(stdout.toString()).toBe(
+    pathToFileURL(path.join(tmpPath, "src/index.js")).toString() + "\n"
+  );
 });
