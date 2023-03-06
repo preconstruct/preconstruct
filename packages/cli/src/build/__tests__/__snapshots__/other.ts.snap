@@ -6,15 +6,12 @@ exports[`browser no module: dist/browser-no-module.browser.cjs.js 1`] = `
 Object.defineProperty(exports, '__esModule', { value: true });
 
 let thing = "wow";
-
 {
   thing = "something";
 }
-
 {
   thing += "other";
 }
-
 var thing$1 = thing;
 
 exports.default = thing$1;
@@ -27,15 +24,12 @@ exports[`browser no module: dist/browser-no-module.cjs.dev.js 1`] = `
 Object.defineProperty(exports, '__esModule', { value: true });
 
 let thing = "wow";
-
 if (typeof window !== "undefined") {
   thing = "something";
 }
-
 if (typeof document !== undefined) {
   thing += "other";
 }
-
 var thing$1 = thing;
 
 exports.default = thing$1;
@@ -59,15 +53,12 @@ exports[`browser no module: dist/browser-no-module.cjs.prod.js 1`] = `
 Object.defineProperty(exports, '__esModule', { value: true });
 
 let thing = "wow";
-
 if (typeof window !== "undefined") {
   thing = "something";
 }
-
 if (typeof document !== undefined) {
   thing += "other";
 }
-
 var thing$1 = thing;
 
 exports.default = thing$1;
@@ -247,11 +238,12 @@ exports[`using external @babel/runtime helpers: dist/external-babel-runtime.cjs.
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
+var _createClass = require('@babel/runtime/helpers/createClass');
 var _classCallCheck = require('@babel/runtime/helpers/classCallCheck');
 
-var Foo = function Foo() {
+var Foo = /*#__PURE__*/_createClass(function Foo() {
   _classCallCheck(this, Foo);
-};
+});
 
 exports.default = Foo;
 "
@@ -273,22 +265,24 @@ exports[`using external @babel/runtime helpers: dist/external-babel-runtime.cjs.
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
+var _createClass = require('@babel/runtime/helpers/createClass');
 var _classCallCheck = require('@babel/runtime/helpers/classCallCheck');
 
-var Foo = function Foo() {
+var Foo = /*#__PURE__*/_createClass(function Foo() {
   _classCallCheck(this, Foo);
-};
+});
 
 exports.default = Foo;
 "
 `;
 
 exports[`using external @babel/runtime helpers: dist/external-babel-runtime.esm.js 1`] = `
-"import _classCallCheck from '@babel/runtime/helpers/esm/classCallCheck';
+"import _createClass from '@babel/runtime/helpers/esm/createClass';
+import _classCallCheck from '@babel/runtime/helpers/esm/classCallCheck';
 
-var Foo = function Foo() {
+var Foo = /*#__PURE__*/_createClass(function Foo() {
   _classCallCheck(this, Foo);
-};
+});
 
 export default Foo;
 "

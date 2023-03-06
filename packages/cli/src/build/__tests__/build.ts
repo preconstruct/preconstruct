@@ -631,11 +631,12 @@ test("using @babel/plugin-transform-runtime with useESModules: true", async () =
 
     Object.defineProperty(exports, '__esModule', { value: true });
 
+    var _createClass = require('@babel/runtime/helpers/createClass');
     var _classCallCheck = require('@babel/runtime/helpers/classCallCheck');
 
-    var Thing = function Thing() {
+    var Thing = /*#__PURE__*/_createClass(function Thing() {
       _classCallCheck(this, Thing);
-    };
+    });
 
     exports.Thing = Thing;
 
@@ -649,11 +650,12 @@ test("using @babel/plugin-transform-runtime with useESModules: true", async () =
     }
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    import _createClass from '@babel/runtime/helpers/esm/createClass';
     import _classCallCheck from '@babel/runtime/helpers/esm/classCallCheck';
 
-    var Thing = function Thing() {
+    var Thing = /*#__PURE__*/_createClass(function Thing() {
       _classCallCheck(this, Thing);
-    };
+    });
 
     export { Thing };
 

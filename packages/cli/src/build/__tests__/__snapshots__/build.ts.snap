@@ -425,7 +425,6 @@ function thing() {
   if (process.env.NODE_ENV !== "production") {
     return "not prod";
   }
-
   return "prod";
 }
 
@@ -450,7 +449,6 @@ exports[`prod checks: prod-checks.cjs.prod.js 1`] = `
 Object.defineProperty(exports, '__esModule', { value: true });
 
 function thing() {
-
   return "prod";
 }
 

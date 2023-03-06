@@ -55,30 +55,24 @@ test("browser", async () => {
     Object.defineProperty(exports, '__esModule', { value: true });
 
     let thing = "wow";
-
     {
       thing = "something";
     }
-
     {
       thing += "other";
     }
-
     var thing$1 = thing;
 
     exports.default = thing$1;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/browser.browser.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     let thing = "wow";
-
     {
       thing = "something";
     }
-
     {
       thing += "other";
     }
-
     var thing$1 = thing;
 
     export default thing$1;
@@ -89,15 +83,12 @@ test("browser", async () => {
     Object.defineProperty(exports, '__esModule', { value: true });
 
     let thing = "wow";
-
     if (typeof window !== "undefined") {
       thing = "something";
     }
-
     if (typeof document !== undefined) {
       thing += "other";
     }
-
     var thing$1 = thing;
 
     exports.default = thing$1;
@@ -113,15 +104,12 @@ test("browser", async () => {
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/browser.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     let thing = "wow";
-
     if (typeof window !== "undefined") {
       thing = "something";
     }
-
     if (typeof document !== undefined) {
       thing += "other";
     }
-
     var thing$1 = thing;
 
     export default thing$1;
