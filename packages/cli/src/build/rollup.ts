@@ -68,9 +68,11 @@ export let getRollupConfig = (
 
   entrypoints.forEach((entrypoint) => {
     input[
-      path.relative(
-        pkg.directory,
-        path.join(entrypoint.directory, "dist", getBaseDistName(entrypoint))
+      normalizePath(
+        path.relative(
+          pkg.directory,
+          path.join(entrypoint.directory, "dist", getBaseDistName(entrypoint))
+        )
       )
     ] = entrypoint.source;
   });
