@@ -63,7 +63,7 @@ test("browser", async () => {
     }
     var thing$1 = thing;
 
-    exports.default = thing$1;
+    exports["default"] = thing$1;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/browser.browser.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     let thing = "wow";
@@ -75,7 +75,7 @@ test("browser", async () => {
     }
     var thing$1 = thing;
 
-    export default thing$1;
+    export { thing$1 as default };
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/browser.cjs.dev.js, dist/browser.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
@@ -91,7 +91,7 @@ test("browser", async () => {
     }
     var thing$1 = thing;
 
-    exports.default = thing$1;
+    exports["default"] = thing$1;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/browser.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
@@ -112,7 +112,7 @@ test("browser", async () => {
     }
     var thing$1 = thing;
 
-    export default thing$1;
+    export { thing$1 as default };
 
   `);
 });
@@ -189,14 +189,12 @@ test("typescript", async () => {
     				var d = Object.getOwnPropertyDescriptor(e, k);
     				Object.defineProperty(n, k, d.get ? d : {
     					enumerable: true,
-    					get: function () {
-    						return e[k];
-    					}
+    					get: function () { return e[k]; }
     				});
     			}
     		});
     	}
-    	n['default'] = e;
+    	n["default"] = e;
     	return Object.freeze(n);
     }
 
@@ -207,7 +205,7 @@ test("typescript", async () => {
     let thing = "something";
 
     exports.path = path__namespace;
-    exports.default = thing;
+    exports["default"] = thing;
     exports.obj = obj;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
@@ -227,8 +225,7 @@ test("typescript", async () => {
 
     let thing = "something";
 
-    export default thing;
-    export { obj };
+    export { thing as default, obj };
 
   `);
 });
@@ -650,7 +647,7 @@ test("builds package using eval", async () => {
       return eval(arg);
     }
 
-    exports.default = compute;
+    exports["default"] = compute;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
@@ -718,9 +715,7 @@ test("builds umd with a dependency containing top-level this in ESM", async () =
 
     Object.defineProperty(exports, 'default', {
     	enumerable: true,
-    	get: function () {
-    		return withTopLevelThisInEsm__default['default'];
-    	}
+    	get: function () { return withTopLevelThisInEsm__default["default"]; }
     });
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯

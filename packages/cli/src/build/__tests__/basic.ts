@@ -628,18 +628,6 @@ test("does not duplicate babel helpers when using @babel/plugin-transform-runtim
       };
     }
 
-    var _iterator = _createForOfIteratorHelper(something),
-      _step;
-    try {
-      for (_iterator.s(); !(_step = _iterator.n()).done;) {
-        var x = _step.value;
-      }
-    } catch (err) {
-      _iterator.e(err);
-    } finally {
-      _iterator.f();
-    }
-
     var _iterator$1 = _createForOfIteratorHelper(something),
       _step$1;
     try {
@@ -650,6 +638,18 @@ test("does not duplicate babel helpers when using @babel/plugin-transform-runtim
       _iterator$1.e(err);
     } finally {
       _iterator$1.f();
+    }
+
+    var _iterator = _createForOfIteratorHelper(something),
+      _step;
+    try {
+      for (_iterator.s(); !(_step = _iterator.n()).done;) {
+        var x = _step.value;
+      }
+    } catch (err) {
+      _iterator.e(err);
+    } finally {
+      _iterator.f();
     }
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
@@ -751,18 +751,6 @@ test("does not duplicate babel helpers when not using @babel/plugin-transform-ru
       };
     }
 
-    var _iterator = _createForOfIteratorHelper(something),
-      _step;
-    try {
-      for (_iterator.s(); !(_step = _iterator.n()).done;) {
-        var x = _step.value;
-      }
-    } catch (err) {
-      _iterator.e(err);
-    } finally {
-      _iterator.f();
-    }
-
     var _iterator$1 = _createForOfIteratorHelper(something),
       _step$1;
     try {
@@ -773,6 +761,18 @@ test("does not duplicate babel helpers when not using @babel/plugin-transform-ru
       _iterator$1.e(err);
     } finally {
       _iterator$1.f();
+    }
+
+    var _iterator = _createForOfIteratorHelper(something),
+      _step;
+    try {
+      for (_iterator.s(); !(_step = _iterator.n()).done;) {
+        var x = _step.value;
+      }
+    } catch (err) {
+      _iterator.e(err);
+    } finally {
+      _iterator.f();
     }
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
@@ -809,18 +809,6 @@ test("imports helpers for a helper only available in a newer version of @babel/r
 
     var _createForOfIteratorHelper = require('@babel/runtime/helpers/createForOfIteratorHelper');
 
-    var _iterator = _createForOfIteratorHelper(something),
-      _step;
-    try {
-      for (_iterator.s(); !(_step = _iterator.n()).done;) {
-        var x = _step.value;
-      }
-    } catch (err) {
-      _iterator.e(err);
-    } finally {
-      _iterator.f();
-    }
-
     var _iterator$1 = _createForOfIteratorHelper(something),
       _step$1;
     try {
@@ -831,6 +819,18 @@ test("imports helpers for a helper only available in a newer version of @babel/r
       _iterator$1.e(err);
     } finally {
       _iterator$1.f();
+    }
+
+    var _iterator = _createForOfIteratorHelper(something),
+      _step;
+    try {
+      for (_iterator.s(); !(_step = _iterator.n()).done;) {
+        var x = _step.value;
+      }
+    } catch (err) {
+      _iterator.e(err);
+    } finally {
+      _iterator.f();
     }
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
@@ -858,30 +858,30 @@ test("new dist filenames", async () => {
   });
   await build(dir);
   await expect(getDist(dir)).resolves.toMatchInlineSnapshot(`
-          ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.cjs.dev.js, dist/scope-test.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-          'use strict';
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.cjs.dev.js, dist/scope-test.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
 
-          Object.defineProperty(exports, '__esModule', { value: true });
+    Object.defineProperty(exports, '__esModule', { value: true });
 
-          var index = "something";
+    var index = "something";
 
-          exports.default = index;
+    exports["default"] = index;
 
-          ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-          'use strict';
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
 
-          if (process.env.NODE_ENV === "production") {
-            module.exports = require("./scope-test.cjs.prod.js");
-          } else {
-            module.exports = require("./scope-test.cjs.dev.js");
-          }
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./scope-test.cjs.prod.js");
+    } else {
+      module.exports = require("./scope-test.cjs.dev.js");
+    }
 
-          ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-          var index = "something";
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    var index = "something";
 
-          export default index;
+    export { index as default };
 
-        `);
+  `);
 });
 
 test("UMD with dep that uses process.env.NODE_ENV", async () => {
@@ -910,34 +910,34 @@ test("UMD with dep that uses process.env.NODE_ENV", async () => {
   });
   await build(dir);
   await expect(getDist(dir)).resolves.toMatchInlineSnapshot(`
-          ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.cjs.dev.js, dist/scope-test.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-          'use strict';
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.cjs.dev.js, dist/scope-test.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
 
-          Object.defineProperty(exports, '__esModule', { value: true });
+    Object.defineProperty(exports, '__esModule', { value: true });
 
-          var somewhere = require('somewhere');
+    var somewhere = require('somewhere');
 
-          console.log(somewhere.x);
-          var index = "something";
+    console.log(somewhere.x);
+    var index = "something";
 
-          exports.default = index;
+    exports["default"] = index;
 
-          ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-          'use strict';
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
 
-          if (process.env.NODE_ENV === "production") {
-            module.exports = require("./scope-test.cjs.prod.js");
-          } else {
-            module.exports = require("./scope-test.cjs.dev.js");
-          }
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./scope-test.cjs.prod.js");
+    } else {
+      module.exports = require("./scope-test.cjs.dev.js");
+    }
 
-          ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.umd.min.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-          !function(e,o){"object"==typeof exports&&"undefined"!=typeof module?module.exports=o():"function"==typeof define&&define.amd?define(o):(e="undefined"!=typeof globalThis?globalThis:e||self).test=o()}(this,(function(){"use strict";console.log("production");return"something"}));
-          //# sourceMappingURL=scope-test.umd.min.js.map
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.umd.min.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    !function(e,o){"object"==typeof exports&&"undefined"!=typeof module?module.exports=o():"function"==typeof define&&define.amd?define(o):(e="undefined"!=typeof globalThis?globalThis:e||self).test=o()}(this,(function(){"use strict";console.log("production");return"something"}));
+    //# sourceMappingURL=scope-test.umd.min.js.map
 
-          ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.umd.min.js.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-          {"version":3,"file":"scope-test.umd.min.js","sources":["../src/index.js"],"sourcesContent":["import { x } from \\"somewhere\\";\\nconsole.log(x);\\nexport default \\"something\\";"],"names":["console","log"],"mappings":"qOACAA,QAAQC,wBACO"}
-        `);
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.umd.min.js.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {"version":3,"file":"scope-test.umd.min.js","sources":["../src/index.js","../node_modules/somewhere/index.js"],"sourcesContent":["import { x } from \\"somewhere\\";\\nconsole.log(x);\\nexport default \\"something\\";","export let x = process.env.NODE_ENV;"],"names":["console","log"],"mappings":"qOACAA,QAAQC,ICD2B,oBDEpB"}
+  `);
 });
 
 test("UMD build with process.env.NODE_ENV and typeof document", async () => {
@@ -971,7 +971,7 @@ test("UMD build with process.env.NODE_ENV and typeof document", async () => {
       console.log(process.env.NODE_ENV);
     };
 
-    exports.default = thing;
+    exports["default"] = thing;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
@@ -991,14 +991,14 @@ test("UMD build with process.env.NODE_ENV and typeof document", async () => {
       console.log(        "production");
     };
 
-    exports.default = thing;
+    exports["default"] = thing;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.umd.min.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     !function(e,o){"object"==typeof exports&&"undefined"!=typeof module?module.exports=o():"function"==typeof define&&define.amd?define(o):(e="undefined"!=typeof globalThis?globalThis:e||self).x=o()}(this,(function(){"use strict";return()=>{console.log("production")}}));
     //# sourceMappingURL=scope-test.umd.min.js.map
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.umd.min.js.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    {"version":3,"file":"scope-test.umd.min.js","sources":["../src/index.js"],"sourcesContent":["let x = typeof document;\\n\\nconst thing = () => {\\n  console.log(process.env.NODE_ENV);\\n};\\n\\nexport default thing;"],"names":["thing","console","log"],"mappings":"wOAEcA,KACZC,QAAQC"}
+    {"version":3,"file":"scope-test.umd.min.js","sources":["../src/index.js"],"sourcesContent":["let x = typeof document;\\n\\nconst thing = () => {\\n  console.log(process.env.NODE_ENV);\\n};\\n\\nexport default thing;"],"names":["thing","console","log","process"],"mappings":"wOAEcA,KACZC,QAAQC,IAAIC"}
   `);
 });
 
@@ -1203,7 +1203,7 @@ test("node: is external", async () => {
 
     var fs__default = /*#__PURE__*/_interopDefault(fs);
 
-    fs__default['default'].writeFileSync("test.txt", "test");
+    fs__default["default"].writeFileSync("test.txt", "test");
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
