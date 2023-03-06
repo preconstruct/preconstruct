@@ -76,6 +76,7 @@ async function entrypointHasDefaultExport(
             (specifier.type === "ExportDefaultSpecifier" ||
               specifier.type === "ExportNamespaceSpecifier" ||
               specifier.type === "ExportSpecifier") &&
+            specifier.exported.type === "Identifier" &&
             specifier.exported.name === "default"
         ))
     ) {
