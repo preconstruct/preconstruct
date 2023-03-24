@@ -1,5 +1,11 @@
 # preconstruct
 
+## 2.4.0
+
+### Minor Changes
+
+- [#516](https://github.com/preconstruct/preconstruct/pull/516) [`d363c88`](https://github.com/preconstruct/preconstruct/commit/d363c880e462758f32e899eb1984d59a4f0cdb8d) Thanks [@emmatown](https://github.com/emmatown)! - Modules with `"use client"` directives are now built as their own chunk with the `"use client"` directive preserved.
+
 ## 2.3.0
 
 ### Minor Changes
