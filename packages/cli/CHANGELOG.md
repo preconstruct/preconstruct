@@ -1,5 +1,11 @@
 # preconstruct
 
+## 2.4.1
+
+### Patch Changes
+
+- [`457b707`](https://github.com/preconstruct/preconstruct/commit/457b707722051219165bb39e673e0b1f3dfdfafd) Thanks [@emmatown](https://github.com/emmatown)! - Fix having a `"use client"` in a non-entrypoint TypeScript file breaking the build
+
 ## 2.4.0
 
 ### Minor Changes
