@@ -97,7 +97,13 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
         );
 
         if (!typeScriptSource) {
-          // a user should never be able to cause this to happen
+          const moduleInfo = this.getModuleInfo(file.facadeModuleId);
+          // this will happen for "use client" modules where it's not an entrypoint
+          // but from rollup's perspective it sort of is since it gets it's own explicit chunk
+          if (moduleInfo?.meta.isUseClientEntry) {
+            continue;
+          }
+          // otherwise, a user should never be able to cause this to happen
           throw new FatalError(
             `no TypeScript source file was found for the entrypoint at ${facadeModuleId}`,
             pkg.name
