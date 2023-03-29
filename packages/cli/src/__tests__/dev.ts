@@ -250,26 +250,20 @@ test("flow", async () => {
 
   await dev(tmpPath);
 
-  expect(
-    await fs.readFile(
-      path.join(tmpPath, "dist", "flow-dev.cjs.js.flow"),
-      "utf8"
-    )
-  ).toMatchSnapshot();
+  expect(await getFiles(tmpPath, ["**/*.flow"])).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ a/dist/flow-dev-a.cjs.js.flow ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    // @flow
+    export * from "../../src/a.js";
 
-  expect(
-    await fs.readFile(
-      path.join(tmpPath, "a", "dist", "flow-dev-a.cjs.js.flow"),
-      "utf8"
-    )
-  ).toMatchSnapshot();
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ b/dist/flow-dev-b.cjs.js.flow ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    // @flow
+    export * from "../../src/b.js";
 
-  expect(
-    await fs.readFile(
-      path.join(tmpPath, "b", "dist", "flow-dev-b.cjs.js.flow"),
-      "utf8"
-    )
-  ).toMatchSnapshot();
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/flow-dev.cjs.js.flow ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    // @flow
+    export * from "../src/index.js";
+
+  `);
 });
 
 test("typescript", async () => {
@@ -277,9 +271,31 @@ test("typescript", async () => {
 
   await dev(tmpPath);
 
-  expect(
-    await fs.readFile(path.join(tmpPath, "dist", "typescript.cjs.d.ts"), "utf8")
-  ).toMatchSnapshot();
+  expect(await getFiles(tmpPath, ["**/*.d.ts{,.map}", "!node_modules/**"]))
+    .toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    // are you seeing an error that a default export doesn't exist but your source file has a default export?
+    // you should run \`yarn\` or \`yarn preconstruct dev\` if preconstruct dev isn't in your postinstall hook
+
+    // curious why you need to?
+    // this file exists so that you can import from the entrypoint normally
+    // except that it points to your source file and you don't need to run build constantly
+    // which means we need to re-export all of the modules from your source file
+    // and since export * doesn't include default exports, we need to read your source file
+    // to check for a default export and re-export it if it exists
+    // it's not ideal, but it works pretty well ¯\\_(ツ)_/¯
+    export * from "../src/index";
+    export { default } from "../src/index";
+    //# sourceMappingURL=typescript.cjs.d.ts.map
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.cjs.d.ts.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {"version":3,"file":"typescript.cjs.d.ts","sourceRoot":"","sources":["../src/index.ts"],"names":[],"mappings":"AAAA"}
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ src/one-more-thing.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    declare var obj: object;
+
+    export { obj };
+  `);
 });
 
 test("exports field with worker condition", async () => {
@@ -357,6 +373,10 @@ test("flow and .d.ts", async () => {
     // to check for a default export and re-export it if it exists
     // it's not ideal, but it works pretty well ¯\\_(ツ)_/¯
     export * from "../src/index.js";
+    //# sourceMappingURL=pkg.cjs.d.ts.map
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.d.ts.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {"version":3,"file":"pkg.cjs.d.ts","sourceRoot":"","sources":["../src/index.js"],"names":[],"mappings":"AAAA"}
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.js.flow ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     // @flow
