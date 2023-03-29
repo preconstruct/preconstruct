@@ -1,5 +1,11 @@
 # preconstruct
 
+## 2.4.2
+
+### Patch Changes
+
+- [#530](https://github.com/preconstruct/preconstruct/pull/530) [`2a3722c`](https://github.com/preconstruct/preconstruct/commit/2a3722c41fce82ec269b63967e2a23b609f8799a) Thanks [@emmatown](https://github.com/emmatown)! - Generate declaration maps for the `.d.ts` files that only re-export the actual entrypoints so that go to definition goes directly to the actual entrypoints.
+
 ## 2.4.1
 
 ### Patch Changes
