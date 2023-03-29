@@ -123,9 +123,11 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
         }
 
         let mainFieldPath = file.fileName.replace(/\.prod\.js$/, "");
-        let relativeToSource = path.relative(
-          path.dirname(path.join(opts.dir!, file.fileName)),
-          dtsFilename.replace(/\.d\.ts$/, "")
+        let relativeToSource = normalizePath(
+          path.relative(
+            path.dirname(path.join(opts.dir!, file.fileName)),
+            dtsFilename.replace(/\.d\.ts$/, "")
+          )
         );
         if (!relativeToSource.startsWith(".")) {
           relativeToSource = `./${relativeToSource}`;
@@ -135,7 +137,7 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
         const dtsFileSource = tsTemplate(
           baseDtsFilename,
           file.exports.includes("default"),
-          normalizePath(relativeToSource)
+          relativeToSource
         );
         this.emitFile({
           type: "asset",
