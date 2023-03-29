@@ -65,6 +65,12 @@ exports[`typescript thing: declarations/src/thing.d.ts 1`] = `
 
 exports[`typescript thing: weird-typescript-thing.cjs.d.ts 1`] = `
 "export * from "./declarations/src/index";
+//# sourceMappingURL=weird-typescript-thing.cjs.d.ts.map
+"
+`;
+
+exports[`typescript thing: weird-typescript-thing.cjs.d.ts.map 1`] = `
+"{"version":3,"file":"weird-typescript-thing.cjs.d.ts","sourceRoot":"","sources":["./declarations/src/index.d.ts"],"names":[],"mappings":"AAAA"}
 "
 `;
 

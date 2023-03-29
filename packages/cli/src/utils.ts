@@ -186,11 +186,31 @@ export * from ${escapedPath};${
   }\n`;
 }
 
-export function tsTemplate(hasDefaultExport: boolean, relativePath: string) {
+export function tsTemplate(
+  filename: string,
+  hasDefaultExport: boolean,
+  relativePath: string
+) {
   const escapedPath = JSON.stringify(relativePath);
   return `export * from ${escapedPath};${
     hasDefaultExport ? `\nexport { default } from ${escapedPath};` : ""
-  }\n`;
+  }\n//# sourceMappingURL=${filename}.map\n`;
+}
+
+export function tsReexportDeclMap(
+  dtsFilename: string,
+  relativePathWithExtension: string
+) {
+  return (
+    JSON.stringify({
+      version: 3,
+      file: dtsFilename,
+      sourceRoot: "",
+      sources: [relativePathWithExtension],
+      names: [],
+      mappings: "AAAA",
+    }) + "\n"
+  );
 }
 
 export type JSONValue =
