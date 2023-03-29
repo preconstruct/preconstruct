@@ -49,36 +49,40 @@ test("monorepo with root src dir and typescript package", async () => {
 
   expect(await getDist(tmpPath + "/src/packages/my-package"))
     .toMatchInlineSnapshot(`
-  ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/index.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-  declare const _default: {};
-  export default _default;
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/index.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    declare const _default: {};
+    export default _default;
 
-  ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/my-package.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-  export * from "./declarations/src/index";
-  export { default } from "./declarations/src/index";
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/my-package.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export * from "./declarations/src/index";
+    export { default } from "./declarations/src/index";
+    //# sourceMappingURL=my-package.cjs.d.ts.map
 
-  ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/my-package.cjs.dev.js, dist/my-package.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-  'use strict';
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/my-package.cjs.d.ts.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {"version":3,"file":"my-package.cjs.d.ts","sourceRoot":"","sources":["./declarations/src/index.d.ts"],"names":[],"mappings":"AAAA"}
 
-  Object.defineProperty(exports, '__esModule', { value: true });
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/my-package.cjs.dev.js, dist/my-package.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
 
-  var index = {};
+    Object.defineProperty(exports, '__esModule', { value: true });
 
-  exports.default = index;
+    var index = {};
 
-  ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/my-package.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-  'use strict';
+    exports.default = index;
 
-  if (process.env.NODE_ENV === "production") {
-    module.exports = require("./my-package.cjs.prod.js");
-  } else {
-    module.exports = require("./my-package.cjs.dev.js");
-  }
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/my-package.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
 
-  ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/my-package.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-  var index = {};
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./my-package.cjs.prod.js");
+    } else {
+      module.exports = require("./my-package.cjs.dev.js");
+    }
 
-  export default index;
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/my-package.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    var index = {};
 
-`);
+    export default index;
+
+  `);
 });

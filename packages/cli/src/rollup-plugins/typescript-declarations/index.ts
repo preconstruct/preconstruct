@@ -4,7 +4,7 @@ import { Plugin } from "rollup";
 import fs from "fs-extra";
 import { Package } from "../../package";
 import { getDeclarations } from "./get-declarations";
-import { tsTemplate } from "../../utils";
+import { tsReexportDeclMap, tsTemplate } from "../../utils";
 import normalizePath from "normalize-path";
 import { overwriteDeclarationMapSourceRoot } from "./common";
 
@@ -130,15 +130,25 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
         if (!relativeToSource.startsWith(".")) {
           relativeToSource = `./${relativeToSource}`;
         }
-        let tsFileSource = tsTemplate(
+        const dtsFileName = `${mainFieldPath}.d.ts`;
+        const baseDtsFilename = path.basename(dtsFileName);
+        const dtsFileSource = tsTemplate(
+          baseDtsFilename,
           file.exports.includes("default"),
           normalizePath(relativeToSource)
         );
-        let tsFileName = mainFieldPath + ".d.ts";
         this.emitFile({
           type: "asset",
-          fileName: tsFileName,
-          source: tsFileSource,
+          fileName: dtsFileName,
+          source: dtsFileSource,
+        });
+        this.emitFile({
+          type: "asset",
+          fileName: `${dtsFileName}.map`,
+          source: tsReexportDeclMap(
+            baseDtsFilename,
+            `${relativeToSource}.d.ts`
+          ),
         });
       }
     },

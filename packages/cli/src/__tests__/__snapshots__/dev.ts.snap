@@ -31,5 +31,6 @@ exports[`typescript 1`] = `
 // it's not ideal, but it works pretty well ¯\\_(ツ)_/¯
 export * from "../src/index";
 export { default } from "../src/index";
+//# sourceMappingURL=typescript.cjs.d.ts.map
 "
 `;

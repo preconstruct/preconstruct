@@ -5,6 +5,7 @@ import {
   flowTemplate,
   validFieldsForEntrypoint,
   getExportsFieldOutputPath,
+  tsReexportDeclMap,
 } from "./utils";
 import * as babel from "@babel/core";
 import * as fs from "fs-extra";
@@ -90,11 +91,15 @@ export async function writeDevTSFile(
   entrypoint: Entrypoint,
   entrypointSourceContent: string
 ) {
-  let cjsDistPath = path
+  const dtsReexportFilename = path
     .join(entrypoint.directory, validFieldsForEntrypoint.main(entrypoint))
     .replace(/\.js$/, ".d.ts");
 
-  let output = await entrypointHasDefaultExport(
+  const baseDtsFilename = path.basename(dtsReexportFilename);
+  const relativePathWithExtension = normalizePath(
+    path.relative(path.dirname(dtsReexportFilename), entrypoint.source)
+  );
+  const output = await entrypointHasDefaultExport(
     entrypoint,
     entrypointSourceContent
   ).then(
@@ -111,16 +116,19 @@ export async function writeDevTSFile(
 // it's not ideal, but it works pretty well ¯\\_(ツ)_/¯
 ` +
       tsTemplate(
+        baseDtsFilename,
         hasDefaultExport,
-        normalizePath(
-          path
-            .relative(path.dirname(cjsDistPath), entrypoint.source)
-            .replace(/\.tsx?$/, "")
-        )
+        relativePathWithExtension.replace(/\.tsx?$/, "")
       )
   );
 
-  await fs.outputFile(cjsDistPath, output);
+  await Promise.all([
+    fs.outputFile(dtsReexportFilename, output),
+    fs.outputFile(
+      dtsReexportFilename + ".map",
+      tsReexportDeclMap(baseDtsFilename, relativePathWithExtension)
+    ),
+  ]);
 }
 
 async function writeDevFlowFile(entrypoint: Entrypoint) {

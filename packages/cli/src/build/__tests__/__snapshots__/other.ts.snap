@@ -154,6 +154,12 @@ export declare type RootState = ReturnType<typeof rootReducer>;
 
 exports[`typescript with forced dts emit: dist/typescript-force-dts-emit.cjs.d.ts 1`] = `
 "export * from "./declarations/src/index";
+//# sourceMappingURL=typescript-force-dts-emit.cjs.d.ts.map
+"
+`;
+
+exports[`typescript with forced dts emit: dist/typescript-force-dts-emit.cjs.d.ts.map 1`] = `
+"{"version":3,"file":"typescript-force-dts-emit.cjs.d.ts","sourceRoot":"","sources":["./declarations/src/index.d.ts"],"names":[],"mappings":"AAAA"}
 "
 `;
 
