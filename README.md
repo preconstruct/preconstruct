@@ -3,7 +3,7 @@
 > Dev and build your code painlessly in monorepos
 
 <p>
-  <a aria-label="NPM version" href="https://www.npmjs.com/package/@preconstruct/cli.svg">
+  <a aria-label="NPM version" href="https://www.npmjs.com/package/@preconstruct/cli">
     <img alt="" src="https://img.shields.io/npm/v/@preconstruct/cli.svg?style=for-the-badge&labelColor=0869B8">
   </a>
   <a aria-label="License" href="#">
