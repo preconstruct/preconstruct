@@ -1,5 +1,11 @@
 # preconstruct
 
+## 2.4.3
+
+### Patch Changes
+
+- [`7f6618a`](https://github.com/preconstruct/preconstruct/commit/7f6618a8209e3bfa256c148f03c09bcd5c8881f7) Thanks [@emmatown](https://github.com/emmatown)! - Remove comment for `preconstruct dev` TypeScript re-export file
+
 ## 2.4.2
 
 ### Patch Changes
