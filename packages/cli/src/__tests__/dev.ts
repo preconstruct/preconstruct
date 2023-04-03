@@ -41,17 +41,17 @@ test("dev command works in node", async () => {
     }),
 
     "packages/package-one/src/index.js": js`
-                                           import { message } from "@my-cool-scope/package-two";
+      import { message } from "@my-cool-scope/package-two";
 
-                                           console.log("message from package one");
-                                           console.log(message);
-                                         `,
+      console.log("message from package one");
+      console.log(message);
+    `,
 
     "packages/package-two/src/index.js": js`
-                                           console.log("message from package two");
+      console.log("message from package two");
 
-                                           export let message = "message from package two but logged by package one";
-                                         `,
+      export let message = "message from package two but logged by package one";
+    `,
   });
 
   await dev(tmpPath);
@@ -86,8 +86,8 @@ test("all the build types", async () => {
         },
       }),
       "src/index.js": js`
-                        export default "some cool thing";
-                      `,
+        export default "some cool thing";
+      `,
     })
   );
 
@@ -169,12 +169,12 @@ test("source maps work", async () => {
       presets: [require.resolve("@babel/preset-env")],
     }),
     "src/index.js": js`
-                      class Bar {}
+      class Bar {}
 
-                      export class Foo extends Bar {}
+      export class Foo extends Bar {}
 
-                      throw new Error("i'm thrown on line 5");
-                    `,
+      throw new Error("i'm thrown on line 5");
+    `,
   });
 
   await dev(tmpPath);
@@ -228,24 +228,24 @@ test("flow", async () => {
     }),
 
     "src/index.js": js`
-                      // @flow
+      // @flow
 
-                      export let something = true;
-                    `,
+      export let something = true;
+    `,
 
     "src/a.js": js`
-                  // @flow
+      // @flow
 
-                  export default "something";
-                `,
+      export default "something";
+    `,
 
     "src/b.js": js`
-                  // @flow
+      // @flow
 
-                  let something = true;
+      let something = true;
 
-                  export { something as default };
-                `,
+      export { something as default };
+    `,
   });
 
   await dev(tmpPath);
@@ -340,13 +340,13 @@ test("flow and .d.ts", async () => {
       module: "dist/pkg.esm.js",
     }),
     "src/index.js": js`
-                      // @flow
+      // @flow
 
-                      export const x = "hello";
-                    `,
+      export const x = "hello";
+    `,
     "src/index.d.ts": ts`
-                        export const x: string;
-                      `,
+      export const x: string;
+    `,
   });
   await dev(tmpPath);
   const files = await getFiles(tmpPath, ["dist/**", "!dist/pkg.cjs.js"]);

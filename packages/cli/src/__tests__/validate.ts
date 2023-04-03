@@ -56,10 +56,10 @@ test("no main field", async () => {
     }),
 
     "src/index.js": js`
-                      // @flow
+      // @flow
 
-                      export default "something";
-                    `,
+      export default "something";
+    `,
   });
 
   try {
@@ -184,20 +184,20 @@ test("one-entrypoint-with-browser-field-one-without", async () => {
     }),
 
     "src/identity.js": js`
-                         export let identity = (x) => x;
-                       `,
+      export let identity = (x) => x;
+    `,
 
     "src/multiply.js": js`
-                         import { identity } from "./identity";
+      import { identity } from "./identity";
 
-                         export let multiply = (a, b) => identity(a * b);
-                       `,
+      export let multiply = (a, b) => identity(a * b);
+    `,
 
     "src/index.js": js`
-                      import { identity } from "./identity";
+      import { identity } from "./identity";
 
-                      export let sum = (a, b) => identity(a + b);
-                    `,
+      export let sum = (a, b) => identity(a + b);
+    `,
   });
   await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
     `[Error: one-entrypoint-with-browser-field-one-without/multiply has a browser build but one-entrypoint-with-browser-field-one-without does not have a browser build. Entrypoints in a package must either all have a particular build type or all not have a particular build type.]`
@@ -217,12 +217,12 @@ test("create package.json for an entrypoint", async () => {
     }),
 
     "src/index.js": js`
-                      export default "something";
-                    `,
+      export default "something";
+    `,
 
     "src/other.js": js`
-                      export default "something";
-                    `,
+      export default "something";
+    `,
   });
   confirms.createEntrypointPkgJson.mockReturnValue(Promise.resolve(true));
 
@@ -338,24 +338,24 @@ test("monorepo umd with dep on other module incorrect peerDeps", async () => {
     }),
 
     "packages/package-four/src/index.js": js`
-                                            import "@some-scope/package-one-umd-with-dep";
-                                          `,
+      import "@some-scope/package-one-umd-with-dep";
+    `,
 
     "packages/package-one/src/index.js": js`
-                                           import { createElement } from "react";
+      import { createElement } from "react";
 
-                                           createElement("div", null);
-                                         `,
+      createElement("div", null);
+    `,
 
     "packages/package-three/src/index.js": js`
-                                             import "@some-scope/package-one-umd-with-dep";
-                                           `,
+      import "@some-scope/package-one-umd-with-dep";
+    `,
 
     "packages/package-two/src/index.js": js`
-                                           import { createElement } from "react";
+      import { createElement } from "react";
 
-                                           createElement("h1", null);
-                                         `,
+      createElement("h1", null);
+    `,
   });
 
   try {
@@ -379,8 +379,8 @@ test("dist not included in package", async () => {
     }),
 
     "src/index.js": js`
-                      export default "something";
-                    `,
+      export default "something";
+    `,
   });
 
   try {
@@ -414,12 +414,12 @@ test("entrypoint not included in package", async () => {
     }),
 
     "src/multiply.js": js`
-                         export let multiply = (a, b) => a * b;
-                       `,
+      export let multiply = (a, b) => a * b;
+    `,
 
     "src/index.js": js`
-                      export let sum = (a, b) => a + b;
-                    `,
+      export let sum = (a, b) => a + b;
+    `,
   });
 
   try {
@@ -446,8 +446,8 @@ test("root dist directory not included in package without entrypoint at root", a
       main: "dist/pkg-a.cjs.js",
     }),
     "src/other.js": js`
-                      export let x = true;
-                    `,
+      export let x = true;
+    `,
   });
 
   await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(`
@@ -478,12 +478,12 @@ test("new entrypoints with old config", async () => {
     }),
 
     "src/multiply.js": js`
-                         export let multiply = (a, b) => a * b;
-                       `,
+      export let multiply = (a, b) => a * b;
+    `,
 
     "src/sum.js": js`
-                    export let sum = (a, b) => a + b;
-                  `,
+      export let sum = (a, b) => a + b;
+    `,
   });
 
   await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
@@ -503,11 +503,11 @@ test("multiple source files for same entrypoint", async () => {
       main: "dist/pkg-a.cjs.js",
     }),
     "src/other.js": js`
-                      export let x = true;
-                    `,
+      export let x = true;
+    `,
     "src/other/index.js": js`
-                            export let x = true;
-                          `,
+      export let x = true;
+    `,
   });
 
   await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
@@ -524,8 +524,8 @@ test("unexpected source option", async () => {
       },
     }),
     "src/index.js": js`
-                      export let x = true;
-                    `,
+      export let x = true;
+    `,
   });
 
   await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
@@ -545,8 +545,8 @@ test("unexpected experimental flag", async () => {
       },
     }),
     "src/index.js": js`
-                      export let x = true;
-                    `,
+      export let x = true;
+    `,
   });
 
   await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
@@ -566,8 +566,8 @@ test("unexpected former experimental flag", async () => {
       },
     }),
     "src/index.js": js`
-                      export let x = true;
-                    `,
+      export let x = true;
+    `,
   });
 
   await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(

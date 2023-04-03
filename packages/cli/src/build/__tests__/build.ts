@@ -62,11 +62,11 @@ test("clears dist folder", async () => {
       main: "dist/already-has-things-in-dist.cjs.js",
     }),
     "src/index.js": js`
-                      export default "something";
-                    `,
+      export default "something";
+    `,
     "dist/something.js": js`
-                           throw new Error("why are you seeing this?");
-                         `,
+      throw new Error("why are you seeing this?");
+    `,
   });
 
   await build(dir);
@@ -105,18 +105,18 @@ test("flow", async () => {
     }),
 
     "src/a.js": js`
-                  export default "wow";
-                `,
+      export default "wow";
+    `,
 
     "src/index.js": js`
-                      // @flow
+      // @flow
 
-                      export function doSomething(arg: string): string {
-                        return "something" + arg;
-                      }
+      export function doSomething(arg: string): string {
+        return "something" + arg;
+      }
 
-                      export { default as something } from "./a";
-                    `,
+      export { default as something } from "./a";
+    `,
   });
 
   await install(tmpPath);
@@ -137,14 +137,14 @@ test("flow", async () => {
       presets: [require.resolve("@babel/preset-flow")],
     }),
     "src/index.js": js`
-                      // @flow
+      // @flow
 
-                      export function doSomething(arg: string): string {
-                        return "something" + arg;
-                      }
+      export function doSomething(arg: string): string {
+        return "something" + arg;
+      }
 
-                      export default "wow";
-                    `,
+      export default "wow";
+    `,
   });
 
   await install(tmpPath);
@@ -164,13 +164,13 @@ test("prod checks", async () => {
     }),
 
     "src/index.js": js`
-                      export function thing() {
-                        if (process.env.NODE_ENV !== "production") {
-                          return "not prod";
-                        }
-                        return "prod";
-                      }
-                    `,
+      export function thing() {
+        if (process.env.NODE_ENV !== "production") {
+          return "not prod";
+        }
+        return "prod";
+      }
+    `,
   });
 
   await build(tmpPath);
@@ -205,10 +205,10 @@ test("umd with dep on other module", async () => {
       path: repoNodeModules,
     },
     "src/index.js": js`
-                      import { createElement } from "react";
+      import { createElement } from "react";
 
-                      createElement("div", null);
-                    `,
+      createElement("div", null);
+    `,
   });
 
   doPromptInput.mockImplementation(async (question) => {
@@ -334,24 +334,24 @@ test("monorepo umd with dep on other module", async () => {
     }),
 
     "packages/package-four/src/index.js": js`
-                                            import "@some-scope/package-one-umd-with-dep";
-                                          `,
+      import "@some-scope/package-one-umd-with-dep";
+    `,
 
     "packages/package-one/src/index.js": js`
-                                           import { createElement } from "react";
+      import { createElement } from "react";
 
-                                           createElement("div", null);
-                                         `,
+      createElement("div", null);
+    `,
 
     "packages/package-three/src/index.js": js`
-                                             import "@some-scope/package-one-umd-with-dep";
-                                           `,
+      import "@some-scope/package-one-umd-with-dep";
+    `,
 
     "packages/package-two/src/index.js": js`
-                                           import { createElement } from "react";
+      import { createElement } from "react";
 
-                                           createElement("h1", null);
-                                         `,
+      createElement("h1", null);
+    `,
   });
   let asked = false;
   doPromptInput.mockImplementation(async (question) => {
@@ -447,10 +447,10 @@ test("json", async () => {
     }),
 
     "src/index.js": js`
-                      import changesetsSchema from "./schema.json";
+      import changesetsSchema from "./schema.json";
 
-                      export let schema = changesetsSchema;
-                    `,
+      export let schema = changesetsSchema;
+    `,
 
     "src/schema.json": JSON.stringify({
       $schema: "http://json-schema.org/draft-07/schema#",
@@ -518,10 +518,10 @@ test("respect browser alias field in dependencies when bundling UMD", async () =
       },
     }),
     "src/index.js": js`
-                      import target from "with-browser-alias-field";
+      import target from "with-browser-alias-field";
 
-                      export default "And the target is: " + target;
-                    `,
+      export default "And the target is: " + target;
+    `,
     "node_modules/with-browser-alias-field/package.json": JSON.stringify({
       name: "with-browser-alias-field",
       browser: {
@@ -529,14 +529,14 @@ test("respect browser alias field in dependencies when bundling UMD", async () =
       },
     }),
     "node_modules/with-browser-alias-field/index.js": js`
-                                                        export { default } from "./lib/file";
-                                                      `,
+      export { default } from "./lib/file";
+    `,
     "node_modules/with-browser-alias-field/lib/file.js": js`
-                                                           export default "node";
-                                                         `,
+      export default "node";
+    `,
     "node_modules/with-browser-alias-field/lib/browser-file.js": js`
-                                                                   export default "browser";
-                                                                 `,
+      export default "browser";
+    `,
   });
 
   await build(dir);
@@ -566,10 +566,10 @@ test("keepDynamicImportAsDynamicImportInCommonJS experimental flag", async () =>
       },
     }),
     "src/index.js": js`
-                      import "some-dep";
+      import "some-dep";
 
-                      import("some-dep");
-                    `,
+      import("some-dep");
+    `,
   });
 
   await build(dir);
@@ -619,8 +619,8 @@ test("using @babel/plugin-transform-runtime with useESModules: true", async () =
       ],
     }),
     "src/index.js": js`
-                      export class Thing {}
-                    `,
+      export class Thing {}
+    `,
   });
 
   await build(dir);
@@ -693,8 +693,8 @@ test("worker and browser build", async () => {
       path: repoNodeModules,
     },
     "src/index.js": js`
-                      export const thing = typeof window;
-                    `,
+      export const thing = typeof window;
+    `,
   });
   await build(dir);
   expect(await getDist(dir)).toMatchInlineSnapshot(`
@@ -767,33 +767,33 @@ test("typescript with nodenext module resolution", async () => {
       module: "dist/pkg-a-something.esm.js",
     }),
     "packages/pkg-a/src/index.ts": ts`
-                                     export const thing = "index";
-                                   `,
+      export const thing = "index";
+    `,
     "packages/pkg-a/src/something.ts": ts`
-                                         export const something = "something";
-                                       `,
+      export const something = "something";
+    `,
     "packages/pkg-a/not-exported.ts": ts`
-                                        export const notExported = true;
-                                      `,
+      export const notExported = true;
+    `,
 
     "packages/pkg-a/node_modules": {
       kind: "symlink",
       path: repoNodeModules,
     },
     "blah.ts": ts`
-                 import { thing } from "pkg-a";
-                 import { something } from "pkg-a/something";
-                 import { notExported } from "pkg-a/not-exported"; // should error
+      import { thing } from "pkg-a";
+      import { something } from "pkg-a/something";
+      import { notExported } from "pkg-a/not-exported"; // should error
 
-                 function acceptThing<T>(x: T) {}
+      function acceptThing<T>(x: T) {}
 
-                 acceptThing<"index">(thing);
-                 acceptThing<"something">(something);
+      acceptThing<"index">(thing);
+      acceptThing<"something">(something);
 
-                 // this is to check that TypeScript is actually checking things
-                 acceptThing<"other">(thing); // should error
-                 acceptThing<"other">(something); // should error
-               `,
+      // this is to check that TypeScript is actually checking things
+      acceptThing<"other">(thing); // should error
+      acceptThing<"other">(something); // should error
+    `,
     "tsconfig.json": JSON.stringify({
       compilerOptions: {
         module: "NodeNext",

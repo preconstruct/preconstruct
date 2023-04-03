@@ -679,8 +679,8 @@ test("unexpected experimental flag throws, not removes", async () => {
       },
     }),
     "src/index.js": js`
-                      export let x = true;
-                    `,
+      export let x = true;
+    `,
   });
 
   await expect(fix(tmpPath)).rejects.toMatchInlineSnapshot(
@@ -700,8 +700,8 @@ test("unexpected former experimental flag is removed", async () => {
       },
     }),
     "src/index.js": js`
-                      export let x = true;
-                    `,
+      export let x = true;
+    `,
   });
   await fix(tmpPath);
   expect(await getFiles(tmpPath, ["package.json"])).toMatchInlineSnapshot(`

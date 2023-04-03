@@ -41,8 +41,8 @@ test("monorepo with root src dir and typescript package", async () => {
   `,
 
     "src/packages/my-package/src/index.ts": ts`
-                                              export default {};
-                                            `,
+      export default {};
+    `,
   });
 
   await build(tmpPath);

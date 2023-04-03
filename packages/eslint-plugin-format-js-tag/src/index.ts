@@ -38,7 +38,10 @@ export const rules = {
             node.quasi.expressions.length === 0
           ) {
             const str = node.quasi.quasis[0].value.cooked;
-            const indentation = "".padEnd(node.tag.loc.start.column + 2);
+            const sourceLines = context.getSourceCode().getLines();
+            const line = sourceLines[node.tag.loc.start.line - 1];
+            const startingSpace = line.match(/^\s*/)?.[0] ?? "";
+            const indentation = "".padEnd(startingSpace.length + 2);
             const lines = prettier
               .format(str, {
                 filepath: path.join(
@@ -52,16 +55,14 @@ export const rules = {
               lines
                 .map((line, i) => {
                   if (i === lines.length - 1) {
-                    return "".padEnd(node.tag.loc.start.column) + line;
+                    return "".padEnd(startingSpace.length) + line;
                   }
                   if (line === "") {
                     return "";
                   }
                   return indentation + line;
                 })
-                .join("\n"); //+
-            //   "\n" +
-            //   "".padEnd(node.tag.loc.start.column);
+                .join("\n");
             if (formatted !== str) {
               context.report({
                 messageId: "unformatted",

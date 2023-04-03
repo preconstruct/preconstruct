@@ -100,10 +100,10 @@ test("scoped package", async () => {
     }),
 
     "src/index.js": js`
-                      // @flow
+      // @flow
 
-                      export default "something";
-                    `,
+      export default "something";
+    `,
   });
 
   confirms.writeMainField.mockReturnValue(Promise.resolve(true));
@@ -259,14 +259,14 @@ let basicThreeEntrypoints = {
     },
   }),
   "src/index.js": js`
-                    export let something = true;
-                  `,
+    export let something = true;
+  `,
   "src/one.js": js`
-                  export let something = true;
-                `,
+    export let something = true;
+  `,
   "src/two.js": js`
-                  export let something = true;
-                `,
+    export let something = true;
+  `,
   "one/package.json": JSON.stringify({}),
   "two/package.json": JSON.stringify({}),
 };

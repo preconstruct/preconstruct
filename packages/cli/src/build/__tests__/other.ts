@@ -33,18 +33,18 @@ test("browser", async () => {
       },
     }),
     "src/index.js": js`
-                      let thing = "wow";
+      let thing = "wow";
 
-                      if (typeof window !== "undefined") {
-                        thing = "something";
-                      }
+      if (typeof window !== "undefined") {
+        thing = "something";
+      }
 
-                      if (typeof document !== undefined) {
-                        thing += "other";
-                      }
+      if (typeof document !== undefined) {
+        thing += "other";
+      }
 
-                      export default thing;
-                    `,
+      export default thing;
+    `,
   });
 
   await build(dir);
@@ -130,18 +130,18 @@ test("browser no module", async () => {
     }),
 
     "src/index.js": js`
-                      let thing = "wow";
+      let thing = "wow";
 
-                      if (typeof window !== "undefined") {
-                        thing = "something";
-                      }
+      if (typeof window !== "undefined") {
+        thing = "something";
+      }
 
-                      if (typeof document !== undefined) {
-                        thing += "other";
-                      }
+      if (typeof document !== undefined) {
+        thing += "other";
+      }
 
-                      export default thing;
-                    `,
+      export default thing;
+    `,
   });
 
   await build(tmpPath);
@@ -331,36 +331,36 @@ test("typescript with forced dts emit", async () => {
 `,
 
     "src/create-store.ts": ts`
-                             // @ts-ignore (installed during test)
-                             import { configureStore, Action } from "@reduxjs/toolkit";
-                             import { ThunkAction } from "redux-thunk";
-                             import { rootReducer, RootState } from "./root-reducer";
+      // @ts-ignore (installed during test)
+      import { configureStore, Action } from "@reduxjs/toolkit";
+      import { ThunkAction } from "redux-thunk";
+      import { rootReducer, RootState } from "./root-reducer";
 
-                             export type AppThunk = ThunkAction<void, RootState, unknown, Action<string>>;
+      export type AppThunk = ThunkAction<void, RootState, unknown, Action<string>>;
 
-                             export function createStore() {
-                               return configureStore<RootState>({
-                                 reducer: rootReducer,
-                               });
-                             }
-                           `,
+      export function createStore() {
+        return configureStore<RootState>({
+          reducer: rootReducer,
+        });
+      }
+    `,
 
     "src/index.ts": ts`
-                      export { createStore } from "./create-store";
-                      export type { AppThunk } from "./create-store";
-                      export type { RootState } from "./root-reducer";
-                    `,
+      export { createStore } from "./create-store";
+      export type { AppThunk } from "./create-store";
+      export type { RootState } from "./root-reducer";
+    `,
 
     "src/root-reducer.ts": ts`
-                             // @ts-ignore (installed during test)
-                             import { combineReducers } from "@reduxjs/toolkit";
+      // @ts-ignore (installed during test)
+      import { combineReducers } from "@reduxjs/toolkit";
 
-                             export const rootReducer = combineReducers({
-                               /* blah blah blah */
-                             });
+      export const rootReducer = combineReducers({
+        /* blah blah blah */
+      });
 
-                             export type RootState = ReturnType<typeof rootReducer>;
-                           `,
+      export type RootState = ReturnType<typeof rootReducer>;
+    `,
   });
 
   await build(tmpPath);
@@ -383,10 +383,10 @@ test("package resolvable but not in deps", async () => {
     }),
 
     "src/index.js": js`
-                      import React from "react";
+      import React from "react";
 
-                      export default React.createContext("something");
-                    `,
+      export default React.createContext("something");
+    `,
   });
   await install(tmpPath);
   try {
@@ -420,17 +420,17 @@ test("package with exports resolvable", async () => {
       },
     }),
     "node_modules/@atomico/hooks/something/use-slot.js": js`
-                                                           export function useSlot(ref) {
-                                                             console.log(ref);
-                                                           }
-                                                         `,
+      export function useSlot(ref) {
+        console.log(ref);
+      }
+    `,
     "src/index.js": js`
-                      import { useSlot } from "@atomico/hooks/use-slot";
+      import { useSlot } from "@atomico/hooks/use-slot";
 
-                      export default function useChildren(ref) {
-                        return useSlot(ref);
-                      }
-                    `,
+      export default function useChildren(ref) {
+        return useSlot(ref);
+      }
+    `,
   });
 
   await build(tmpPath);
@@ -458,8 +458,8 @@ test("entrypoint outside package directory", async () => {
     }),
 
     "some-file.js": js`
-                      export let something = true;
-                    `,
+      export let something = true;
+    `,
 
     "pkg-a/package.json": JSON.stringify({
       name: "@entrypoint-outside-pkg-dir/pkg-a",
@@ -492,8 +492,8 @@ test("module imported outside package directory", async () => {
     }),
 
     "some-file.js": js`
-                      export let something = true;
-                    `,
+      export let something = true;
+    `,
 
     "pkg-a/package.json": JSON.stringify({
       name: "@imports-outside-pkg-dir/pkg-a",
@@ -501,8 +501,8 @@ test("module imported outside package directory", async () => {
     }),
 
     "pkg-a/src/index.js": js`
-                            export { something } from "../../some-file";
-                          `,
+      export { something } from "../../some-file";
+    `,
   });
   try {
     await build(tmpPath);
@@ -531,8 +531,8 @@ test("using external @babel/runtime helpers", async () => {
       plugins: [require.resolve("@babel/plugin-transform-runtime")],
     }),
     "src/index.js": js`
-                      export default class Foo {}
-                    `,
+      export default class Foo {}
+    `,
   });
 
   await install(tmpPath);
@@ -558,8 +558,8 @@ test("should lazily get globals", async () => {
     }),
 
     "src/index.js": js`
-                      export default "something";
-                    `,
+      export default "something";
+    `,
   });
 
   (doPromptInput as jest.MockedFunction<
@@ -608,14 +608,14 @@ test("batches build errors", async () => {
     }),
 
     "packages/package-one/src/index.js": js`
-                                           import "something";
-                                           import "something-2";
-                                         `,
+      import "something";
+      import "something-2";
+    `,
 
     "packages/package-two/src/index.js": js`
-                                           import "something";
-                                           import "something-2";
-                                         `,
+      import "something";
+      import "something-2";
+    `,
   });
   let error;
   try {
@@ -636,10 +636,10 @@ test("builds package using eval", async () => {
   let dir = await testdir({
     "package.json": basicPkgJson(),
     "src/index.js": js`
-                      export default function compute(arg) {
-                        return eval(arg);
-                      }
-                    `,
+      export default function compute(arg) {
+        return eval(arg);
+      }
+    `,
   });
 
   await build(dir);
@@ -677,31 +677,31 @@ test("builds umd with a dependency containing top-level this in ESM", async () =
       },
     }),
     "src/index.js": js`
-                      export { default } from "with-top-level-this-in-esm";
-                    `,
+      export { default } from "with-top-level-this-in-esm";
+    `,
     "node_modules/with-top-level-this-in-esm/package.json": JSON.stringify({
       name: "with-top-level-this-in-esm",
     }),
     "node_modules/with-top-level-this-in-esm/index.js": js`
-                                                          // output transpiled by TS with inlined tslib helper
-                                                          var __assign =
-                                                            (this && this.__assign) ||
-                                                            function () {
-                                                              __assign =
-                                                                Object.assign ||
-                                                                function (t) {
-                                                                  for (var s, i = 1, n = arguments.length; i < n; i++) {
-                                                                    s = arguments[i];
-                                                                    for (var p in s)
-                                                                      if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
-                                                                  }
-                                                                  return t;
-                                                                };
-                                                              return __assign.apply(this, arguments);
-                                                            };
-                                                          var foo = { bar: 42 };
-                                                          export default __assign({}, foo);
-                                                        `,
+      // output transpiled by TS with inlined tslib helper
+      var __assign =
+        (this && this.__assign) ||
+        function () {
+          __assign =
+            Object.assign ||
+            function (t) {
+              for (var s, i = 1, n = arguments.length; i < n; i++) {
+                s = arguments[i];
+                for (var p in s)
+                  if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
+              }
+              return t;
+            };
+          return __assign.apply(this, arguments);
+        };
+      var foo = { bar: 42 };
+      export default __assign({}, foo);
+    `,
   });
 
   await build(dir);
@@ -749,8 +749,8 @@ test("fails for source files containing top-level this", async () => {
   let dir = await testdir({
     "package.json": basicPkgJson(),
     "src/index.js": js`
-                      export default this;
-                    `,
+      export default this;
+    `,
   });
 
   try {
@@ -776,11 +776,11 @@ test(".d.ts", async () => {
       module: "dist/pkg.esm.js",
     }),
     "src/index.js": js`
-                      export const x = "hello";
-                    `,
+      export const x = "hello";
+    `,
     "src/index.d.ts": ts`
-                        export const x: string;
-                      `,
+      export const x: string;
+    `,
     node_modules: { kind: "symlink", path: repoNodeModules },
     "tsconfig.json": typescriptFixture["tsconfig.json"],
   });
@@ -831,27 +831,27 @@ if (process.platform !== "win32") {
         module: "dist/pkg.esm.js",
       }),
       "src/index.js": js`
-                        export { A } from "./client";
-                        export { C } from "./c";
-                        export { B } from "./b";
-                      `,
+        export { A } from "./client";
+        export { C } from "./c";
+        export { B } from "./b";
+      `,
       "src/client.js": js`
-                         "use client";
-                         export const A = "something";
-                       `,
+        "use client";
+        export const A = "something";
+      `,
       "src/b.js": js`
-                    export const B = "b";
-                  `,
+        export const B = "b";
+      `,
       "src/c.js": js`
-                    import { D } from "./d";
-                    export function C() {
-                      return D;
-                    }
-                  `,
+        import { D } from "./d";
+        export function C() {
+          return D;
+        }
+      `,
       "src/d.js": js`
-                    "use client";
-                    export const D = "d";
-                  `,
+        "use client";
+        export const D = "d";
+      `,
     });
     let originalProcessCwd = process.cwd;
     try {
@@ -979,9 +979,9 @@ if (process.platform !== "win32") {
         module: "dist/pkg.esm.js",
       }),
       "src/index.js": js`
-                        "use client";
-                        export const a = true;
-                      `,
+        "use client";
+        export const a = true;
+      `,
     });
     let originalProcessCwd = process.cwd;
     try {
@@ -1022,16 +1022,16 @@ if (process.platform !== "win32") {
     const dir = await testdir({
       ...typescriptFixture,
       "src/index.ts": ts`
-                        export { A } from "./a";
-                        export { B } from "./b";
-                      `,
+        export { A } from "./a";
+        export { B } from "./b";
+      `,
       "src/a.ts": ts`
-                    "use client";
-                    export const A = 1;
-                  `,
+        "use client";
+        export const A = 1;
+      `,
       "src/b.ts": ts`
-                    export const B = 2;
-                  `,
+        export const B = 2;
+      `,
     });
     let originalProcessCwd = process.cwd;
     try {

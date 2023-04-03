@@ -27,11 +27,11 @@ test("multiple entrypoints", async () => {
       module: "dist/multiple-entrypoints-multiply.esm.js",
     }),
     "src/index.js": js`
-                      export let sum = (a, b) => a + b;
-                    `,
+      export let sum = (a, b) => a + b;
+    `,
     "src/multiply.js": js`
-                         export let multiply = (a, b) => a * b;
-                       `,
+      export let multiply = (a, b) => a * b;
+    `,
   });
 
   await build(dir);
@@ -100,11 +100,11 @@ test("two entrypoints, one module, one not", async () => {
       module: "dist/two-entrypoints-one-module-one-not-multiply.esm.js",
     }),
     "src/index.js": js`
-                      export let sum = (a, b) => a + b;
-                    `,
+      export let sum = (a, b) => a + b;
+    `,
     "src/multiply.js": js`
-                         export let multiply = (a, b) => a * b;
-                       `,
+      export let multiply = (a, b) => a * b;
+    `,
   });
 
   await expect(build(dir)).rejects.toMatchInlineSnapshot(
@@ -130,24 +130,24 @@ test("two entrypoints with a common dependency", async () => {
     }),
 
     "src/identity.js": js`
-                         export let identity = (x) => x;
-                       `,
+      export let identity = (x) => x;
+    `,
 
     "src/multiply.js": js`
-                         import { identity } from "./identity";
+      import { identity } from "./identity";
 
-                         export let multiply = (a, b) => identity(a * b);
+      export let multiply = (a, b) => identity(a * b);
 
-                         export { identity };
-                       `,
+      export { identity };
+    `,
 
     "src/index.js": js`
-                      import { identity } from "./identity";
+      import { identity } from "./identity";
 
-                      export let sum = (a, b) => identity(a + b);
+      export let sum = (a, b) => identity(a + b);
 
-                      export { identity };
-                    `,
+      export { identity };
+    `,
   });
 
   await build(tmpPath);
@@ -175,14 +175,14 @@ test("two entrypoints where one requires the other entrypoint", async () => {
     }),
 
     "src/index.js": js`
-                      export let identity = (x) => x;
-                    `,
+      export let identity = (x) => x;
+    `,
 
     "src/multiply.js": js`
-                         import { identity } from "./index";
+      import { identity } from "./index";
 
-                         export let multiply = (a, b) => identity(a * b);
-                       `,
+      export let multiply = (a, b) => identity(a * b);
+    `,
   });
 
   await build(tmpPath);

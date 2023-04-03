@@ -71,32 +71,32 @@ test("typescript thing", async () => {
       2
     ),
     "src/index.ts": ts`
-                      import { makeThing } from "./thing";
+      import { makeThing } from "./thing";
 
-                      export const thing = makeThing();
-                    `,
+      export const thing = makeThing();
+    `,
 
     "src/other.ts": ts`
-                      export const thing = () => "wow" as const;
-                    `,
+      export const thing = () => "wow" as const;
+    `,
 
     "src/thing.tsx": tsx`
-                       import { thing } from "./other";
+      import { thing } from "./other";
 
-                       export const makeThing = () => thing();
-                     `,
+      export const makeThing = () => thing();
+    `,
 
     "dist/declarations/src/index.d.ts": ts`
-                                          export declare const thing: "wow";
-                                        `,
+      export declare const thing: "wow";
+    `,
 
     "dist/declarations/src/other.d.ts": ts`
-                                          export declare const thing: () => "wow";
-                                        `,
+      export declare const thing: () => "wow";
+    `,
 
     "dist/declarations/src/thing.d.ts": ts`
-                                          export declare const makeThing: () => "wow";
-                                        `,
+      export declare const makeThing: () => "wow";
+    `,
   });
   await build(tmpPath);
 
@@ -143,8 +143,8 @@ test("typescript declarationMap", async () => {
       2
     ),
     "src/index.ts": ts`
-                      export const thing = "wow" as const;
-                    `,
+      export const thing = "wow" as const;
+    `,
   });
 
   await build(dir);
@@ -194,11 +194,11 @@ test("process.env.NODE_ENV reassignment", async () => {
       main: "dist/test.cjs.js",
     }),
     "src/index.js": js`
-                      process.env.NODE_ENV = "development";
-                      something12.process.env.NODE_ENV = "development";
-                      console.log(process.env.NODE_ENV);
-                      console.log(something.process.env.NODE_ENV);
-                    `,
+      process.env.NODE_ENV = "development";
+      something12.process.env.NODE_ENV = "development";
+      console.log(process.env.NODE_ENV);
+      console.log(something.process.env.NODE_ENV);
+    `,
   });
   await build(dir);
   expect(await getDist(dir)).toMatchInlineSnapshot(`
@@ -237,11 +237,11 @@ test("process.env.NODE_ENV reassignment new approach", async () => {
       main: "dist/test.cjs.js",
     }),
     "src/index.js": js`
-                      process.env.NODE_ENV = "development";
-                      something12.process.env.NODE_ENV = "development";
-                      console.log(process.env.NODE_ENV);
-                      console.log(something.process.env.NODE_ENV);
-                    `,
+      process.env.NODE_ENV = "development";
+      something12.process.env.NODE_ENV = "development";
+      console.log(process.env.NODE_ENV);
+      console.log(something.process.env.NODE_ENV);
+    `,
   });
   await build(dir);
   expect(await getDist(dir)).toMatchInlineSnapshot(`
@@ -857,8 +857,8 @@ test("new dist filenames", async () => {
       module: "dist/scope-test.esm.js",
     }),
     "src/index.js": js`
-                      export default "something";
-                    `,
+      export default "something";
+    `,
   });
   await build(dir);
   await expect(getDist(dir)).resolves.toMatchInlineSnapshot(`
@@ -900,13 +900,13 @@ test("UMD with dep that uses process.env.NODE_ENV", async () => {
       preconstruct: { umdName: "test" },
     }),
     "src/index.js": js`
-                      import { x } from "somewhere";
-                      console.log(x);
-                      export default "something";
-                    `,
+      import { x } from "somewhere";
+      console.log(x);
+      export default "something";
+    `,
     "node_modules/somewhere/index.js": js`
-                                         export let x = process.env.NODE_ENV;
-                                       `,
+      export let x = process.env.NODE_ENV;
+    `,
 
     "node_modules/somewhere/package.json": JSON.stringify({
       name: "somewhere",
@@ -955,14 +955,14 @@ test("UMD build with process.env.NODE_ENV and typeof document", async () => {
       },
     }),
     "src/index.js": js`
-                      let x = typeof document;
+      let x = typeof document;
 
-                      const thing = () => {
-                        console.log(process.env.NODE_ENV);
-                      };
+      const thing = () => {
+        console.log(process.env.NODE_ENV);
+      };
 
-                      export default thing;
-                    `,
+      export default thing;
+    `,
   });
   await build(dir);
   await expect(getDist(dir)).resolves.toMatchInlineSnapshot(`
@@ -1036,17 +1036,17 @@ test("typescript declaration emit with unreferencable types emits diagnostic", a
       2
     ),
     "src/index.ts": ts`
-                      import { x } from "./x";
+      import { x } from "./x";
 
-                      export const thing = x();
-                    `,
+      export const thing = x();
+    `,
     "src/x.ts": ts`
-                  class A {
-                    private a?: string;
-                  }
+      class A {
+        private a?: string;
+      }
 
-                  export const x = () => new A();
-                `,
+      export const x = () => new A();
+    `,
   });
   const error = await build(dir).catch((x) => x);
   expect(error).toBeInstanceOf(BatchError);
@@ -1098,10 +1098,10 @@ test("typescript declaration emit with json import", async () => {
       2
     ),
     "src/index.ts": ts`
-                      import x from "./x.json";
+      import x from "./x.json";
 
-                      export const thing = x;
-                    `,
+      export const thing = x;
+    `,
     "src/x.json": JSON.stringify({ thing: true, other: "" }),
   });
   await build(dir);
@@ -1157,8 +1157,8 @@ test("bigint usage", async () => {
       path: repoNodeModules,
     },
     "src/index.js": ts`
-                      export const thing = 5n;
-                    `,
+      export const thing = 5n;
+    `,
   });
   await build(dir);
   expect(await getDist(dir)).toMatchInlineSnapshot(`
@@ -1196,9 +1196,9 @@ test("node: is external", async () => {
       module: "dist/scope-test.esm.js",
     }),
     "src/index.js": ts`
-                      import fs from "node:fs";
-                      fs.writeFileSync("test.txt", "test");
-                    `,
+      import fs from "node:fs";
+      fs.writeFileSync("test.txt", "test");
+    `,
   });
   await build(dir);
   expect(await getDist(dir)).toMatchInlineSnapshot(`
@@ -1238,8 +1238,8 @@ test("importing css fails with a nice error", async () => {
       module: "dist/scope-test.esm.js",
     }),
     "src/index.js": js`
-                      import "./blah.css";
-                    `,
+      import "./blah.css";
+    `,
     "src/blah.css": "",
   });
   await expect(build(dir)).rejects.toMatchInlineSnapshot(

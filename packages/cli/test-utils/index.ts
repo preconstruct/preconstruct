@@ -309,27 +309,27 @@ export const typescriptFixture = {
     presets: [require.resolve("@babel/preset-typescript")],
   }),
   "src/index.ts": ts`
-                    import { SomeType } from "./another-thing";
-                    export * from "./one-more-thing";
-                    import * as path from "path";
+    import { SomeType } from "./another-thing";
+    export * from "./one-more-thing";
+    import * as path from "path";
 
-                    export { path };
+    export { path };
 
-                    let thing: SomeType = "something";
+    let thing: SomeType = "something";
 
-                    export default thing;
-                  `,
+    export default thing;
+  `,
   "src/another-thing.ts": ts`
-                            export type SomeType = string;
-                          `,
+    export type SomeType = string;
+  `,
   "src/one-more-thing.js": js`
-                             export let obj = {};
-                           `,
+    export let obj = {};
+  `,
   "src/one-more-thing.d.ts": ts`
-                               declare var obj: object;
+    declare var obj: object;
 
-                               export { obj };
-                             `,
+    export { obj };
+  `,
 } as const;
 
 type Fixture = {
