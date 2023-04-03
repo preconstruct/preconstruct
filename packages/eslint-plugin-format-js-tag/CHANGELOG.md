@@ -1,5 +1,11 @@
 # @preconstruct/eslint-plugin-format-js-tag
 
+## 0.3.0
+
+### Minor Changes
+
+- [`51d1ffa`](https://github.com/preconstruct/preconstruct/commit/51d1ffa9caf4153378491535e06f3008b4d8b3b5) Thanks [@emmatown](https://github.com/emmatown)! - Fix indentation
+
 ## 0.2.0
 
 ### Minor Changes
