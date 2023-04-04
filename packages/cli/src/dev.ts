@@ -18,7 +18,7 @@ let tsExtensionPattern = /tsx?$/;
 
 type TypeSystemInfo = {
   flow: boolean;
-  typescript: false | string;
+  typescript: false | { contents: string; filename: string };
 };
 
 async function getTypeSystem(entrypoint: Entrypoint): Promise<TypeSystemInfo> {
@@ -28,14 +28,12 @@ async function getTypeSystem(entrypoint: Entrypoint): Promise<TypeSystemInfo> {
     typescript: false,
   };
   if (tsExtensionPattern.test(entrypoint.source)) {
-    ret.typescript = sourceContents;
+    ret.typescript = { contents: sourceContents, filename: entrypoint.source };
   } else {
     try {
-      let tsSourceContents = await fs.readFile(
-        entrypoint.source.replace(/\.jsx?/, ".d.ts"),
-        "utf8"
-      );
-      ret.typescript = tsSourceContents;
+      const filename = entrypoint.source.replace(/\.jsx?/, ".d.ts");
+      let tsSourceContents = await fs.readFile(filename, "utf8");
+      ret.typescript = { contents: tsSourceContents, filename };
     } catch (err) {
       if (err.code !== "ENOENT") {
         throw err;
@@ -50,7 +48,8 @@ async function getTypeSystem(entrypoint: Entrypoint): Promise<TypeSystemInfo> {
 
 async function entrypointHasDefaultExport(
   entrypoint: Entrypoint,
-  content: string
+  content: string,
+  filename: string
 ) {
   // this regex won't tell us that a module definitely has a default export
   // if it doesn't match though, it will tell us that the module
@@ -63,7 +62,7 @@ async function entrypointHasDefaultExport(
     return false;
   }
   let ast = (await babel.parseAsync(content, {
-    filename: entrypoint.source,
+    filename,
     sourceType: "module",
     cwd: entrypoint.package.project.directory,
   }))! as babel.types.File;
@@ -89,7 +88,7 @@ async function entrypointHasDefaultExport(
 
 export async function writeDevTSFile(
   entrypoint: Entrypoint,
-  entrypointSourceContent: string
+  tsishFile: { contents: string; filename: string }
 ) {
   const dtsReexportFilename = path
     .join(entrypoint.directory, validFieldsForEntrypoint.main(entrypoint))
@@ -101,7 +100,8 @@ export async function writeDevTSFile(
   );
   const output = await entrypointHasDefaultExport(
     entrypoint,
-    entrypointSourceContent
+    tsishFile.contents,
+    tsishFile.filename
   ).then((hasDefaultExport) =>
     tsTemplate(
       baseDtsFilename,

@@ -1246,3 +1246,76 @@ test("importing css fails with a nice error", async () => {
     `[Error: 🎁 @scope/test only .ts, .tsx, .js, .jsx, and .json files can be imported but "./blah.css" is imported in "src/index.js"]`
   );
 });
+
+test(".d.ts file with default export", async () => {
+  let dir = await testdir({
+    node_modules: { kind: "symlink", path: repoNodeModules },
+    "package.json": JSON.stringify({
+      name: "typescript",
+      main: "dist/typescript.cjs.js",
+      module: "dist/typescript.esm.js",
+      dependencies: {
+        typescript: "^3.4.5",
+      },
+    }),
+    "tsconfig.json": JSON.stringify({
+      compilerOptions: {
+        target: "esnext",
+        module: "commonjs",
+        strict: true,
+        esModuleInterop: true,
+        noEmit: true,
+      },
+    }),
+    ".babelrc": JSON.stringify({
+      presets: [require.resolve("@babel/preset-typescript")],
+    }),
+    "src/index.js": js`
+      export const a = true;
+      export default a;
+    `,
+    "src/index.d.ts": ts`
+      export declare const a: boolean;
+      export default a;
+    `,
+  });
+  await build(dir);
+  expect(await getDist(dir)).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/index.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export declare const a: boolean;
+    export default a;
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export * from "./declarations/src/index";
+    export { default } from "./declarations/src/index";
+    //# sourceMappingURL=typescript.cjs.d.ts.map
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.cjs.d.ts.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {"version":3,"file":"typescript.cjs.d.ts","sourceRoot":"","sources":["./declarations/src/index.d.ts"],"names":[],"mappings":"AAAA"}
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.cjs.dev.js, dist/typescript.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    const a = true;
+
+    exports.a = a;
+    exports.default = a;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./typescript.cjs.prod.js");
+    } else {
+      module.exports = require("./typescript.cjs.dev.js");
+    }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    const a = true;
+
+    export default a;
+    export { a };
+
+  `);
+});
