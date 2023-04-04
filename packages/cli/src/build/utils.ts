@@ -28,10 +28,10 @@ export async function cleanProjectBeforeBuild(project: Project) {
         pkg.entrypoints.map(async (entrypoint) => {
           if (isTsPath(entrypoint.source)) {
             await fs.mkdir(path.join(entrypoint.directory, "dist"));
-            await writeDevTSFile(
-              entrypoint,
-              await fs.readFile(entrypoint.source, "utf8")
-            );
+            await writeDevTSFile(entrypoint, {
+              contents: await fs.readFile(entrypoint.source, "utf8"),
+              filename: entrypoint.source,
+            });
           }
         })
       );
