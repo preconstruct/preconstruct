@@ -1,5 +1,11 @@
 # preconstruct
 
+## 2.4.4
+
+### Patch Changes
+
+- [`1f83965`](https://github.com/preconstruct/preconstruct/commit/1f83965ff004a84c585a3fde6bb866d6f7f026cd) Thanks [@emmatown](https://github.com/emmatown)! - Fix `preconstruct dev` throwing a syntax error when an entrypoint has a `.d.ts` file with a default export.
+
 ## 2.4.3
 
 ### Patch Changes
