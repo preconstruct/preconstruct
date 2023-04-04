@@ -3,7 +3,6 @@ import path from "path";
 import * as fs from "fs-extra";
 import * as realFs from "fs";
 import {
-  getDist,
   getFiles,
   js,
   repoNodeModules,
