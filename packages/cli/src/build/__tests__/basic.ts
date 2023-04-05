@@ -1002,7 +1002,7 @@ test("UMD build with process.env.NODE_ENV and typeof document", async () => {
     //# sourceMappingURL=scope-test.umd.min.js.map
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.umd.min.js.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    {"version":3,"file":"scope-test.umd.min.js","sources":["../src/index.js"],"sourcesContent":["let x = typeof document;\\n\\nconst thing = () => {\\n  console.log(process.env.NODE_ENV);\\n};\\n\\nexport default thing;"],"names":["thing","console","log"],"mappings":"wOAEcA,KACZC,QAAQC"}
+    {"version":3,"file":"scope-test.umd.min.js","sources":["../src/index.js"],"sourcesContent":["let x = typeof document;\\n\\nconst thing = () => {\\n  console.log(process.env.NODE_ENV);\\n};\\n\\nexport default thing;"],"names":["thing","console","log"],"mappings":"wOAEcA,KACZC,QAAQC,iBAAyB"}
   `);
 });
 
