@@ -7,7 +7,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 var index = "something";
 
-exports.default = index;
+exports["default"] = index;
 "
 `;
 
@@ -29,14 +29,14 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 var index = "something";
 
-exports.default = index;
+exports["default"] = index;
 "
 `;
 
 exports[`basic: valid-package.esm.js 1`] = `
 "var index = "something";
 
-export default index;
+export { index as default };
 "
 `;
 
@@ -79,13 +79,13 @@ exports[`typescript thing: weird-typescript-thing.cjs.dev.js 1`] = `
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-const thing = () => "wow";
+const thing$1 = () => "wow";
 
-const makeThing = () => thing();
+const makeThing = () => thing$1();
 
-const thing$1 = makeThing();
+const thing = makeThing();
 
-exports.thing = thing$1;
+exports.thing = thing;
 "
 `;
 
@@ -105,23 +105,23 @@ exports[`typescript thing: weird-typescript-thing.cjs.prod.js 1`] = `
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-const thing = () => "wow";
+const thing$1 = () => "wow";
 
-const makeThing = () => thing();
+const makeThing = () => thing$1();
 
-const thing$1 = makeThing();
+const thing = makeThing();
 
-exports.thing = thing$1;
+exports.thing = thing;
 "
 `;
 
 exports[`typescript thing: weird-typescript-thing.esm.js 1`] = `
-"const thing = () => "wow";
+"const thing$1 = () => "wow";
 
-const makeThing = () => thing();
+const makeThing = () => thing$1();
 
-const thing$1 = makeThing();
+const thing = makeThing();
 
-export { thing$1 as thing };
+export { thing };
 "
 `;

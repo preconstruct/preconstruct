@@ -1,6 +1,6 @@
-import { AcornNode, Plugin, SourceDescription } from "rollup";
+import { AcornNode, Plugin, SourceDescription, SourceMapInput } from "rollup";
 import { Program } from "estree";
-import MagicString, { SourceMap } from "magic-string";
+import MagicString from "magic-string";
 
 export function serverComponentsPlugin({
   sourceMap,
@@ -42,7 +42,9 @@ export function serverComponentsPlugin({
             };
 
             if (sourceMap) {
-              output.map = magicString.generateMap({ hires: true });
+              output.map = magicString.generateMap({
+                hires: true,
+              }) as SourceMapInput;
             }
             if (!output.meta) {
               output.meta = {};
@@ -59,12 +61,14 @@ export function serverComponentsPlugin({
         const moduleInfo = this.getModuleInfo(chunk.facadeModuleId);
         if (moduleInfo?.meta.isUseClientEntry) {
           const magicString = new MagicString(code);
-          magicString.prepend('"use client";\n');
-          const chunkInfo: { code: string; map?: SourceMap } = {
+          magicString.prepend("'use client';\n");
+          const chunkInfo: { code: string; map?: SourceMapInput } = {
             code: magicString.toString(),
           };
           if (sourceMap) {
-            chunkInfo.map = magicString.generateMap({ hires: true });
+            chunkInfo.map = magicString.generateMap({
+              hires: true,
+            }) as SourceMapInput;
           }
           return chunkInfo;
         }

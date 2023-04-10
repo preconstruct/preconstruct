@@ -165,21 +165,26 @@ function hash(content: string) {
   return crypto.createHash("md5").update(content).digest("hex");
 }
 
-export let stripHashes = async (chunkName: string) => {
-  let transformer = (pathname: string, content: string) => {
-    return pathname.replace(new RegExp(`${chunkName}-[^\\.]+`, "g"), () => {
-      return `chunk-this-is-not-the-real-hash-${hash(content)}`;
-    });
-  };
+export function stripHashes(...chunkNames: string[]) {
+  const pattern = new RegExp(
+    `(${chunkNames.join(
+      "|"
+    )})-[^\\.]+?(\\.(?:esm|cjs|cjs\\.(?:dev|prod))\\.js)`,
+    "g"
+  );
   return {
-    transformPath: transformer,
-    transformContent: (content: string) => {
-      return content.replace(new RegExp(`${chunkName}-[^\\.]+`, "g"), () => {
-        return "chunk-some-hash";
+    transformPath(pathname: string, content: string) {
+      return pathname.replace(pattern, (_, chunkName, ext) => {
+        return `${chunkName}-this-is-not-the-real-hash-${hash(content)}${ext}`;
+      });
+    },
+    transformContent(content: string) {
+      return content.replace(pattern, (_, chunkName, ext) => {
+        return `${chunkName}-some-hash${ext}`;
       });
     },
   };
-};
+}
 
 export async function snapshotDirectory(
   tmpPath: string,
@@ -406,21 +411,31 @@ async function readNormalizedFile(filePath: string): Promise<string> {
   return content;
 }
 
-export async function getFiles(dir: string, glob: string[] = ["**"]) {
+export async function getFiles(
+  dir: string,
+  glob: string[] = ["**"],
+  {
+    transformContent = (x) => x,
+    transformPath = (x) => x,
+  }: {
+    transformPath?: (path: string, contents: string) => string;
+    transformContent?: (content: string) => string;
+  } = {}
+) {
   const files = await fastGlob(glob, { cwd: dir });
-  const filesObj: Record<string, string> = {
-    [dirPrintingSymbol]: true,
-  };
-  await Promise.all(
-    files.map(async (filename) => {
-      filesObj[filename] = await readNormalizedFile(path.join(dir, filename));
-    })
-  );
-  let newObj: Record<string, string> = { [dirPrintingSymbol]: true };
-  files.sort().forEach((filename) => {
-    newObj[filename] = filesObj[filename];
-  });
-  return newObj;
+  return Object.fromEntries([
+    ...(
+      await Promise.all(
+        files.map(async (filename) => {
+          const contents = transformContent(
+            await readNormalizedFile(path.join(dir, filename))
+          );
+          return [transformPath(filename, contents), contents] as const;
+        })
+      )
+    ).sort((a, b) => a[0].localeCompare(b[0])),
+    [dirPrintingSymbol, true],
+  ]);
 }
 
 export const basicPkgJson = (options?: {

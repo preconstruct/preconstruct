@@ -51,6 +51,8 @@ async function watchPackage(pkg: Package, aliases: Aliases) {
                 ? relativePath(event.input)
                 : Array.isArray(event.input)
                 ? event.input.map(relativePath).join(", ")
+                : event.input === undefined
+                ? ""
                 : Object.values(event.input)
                     // @ts-ignore
                     .map(relativePath)
