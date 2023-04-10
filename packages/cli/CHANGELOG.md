@@ -1,5 +1,19 @@
 # preconstruct
 
+## 2.5.0
+
+### Minor Changes
+
+- [#540](https://github.com/preconstruct/preconstruct/pull/540) [`261140b`](https://github.com/preconstruct/preconstruct/commit/261140ba55fa1438e87b14509ee50c999475b8f4) Thanks [@emmatown](https://github.com/emmatown)! - Self-referencing a package with its name is now allowed. They are emitted as written (not resolved to a particular bundle ahead of time).
+
+### Patch Changes
+
+- [#538](https://github.com/preconstruct/preconstruct/pull/538) [`d2cd411`](https://github.com/preconstruct/preconstruct/commit/d2cd411b343b42aa1ae5a30dd7d72b99fa75165d) Thanks [@emmatown](https://github.com/emmatown)! - Update rollup and magic-string
+
+* [#541](https://github.com/preconstruct/preconstruct/pull/541) [`2fd4ed2`](https://github.com/preconstruct/preconstruct/commit/2fd4ed2f1a35e587908eb2c8883da59e9a5df608) Thanks [@emmatown](https://github.com/emmatown)! - Fix issues with `'use client'` directive module preservation
+
+- [#536](https://github.com/preconstruct/preconstruct/pull/536) [`3645eed`](https://github.com/preconstruct/preconstruct/commit/3645eedf0fec94ab16e8464f244458b03ae95e2e) Thanks [@jordanoverbye](https://github.com/jordanoverbye)! - Upgraded dependency `terser`
+
 ## 2.4.4
 
 ### Patch Changes
