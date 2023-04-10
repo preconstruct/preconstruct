@@ -845,15 +845,8 @@ test("simple use client", async () => {
       module.exports = require("./client-some-hash.cjs.dev.js");
     }
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/client-this-is-not-the-real-hash-a38c80456df632dc83f179d407942ef1.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    "use client";
-    const A = "something";
-    console.log("client");
-
-    export { A };
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/client-this-is-not-the-real-hash-ae89a24f4474121fa7710eb213fde301.cjs.dev.js, dist/client-this-is-not-the-real-hash-ae89a24f4474121fa7710eb213fde301.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    "use client";
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/client-this-is-not-the-real-hash-a11d1f492d9543facacf36a90317cec3.cjs.dev.js, dist/client-this-is-not-the-real-hash-a11d1f492d9543facacf36a90317cec3.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use client';
     'use strict';
 
     Object.defineProperty(exports, '__esModule', { value: true });
@@ -862,6 +855,13 @@ test("simple use client", async () => {
     console.log("client");
 
     exports.A = A;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/client-this-is-not-the-real-hash-fd8b1fd76b9a9f92e7a34756ea9de1bb.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use client';
+    const A = "something";
+    console.log("client");
+
+    export { A };
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.dev.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
@@ -932,12 +932,6 @@ test("use client", async () => {
   await build(dir);
   expect(await getFiles(dir, ["dist/**"], stripHashes("client", "d")))
     .toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/client-this-is-not-the-real-hash-212fb4ccc7a43c8c432c7e4eb61fec25.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    "use client";
-    const A = "something";
-
-    export { A };
-
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/client-this-is-not-the-real-hash-309cc5e233da5126cc473e58b428ae77.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
@@ -947,8 +941,8 @@ test("use client", async () => {
       module.exports = require("./client-some-hash.cjs.dev.js");
     }
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/client-this-is-not-the-real-hash-d16d3e6ec580816fdc29f3ce0255ea8d.cjs.dev.js, dist/client-this-is-not-the-real-hash-d16d3e6ec580816fdc29f3ce0255ea8d.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    "use client";
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/client-this-is-not-the-real-hash-58cd7e7ea387bdad7ade6e69ad459a33.cjs.dev.js, dist/client-this-is-not-the-real-hash-58cd7e7ea387bdad7ade6e69ad459a33.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use client';
     'use strict';
 
     Object.defineProperty(exports, '__esModule', { value: true });
@@ -957,8 +951,14 @@ test("use client", async () => {
 
     exports.A = A;
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/d-this-is-not-the-real-hash-7f02ec9f67dc1ea449c07eba7ff6c6ef.cjs.dev.js, dist/d-this-is-not-the-real-hash-7f02ec9f67dc1ea449c07eba7ff6c6ef.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    "use client";
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/client-this-is-not-the-real-hash-b139dd137c1582a38e35a32f7605ab74.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use client';
+    const A = "something";
+
+    export { A };
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/d-this-is-not-the-real-hash-24ae31ff9082854e1c87c472a0860694.cjs.dev.js, dist/d-this-is-not-the-real-hash-24ae31ff9082854e1c87c472a0860694.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use client';
     'use strict';
 
     Object.defineProperty(exports, '__esModule', { value: true });
@@ -967,8 +967,8 @@ test("use client", async () => {
 
     exports.D = D;
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/d-this-is-not-the-real-hash-be4ed809667566843060574df59e2148.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    "use client";
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/d-this-is-not-the-real-hash-edd08facffb57479ea67330357004b7f.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use client';
     const D = "d";
 
     export { D };
@@ -1057,7 +1057,7 @@ test("use client as entrypoint", async () => {
   await build(dir);
   expect(await getFiles(dir, ["dist/**"])).toMatchInlineSnapshot(`
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.dev.js, dist/pkg.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    "use client";
+    'use client';
     'use strict';
 
     Object.defineProperty(exports, '__esModule', { value: true });
@@ -1076,7 +1076,7 @@ test("use client as entrypoint", async () => {
     }
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    "use client";
+    'use client';
     const a = true;
 
     export { a };
@@ -1102,12 +1102,6 @@ test("use client with typescript", async () => {
   await build(dir);
   expect(await getFiles(dir, ["dist/**"], stripHashes("a")))
     .toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/a-this-is-not-the-real-hash-07648f1b1366dbe9cc93bee49ca86cfc.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    "use client";
-    const A = 1;
-
-    export { A };
-
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/a-this-is-not-the-real-hash-31df1da61df583d4d0394e050f45c88f.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
@@ -1117,8 +1111,14 @@ test("use client with typescript", async () => {
       module.exports = require("./a-some-hash.cjs.dev.js");
     }
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/a-this-is-not-the-real-hash-87cc476583ec65009aaf4a3181cf8a43.cjs.dev.js, dist/a-this-is-not-the-real-hash-87cc476583ec65009aaf4a3181cf8a43.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    "use client";
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/a-this-is-not-the-real-hash-d912e49410d7ef28505c151217271ac8.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use client';
+    const A = 1;
+
+    export { A };
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/a-this-is-not-the-real-hash-f67b4ee51aa01653fbab25fa1bdfb30e.cjs.dev.js, dist/a-this-is-not-the-real-hash-f67b4ee51aa01653fbab25fa1bdfb30e.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use client';
     'use strict';
 
     Object.defineProperty(exports, '__esModule', { value: true });
@@ -1254,7 +1254,7 @@ test("use client as entrypoint with typescript", async () => {
     //# sourceMappingURL=typescript.cjs.d.ts.map
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    "use client";
+    'use client';
     const A = 1;
 
     export { A };

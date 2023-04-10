@@ -61,7 +61,7 @@ export function serverComponentsPlugin({
         const moduleInfo = this.getModuleInfo(chunk.facadeModuleId);
         if (moduleInfo?.meta.isUseClientEntry) {
           const magicString = new MagicString(code);
-          magicString.prepend('"use client";\n');
+          magicString.prepend("'use client';\n");
           const chunkInfo: { code: string; map?: SourceMapInput } = {
             code: magicString.toString(),
           };
