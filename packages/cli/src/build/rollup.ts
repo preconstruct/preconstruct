@@ -55,6 +55,7 @@ export let getRollupConfig = (
   if (pkg.json.dependencies && type !== "umd") {
     external.push(...Object.keys(pkg.json.dependencies));
   }
+  external.push(pkg.name);
 
   let wrapExternalPredicate = (inner: ExternalPredicate): ExternalPredicate =>
     inner;
