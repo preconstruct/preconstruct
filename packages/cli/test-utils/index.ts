@@ -4,7 +4,6 @@ import fastGlob from "fast-glob";
 import fixturez from "fixturez";
 import spawn from "spawndamnit";
 import outdent from "outdent";
-import crypto from "crypto";
 // import profiler from "v8-profiler-next";
 import chalk from "chalk";
 
@@ -159,31 +158,6 @@ export async function snapshotDistFiles(tmpPath: string) {
       );
     })
   );
-}
-
-function hash(content: string) {
-  return crypto.createHash("md5").update(content).digest("hex");
-}
-
-export function stripHashes(...chunkNames: string[]) {
-  const pattern = new RegExp(
-    `(${chunkNames.join(
-      "|"
-    )})-[^\\.]+?(\\.(?:esm|cjs|cjs\\.(?:dev|prod))\\.js)`,
-    "g"
-  );
-  return {
-    transformPath(pathname: string, content: string) {
-      return pathname.replace(pattern, (_, chunkName, ext) => {
-        return `${chunkName}-this-is-not-the-real-hash-${hash(content)}${ext}`;
-      });
-    },
-    transformContent(content: string) {
-      return content.replace(pattern, (_, chunkName, ext) => {
-        return `${chunkName}-some-hash${ext}`;
-      });
-    },
-  };
 }
 
 export async function snapshotDirectory(
@@ -411,26 +385,16 @@ async function readNormalizedFile(filePath: string): Promise<string> {
   return content;
 }
 
-export async function getFiles(
-  dir: string,
-  glob: string[] = ["**"],
-  {
-    transformContent = (x) => x,
-    transformPath = (x) => x,
-  }: {
-    transformPath?: (path: string, contents: string) => string;
-    transformContent?: (content: string) => string;
-  } = {}
-) {
+export async function getFiles(dir: string, glob: string[] = ["**"]) {
   const files = await fastGlob(glob, { cwd: dir });
   return Object.fromEntries([
     ...(
       await Promise.all(
         files.map(async (filename) => {
-          const contents = transformContent(
-            await readNormalizedFile(path.join(dir, filename))
-          );
-          return [transformPath(filename, contents), contents] as const;
+          return [
+            filename,
+            await readNormalizedFile(path.join(dir, filename)),
+          ] as const;
         })
       )
     ).sort((a, b) => a[0].localeCompare(b[0])),
