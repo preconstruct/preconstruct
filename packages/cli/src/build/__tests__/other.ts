@@ -63,7 +63,7 @@ test("browser", async () => {
     }
     var thing$1 = thing;
 
-    exports.default = thing$1;
+    exports["default"] = thing$1;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/browser.browser.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     let thing = "wow";
@@ -75,7 +75,7 @@ test("browser", async () => {
     }
     var thing$1 = thing;
 
-    export default thing$1;
+    export { thing$1 as default };
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/browser.cjs.dev.js, dist/browser.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
@@ -91,7 +91,7 @@ test("browser", async () => {
     }
     var thing$1 = thing;
 
-    exports.default = thing$1;
+    exports["default"] = thing$1;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/browser.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
@@ -112,7 +112,7 @@ test("browser", async () => {
     }
     var thing$1 = thing;
 
-    export default thing$1;
+    export { thing$1 as default };
 
   `);
 });
@@ -193,14 +193,12 @@ test("typescript", async () => {
     				var d = Object.getOwnPropertyDescriptor(e, k);
     				Object.defineProperty(n, k, d.get ? d : {
     					enumerable: true,
-    					get: function () {
-    						return e[k];
-    					}
+    					get: function () { return e[k]; }
     				});
     			}
     		});
     	}
-    	n['default'] = e;
+    	n["default"] = e;
     	return Object.freeze(n);
     }
 
@@ -211,7 +209,7 @@ test("typescript", async () => {
     let thing = "something";
 
     exports.path = path__namespace;
-    exports.default = thing;
+    exports["default"] = thing;
     exports.obj = obj;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
@@ -231,8 +229,7 @@ test("typescript", async () => {
 
     let thing = "something";
 
-    export default thing;
-    export { obj };
+    export { thing as default, obj };
 
   `);
 });
@@ -654,7 +651,7 @@ test("builds package using eval", async () => {
       return eval(arg);
     }
 
-    exports.default = compute;
+    exports["default"] = compute;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
@@ -722,9 +719,7 @@ test("builds umd with a dependency containing top-level this in ESM", async () =
 
     Object.defineProperty(exports, 'default', {
     	enumerable: true,
-    	get: function () {
-    		return withTopLevelThisInEsm__default['default'];
-    	}
+    	get: function () { return withTopLevelThisInEsm__default["default"]; }
     });
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
@@ -741,7 +736,7 @@ test("builds umd with a dependency containing top-level this in ESM", async () =
     //# sourceMappingURL=pkg.umd.min.js.map
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.umd.min.js.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    {"version":3,"file":"pkg.umd.min.js","sources":["../node_modules/with-top-level-this-in-esm/index.js"],"sourcesContent":["// output transpiled by TS with inlined tslib helper\\nvar __assign =\\n  (this && this.__assign) ||\\n  function () {\\n    __assign =\\n      Object.assign ||\\n      function (t) {\\n        for (var s, i = 1, n = arguments.length; i < n; i++) {\\n          s = arguments[i];\\n          for (var p in s)\\n            if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];\\n        }\\n        return t;\\n      };\\n    return __assign.apply(this, arguments);\\n  };\\nvar foo = { bar: 42 };\\nexport default __assign({}, foo);"],"names":["__assign","Object","assign","t","s","i","n","arguments","length","p","prototype","hasOwnProperty","call","apply","this","bar"],"mappings":"oOACA,IAAIA,EAEF,WAWE,OAVAA,EACEC,OAAOC,QACP,SAAUC,GACR,IAAK,IAAIC,EAAGC,EAAI,EAAGC,EAAIC,UAAUC,OAAQH,EAAIC,EAAGD,IAE9C,IAAK,IAAII,KADTL,EAAIG,UAAUF,GAERJ,OAAOS,UAAUC,eAAeC,KAAKR,EAAGK,KAAIN,EAAEM,GAAKL,EAAEK,IAE7D,OAAON,GAEJH,EAASa,MAAMC,KAAMP,mBAGjBP,EAAS,GADd,CAAEe,IAAK"}
+    {"version":3,"file":"pkg.umd.min.js","sources":["../node_modules/with-top-level-this-in-esm/index.js"],"sourcesContent":["// output transpiled by TS with inlined tslib helper\\nvar __assign =\\n  (this && this.__assign) ||\\n  function () {\\n    __assign =\\n      Object.assign ||\\n      function (t) {\\n        for (var s, i = 1, n = arguments.length; i < n; i++) {\\n          s = arguments[i];\\n          for (var p in s)\\n            if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];\\n        }\\n        return t;\\n      };\\n    return __assign.apply(this, arguments);\\n  };\\nvar foo = { bar: 42 };\\nexport default __assign({}, foo);"],"names":["__assign","Object","assign","t","s","i","n","arguments","length","p","prototype","hasOwnProperty","call","apply","this","bar"],"mappings":"oOACA,IAAIA,EAEF,WAWE,OAVAA,EACEC,OAAOC,QACP,SAAUC,GACR,IAAK,IAAIC,EAAGC,EAAI,EAAGC,EAAIC,UAAUC,OAAQH,EAAIC,EAAGD,IAE9C,IAAK,IAAII,KADTL,EAAIG,UAAUF,GAERJ,OAAOS,UAAUC,eAAeC,KAAKR,EAAGK,KAAIN,EAAEM,GAAKL,EAAEK,IAE7D,OAAON,CACf,EACWH,EAASa,MAAMC,KAAMP,UAChC,SAEeP,EAAS,CAAE,EADhB,CAAEe,IAAK"}
   `);
 });
 
@@ -858,114 +853,114 @@ if (process.platform !== "win32") {
       process.cwd = () => dir;
       await build(dir);
       expect(await getFiles(dir, ["dist/**"])).toMatchInlineSnapshot(`
-              ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/client-20a7a0ce.cjs.dev.js, dist/client-d0bc5238.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-              "use client";
-              'use strict';
+        ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/client-11fae4c4.cjs.dev.js, dist/client-c90d5c53.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+        "use client";
+        'use strict';
 
-              Object.defineProperty(exports, '__esModule', { value: true });
+        Object.defineProperty(exports, '__esModule', { value: true });
 
-              const A = "something";
+        const A = "something";
 
-              exports.A = A;
+        exports.A = A;
 
-              ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/client-9868ff2a.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-              "use client";
-              const A = "something";
+        ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/client-28de3131.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+        "use client";
+        const A = "something";
 
-              export { A };
+        export { A };
 
-              ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/client-d0bc5238.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-              'use strict';
+        ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/client-c90d5c53.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+        'use strict';
 
-              if (process.env.NODE_ENV === "production") {
-                module.exports = require("./client-d0bc5238.cjs.prod.js");
-              } else {
-                module.exports = require("./client-d0bc5238.cjs.dev.js");
-              }
+        if (process.env.NODE_ENV === "production") {
+          module.exports = require("./client-c90d5c53.cjs.prod.js");
+        } else {
+          module.exports = require("./client-c90d5c53.cjs.dev.js");
+        }
 
-              ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/d-2af6f49d.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-              'use strict';
+        ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/d-31685e16.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+        'use strict';
 
-              if (process.env.NODE_ENV === "production") {
-                module.exports = require("./d-2af6f49d.cjs.prod.js");
-              } else {
-                module.exports = require("./d-2af6f49d.cjs.dev.js");
-              }
+        if (process.env.NODE_ENV === "production") {
+          module.exports = require("./d-31685e16.cjs.prod.js");
+        } else {
+          module.exports = require("./d-31685e16.cjs.dev.js");
+        }
 
-              ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/d-2af6f49d.cjs.prod.js, dist/d-89a2b600.cjs.dev.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-              "use client";
-              'use strict';
+        ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/d-31685e16.cjs.prod.js, dist/d-d4cb9131.cjs.dev.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+        "use client";
+        'use strict';
 
-              Object.defineProperty(exports, '__esModule', { value: true });
+        Object.defineProperty(exports, '__esModule', { value: true });
 
-              const D = "d";
+        const D = "d";
 
-              exports.D = D;
+        exports.D = D;
 
-              ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/d-77f3a222.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-              "use client";
-              const D = "d";
+        ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/d-bee640a0.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+        "use client";
+        const D = "d";
 
-              export { D };
+        export { D };
 
-              ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.dev.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-              'use strict';
+        ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.dev.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+        'use strict';
 
-              Object.defineProperty(exports, '__esModule', { value: true });
+        Object.defineProperty(exports, '__esModule', { value: true });
 
-              var client = require('./client-20a7a0ce.cjs.dev.js');
-              var d = require('./d-89a2b600.cjs.dev.js');
+        var client = require('./client-11fae4c4.cjs.dev.js');
+        var d = require('./d-d4cb9131.cjs.dev.js');
 
-              function C() {
-                return d.D;
-              }
+        function C() {
+          return d.D;
+        }
 
-              const B = "b";
+        const B = "b";
 
-              exports.A = client.A;
-              exports.B = B;
-              exports.C = C;
+        exports.A = client.A;
+        exports.B = B;
+        exports.C = C;
 
-              ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-              'use strict';
+        ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+        'use strict';
 
-              if (process.env.NODE_ENV === "production") {
-                module.exports = require("./pkg.cjs.prod.js");
-              } else {
-                module.exports = require("./pkg.cjs.dev.js");
-              }
+        if (process.env.NODE_ENV === "production") {
+          module.exports = require("./pkg.cjs.prod.js");
+        } else {
+          module.exports = require("./pkg.cjs.dev.js");
+        }
 
-              ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-              'use strict';
+        ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+        'use strict';
 
-              Object.defineProperty(exports, '__esModule', { value: true });
+        Object.defineProperty(exports, '__esModule', { value: true });
 
-              var client = require('./client-d0bc5238.cjs.prod.js');
-              var d = require('./d-2af6f49d.cjs.prod.js');
+        var client = require('./client-c90d5c53.cjs.prod.js');
+        var d = require('./d-31685e16.cjs.prod.js');
 
-              function C() {
-                return d.D;
-              }
+        function C() {
+          return d.D;
+        }
 
-              const B = "b";
+        const B = "b";
 
-              exports.A = client.A;
-              exports.B = B;
-              exports.C = C;
+        exports.A = client.A;
+        exports.B = B;
+        exports.C = C;
 
-              ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-              export { A } from './client-9868ff2a.esm.js';
-              import { D } from './d-77f3a222.esm.js';
+        ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+        export { A } from './client-28de3131.esm.js';
+        import { D } from './d-bee640a0.esm.js';
 
-              function C() {
-                return D;
-              }
+        function C() {
+          return D;
+        }
 
-              const B = "b";
+        const B = "b";
 
-              export { B, C };
+        export { B, C };
 
-          `);
+      `);
     } finally {
       process.cwd = originalProcessCwd;
     }
@@ -1038,7 +1033,16 @@ if (process.platform !== "win32") {
       process.cwd = () => dir;
       await build(dir);
       expect(await getFiles(dir, ["dist/**"])).toMatchInlineSnapshot(`
-        ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/a-2842c06a.cjs.dev.js, dist/a-6cff1501.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+        ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/a-322ea539.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+        'use strict';
+
+        if (process.env.NODE_ENV === "production") {
+          module.exports = require("./a-322ea539.cjs.prod.js");
+        } else {
+          module.exports = require("./a-322ea539.cjs.dev.js");
+        }
+
+        ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/a-322ea539.cjs.prod.js, dist/a-a9abfd33.cjs.dev.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
         "use client";
         'use strict';
 
@@ -1048,20 +1052,11 @@ if (process.platform !== "win32") {
 
         exports.A = A;
 
-        ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/a-50901018.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+        ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/a-b89f2efa.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
         "use client";
         const A = 1;
 
         export { A };
-
-        ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/a-6cff1501.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-        'use strict';
-
-        if (process.env.NODE_ENV === "production") {
-          module.exports = require("./a-6cff1501.cjs.prod.js");
-        } else {
-          module.exports = require("./a-6cff1501.cjs.dev.js");
-        }
 
         ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/a.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
         export declare const A = 1;
@@ -1085,7 +1080,7 @@ if (process.platform !== "win32") {
 
         Object.defineProperty(exports, '__esModule', { value: true });
 
-        var a = require('./a-2842c06a.cjs.dev.js');
+        var a = require('./a-a9abfd33.cjs.dev.js');
 
         const B = 2;
 
@@ -1106,7 +1101,7 @@ if (process.platform !== "win32") {
 
         Object.defineProperty(exports, '__esModule', { value: true });
 
-        var a = require('./a-6cff1501.cjs.prod.js');
+        var a = require('./a-322ea539.cjs.prod.js');
 
         const B = 2;
 
@@ -1114,7 +1109,7 @@ if (process.platform !== "win32") {
         exports.B = B;
 
         ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-        export { A } from './a-50901018.esm.js';
+        export { A } from './a-b89f2efa.esm.js';
 
         const B = 2;
 

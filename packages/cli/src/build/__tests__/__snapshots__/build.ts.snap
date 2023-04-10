@@ -70,7 +70,7 @@ function doSomething(arg) {
 }
 var index = "wow";
 
-exports.default = index;
+exports["default"] = index;
 exports.doSomething = doSomething;
 "
 `;
@@ -103,7 +103,7 @@ function doSomething(arg) {
 }
 var index = "wow";
 
-exports.default = index;
+exports["default"] = index;
 exports.doSomething = doSomething;
 "
 `;
@@ -114,8 +114,7 @@ exports[`flow: flow-export-default.esm.js 1`] = `
 }
 var index = "wow";
 
-export default index;
-export { doSomething };
+export { index as default, doSomething };
 "
 `;
 
@@ -126,7 +125,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 var index = 2;
 
-exports.default = index;
+exports["default"] = index;
 "
 `;
 
@@ -148,14 +147,14 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 var index = 2;
 
-exports.default = index;
+exports["default"] = index;
 "
 `;
 
 exports[`monorepo single package: some-scope-package-two-single-package.esm.js 1`] = `
 "var index = 2;
 
-export default index;
+export { index as default };
 "
 `;
 
@@ -192,7 +191,7 @@ exports[`monorepo umd with dep on other module: some-scope-package-four-umd-with
 "
 `;
 
-exports[`monorepo umd with dep on other module: some-scope-package-four-umd-with-dep.umd.min.js.map 1`] = `"{"version":3,"file":"some-scope-package-four-umd-with-dep.umd.min.js","sources":["../../package-one/src/index.js"],"sourcesContent":["import { createElement } from \\"react\\";\\n\\ncreateElement(\\"div\\", null);"],"names":[],"mappings":"iQAEc,MAAO"}"`;
+exports[`monorepo umd with dep on other module: some-scope-package-four-umd-with-dep.umd.min.js.map 1`] = `"{"version":3,"file":"some-scope-package-four-umd-with-dep.umd.min.js","sources":["../../package-one/src/index.js"],"sourcesContent":["import { createElement } from \\"react\\";\\n\\ncreateElement(\\"div\\", null);"],"names":["createElement"],"mappings":"iPAEAA,EAAAA,cAAc,MAAO"}"`;
 
 exports[`monorepo umd with dep on other module: some-scope-package-one-umd-with-dep.cjs.dev.js 1`] = `
 "'use strict';
@@ -229,7 +228,7 @@ exports[`monorepo umd with dep on other module: some-scope-package-one-umd-with-
 "
 `;
 
-exports[`monorepo umd with dep on other module: some-scope-package-one-umd-with-dep.umd.min.js.map 1`] = `"{"version":3,"file":"some-scope-package-one-umd-with-dep.umd.min.js","sources":["../src/index.js"],"sourcesContent":["import { createElement } from \\"react\\";\\n\\ncreateElement(\\"div\\", null);"],"names":[],"mappings":"iQAEc,MAAO"}"`;
+exports[`monorepo umd with dep on other module: some-scope-package-one-umd-with-dep.umd.min.js.map 1`] = `"{"version":3,"file":"some-scope-package-one-umd-with-dep.umd.min.js","sources":["../src/index.js"],"sourcesContent":["import { createElement } from \\"react\\";\\n\\ncreateElement(\\"div\\", null);"],"names":["createElement"],"mappings":"iPAEAA,EAAAA,cAAc,MAAO"}"`;
 
 exports[`monorepo umd with dep on other module: some-scope-package-three-umd-with-dep.cjs.dev.js 1`] = `
 "'use strict';
@@ -301,7 +300,7 @@ exports[`monorepo umd with dep on other module: some-scope-package-two-umd-with-
 "
 `;
 
-exports[`monorepo umd with dep on other module: some-scope-package-two-umd-with-dep.umd.min.js.map 1`] = `"{"version":3,"file":"some-scope-package-two-umd-with-dep.umd.min.js","sources":["../src/index.js"],"sourcesContent":["import { createElement } from \\"react\\";\\n\\ncreateElement(\\"h1\\", null);"],"names":[],"mappings":"iQAEc,KAAM"}"`;
+exports[`monorepo umd with dep on other module: some-scope-package-two-umd-with-dep.umd.min.js.map 1`] = `"{"version":3,"file":"some-scope-package-two-umd-with-dep.umd.min.js","sources":["../src/index.js"],"sourcesContent":["import { createElement } from \\"react\\";\\n\\ncreateElement(\\"h1\\", null);"],"names":["createElement"],"mappings":"iPAEAA,EAAAA,cAAc,KAAM"}"`;
 
 exports[`monorepo: some-scope-package-one.cjs.dev.js 1`] = `
 "'use strict';
@@ -310,7 +309,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 var index = 1;
 
-exports.default = index;
+exports["default"] = index;
 "
 `;
 
@@ -332,14 +331,14 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 var index = 1;
 
-exports.default = index;
+exports["default"] = index;
 "
 `;
 
 exports[`monorepo: some-scope-package-one.esm.js 1`] = `
 "var index = 1;
 
-export default index;
+export { index as default };
 "
 `;
 
@@ -350,7 +349,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 var index = 2;
 
-exports.default = index;
+exports["default"] = index;
 "
 `;
 
@@ -372,14 +371,14 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 var index = 2;
 
-exports.default = index;
+exports["default"] = index;
 "
 `;
 
 exports[`monorepo: some-scope-package-two.esm.js 1`] = `
 "var index = 2;
 
-export default index;
+export { index as default };
 "
 `;
 
@@ -390,7 +389,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 var index = "this does not have a module build";
 
-exports.default = index;
+exports["default"] = index;
 "
 `;
 
@@ -412,7 +411,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 var index = "this does not have a module build";
 
-exports.default = index;
+exports["default"] = index;
 "
 `;
 
@@ -491,4 +490,4 @@ exports[`umd with dep on other module: umd-with-dep.umd.min.js 1`] = `
 "
 `;
 
-exports[`umd with dep on other module: umd-with-dep.umd.min.js.map 1`] = `"{"version":3,"file":"umd-with-dep.umd.min.js","sources":["../src/index.js"],"sourcesContent":["import { createElement } from \\"react\\";\\n\\ncreateElement(\\"div\\", null);"],"names":[],"mappings":"iQAEc,MAAO"}"`;
+exports[`umd with dep on other module: umd-with-dep.umd.min.js.map 1`] = `"{"version":3,"file":"umd-with-dep.umd.min.js","sources":["../src/index.js"],"sourcesContent":["import { createElement } from \\"react\\";\\n\\ncreateElement(\\"div\\", null);"],"names":["createElement"],"mappings":"iPAEAA,EAAAA,cAAc,MAAO"}"`;

@@ -14,7 +14,7 @@ let thing = "wow";
 }
 var thing$1 = thing;
 
-exports.default = thing$1;
+exports["default"] = thing$1;
 "
 `;
 
@@ -32,7 +32,7 @@ if (typeof document !== undefined) {
 }
 var thing$1 = thing;
 
-exports.default = thing$1;
+exports["default"] = thing$1;
 "
 `;
 
@@ -61,7 +61,7 @@ if (typeof document !== undefined) {
 }
 var thing$1 = thing;
 
-exports.default = thing$1;
+exports["default"] = thing$1;
 "
 `;
 
@@ -96,7 +96,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 var index = "something";
 
-exports.default = index;
+exports["default"] = index;
 "
 `;
 
@@ -118,7 +118,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 var index = "something";
 
-exports.default = index;
+exports["default"] = index;
 "
 `;
 
@@ -251,7 +251,7 @@ var Foo = /*#__PURE__*/_createClass(function Foo() {
   _classCallCheck(this, Foo);
 });
 
-exports.default = Foo;
+exports["default"] = Foo;
 "
 `;
 
@@ -278,7 +278,7 @@ var Foo = /*#__PURE__*/_createClass(function Foo() {
   _classCallCheck(this, Foo);
 });
 
-exports.default = Foo;
+exports["default"] = Foo;
 "
 `;
 
@@ -290,7 +290,7 @@ var Foo = /*#__PURE__*/_createClass(function Foo() {
   _classCallCheck(this, Foo);
 });
 
-export default Foo;
+export { Foo as default };
 "
 `;
 

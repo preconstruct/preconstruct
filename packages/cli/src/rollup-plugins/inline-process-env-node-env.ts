@@ -1,4 +1,4 @@
-import { Plugin, SourceDescription } from "rollup";
+import { Plugin, SourceDescription, SourceMapInput } from "rollup";
 import { walk } from "estree-walker";
 import isReference from "is-reference";
 import MagicString from "magic-string";
@@ -55,7 +55,9 @@ export function inlineProcessEnvNodeEnv({
         });
         let output: SourceDescription = { code: magicString.toString(), ast };
         if (sourceMap) {
-          output.map = magicString.generateMap({ hires: true });
+          output.map = magicString.generateMap({
+            hires: true,
+          }) as SourceMapInput;
         }
         return output;
       }

@@ -79,7 +79,7 @@ test("clears dist folder", async () => {
 
     var index = "something";
 
-    exports.default = index;
+    exports["default"] = index;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/already-has-things-in-dist.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
@@ -885,9 +885,7 @@ test("self import", async () => {
 
     Object.defineProperty(exports, 'a', {
     	enumerable: true,
-    	get: function () {
-    		return _package.a;
-    	}
+    	get: function () { return _package.a; }
     });
     exports.b = b;
 

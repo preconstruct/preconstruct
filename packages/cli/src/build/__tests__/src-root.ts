@@ -68,7 +68,7 @@ test("monorepo with root src dir and typescript package", async () => {
 
     var index = {};
 
-    exports.default = index;
+    exports["default"] = index;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/my-package.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
@@ -82,7 +82,7 @@ test("monorepo with root src dir and typescript package", async () => {
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/my-package.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     var index = {};
 
-    export default index;
+    export { index as default };
 
   `);
 });
