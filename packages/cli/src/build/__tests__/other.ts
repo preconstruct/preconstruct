@@ -10,6 +10,7 @@ import {
   repoNodeModules,
   typescriptFixture,
   getFiles,
+  stripHashes,
 } from "../../../test-utils";
 import { doPromptInput } from "../../prompt";
 
@@ -816,308 +817,447 @@ test(".d.ts", async () => {
   `);
 });
 
-// TODO: the hashes are unpredictable on windows for some reason so these tests are skipped for now
-if (process.platform !== "win32") {
-  test("use client", async () => {
-    const dir = await testdir({
-      "package.json": JSON.stringify({
-        name: "pkg",
-        main: "dist/pkg.cjs.js",
-        module: "dist/pkg.esm.js",
-      }),
-      "src/index.js": js`
-        export { A } from "./client";
-        export { C } from "./c";
-        export { B } from "./b";
-      `,
-      "src/client.js": js`
-        "use client";
-        export const A = "something";
-      `,
-      "src/b.js": js`
-        export const B = "b";
-      `,
-      "src/c.js": js`
-        import { D } from "./d";
-        export function C() {
-          return D;
-        }
-      `,
-      "src/d.js": js`
-        "use client";
-        export const D = "d";
-      `,
-    });
-    let originalProcessCwd = process.cwd;
-    try {
-      process.cwd = () => dir;
-      await build(dir);
-      expect(await getFiles(dir, ["dist/**"])).toMatchInlineSnapshot(`
-        ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/client-11fae4c4.cjs.dev.js, dist/client-c90d5c53.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-        "use client";
-        'use strict';
-
-        Object.defineProperty(exports, '__esModule', { value: true });
-
-        const A = "something";
-
-        exports.A = A;
-
-        ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/client-28de3131.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-        "use client";
-        const A = "something";
-
-        export { A };
-
-        ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/client-c90d5c53.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-        'use strict';
-
-        if (process.env.NODE_ENV === "production") {
-          module.exports = require("./client-c90d5c53.cjs.prod.js");
-        } else {
-          module.exports = require("./client-c90d5c53.cjs.dev.js");
-        }
-
-        ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/d-31685e16.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-        'use strict';
-
-        if (process.env.NODE_ENV === "production") {
-          module.exports = require("./d-31685e16.cjs.prod.js");
-        } else {
-          module.exports = require("./d-31685e16.cjs.dev.js");
-        }
-
-        ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/d-31685e16.cjs.prod.js, dist/d-d4cb9131.cjs.dev.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-        "use client";
-        'use strict';
-
-        Object.defineProperty(exports, '__esModule', { value: true });
-
-        const D = "d";
-
-        exports.D = D;
-
-        ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/d-bee640a0.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-        "use client";
-        const D = "d";
-
-        export { D };
-
-        ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.dev.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-        'use strict';
-
-        Object.defineProperty(exports, '__esModule', { value: true });
-
-        var client = require('./client-11fae4c4.cjs.dev.js');
-        var d = require('./d-d4cb9131.cjs.dev.js');
-
-        function C() {
-          return d.D;
-        }
-
-        const B = "b";
-
-        exports.A = client.A;
-        exports.B = B;
-        exports.C = C;
-
-        ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-        'use strict';
-
-        if (process.env.NODE_ENV === "production") {
-          module.exports = require("./pkg.cjs.prod.js");
-        } else {
-          module.exports = require("./pkg.cjs.dev.js");
-        }
-
-        ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-        'use strict';
-
-        Object.defineProperty(exports, '__esModule', { value: true });
-
-        var client = require('./client-c90d5c53.cjs.prod.js');
-        var d = require('./d-31685e16.cjs.prod.js');
-
-        function C() {
-          return d.D;
-        }
-
-        const B = "b";
-
-        exports.A = client.A;
-        exports.B = B;
-        exports.C = C;
-
-        ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-        export { A } from './client-28de3131.esm.js';
-        import { D } from './d-bee640a0.esm.js';
-
-        function C() {
-          return D;
-        }
-
-        const B = "b";
-
-        export { B, C };
-
-      `);
-    } finally {
-      process.cwd = originalProcessCwd;
-    }
+test("simple use client", async () => {
+  const dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "pkg",
+      main: "dist/pkg.cjs.js",
+      module: "dist/pkg.esm.js",
+    }),
+    "src/index.js": js`
+      export { A } from "./client";
+    `,
+    "src/client.js": js`
+      "use client";
+      export const A = "something";
+      console.log("client");
+    `,
   });
+  await build(dir);
+  expect(await getFiles(dir, ["dist/**"], stripHashes("client")))
+    .toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/client-this-is-not-the-real-hash-309cc5e233da5126cc473e58b428ae77.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
 
-  test("use client as entrypoint", async () => {
-    const dir = await testdir({
-      "package.json": JSON.stringify({
-        name: "pkg",
-        main: "dist/pkg.cjs.js",
-        module: "dist/pkg.esm.js",
-      }),
-      "src/index.js": js`
-        "use client";
-        export const a = true;
-      `,
-    });
-    let originalProcessCwd = process.cwd;
-    try {
-      process.cwd = () => dir;
-      await build(dir);
-      expect(await getFiles(dir, ["dist/**"])).toMatchInlineSnapshot(`
-              ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.dev.js, dist/pkg.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-              "use client";
-              'use strict';
-
-              Object.defineProperty(exports, '__esModule', { value: true });
-
-              const a = true;
-
-              exports.a = a;
-
-              ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-              'use strict';
-
-              if (process.env.NODE_ENV === "production") {
-                module.exports = require("./pkg.cjs.prod.js");
-              } else {
-                module.exports = require("./pkg.cjs.dev.js");
-              }
-
-              ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-              "use client";
-              const a = true;
-
-              export { a };
-
-          `);
-    } finally {
-      process.cwd = originalProcessCwd;
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./client-some-hash.cjs.prod.js");
+    } else {
+      module.exports = require("./client-some-hash.cjs.dev.js");
     }
-  });
-  test("use client with typescript", async () => {
-    const dir = await testdir({
-      ...typescriptFixture,
-      "src/index.ts": ts`
-        export { A } from "./a";
-        export { B } from "./b";
-      `,
-      "src/a.ts": ts`
-        "use client";
-        export const A = 1;
-      `,
-      "src/b.ts": ts`
-        export const B = 2;
-      `,
-    });
-    let originalProcessCwd = process.cwd;
-    try {
-      process.cwd = () => dir;
-      await build(dir);
-      expect(await getFiles(dir, ["dist/**"])).toMatchInlineSnapshot(`
-        ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/a-322ea539.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-        'use strict';
 
-        if (process.env.NODE_ENV === "production") {
-          module.exports = require("./a-322ea539.cjs.prod.js");
-        } else {
-          module.exports = require("./a-322ea539.cjs.dev.js");
-        }
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/client-this-is-not-the-real-hash-a38c80456df632dc83f179d407942ef1.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    "use client";
+    const A = "something";
+    console.log("client");
 
-        ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/a-322ea539.cjs.prod.js, dist/a-a9abfd33.cjs.dev.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-        "use client";
-        'use strict';
+    export { A };
 
-        Object.defineProperty(exports, '__esModule', { value: true });
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/client-this-is-not-the-real-hash-ae89a24f4474121fa7710eb213fde301.cjs.dev.js, dist/client-this-is-not-the-real-hash-ae89a24f4474121fa7710eb213fde301.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    "use client";
+    'use strict';
 
-        const A = 1;
+    Object.defineProperty(exports, '__esModule', { value: true });
 
-        exports.A = A;
+    const A = "something";
+    console.log("client");
 
-        ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/a-b89f2efa.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-        "use client";
-        const A = 1;
+    exports.A = A;
 
-        export { A };
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.dev.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
 
-        ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/a.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-        export declare const A = 1;
+    Object.defineProperty(exports, '__esModule', { value: true });
 
-        ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/b.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-        export declare const B = 2;
+    var client = require('./client-some-hash.cjs.dev.js');
 
-        ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/index.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-        export { A } from "./a";
-        export { B } from "./b";
 
-        ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-        export * from "./declarations/src/index";
-        //# sourceMappingURL=typescript.cjs.d.ts.map
 
-        ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.cjs.d.ts.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-        {"version":3,"file":"typescript.cjs.d.ts","sourceRoot":"","sources":["./declarations/src/index.d.ts"],"names":[],"mappings":"AAAA"}
+    exports.A = client.A;
 
-        ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.cjs.dev.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-        'use strict';
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
 
-        Object.defineProperty(exports, '__esModule', { value: true });
-
-        var a = require('./a-a9abfd33.cjs.dev.js');
-
-        const B = 2;
-
-        exports.A = a.A;
-        exports.B = B;
-
-        ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-        'use strict';
-
-        if (process.env.NODE_ENV === "production") {
-          module.exports = require("./typescript.cjs.prod.js");
-        } else {
-          module.exports = require("./typescript.cjs.dev.js");
-        }
-
-        ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-        'use strict';
-
-        Object.defineProperty(exports, '__esModule', { value: true });
-
-        var a = require('./a-322ea539.cjs.prod.js');
-
-        const B = 2;
-
-        exports.A = a.A;
-        exports.B = B;
-
-        ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-        export { A } from './a-b89f2efa.esm.js';
-
-        const B = 2;
-
-        export { B };
-
-      `);
-    } finally {
-      process.cwd = originalProcessCwd;
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./pkg.cjs.prod.js");
+    } else {
+      module.exports = require("./pkg.cjs.dev.js");
     }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    var client = require('./client-some-hash.cjs.prod.js');
+
+
+
+    exports.A = client.A;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export { A } from './client-some-hash.esm.js';
+
+  `);
+});
+test("use client", async () => {
+  const dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "pkg",
+      main: "dist/pkg.cjs.js",
+      module: "dist/pkg.esm.js",
+    }),
+    "src/index.js": js`
+      export { A } from "./client";
+      export { C } from "./c";
+      export { B } from "./b";
+    `,
+    "src/client.js": js`
+      "use client";
+      export const A = "something";
+    `,
+    "src/b.js": js`
+      export const B = "b";
+    `,
+    "src/c.js": js`
+      import { D } from "./d";
+      export function C() {
+        return D;
+      }
+    `,
+    "src/d.js": js`
+      "use client";
+      export const D = "d";
+    `,
   });
-}
+  await build(dir);
+  expect(await getFiles(dir, ["dist/**"], stripHashes("client", "d")))
+    .toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/client-this-is-not-the-real-hash-212fb4ccc7a43c8c432c7e4eb61fec25.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    "use client";
+    const A = "something";
+
+    export { A };
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/client-this-is-not-the-real-hash-309cc5e233da5126cc473e58b428ae77.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./client-some-hash.cjs.prod.js");
+    } else {
+      module.exports = require("./client-some-hash.cjs.dev.js");
+    }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/client-this-is-not-the-real-hash-d16d3e6ec580816fdc29f3ce0255ea8d.cjs.dev.js, dist/client-this-is-not-the-real-hash-d16d3e6ec580816fdc29f3ce0255ea8d.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    "use client";
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    const A = "something";
+
+    exports.A = A;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/d-this-is-not-the-real-hash-7f02ec9f67dc1ea449c07eba7ff6c6ef.cjs.dev.js, dist/d-this-is-not-the-real-hash-7f02ec9f67dc1ea449c07eba7ff6c6ef.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    "use client";
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    const D = "d";
+
+    exports.D = D;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/d-this-is-not-the-real-hash-be4ed809667566843060574df59e2148.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    "use client";
+    const D = "d";
+
+    export { D };
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/d-this-is-not-the-real-hash-fe4bc2a46f636c80b94c4fc4d054f67e.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./d-some-hash.cjs.prod.js");
+    } else {
+      module.exports = require("./d-some-hash.cjs.dev.js");
+    }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.dev.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    var client = require('./client-some-hash.cjs.dev.js');
+    var d = require('./d-some-hash.cjs.dev.js');
+
+    function C() {
+      return d.D;
+    }
+
+    const B = "b";
+
+    exports.A = client.A;
+    exports.B = B;
+    exports.C = C;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./pkg.cjs.prod.js");
+    } else {
+      module.exports = require("./pkg.cjs.dev.js");
+    }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    var client = require('./client-some-hash.cjs.prod.js');
+    var d = require('./d-some-hash.cjs.prod.js');
+
+    function C() {
+      return d.D;
+    }
+
+    const B = "b";
+
+    exports.A = client.A;
+    exports.B = B;
+    exports.C = C;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export { A } from './client-some-hash.esm.js';
+    import { D } from './d-some-hash.esm.js';
+
+    function C() {
+      return D;
+    }
+
+    const B = "b";
+
+    export { B, C };
+
+  `);
+});
+
+test("use client as entrypoint", async () => {
+  const dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "pkg",
+      main: "dist/pkg.cjs.js",
+      module: "dist/pkg.esm.js",
+    }),
+    "src/index.js": js`
+      "use client";
+      export const a = true;
+    `,
+  });
+  await build(dir);
+  expect(await getFiles(dir, ["dist/**"])).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.dev.js, dist/pkg.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    "use client";
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    const a = true;
+
+    exports.a = a;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./pkg.cjs.prod.js");
+    } else {
+      module.exports = require("./pkg.cjs.dev.js");
+    }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    "use client";
+    const a = true;
+
+    export { a };
+
+  `);
+});
+
+test("use client with typescript", async () => {
+  const dir = await testdir({
+    ...typescriptFixture,
+    "src/index.ts": ts`
+      export { A } from "./a";
+      export { B } from "./b";
+    `,
+    "src/a.ts": ts`
+      "use client";
+      export const A = 1;
+    `,
+    "src/b.ts": ts`
+      export const B = 2;
+    `,
+  });
+  await build(dir);
+  expect(await getFiles(dir, ["dist/**"], stripHashes("a")))
+    .toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/a-this-is-not-the-real-hash-07648f1b1366dbe9cc93bee49ca86cfc.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    "use client";
+    const A = 1;
+
+    export { A };
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/a-this-is-not-the-real-hash-31df1da61df583d4d0394e050f45c88f.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./a-some-hash.cjs.prod.js");
+    } else {
+      module.exports = require("./a-some-hash.cjs.dev.js");
+    }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/a-this-is-not-the-real-hash-87cc476583ec65009aaf4a3181cf8a43.cjs.dev.js, dist/a-this-is-not-the-real-hash-87cc476583ec65009aaf4a3181cf8a43.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    "use client";
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    const A = 1;
+
+    exports.A = A;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/a.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export declare const A = 1;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/b.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export declare const B = 2;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/index.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export { A } from "./a";
+    export { B } from "./b";
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export * from "./declarations/src/index";
+    //# sourceMappingURL=typescript.cjs.d.ts.map
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.cjs.d.ts.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {"version":3,"file":"typescript.cjs.d.ts","sourceRoot":"","sources":["./declarations/src/index.d.ts"],"names":[],"mappings":"AAAA"}
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.cjs.dev.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    var a = require('./a-some-hash.cjs.dev.js');
+
+    const B = 2;
+
+    exports.A = a.A;
+    exports.B = B;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./typescript.cjs.prod.js");
+    } else {
+      module.exports = require("./typescript.cjs.dev.js");
+    }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    var a = require('./a-some-hash.cjs.prod.js');
+
+    const B = 2;
+
+    exports.A = a.A;
+    exports.B = B;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export { A } from './a-some-hash.esm.js';
+
+    const B = 2;
+
+    export { B };
+
+  `);
+});
+test("use client as entrypoint with typescript", async () => {
+  const dir = await testdir({
+    node_modules: { kind: "symlink", path: repoNodeModules },
+    "package.json": JSON.stringify({
+      name: "typescript",
+      main: "dist/typescript.cjs.js",
+      module: "dist/typescript.esm.js",
+      dependencies: {
+        typescript: "^3.4.5",
+      },
+      preconstruct: {
+        entrypoints: ["index.ts", "another.ts"],
+      },
+    }),
+    "another/package.json": JSON.stringify({
+      main: "dist/typescript-another.cjs.js",
+      module: "dist/typescript-another.esm.js",
+    }),
+    "tsconfig.json": JSON.stringify({
+      compilerOptions: {
+        target: "esnext",
+        module: "commonjs",
+        strict: true,
+        esModuleInterop: true,
+        noEmit: true,
+      },
+    }),
+    ".babelrc": JSON.stringify({
+      presets: [require.resolve("@babel/preset-typescript")],
+    }),
+    "src/index.ts": ts`
+      "use client";
+      export const A = 1;
+    `,
+    "src/another.ts": ts`
+      import { A } from "./index";
+      export function something() {
+        console.log(A);
+      }
+    `,
+  });
+  await build(dir);
+  expect(await getFiles(dir, ["{another/dist,dist}/**/*.{esm.js,d.ts}"]))
+    .toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ another/dist/typescript-another.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export * from "../../dist/declarations/src/another";
+    //# sourceMappingURL=typescript-another.cjs.d.ts.map
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ another/dist/typescript-another.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    import { A } from '../../dist/typescript.esm.js';
+
+    function something() {
+      console.log(A);
+    }
+
+    export { something };
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/another.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export declare function something(): void;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/index.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export declare const A = 1;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export * from "./declarations/src/index";
+    //# sourceMappingURL=typescript.cjs.d.ts.map
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    "use client";
+    const A = 1;
+
+    export { A };
+
+  `);
+});
