@@ -1,0 +1,13 @@
+name: "Setup Dependencies"
+runs:
+  using: "composite"
+  steps:
+    - name: Setup Node.js LTS
+      uses: actions/setup-node@v3
+      with:
+        node-version: lts/*
+        cache: yarn
+
+    - name: Install Dependencies
+      run: yarn install
+      shell: bash
