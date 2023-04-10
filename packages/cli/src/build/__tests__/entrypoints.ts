@@ -1,12 +1,6 @@
 import build from "../";
 import path from "path";
-import {
-  snapshotDirectory,
-  stripHashes,
-  testdir,
-  js,
-  getFiles,
-} from "../../../test-utils";
+import { snapshotDirectory, testdir, js, getFiles } from "../../../test-utils";
 
 jest.setTimeout(10000);
 
@@ -152,7 +146,7 @@ test("two entrypoints with a common dependency", async () => {
 
   await build(tmpPath);
 
-  await snapshotDirectory(tmpPath, await stripHashes("identity"));
+  await snapshotDirectory(tmpPath);
   let root = require(tmpPath);
   let other = require(path.join(tmpPath, "multiply"));
   expect(typeof root.identity).toBe("function");
