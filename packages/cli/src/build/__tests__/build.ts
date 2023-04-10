@@ -825,3 +825,87 @@ test("typescript with nodenext module resolution", async () => {
   `);
   expect(stderr.toString("utf8")).toMatchInlineSnapshot(`""`);
 });
+
+test("self import", async () => {
+  let dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "@my-test/package",
+      main: "dist/my-test-package.cjs.js",
+      module: "dist/my-test-package.esm.js",
+      preconstruct: {
+        entrypoints: ["index.js", "other.js"],
+      },
+    }),
+    "other/package.json": JSON.stringify({
+      main: "dist/my-test-package-other.cjs.js",
+      module: "dist/my-test-package-other.esm.js",
+    }),
+    "src/index.js": js`
+      export const a = 1;
+    `,
+    "src/other.js": js`
+      export { a } from "@my-test/package";
+      export const b = a;
+    `,
+  });
+  await build(dir);
+  expect(await getFiles(dir, ["dist/**", "other/dist/**"]))
+    .toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/my-test-package.cjs.dev.js, dist/my-test-package.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    const a = 1;
+
+    exports.a = a;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/my-test-package.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./my-test-package.cjs.prod.js");
+    } else {
+      module.exports = require("./my-test-package.cjs.dev.js");
+    }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/my-test-package.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    const a = 1;
+
+    export { a };
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ other/dist/my-test-package-other.cjs.dev.js, other/dist/my-test-package-other.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    var _package = require('@my-test/package');
+
+    const b = a;
+
+    Object.defineProperty(exports, 'a', {
+    	enumerable: true,
+    	get: function () {
+    		return _package.a;
+    	}
+    });
+    exports.b = b;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ other/dist/my-test-package-other.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./my-test-package-other.cjs.prod.js");
+    } else {
+      module.exports = require("./my-test-package-other.cjs.dev.js");
+    }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ other/dist/my-test-package-other.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export { a } from '@my-test/package';
+
+    const b = a;
+
+    export { b };
+
+  `);
+});
