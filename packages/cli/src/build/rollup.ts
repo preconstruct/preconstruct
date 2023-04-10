@@ -134,6 +134,7 @@ export let getRollupConfig = (
       type === "node-prod" && flowAndNodeDevProdEntry(),
       resolveErrorsPlugin(pkg, warnings, type === "umd"),
       type === "node-prod" && typescriptDeclarations(pkg),
+      serverComponentsPlugin({ sourceMap: type === "umd" }),
       babel({
         cwd: pkg.project.directory,
         reportTransformedFile,
@@ -159,7 +160,6 @@ export let getRollupConfig = (
       json({
         namedExports: false,
       }),
-      serverComponentsPlugin({ sourceMap: type === "umd" }),
       type === "umd" &&
         alias({
           entries: aliases,

@@ -98,9 +98,9 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
 
         if (!typeScriptSource) {
           const moduleInfo = this.getModuleInfo(file.facadeModuleId);
-          // this will happen for "use client" modules where it's not an entrypoint
-          // but from rollup's perspective it sort of is since it gets it's own explicit chunk
-          if (moduleInfo?.meta.isUseClientEntry) {
+          // this will happen for "use client" modules where it's not
+          // an actual entrypoint but it is a Rollup entry
+          if (moduleInfo?.meta.useClientReferenceId) {
             continue;
           }
           // otherwise, a user should never be able to cause this to happen

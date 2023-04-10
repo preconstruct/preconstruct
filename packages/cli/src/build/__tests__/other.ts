@@ -872,7 +872,10 @@ test("simple use client", async () => {
 
 
 
-    exports.A = client.A;
+    Object.defineProperty(exports, 'A', {
+    	enumerable: true,
+    	get: function () { return client.A; }
+    });
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
@@ -892,7 +895,10 @@ test("simple use client", async () => {
 
 
 
-    exports.A = client.A;
+    Object.defineProperty(exports, 'A', {
+    	enumerable: true,
+    	get: function () { return client.A; }
+    });
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     export { A } from './client-some-hash.esm.js';
@@ -996,7 +1002,10 @@ test("use client", async () => {
 
     const B = "b";
 
-    exports.A = client.A;
+    Object.defineProperty(exports, 'A', {
+      enumerable: true,
+      get: function () { return client.A; }
+    });
     exports.B = B;
     exports.C = C;
 
@@ -1023,7 +1032,10 @@ test("use client", async () => {
 
     const B = "b";
 
-    exports.A = client.A;
+    Object.defineProperty(exports, 'A', {
+      enumerable: true,
+      get: function () { return client.A; }
+    });
     exports.B = B;
     exports.C = C;
 
@@ -1153,7 +1165,10 @@ test("use client with typescript", async () => {
 
     const B = 2;
 
-    exports.A = a.A;
+    Object.defineProperty(exports, 'A', {
+    	enumerable: true,
+    	get: function () { return a.A; }
+    });
     exports.B = B;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
@@ -1174,7 +1189,10 @@ test("use client with typescript", async () => {
 
     const B = 2;
 
-    exports.A = a.A;
+    Object.defineProperty(exports, 'A', {
+    	enumerable: true,
+    	get: function () { return a.A; }
+    });
     exports.B = B;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
@@ -1258,6 +1276,191 @@ test("use client as entrypoint with typescript", async () => {
     const A = 1;
 
     export { A };
+
+  `);
+});
+
+test("no hoisting client only imports", async () => {
+  const dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "pkg",
+      main: "dist/pkg.cjs.js",
+      module: "dist/pkg.esm.js",
+      dependencies: {
+        "client-only": "latest",
+      },
+    }),
+    "src/index.js": js`
+      export * as x from "./client";
+    `,
+    "src/client.js": js`
+      "use client";
+      import "client-only";
+      export const a = 1;
+      export const b = 1;
+    `,
+  });
+  await build(dir);
+  expect(await getFiles(dir, ["dist/**.esm.js"], stripHashes("client")))
+    .toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/client-this-is-not-the-real-hash-2d9a93e2d378420c96993764a8d2b439.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use client';
+    import 'client-only';
+
+    const a = 1;
+    const b = 1;
+
+    export { a, b };
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    import * as client from './client-some-hash.esm.js';
+    export { client as x };
+
+  `);
+});
+test("cycle with use client", async () => {
+  const dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "pkg",
+      main: "dist/pkg.cjs.js",
+      module: "dist/pkg.esm.js",
+      dependencies: {
+        "client-only": "latest",
+      },
+    }),
+    "src/index.js": js`
+      import { client } from "./ui";
+      import { another } from "./other";
+
+      export async function thing() {
+        return a;
+      }
+
+      export function other() {
+        console.log(another, client);
+      }
+    `,
+    "src/other.js": js`
+      import "./index";
+
+      export function another() {
+        return c;
+      }
+    `,
+    "src/ui.js": js`
+      "use client";
+      import "client-only";
+
+      export function client() {
+        console.log("a");
+      }
+    `,
+  });
+  await build(dir);
+  expect(await getFiles(dir, ["dist/**.esm.js"], stripHashes("ui")))
+    .toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    import { client } from './ui-some-hash.esm.js';
+
+    function another() {
+      return c;
+    }
+
+    async function thing() {
+      return a;
+    }
+    function other() {
+      console.log(another, client);
+    }
+
+    export { other, thing };
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/ui-this-is-not-the-real-hash-bed1afce5b6c65dfe85deec7c0ef27d1.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use client';
+    import 'client-only';
+
+    function client() {
+      console.log("a");
+    }
+
+    export { client };
+
+  `);
+});
+test("import use client self", async () => {
+  const dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "pkg",
+      main: "dist/pkg.cjs.js",
+      module: "dist/pkg.esm.js",
+      dependencies: {
+        "client-only": "latest",
+      },
+    }),
+    "src/index.js": js`
+      export { client } from "./ui";
+    `,
+    "src/ui.js": js`
+      "use client";
+      import "client-only";
+      import * as self from "./ui";
+
+      export function client() {
+        console.log("a", self);
+      }
+    `,
+  });
+  await build(dir);
+  expect(await getFiles(dir, ["dist/**.esm.js"], stripHashes("ui")))
+    .toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export { client } from './ui-some-hash.esm.js';
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/ui-this-is-not-the-real-hash-caf79d0376c465220743255e5be1da2d.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use client';
+    import 'client-only';
+    import * as self from './ui-some-hash.esm.js';
+
+    function client() {
+      console.log("a", self);
+    }
+
+    export { client };
+
+  `);
+});
+test("import use client self as entrypoint", async () => {
+  const dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "pkg",
+      main: "dist/pkg.cjs.js",
+      module: "dist/pkg.esm.js",
+      dependencies: {
+        "client-only": "latest",
+      },
+    }),
+    "src/index.js": js`
+      "use client";
+      import "client-only";
+      import * as self from "./index";
+
+      export function client() {
+        console.log("a", self);
+      }
+    `,
+  });
+  await build(dir);
+  expect(await getFiles(dir, ["dist/**.esm.js"])).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use client';
+    import 'client-only';
+    import * as self from './pkg.esm.js';
+
+    function client() {
+      console.log("a", self);
+    }
+
+    export { client };
 
   `);
 });
