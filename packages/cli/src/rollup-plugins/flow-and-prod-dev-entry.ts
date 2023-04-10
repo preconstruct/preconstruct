@@ -2,85 +2,13 @@ import path from "path";
 import { Plugin } from "rollup";
 import { getDevPath, getProdPath } from "../build/utils";
 import { flowTemplate } from "../utils";
-import { Package } from "../package";
-import { FatalError } from "../errors";
 
 import * as fs from "fs-extra";
 import normalizePath from "normalize-path";
 
-const allowedExtensionRegex = /\.([tj]sx?|json)$/;
-
-export default function flowAndNodeDevProdEntry(
-  pkg: Package,
-  warnings: FatalError[]
-): Plugin {
+export default function flowAndNodeDevProdEntry(): Plugin {
   return {
     name: "flow-and-prod-dev-entry",
-    load(id) {
-      if (id === "could-not-resolve") {
-        return "";
-      }
-      return null;
-    },
-    async resolveId(source, importer) {
-      let resolved = await this.resolve(source, importer, {
-        skipSelf: true,
-      });
-      if (resolved === null) {
-        if (!source.startsWith(".")) {
-          warnings.push(
-            new FatalError(
-              `"${source}" is imported ${
-                importer
-                  ? `by "${normalizePath(
-                      path.relative(pkg.directory, importer!)
-                    )}"`
-                  : ""
-              } but the package is not specified in dependencies or peerDependencies`,
-              pkg.name
-            )
-          );
-          return "could-not-resolve";
-        }
-        throw new FatalError(
-          `Could not resolve ${source} ` +
-            (importer ? `from ${path.relative(pkg.directory, importer)}` : ""),
-          pkg.name
-        );
-      }
-
-      if (source.startsWith("\0") || resolved.id.startsWith("\0")) {
-        return resolved;
-      }
-      if (resolved.id.startsWith(pkg.directory)) {
-        if (!resolved.external && !allowedExtensionRegex.test(resolved.id)) {
-          warnings.push(
-            new FatalError(
-              `only .ts, .tsx, .js, .jsx, and .json files can be imported but "${source}" is imported in ${
-                importer
-                  ? `"${normalizePath(path.relative(pkg.directory, importer))}"`
-                  : "a module"
-              }`,
-              pkg.name
-            )
-          );
-          return "could-not-resolve";
-        }
-
-        return resolved;
-      }
-      warnings.push(
-        new FatalError(
-          `all relative imports in a package should only import modules inside of their package directory but ${
-            importer
-              ? `"${normalizePath(path.relative(pkg.directory, importer))}"`
-              : "a module"
-          } is importing "${source}"`,
-          pkg.name
-        )
-      );
-      return "could-not-resolve";
-    },
     async generateBundle(opts, bundle) {
       for (const n in bundle) {
         const file = bundle[n];

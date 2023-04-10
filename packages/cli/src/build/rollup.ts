@@ -22,6 +22,7 @@ import { EXTENSIONS } from "../constants";
 import { inlineProcessEnvNodeEnv } from "../rollup-plugins/inline-process-env-node-env";
 import normalizePath from "normalize-path";
 import { serverComponentsPlugin } from "../rollup-plugins/server-components";
+import { resolveErrorsPlugin } from "../rollup-plugins/resolve";
 
 type ExternalPredicate = (source: string) => boolean;
 
@@ -77,21 +78,18 @@ export let getRollupConfig = (
     ] = entrypoint.source;
   });
 
-  let warnings: Array<FatalError> = [];
+  let warnings = new Set<string>();
 
   const config: RollupOptions = {
     input,
     external: wrapExternalPredicate(makeExternalPredicate(external)),
     onwarn: (warning) => {
       if (typeof warning === "string") {
-        warnings.push(
-          new FatalError(
-            `An unhandled Rollup error occurred: ${chalk.red(
-              // @ts-ignore
-              warning.toString()
-            )}`,
-            pkg.name
-          )
+        warnings.add(
+          `An unhandled Rollup error occurred: ${chalk.red(
+            // @ts-ignore
+            warning.toString()
+          )}`
         );
         return;
       }
@@ -102,41 +100,22 @@ export let getRollupConfig = (
         case "UNUSED_EXTERNAL_IMPORT": {
           break;
         }
-        case "UNRESOLVED_IMPORT": {
-          if (!warning.source!.startsWith(".")) {
-            warnings.push(
-              new FatalError(
-                `"${warning.source}" is imported by "${normalizePath(
-                  path.relative(pkg.directory, warning.importer!)
-                )}" but the package is not specified in dependencies or peerDependencies`,
-                pkg.name
-              )
-            );
-            return;
-          }
-        }
         case "THIS_IS_UNDEFINED": {
           if (type === "umd") {
             return;
           }
-          warnings.push(
-            new FatalError(
-              `"${normalizePath(
-                path.relative(pkg.directory, warning.loc!.file!)
-              )}" used \`this\` keyword at the top level of an ES module. You can read more about this at ${warning.url!} and fix this issue that has happened here:\n\n${warning.frame!}\n`,
-              pkg.name
-            )
+          warnings.add(
+            `"${normalizePath(
+              path.relative(pkg.directory, warning.loc!.file!)
+            )}" used \`this\` keyword at the top level of an ES module. You can read more about this at ${warning.url!} and fix this issue that has happened here:\n\n${warning.frame!}\n`
           );
           return;
         }
         default: {
-          warnings.push(
-            new FatalError(
-              `An unhandled Rollup error occurred: ${chalk.red(
-                warning.toString()
-              )}`,
-              pkg.name
-            )
+          warnings.add(
+            `An unhandled Rollup error occurred: ${chalk.red(
+              warning.toString()
+            )}`
           );
         }
       }
@@ -145,12 +124,15 @@ export let getRollupConfig = (
       {
         name: "throw-warnings",
         buildEnd() {
-          if (warnings.length) {
-            throw new BatchError(warnings);
+          if (warnings.size) {
+            throw new BatchError(
+              [...warnings].map((x) => new FatalError(x, pkg.name))
+            );
           }
         },
       } as Plugin,
-      type === "node-prod" && flowAndNodeDevProdEntry(pkg, warnings),
+      type === "node-prod" && flowAndNodeDevProdEntry(),
+      resolveErrorsPlugin(pkg, warnings, type === "umd"),
       type === "node-prod" && typescriptDeclarations(pkg),
       babel({
         cwd: pkg.project.directory,
