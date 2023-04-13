@@ -8,7 +8,8 @@ import path from "path";
 import resolveFrom from "resolve-from";
 import * as logger from "../logger";
 import { Project } from "../project";
-import { getDistExtension } from "../utils";
+import { forkExtension, getDistExtension } from "../utils";
+import { inlineProcessEnvNodeEnv } from "../rollup-plugins/inline-process-env-node-env";
 
 function getGlobal(project: Project, name: string) {
   if (
@@ -66,7 +67,29 @@ const babelHelperId = /@babel\/runtime(|-corejs[23])\/helpers\//;
 const interop = (id: string | null): "auto" | "default" =>
   id && babelHelperId.test(id) ? "default" : "auto";
 
+function forkDevProdConditions(
+  options: OutputOptions & { entryFileNames: string; chunkFileNames: string },
+  shouldFork: boolean | undefined
+): OutputOptions[] {
+  if (!shouldFork) {
+    return [options];
+  }
+  return (["dev", "prod"] as const).map((condition) => ({
+    ...options,
+    entryFileNames: forkExtension(options.entryFileNames, condition),
+    chunkFileNames: forkExtension(options.chunkFileNames, condition),
+    plugins: [
+      inlineProcessEnvNodeEnv({
+        sourceMap: false,
+        value: condition === "prod" ? "production" : "development",
+      }),
+    ],
+  }));
+}
+
 export function getRollupConfigs(pkg: Package, aliases: Aliases) {
+  const exportsFieldConfig = pkg.exportsFieldConfig();
+
   const cjsPlugins: OutputPlugin[] = pkg.project.experimentalFlags
     .keepDynamicImportAsDynamicImportInCommonJS
     ? [
@@ -114,14 +137,15 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
         plugins: cjsPlugins,
       },
       ...(hasModuleField
-        ? [
+        ? forkDevProdConditions(
             {
               format: "es" as const,
               entryFileNames: `[name].${getDistExtension("esm")}`,
               chunkFileNames: `dist/[name]-[hash].${getDistExtension("esm")}`,
               dir: pkg.directory,
             },
-          ]
+            exportsFieldConfig?.useDevProdConditions
+          )
         : []),
     ],
   });
@@ -173,8 +197,6 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
       });
     });
 
-  const exportsFieldConfig = pkg.exportsFieldConfig();
-
   let hasBrowserField = pkg.entrypoints[0].json.browser !== undefined;
 
   if (hasBrowserField) {
@@ -198,14 +220,19 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
           interop,
           plugins: cjsPlugins,
         },
-        hasModuleField && {
-          format: "es" as const,
-          entryFileNames: `[name].${getDistExtension("browser-esm")}`,
-          chunkFileNames: `dist/[name]-[hash].${getDistExtension(
-            "browser-esm"
-          )}`,
-          dir: pkg.directory,
-        },
+        ...(hasModuleField
+          ? forkDevProdConditions(
+              {
+                format: "es" as const,
+                entryFileNames: `[name].${getDistExtension("browser-esm")}`,
+                chunkFileNames: `dist/[name]-[hash].${getDistExtension(
+                  "browser-esm"
+                )}`,
+                dir: pkg.directory,
+              },
+              exportsFieldConfig?.useDevProdConditions
+            )
+          : []),
       ].filter(
         (value): value is Exclude<typeof value, false> => value !== false
       ),
@@ -222,14 +249,15 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
         "worker",
         () => {}
       ),
-      outputs: [
+      outputs: forkDevProdConditions(
         {
           format: "es" as const,
           entryFileNames: `[name].${getDistExtension("worker")}`,
           chunkFileNames: `dist/[name]-[hash].${getDistExtension("worker")}`,
           dir: pkg.directory,
         },
-      ],
+        exportsFieldConfig.useDevProdConditions
+      ),
     });
   }
 

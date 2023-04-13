@@ -1,6 +1,10 @@
 import normalizePath from "normalize-path";
 import { Entrypoint } from "./entrypoint";
-import { Package, ExportsConditions } from "./package";
+import {
+  Package,
+  ExportsConditions,
+  CanonicalExportsFieldConfig,
+} from "./package";
 import * as nodePath from "path";
 
 let fields = [
@@ -76,6 +80,60 @@ export function getBaseDistName(entrypoint: MinimalEntrypoint) {
   return entrypoint.package.name.replace(/.*\//, "");
 }
 
+interface DeepStringValues {
+  [key: string]: string | DeepStringValues;
+}
+
+function forkExtensionsRecursively<T extends DeepStringValues>(
+  obj: T,
+  extensionFork: "dev" | "prod"
+): T {
+  const result: DeepStringValues = {};
+  for (let key in obj) {
+    if (!Object.prototype.hasOwnProperty.call(obj, key)) {
+      continue;
+    }
+    const value = obj[key];
+    if (typeof value === "string") {
+      result[key] = forkExtension(value, extensionFork);
+    } else if (value) {
+      result[key] = forkExtensionsRecursively(value, extensionFork);
+    } else {
+      result[key] = value;
+    }
+  }
+  return result as T;
+}
+
+function entryPointExports(
+  entrypoint: Entrypoint,
+  exportsFieldConfig: NonNullable<CanonicalExportsFieldConfig>,
+  extensionFork?: "dev" | "prod"
+) {
+  const esmBuild = getExportsFieldOutputPath(entrypoint, "esm");
+
+  const exports = {
+    module: exportsFieldConfig.envConditions.size
+      ? {
+          ...(exportsFieldConfig.envConditions.has("worker") && {
+            worker: getExportsFieldOutputPath(entrypoint, "worker"),
+          }),
+          ...(exportsFieldConfig.envConditions.has("browser") && {
+            browser: getExportsFieldOutputPath(entrypoint, "browser-esm"),
+          }),
+          default: esmBuild,
+        }
+      : esmBuild,
+    default: getExportsFieldOutputPath(entrypoint, "cjs"),
+  };
+
+  if (extensionFork) {
+    return forkExtensionsRecursively(exports, extensionFork);
+  }
+
+  return exports;
+}
+
 export function exportsField(
   pkg: Package
 ): Record<string, ExportsConditions | string> | undefined {
@@ -86,25 +144,14 @@ export function exportsField(
 
   let output: Record<string, ExportsConditions> = {};
   pkg.entrypoints.forEach((entrypoint) => {
-    const esmBuild = getExportsFieldOutputPath(entrypoint, "esm");
-    const exportConditions = {
-      module: exportsFieldConfig.envConditions.size
-        ? {
-            ...(exportsFieldConfig.envConditions.has("worker") && {
-              worker: getExportsFieldOutputPath(entrypoint, "worker"),
-            }),
-            ...(exportsFieldConfig.envConditions.has("browser") && {
-              browser: getExportsFieldOutputPath(entrypoint, "browser-esm"),
-            }),
-            default: esmBuild,
-          }
-        : esmBuild,
-      default: getExportsFieldOutputPath(entrypoint, "cjs"),
-    };
-
     output[
       "." + entrypoint.name.replace(entrypoint.package.name, "")
-    ] = exportConditions;
+    ] = exportsFieldConfig.useDevProdConditions
+      ? {
+          development: entryPointExports(entrypoint, exportsFieldConfig, "dev"),
+          ...entryPointExports(entrypoint, exportsFieldConfig, "prod"),
+        }
+      : entryPointExports(entrypoint, exportsFieldConfig);
   });
   return {
     ...output,
@@ -132,6 +179,10 @@ const buildTargetToExtensionPrefix: Record<BuildTarget, string> = {
 
 export function getDistExtension(target: BuildTarget) {
   return `${buildTargetToExtensionPrefix[target]}.js`;
+}
+
+export function forkExtension(pathLike: string, fork: string): string {
+  return pathLike.replace(/(\.[^\.]+$)/, `.${fork}$1`);
 }
 
 function getDistFilename(entrypoint: MinimalEntrypoint, target: BuildTarget) {

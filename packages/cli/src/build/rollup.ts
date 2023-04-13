@@ -170,13 +170,15 @@ export let getRollupConfig = (
         browser: type === "umd",
         moduleDirectories: type === "umd" ? ["node_modules"] : [],
       }),
-      type === "umd" && inlineProcessEnvNodeEnv({ sourceMap: true }),
+      type === "umd" &&
+        inlineProcessEnvNodeEnv({ sourceMap: true, value: "production" }),
       type === "umd" &&
         terser({
           sourceMap: true,
           compress: true,
         }),
-      type === "node-prod" && inlineProcessEnvNodeEnv({ sourceMap: false }),
+      type === "node-prod" &&
+        inlineProcessEnvNodeEnv({ sourceMap: false, value: "production" }),
       (type === "browser" || type === "umd") &&
         replace({
           values: {

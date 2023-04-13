@@ -98,9 +98,13 @@ function createEntrypoints(
   );
 }
 
-export type ExportsConditions = {
+type BaseExportsConditions = {
   module: string | { worker?: string; browser?: string; default: string };
   default: string;
+};
+
+export type ExportsConditions = BaseExportsConditions & {
+  development?: BaseExportsConditions;
 };
 
 export type EnvCondition = "browser" | "worker";
@@ -111,6 +115,7 @@ export class Package extends Item<{
     exports?: {
       extra?: Record<string, JSONValue>;
       envConditions?: EnvCondition[];
+      useDevProdConditions?: boolean;
     };
     entrypoints?: JSONValue;
   };
@@ -345,10 +350,11 @@ export class Package extends Item<{
   }
 }
 
-type CanonicalExportsFieldConfig =
+export type CanonicalExportsFieldConfig =
   | undefined
   | {
       envConditions: Set<"worker" | "browser">;
+      useDevProdConditions: boolean;
       extra: Record<string, JSONValue>;
     };
 
@@ -382,6 +388,7 @@ function parseExportsFieldConfig(
   const parsedConfig: CanonicalExportsFieldConfig = {
     envConditions: new Set(),
     extra: {},
+    useDevProdConditions: false,
   };
   if (config === true) {
     return parsedConfig;
@@ -417,6 +424,15 @@ function parseExportsFieldConfig(
       } else {
         throw new FatalError(
           'the "preconstruct.exports.envConditions" field must be an array containing zero or more of "worker" and "browser" if it is present',
+          name
+        );
+      }
+    } else if (key === "useDevProdConditions") {
+      if (typeof value === "boolean") {
+        parsedConfig.useDevProdConditions = value;
+      } else {
+        throw new FatalError(
+          'the "preconstruct.exports.useDevProdConditions" field must be a boolean if it is present',
           name
         );
       }

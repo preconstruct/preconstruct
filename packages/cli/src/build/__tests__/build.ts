@@ -907,3 +907,102 @@ test("self import", async () => {
 
   `);
 });
+
+test("dev prod conditions", async () => {
+  let dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "@dev-prod-conditions/test",
+      main: "dist/dev-prod-conditions-test.cjs.js",
+      module: "dist/dev-prod-conditions-test.esm.js",
+      browser: {
+        "./dist/dev-prod-conditions-test.esm.js":
+          "./dist/dev-prod-conditions-test.browser.esm.js",
+      },
+      exports: {
+        ".": {
+          development: {
+            module: {
+              browser: "./dist/dev-prod-conditions-test.browser.esm.dev.js",
+              default: "./dist/dev-prod-conditions-test.esm.dev.js",
+            },
+            default: "./dist/dev-prod-conditions-test.cjs.dev.js",
+          },
+          module: {
+            browser: "./dist/dev-prod-conditions-test.browser.esm.prod.js",
+            default: "./dist/dev-prod-conditions-test.esm.prod.js",
+          },
+          default: "./dist/dev-prod-conditions-test.cjs.prod.js",
+        },
+        "./package.json": "./package.json",
+      },
+      preconstruct: {
+        exports: {
+          envConditions: ["browser"],
+          useDevProdConditions: true,
+        },
+      },
+    }),
+    node_modules: {
+      kind: "symlink",
+      path: repoNodeModules,
+    },
+    "src/index.js": js`
+                      export const thing =
+                        process.env.NODE_ENV !== "production" ? { dev: true } : { prod: true };
+                    `,
+  });
+  await build(dir);
+  expect(await getDist(dir)).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/dev-prod-conditions-test.browser.esm.dev.js, dist/dev-prod-conditions-test.esm.dev.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    const thing =        "development" !== "production" ? {
+      dev: true
+    } : {
+      prod: true
+    };
+
+    export { thing };
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/dev-prod-conditions-test.browser.esm.prod.js, dist/dev-prod-conditions-test.esm.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    const thing =         "production" !== "production" ? {
+      dev: true
+    } : {
+      prod: true
+    };
+
+    export { thing };
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/dev-prod-conditions-test.cjs.dev.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    const thing = process.env.NODE_ENV !== "production" ? {
+      dev: true
+    } : {
+      prod: true
+    };
+
+    exports.thing = thing;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/dev-prod-conditions-test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./dev-prod-conditions-test.cjs.prod.js");
+    } else {
+      module.exports = require("./dev-prod-conditions-test.cjs.dev.js");
+    }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/dev-prod-conditions-test.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    const thing = {
+      prod: true
+    };
+
+    exports.thing = thing;
+
+  `);
+});
