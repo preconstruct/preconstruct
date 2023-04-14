@@ -203,10 +203,6 @@ export function tsTemplate(
   }\n//# sourceMappingURL=${filename}.map\n`;
 }
 
-function isValidJsIdentifier(name: string) {
-  return /^(?!\d)[\w$]+$/.test(name);
-}
-
 function getReexportStatement(namedExports: string[], source: string): string {
   return `export {\n  ${namedExports.join(",  \n")}\n} from ${source};`;
 }
