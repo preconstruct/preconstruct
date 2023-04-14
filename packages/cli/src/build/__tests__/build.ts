@@ -1082,9 +1082,11 @@ test("correct default export using mjs and dmts proxies", async () => {
     }
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.mjs ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    import * as _ns from "./pkg-a.cjs.js";
-    export default _ns.default.default;
-    export var thing = _ns.thing;
+    export {
+      thing
+    } from "./pkg-a.cjs.js";
+    import ns from "./pkg-a.cjs.js";
+    export default ns.default;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     const thing = "index";
@@ -1127,6 +1129,133 @@ test("correct default export using mjs and dmts proxies", async () => {
     4 actual 100 expected 100
     5 actual true expected true
     6 actual 100 expected 100
+    "
+  `);
+  expect(node.stderr.toString("utf8")).toMatchInlineSnapshot(`""`);
+});
+
+test("no __esModule when reexporting namespace with mjs proxy", async () => {
+  let dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "@mjs-proxy-no-__esmodule/repo",
+      preconstruct: {
+        packages: ["packages/pkg-a"],
+      },
+    }),
+    "packages/pkg-a/package.json": JSON.stringify({
+      name: "pkg-a",
+      main: "dist/pkg-a.cjs.js",
+      module: "dist/pkg-a.esm.js",
+      exports: {
+        ".": {
+          module: "./dist/pkg-a.esm.js",
+          import: "./dist/pkg-a.cjs.mjs",
+          default: "./dist/pkg-a.cjs.js",
+        },
+        "./package.json": "./package.json",
+      },
+      preconstruct: {
+        entrypoints: ["index.js"],
+        exports: {
+          useMjsProxy: true,
+        },
+      },
+    }),
+    "packages/pkg-a/something/package.json": JSON.stringify({
+      main: "dist/pkg-a-something.cjs.js",
+      module: "dist/pkg-a-something.esm.js",
+    }),
+    "packages/pkg-a/src/index.js": ts`
+      export * as somethingNs from "./something";
+    `,
+    "packages/pkg-a/src/something.js": ts`
+      export const something = "something";
+      export default 100;
+    `,
+
+    "packages/pkg-a/node_modules": {
+      kind: "symlink",
+      path: repoNodeModules,
+    },
+    "runtime-blah.mjs": ts`
+      let counter = 0;
+      function acceptThing(actual, expected) {
+        console.log(++counter, "actual", actual, "expected", expected);
+      }
+
+      import * as ns from "pkg-a";
+
+      acceptThing(ns.somethingNs.something, "something");
+      acceptThing(ns.somethingNs.default, 100);
+      acceptThing(ns.__esModule, undefined);
+    `,
+    "tsconfig.json": JSON.stringify({
+      compilerOptions: {
+        module: "NodeNext",
+        moduleResolution: "nodenext",
+        strict: true,
+        declaration: true,
+      },
+    }),
+  });
+  await fs.ensureSymlink(
+    path.join(dir, "packages/pkg-a"),
+    path.join(dir, "node_modules/pkg-a")
+  );
+  await build(dir);
+
+  expect(await getFiles(dir, ["packages/*/dist/**"])).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.dev.js, packages/pkg-a/dist/pkg-a.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    const something = "something";
+    var something$1 = 100;
+
+    var something$2 = /*#__PURE__*/Object.freeze({
+    	__proto__: null,
+    	something: something,
+    	'default': something$1
+    });
+
+    exports.somethingNs = something$2;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./pkg-a.cjs.prod.js");
+    } else {
+      module.exports = require("./pkg-a.cjs.dev.js");
+    }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.mjs ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export {
+      somethingNs
+    } from "./pkg-a.cjs.js";
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    const something = "something";
+    var something$1 = 100;
+
+    var something$2 = /*#__PURE__*/Object.freeze({
+    	__proto__: null,
+    	something: something,
+    	'default': something$1
+    });
+
+    export { something$2 as somethingNs };
+
+  `);
+
+  let node = await spawn("node", ["runtime-blah.mjs"], { cwd: dir });
+
+  expect(node.code).toBe(0);
+  expect(node.stdout.toString("utf8")).toMatchInlineSnapshot(`
+    "1 actual something expected something
+    2 actual 100 expected 100
+    3 actual undefined expected undefined
     "
   `);
   expect(node.stderr.toString("utf8")).toMatchInlineSnapshot(`""`);

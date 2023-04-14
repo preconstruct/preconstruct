@@ -209,18 +209,15 @@ function isValidJsIdentifier(name: string) {
 
 export function mjsTemplate(exports: string[], relativePath: string) {
   const escapedPath = JSON.stringify(relativePath);
-  return `import * as _ns from ${escapedPath};\n${exports
-    .map((name, i) => {
-      if (name === "default") {
-        return `export default _ns.default.default;`;
-      }
-      if (!isValidJsIdentifier(name)) {
-        const escapedName = JSON.stringify(name);
-        return `var _export${i} = _ns[${escapedName}];\nexport { _export${i} as ${escapedName} };`;
-      }
-      return `export var ${name} = _ns.${name};`;
-    })
-    .join("\n")}\n`;
+  const nonDefaultExports = exports.filter((name) => name !== "default");
+  const hasDefaultExport = exports.length !== nonDefaultExports.length;
+  return `export {\n  ${nonDefaultExports.join(
+    ",  \n"
+  )}\n} from ${escapedPath};\n${
+    hasDefaultExport
+      ? `import ns from ${escapedPath};\nexport default ns.default;\n`
+      : ""
+  }`;
 }
 
 export function dmtsTemplate(exports: string[], relativePath: string) {
