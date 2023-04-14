@@ -218,17 +218,6 @@ export function mjsTemplate(exports: string[], relativePath: string) {
   }`;
 }
 
-export function dmtsTemplate(exports: string[], relativePath: string) {
-  const escapedPath = JSON.stringify(`${relativePath}.js`);
-  const nonDefaultExports = exports.filter((name) => name !== "default");
-  const hasDefaultExport = exports.length !== nonDefaultExports.length;
-  return `${getReexportStatement(nonDefaultExports, escapedPath)}\n${
-    hasDefaultExport
-      ? `import ns from ${escapedPath};\nexport default ns.default;\n`
-      : ""
-  }`;
-}
-
 export function tsReexportDeclMap(
   dtsFilename: string,
   relativePathWithExtension: string

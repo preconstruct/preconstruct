@@ -4,7 +4,7 @@ import { Plugin } from "rollup";
 import fs from "fs-extra";
 import { Package } from "../../package";
 import { getDeclarations } from "./get-declarations";
-import { dmtsTemplate, tsReexportDeclMap, tsTemplate } from "../../utils";
+import { mjsTemplate, tsReexportDeclMap, tsTemplate } from "../../utils";
 import normalizePath from "normalize-path";
 import { overwriteDeclarationMapSourceRoot } from "./common";
 
@@ -157,7 +157,9 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
           this.emitFile({
             type: "asset",
             fileName: dtsFileName.replace(/\.d\.ts$/, ".d.mts"),
-            source: dmtsTemplate(file.exports, relativeToSource),
+            // even though we are emitting a declaration file it's currently safe to reuse the `.mjs` template
+            // it only has reexports, no runtime expressions and even no types in it
+            source: mjsTemplate(file.exports, `${relativeToSource}.js`),
           });
         }
       }
