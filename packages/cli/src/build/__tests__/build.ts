@@ -1048,10 +1048,11 @@ test("correct default export using mjs and dmts proxies", async () => {
     export default _default;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.d.mts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    import * as _ns from "./declarations/src/index.js";
-    declare const _def: typeof _ns.default.default;
-    export default _def;
-    export declare var thing: typeof _ns.thing;
+    export {
+      thing
+    } from "./declarations/src/index.js";
+    import ns from "./declarations/src/index.js";
+    export default ns.default;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     export * from "./declarations/src/index";
