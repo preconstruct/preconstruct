@@ -99,7 +99,7 @@ export function exportsField(
             default: esmBuild,
           }
         : esmBuild,
-      ...(exportsFieldConfig.useMjsProxy && {
+      ...(exportsFieldConfig.unwrappedDefaultExportForImportCondition && {
         import: getExportsFieldOutputPath(entrypoint, "cjs").replace(
           /\.js$/,
           ".mjs"

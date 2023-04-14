@@ -350,7 +350,7 @@ type CanonicalExportsFieldConfig =
   | {
       envConditions: Set<"worker" | "browser">;
       extra: Record<string, JSONValue>;
-      useMjsProxy: boolean;
+      unwrappedDefaultExportForImportCondition: boolean;
     };
 
 function parseExportsFieldConfig(
@@ -383,7 +383,7 @@ function parseExportsFieldConfig(
   const parsedConfig: CanonicalExportsFieldConfig = {
     envConditions: new Set(),
     extra: {},
-    useMjsProxy: false,
+    unwrappedDefaultExportForImportCondition: false,
   };
   if (config === true) {
     return parsedConfig;
@@ -422,12 +422,12 @@ function parseExportsFieldConfig(
           name
         );
       }
-    } else if (key === "useMjsProxy") {
+    } else if (key === "unwrappedDefaultExportForImportCondition") {
       if (typeof value === "boolean") {
-        parsedConfig.useMjsProxy = value;
+        parsedConfig.unwrappedDefaultExportForImportCondition = value;
       } else {
         throw new FatalError(
-          'the "preconstruct.exports.useMjsProxy" field must be a boolean if it is present',
+          'the "preconstruct.exports.unwrappedDefaultExportForImportCondition" field must be a boolean if it is present',
           name
         );
       }

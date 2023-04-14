@@ -153,7 +153,9 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
           ),
         });
 
-        if (pkg.exportsFieldConfig()?.useMjsProxy) {
+        if (
+          pkg.exportsFieldConfig()?.unwrappedDefaultExportForImportCondition
+        ) {
           this.emitFile({
             type: "asset",
             fileName: dtsFileName.replace(/\.d\.ts$/, ".d.mts"),
