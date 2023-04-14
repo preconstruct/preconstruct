@@ -99,6 +99,12 @@ export function exportsField(
             default: esmBuild,
           }
         : esmBuild,
+      ...(exportsFieldConfig.useMjsProxy && {
+        import: getExportsFieldOutputPath(entrypoint, "cjs").replace(
+          /\.js$/,
+          ".mjs"
+        ),
+      }),
       default: getExportsFieldOutputPath(entrypoint, "cjs"),
     };
 
@@ -195,6 +201,41 @@ export function tsTemplate(
   return `export * from ${escapedPath};${
     hasDefaultExport ? `\nexport { default } from ${escapedPath};` : ""
   }\n//# sourceMappingURL=${filename}.map\n`;
+}
+
+function isValidJsIdentifier(name: string) {
+  return /^(?!\d)[\w$]+$/.test(name);
+}
+
+export function mjsTemplate(exports: string[], relativePath: string) {
+  const escapedPath = JSON.stringify(relativePath);
+  return `import * as _ns from ${escapedPath};\n${exports
+    .map((name, i) => {
+      if (name === "default") {
+        return `export default _ns.default.default;`;
+      }
+      if (!isValidJsIdentifier(name)) {
+        const escapedName = JSON.stringify(name);
+        return `var _export${i} = _ns[${escapedName}];\nexport { _export${i} as ${escapedName} };`;
+      }
+      return `export var ${name} = _ns.${name};`;
+    })
+    .join("\n")}\n`;
+}
+
+export function dmtsTemplate(exports: string[], relativePath: string) {
+  const escapedPath = JSON.stringify(`${relativePath}.js`);
+  return `import * as _ns from ${escapedPath};\n${exports
+    .map((name, i) => {
+      if (name === "default") {
+        return `declare const _def: typeof _ns.default.default;\nexport default _def;`;
+      }
+      if (!isValidJsIdentifier(name)) {
+        throw new Error("TypeScript does not support non-identifier exports");
+      }
+      return `export declare var ${name}: typeof _ns.${name};`;
+    })
+    .join("\n")}\n`;
 }
 
 export function tsReexportDeclMap(

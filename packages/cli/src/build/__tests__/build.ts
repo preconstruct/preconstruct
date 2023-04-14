@@ -907,3 +907,227 @@ test("self import", async () => {
 
   `);
 });
+
+test("correct default export using mjs and dmts proxies", async () => {
+  let dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "@mjs-proxy/repo",
+      preconstruct: {
+        packages: ["packages/pkg-a"],
+      },
+    }),
+    "packages/pkg-a/package.json": JSON.stringify({
+      name: "pkg-a",
+      main: "dist/pkg-a.cjs.js",
+      module: "dist/pkg-a.esm.js",
+      exports: {
+        ".": {
+          module: "./dist/pkg-a.esm.js",
+          import: "./dist/pkg-a.cjs.mjs",
+          default: "./dist/pkg-a.cjs.js",
+        },
+        "./something": {
+          module: "./something/dist/pkg-a-something.esm.js",
+          import: "./something/dist/pkg-a-something.cjs.mjs",
+          default: "./something/dist/pkg-a-something.cjs.js",
+        },
+        "./package.json": "./package.json",
+      },
+      preconstruct: {
+        entrypoints: ["index.ts", "something.ts"],
+        exports: {
+          useMjsProxy: true,
+        },
+      },
+    }),
+    "packages/pkg-a/something/package.json": JSON.stringify({
+      main: "dist/pkg-a-something.cjs.js",
+      module: "dist/pkg-a-something.esm.js",
+    }),
+    "packages/pkg-a/src/index.ts": ts`
+      export const thing = "index";
+      export default true;
+    `,
+    "packages/pkg-a/src/something.ts": ts`
+      export const something = "something";
+      export default 100;
+    `,
+    "packages/pkg-a/not-exported.ts": ts`
+      export const notExported = true;
+      export default "foo";
+    `,
+
+    "packages/pkg-a/node_modules": {
+      kind: "symlink",
+      path: repoNodeModules,
+    },
+    "blah.mts": ts`
+      function acceptThing<T>(x: T) {}
+
+      import { thing } from "pkg-a";
+      import { something } from "pkg-a/something";
+      import { notExported } from "pkg-a/not-exported"; // should error
+
+      acceptThing<"index">(thing);
+      acceptThing<"something">(something);
+
+      // this is to check that TypeScript is actually checking things
+      acceptThing<"other">(thing); // should error
+      acceptThing<"other">(something); // should error
+
+      import indexDefault from "pkg-a";
+      import somethingDefault from "pkg-a/something";
+      import notExportedDefault from "pkg-a/not-exported"; // should error
+
+      acceptThing<boolean>(indexDefault);
+      acceptThing<number>(somethingDefault);
+
+      // this is to check that TypeScript is actually checking things
+      acceptThing<"other">(indexDefault); // should error
+      acceptThing<"other">(somethingDefault); // should error
+
+      import * as indexNs from "pkg-a";
+      import * as somethingNs from "pkg-a/something";
+      import * as notExportedNs from "pkg-a/not-exported"; // should error
+
+      acceptThing<boolean>(indexNs.default);
+      acceptThing<number>(somethingNs.default);
+
+      // this is to check that TypeScript is actually checking things
+      acceptThing<"other">(indexNs.default); // should error
+      acceptThing<"other">(somethingNs.default); // should error
+    `,
+    "runtime-blah.mjs": ts`
+      let counter = 0;
+      function acceptThing(actual, expected) {
+        console.log(++counter, "actual", actual, "expected", expected);
+      }
+
+      import { thing } from "pkg-a";
+      import { something } from "pkg-a/something";
+
+      acceptThing(thing, "index");
+      acceptThing(something, "something");
+
+      import indexDefault from "pkg-a";
+      import somethingDefault from "pkg-a/something";
+
+      acceptThing(indexDefault, true);
+      acceptThing(somethingDefault, 100);
+
+      import * as indexNs from "pkg-a";
+      import * as somethingNs from "pkg-a/something";
+
+      acceptThing(indexNs.default, true);
+      acceptThing(somethingNs.default, 100);
+    `,
+    "tsconfig.json": JSON.stringify({
+      compilerOptions: {
+        module: "NodeNext",
+        moduleResolution: "nodenext",
+        strict: true,
+        declaration: true,
+      },
+    }),
+  });
+  await fs.ensureSymlink(
+    path.join(dir, "packages/pkg-a"),
+    path.join(dir, "node_modules/pkg-a")
+  );
+  await build(dir);
+
+  expect(await getFiles(dir, ["packages/*/dist/**"])).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/declarations/src/index.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export declare const thing = "index";
+    declare const _default: true;
+    export default _default;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/declarations/src/something.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export declare const something = "something";
+    declare const _default: 100;
+    export default _default;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.d.mts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    import * as _ns from "./declarations/src/index.js";
+    declare const _def: typeof _ns.default.default;
+    export default _def;
+    export declare var thing: typeof _ns.thing;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export * from "./declarations/src/index";
+    export { default } from "./declarations/src/index";
+    //# sourceMappingURL=pkg-a.cjs.d.ts.map
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.d.ts.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {"version":3,"file":"pkg-a.cjs.d.ts","sourceRoot":"","sources":["./declarations/src/index.d.ts"],"names":[],"mappings":"AAAA"}
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.dev.js, packages/pkg-a/dist/pkg-a.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    const thing = "index";
+    var index = true;
+
+    exports["default"] = index;
+    exports.thing = thing;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./pkg-a.cjs.prod.js");
+    } else {
+      module.exports = require("./pkg-a.cjs.dev.js");
+    }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.mjs ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    import * as _ns from "./pkg-a.cjs.js";
+    export default _ns.default.default;
+    export var thing = _ns.thing;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    const thing = "index";
+    var index = true;
+
+    export { index as default, thing };
+
+  `);
+
+  let tsc = await spawn(
+    path.join(
+      path.dirname(require.resolve("typescript/package.json")),
+      "bin/tsc"
+    ),
+    [],
+    { cwd: dir }
+  );
+  expect(tsc.code).toBe(2);
+  expect(tsc.stdout.toString("utf8")).toMatchInlineSnapshot(`
+    "blah.mts(5,29): error TS2307: Cannot find module 'pkg-a/not-exported' or its corresponding type declarations.
+    blah.mts(11,22): error TS2345: Argument of type '"index"' is not assignable to parameter of type '"other"'.
+    blah.mts(12,22): error TS2345: Argument of type '"something"' is not assignable to parameter of type '"other"'.
+    blah.mts(16,32): error TS2307: Cannot find module 'pkg-a/not-exported' or its corresponding type declarations.
+    blah.mts(22,22): error TS2345: Argument of type 'true' is not assignable to parameter of type '"other"'.
+    blah.mts(23,22): error TS2345: Argument of type '100' is not assignable to parameter of type '"other"'.
+    blah.mts(27,32): error TS2307: Cannot find module 'pkg-a/not-exported' or its corresponding type declarations.
+    blah.mts(33,22): error TS2345: Argument of type 'true' is not assignable to parameter of type '"other"'.
+    blah.mts(34,22): error TS2345: Argument of type '100' is not assignable to parameter of type '"other"'.
+    "
+  `);
+  expect(tsc.stderr.toString("utf8")).toMatchInlineSnapshot(`""`);
+
+  let node = await spawn("node", ["runtime-blah.mjs"], { cwd: dir });
+
+  expect(node.code).toBe(0);
+  expect(node.stdout.toString("utf8")).toMatchInlineSnapshot(`
+    "1 actual index expected index
+    2 actual something expected something
+    3 actual true expected true
+    4 actual 100 expected 100
+    5 actual true expected true
+    6 actual 100 expected 100
+    "
+  `);
+  expect(node.stderr.toString("utf8")).toMatchInlineSnapshot(`""`);
+});

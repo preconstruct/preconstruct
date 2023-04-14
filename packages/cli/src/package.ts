@@ -350,6 +350,7 @@ type CanonicalExportsFieldConfig =
   | {
       envConditions: Set<"worker" | "browser">;
       extra: Record<string, JSONValue>;
+      useMjsProxy: boolean;
     };
 
 function parseExportsFieldConfig(
@@ -382,6 +383,7 @@ function parseExportsFieldConfig(
   const parsedConfig: CanonicalExportsFieldConfig = {
     envConditions: new Set(),
     extra: {},
+    useMjsProxy: false,
   };
   if (config === true) {
     return parsedConfig;
@@ -417,6 +419,15 @@ function parseExportsFieldConfig(
       } else {
         throw new FatalError(
           'the "preconstruct.exports.envConditions" field must be an array containing zero or more of "worker" and "browser" if it is present',
+          name
+        );
+      }
+    } else if (key === "useMjsProxy") {
+      if (typeof value === "boolean") {
+        parsedConfig.useMjsProxy = value;
+      } else {
+        throw new FatalError(
+          'the "preconstruct.exports.useMjsProxy" field must be a boolean if it is present',
           name
         );
       }

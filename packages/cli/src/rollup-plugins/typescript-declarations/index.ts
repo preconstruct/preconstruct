@@ -4,7 +4,7 @@ import { Plugin } from "rollup";
 import fs from "fs-extra";
 import { Package } from "../../package";
 import { getDeclarations } from "./get-declarations";
-import { tsReexportDeclMap, tsTemplate } from "../../utils";
+import { dmtsTemplate, tsReexportDeclMap, tsTemplate } from "../../utils";
 import normalizePath from "normalize-path";
 import { overwriteDeclarationMapSourceRoot } from "./common";
 
@@ -152,6 +152,14 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
             `${relativeToSource}.d.ts`
           ),
         });
+
+        if (pkg.exportsFieldConfig()?.useMjsProxy) {
+          this.emitFile({
+            type: "asset",
+            fileName: dtsFileName.replace(/\.d\.ts$/, ".d.mts"),
+            source: dmtsTemplate(file.exports, relativeToSource),
+          });
+        }
       }
     },
   };
