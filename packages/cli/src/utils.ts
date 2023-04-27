@@ -100,10 +100,7 @@ export function exportsField(
           }
         : esmBuild,
       ...(exportsFieldConfig.importDefaultExport === "unwrapped-default" && {
-        import: getExportsFieldOutputPath(entrypoint, "cjs").replace(
-          /\.js$/,
-          ".mjs"
-        ),
+        import: getExportsImportUnwrappingDefaultOutputPath(entrypoint),
       }),
       default: getExportsFieldOutputPath(entrypoint, "cjs"),
     };
@@ -150,6 +147,12 @@ export function getExportsFieldOutputPath(
 ) {
   const prefix = entrypoint.name.replace(entrypoint.package.name, "");
   return `.${prefix}/${getDistFilename(entrypoint, target)}`;
+}
+
+export function getExportsImportUnwrappingDefaultOutputPath(
+  entrypoint: Entrypoint
+) {
+  return getExportsFieldOutputPath(entrypoint, "cjs").replace(/\.js$/, ".mjs");
 }
 
 export const validFieldsForEntrypoint = {

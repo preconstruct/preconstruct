@@ -6,6 +6,7 @@ import {
   validFieldsForEntrypoint,
   getExportsFieldOutputPath,
   tsReexportDeclMap,
+  getExportsImportUnwrappingDefaultOutputPath,
 } from "./utils";
 import * as babel from "@babel/core";
 import * as fs from "fs-extra";
@@ -158,6 +159,9 @@ export default async function dev(projectDir: string) {
           let typeSystemPromise = getTypeSystem(entrypoint);
 
           let distDirectory = path.join(entrypoint.directory, "dist");
+          let entrypointPath = normalizePath(
+            path.relative(distDirectory, entrypoint.source)
+          );
 
           await fs.remove(distDirectory);
           await fs.ensureDir(distDirectory);
@@ -204,14 +208,26 @@ let unregister = require(${JSON.stringify(
               )});
 
 // this re-exports the source file
-module.exports = require(${JSON.stringify(
-                normalizePath(path.relative(distDirectory, entrypoint.source))
-              )});
+module.exports = require(${JSON.stringify(entrypointPath)});
 
 unregister();
 `
             ),
           ];
+          if (
+            pkg.exportsFieldConfig()?.importDefaultExport ===
+            "unwrapped-default"
+          ) {
+            promises.push(
+              fs.writeFile(
+                path.join(
+                  entrypoint.package.directory,
+                  getExportsImportUnwrappingDefaultOutputPath(entrypoint)
+                ),
+                `export * from ${JSON.stringify(entrypointPath)};\n`
+              )
+            );
+          }
           if (entrypoint.json.module) {
             promises.push(
               fs.symlink(
