@@ -154,7 +154,7 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
         });
 
         if (
-          pkg.exportsFieldConfig()?.unwrappedDefaultExportForImportCondition
+          pkg.exportsFieldConfig()?.importDefaultExport === "unwrapped-default"
         ) {
           this.emitFile({
             type: "asset",

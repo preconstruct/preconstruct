@@ -936,7 +936,7 @@ test("correct default export using mjs and dmts proxies", async () => {
       preconstruct: {
         entrypoints: ["index.ts", "something.ts"],
         exports: {
-          unwrappedDefaultExportForImportCondition: true,
+          importDefaultExport: "unwrapped-default",
         },
       },
     }),
@@ -1158,7 +1158,7 @@ test("no __esModule when reexporting namespace with mjs proxy", async () => {
       preconstruct: {
         entrypoints: ["index.js"],
         exports: {
-          unwrappedDefaultExportForImportCondition: true,
+          importDefaultExport: "unwrapped-default",
         },
       },
     }),

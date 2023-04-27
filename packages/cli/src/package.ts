@@ -350,7 +350,7 @@ type CanonicalExportsFieldConfig =
   | {
       envConditions: Set<"worker" | "browser">;
       extra: Record<string, JSONValue>;
-      unwrappedDefaultExportForImportCondition: boolean;
+      importDefaultExport: "namespace" | "unwrapped-default";
     };
 
 function parseExportsFieldConfig(
@@ -383,7 +383,7 @@ function parseExportsFieldConfig(
   const parsedConfig: CanonicalExportsFieldConfig = {
     envConditions: new Set(),
     extra: {},
-    unwrappedDefaultExportForImportCondition: false,
+    importDefaultExport: "namespace",
   };
   if (config === true) {
     return parsedConfig;
@@ -422,12 +422,12 @@ function parseExportsFieldConfig(
           name
         );
       }
-    } else if (key === "unwrappedDefaultExportForImportCondition") {
-      if (typeof value === "boolean") {
-        parsedConfig.unwrappedDefaultExportForImportCondition = value;
+    } else if (key === "importDefaultExport") {
+      if (value === "unwrapped-default" || value === "namespace") {
+        parsedConfig.importDefaultExport = value;
       } else {
         throw new FatalError(
-          'the "preconstruct.exports.unwrappedDefaultExportForImportCondition" field must be a boolean if it is present',
+          'the "preconstruct.exports.importDefaultExport" field must be set to "unwrapped-default" or "namespace" if it is present',
           name
         );
       }

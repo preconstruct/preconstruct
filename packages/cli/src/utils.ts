@@ -99,7 +99,7 @@ export function exportsField(
             default: esmBuild,
           }
         : esmBuild,
-      ...(exportsFieldConfig.unwrappedDefaultExportForImportCondition && {
+      ...(exportsFieldConfig.importDefaultExport === "unwrapped-default" && {
         import: getExportsFieldOutputPath(entrypoint, "cjs").replace(
           /\.js$/,
           ".mjs"
