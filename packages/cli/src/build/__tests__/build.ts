@@ -18,6 +18,7 @@ import {
 import { doPromptInput as _doPromptInput } from "../../prompt";
 import { confirms as _confirms } from "../../messages";
 import spawn from "spawndamnit";
+import stripAnsi from "strip-ansi";
 
 const f = fixturez(__dirname);
 
@@ -1054,6 +1055,9 @@ test("correct default export using mjs and dmts proxies", async () => {
     import ns from "./declarations/src/index.js";
     export default ns.default;
 
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.d.mts.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {"version":3,"file":"pkg-a.cjs.d.mts","sourceRoot":"","sources":["../src/index.ts"],"names":[],"mappings":"AAAA"}
+
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     export * from "./declarations/src/index";
     export { default } from "./declarations/src/index";
@@ -1133,6 +1137,378 @@ test("correct default export using mjs and dmts proxies", async () => {
     "
   `);
   expect(node.stderr.toString("utf8")).toMatchInlineSnapshot(`""`);
+});
+
+test("importing a package via dynamic import from another package provides the right types", async () => {
+  let dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "@mjs-proxy/repo",
+      preconstruct: {
+        packages: ["packages/*"],
+      },
+    }),
+    "packages/pkg-a/package.json": JSON.stringify({
+      name: "pkg-a",
+      main: "dist/pkg-a.cjs.js",
+      module: "dist/pkg-a.esm.js",
+      exports: {
+        ".": {
+          module: "./dist/pkg-a.esm.js",
+          import: "./dist/pkg-a.cjs.mjs",
+          default: "./dist/pkg-a.cjs.js",
+        },
+        "./package.json": "./package.json",
+      },
+      preconstruct: {
+        entrypoints: ["index.ts"],
+        exports: {
+          importDefaultExport: "unwrapped-default",
+        },
+      },
+    }),
+    "packages/pkg-a/src/index.ts": ts`
+      export const thing = "index";
+      export default true;
+    `,
+    "packages/pkg-b/package.json": JSON.stringify({
+      name: "pkg-b",
+      main: "dist/pkg-b.cjs.js",
+      module: "dist/pkg-b.esm.js",
+      exports: {
+        ".": {
+          module: "./dist/pkg-b.esm.js",
+          import: "./dist/pkg-b.cjs.mjs",
+          default: "./dist/pkg-b.cjs.js",
+        },
+        "./package.json": "./package.json",
+      },
+      preconstruct: {
+        entrypoints: ["index.ts"],
+        exports: {
+          importDefaultExport: "unwrapped-default",
+        },
+      },
+      dependencies: {
+        "pkg-a": "^1.0.0",
+      },
+    }),
+
+    "packages/pkg-b/src/index.ts": ts`
+      export const thing = import("pkg-a").then((x) => x.default);
+    `,
+
+    "node_modules/typescript": {
+      kind: "symlink",
+      path: path.join(repoNodeModules, "typescript"),
+    },
+    "tsconfig.json": JSON.stringify({
+      compilerOptions: {
+        module: "NodeNext",
+        moduleResolution: "nodenext",
+        strict: true,
+        declaration: true,
+      },
+    }),
+  });
+  await fs.ensureSymlink(
+    path.join(dir, "packages/pkg-a"),
+    path.join(dir, "node_modules/pkg-a")
+  );
+  await fs.ensureSymlink(
+    path.join(dir, "packages/pkg-b"),
+    path.join(dir, "node_modules/pkg-b")
+  );
+  await build(dir);
+
+  expect(await getFiles(dir, ["packages/pkg-b/dist/**"]))
+    .toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-b/dist/declarations/src/index.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export declare const thing: Promise<boolean>;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-b/dist/pkg-b.cjs.d.mts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export {
+      thing
+    } from "./declarations/src/index.js";
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-b/dist/pkg-b.cjs.d.mts.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {"version":3,"file":"pkg-b.cjs.d.mts","sourceRoot":"","sources":["../src/index.ts"],"names":[],"mappings":"AAAA"}
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-b/dist/pkg-b.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export * from "./declarations/src/index";
+    //# sourceMappingURL=pkg-b.cjs.d.ts.map
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-b/dist/pkg-b.cjs.d.ts.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {"version":3,"file":"pkg-b.cjs.d.ts","sourceRoot":"","sources":["./declarations/src/index.d.ts"],"names":[],"mappings":"AAAA"}
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-b/dist/pkg-b.cjs.dev.js, packages/pkg-b/dist/pkg-b.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    function _interopNamespace(e) {
+    	if (e && e.__esModule) return e;
+    	var n = Object.create(null);
+    	if (e) {
+    		Object.keys(e).forEach(function (k) {
+    			if (k !== 'default') {
+    				var d = Object.getOwnPropertyDescriptor(e, k);
+    				Object.defineProperty(n, k, d.get ? d : {
+    					enumerable: true,
+    					get: function () { return e[k]; }
+    				});
+    			}
+    		});
+    	}
+    	n["default"] = e;
+    	return Object.freeze(n);
+    }
+
+    const thing = Promise.resolve().then(function () { return /*#__PURE__*/_interopNamespace(require('pkg-a')); }).then(x => x.default);
+
+    exports.thing = thing;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-b/dist/pkg-b.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./pkg-b.cjs.prod.js");
+    } else {
+      module.exports = require("./pkg-b.cjs.dev.js");
+    }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-b/dist/pkg-b.cjs.mjs ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export {
+      thing
+    } from "./pkg-b.cjs.js";
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-b/dist/pkg-b.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    const thing = import('pkg-a').then(x => x.default);
+
+    export { thing };
+
+  `);
+});
+
+test("importing another package via dynamic import and exporting the namespace produces a typescript error because the type cannot be named", async () => {
+  let dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "@mjs-proxy/repo",
+      preconstruct: {
+        packages: ["packages/*"],
+      },
+    }),
+    "packages/pkg-a/package.json": JSON.stringify({
+      name: "pkg-a",
+      main: "dist/pkg-a.cjs.js",
+      module: "dist/pkg-a.esm.js",
+      exports: {
+        ".": {
+          module: "./dist/pkg-a.esm.js",
+          import: "./dist/pkg-a.cjs.mjs",
+          default: "./dist/pkg-a.cjs.js",
+        },
+        "./package.json": "./package.json",
+      },
+      preconstruct: {
+        entrypoints: ["index.ts"],
+        exports: {
+          importDefaultExport: "unwrapped-default",
+        },
+      },
+    }),
+    "packages/pkg-a/src/index.ts": ts`
+      export const thing = "index";
+      export default true;
+    `,
+    "packages/pkg-b/package.json": JSON.stringify({
+      name: "pkg-b",
+      main: "dist/pkg-b.cjs.js",
+      module: "dist/pkg-b.esm.js",
+      exports: {
+        ".": {
+          module: "./dist/pkg-b.esm.js",
+          import: "./dist/pkg-b.cjs.mjs",
+          default: "./dist/pkg-b.cjs.js",
+        },
+        "./package.json": "./package.json",
+      },
+      preconstruct: {
+        entrypoints: ["index.ts"],
+        exports: {
+          importDefaultExport: "unwrapped-default",
+        },
+      },
+      dependencies: {
+        "pkg-a": "^1.0.0",
+      },
+    }),
+
+    "packages/pkg-b/src/index.ts": ts`
+      export const thing = import("pkg-a");
+    `,
+
+    "node_modules/typescript": {
+      kind: "symlink",
+      path: path.join(repoNodeModules, "typescript"),
+    },
+    "tsconfig.json": JSON.stringify({
+      compilerOptions: {
+        module: "NodeNext",
+        moduleResolution: "nodenext",
+        strict: true,
+        declaration: true,
+      },
+    }),
+  });
+  await fs.ensureSymlink(
+    path.join(dir, "packages/pkg-a"),
+    path.join(dir, "node_modules/pkg-a")
+  );
+  await fs.ensureSymlink(
+    path.join(dir, "packages/pkg-b"),
+    path.join(dir, "node_modules/pkg-b")
+  );
+  const error = await build(dir).catch((x) => x);
+  expect(stripAnsi(error + "")).toMatchInlineSnapshot(`
+    "Error: 🎁 Generating TypeScript declarations for packages/pkg-b/src/index.ts failed:
+    🎁 packages/pkg-b/src/index.ts:1:14 - error TS2841: The type of this expression cannot be named without a 'resolution-mode' assertion, which is an unstable feature. Use nightly TypeScript to silence this error. Try updating with 'npm install -D typescript@next'.
+    🎁
+    🎁 1 export const thing = import("pkg-a");
+    🎁                ~~~~~
+    🎁"
+  `);
+});
+
+test("importing another package via dynamic import and exporting something that requires importing a type from the other package works", async () => {
+  let dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "@mjs-proxy/repo",
+      preconstruct: {
+        packages: ["packages/*"],
+      },
+    }),
+    "packages/pkg-a/package.json": JSON.stringify({
+      name: "pkg-a",
+      main: "dist/pkg-a.cjs.js",
+      module: "dist/pkg-a.esm.js",
+      exports: {
+        ".": {
+          module: "./dist/pkg-a.esm.js",
+          import: "./dist/pkg-a.cjs.mjs",
+          default: "./dist/pkg-a.cjs.js",
+        },
+        "./package.json": "./package.json",
+      },
+      preconstruct: {
+        entrypoints: ["index.ts"],
+        exports: {
+          importDefaultExport: "unwrapped-default",
+        },
+      },
+    }),
+    "packages/pkg-a/src/index.ts": ts`
+      export type A = {
+        a?: A;
+      };
+      export const thing: A = {};
+      const _default: A = {};
+      export default _default;
+    `,
+    "packages/pkg-b/package.json": JSON.stringify({
+      name: "pkg-b",
+      main: "dist/pkg-b.cjs.js",
+      module: "dist/pkg-b.esm.js",
+      exports: {
+        ".": {
+          module: "./dist/pkg-b.esm.js",
+          import: "./dist/pkg-b.cjs.mjs",
+          default: "./dist/pkg-b.cjs.js",
+        },
+        "./package.json": "./package.json",
+      },
+      preconstruct: {
+        entrypoints: ["index.ts"],
+        exports: {
+          importDefaultExport: "unwrapped-default",
+        },
+      },
+      dependencies: {
+        "pkg-a": "^1.0.0",
+      },
+    }),
+
+    "packages/pkg-b/src/index.ts": ts`
+      export const pkgADefault = import("pkg-a").then((x) => x.default);
+      export const pkgAThing = import("pkg-a").then((x) => x.thing);
+    `,
+
+    "node_modules/typescript": {
+      kind: "symlink",
+      path: path.join(repoNodeModules, "typescript"),
+    },
+    "node_modules/@babel/preset-typescript": {
+      kind: "symlink",
+      path: path.join(repoNodeModules, "@babel/preset-typescript"),
+    },
+    "babel.config.json": JSON.stringify({
+      presets: ["@babel/preset-typescript"],
+    }),
+    "tsconfig.json": JSON.stringify({
+      compilerOptions: {
+        module: "NodeNext",
+        moduleResolution: "nodenext",
+        strict: true,
+        declaration: true,
+      },
+    }),
+  });
+  await fs.ensureSymlink(
+    path.join(dir, "packages/pkg-a"),
+    path.join(dir, "node_modules/pkg-a")
+  );
+  await fs.ensureSymlink(
+    path.join(dir, "packages/pkg-b"),
+    path.join(dir, "node_modules/pkg-b")
+  );
+  await build(dir);
+
+  expect(await getFiles(dir, ["packages/*/dist/**/*.d.{,m}ts"]))
+    .toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/declarations/src/index.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export declare type A = {
+        a?: A;
+    };
+    export declare const thing: A;
+    declare const _default: A;
+    export default _default;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.d.mts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export {
+      thing
+    } from "./declarations/src/index.js";
+    import ns from "./declarations/src/index.js";
+    export default ns.default;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export * from "./declarations/src/index";
+    export { default } from "./declarations/src/index";
+    //# sourceMappingURL=pkg-a.cjs.d.ts.map
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-b/dist/declarations/src/index.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export declare const pkgADefault: Promise<import("pkg-a").A>;
+    export declare const pkgAThing: Promise<import("pkg-a").A>;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-b/dist/pkg-b.cjs.d.mts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export {
+      pkgADefault,
+      pkgAThing
+    } from "./declarations/src/index.js";
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-b/dist/pkg-b.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export * from "./declarations/src/index";
+    //# sourceMappingURL=pkg-b.cjs.d.ts.map
+
+  `);
 });
 
 test("no __esModule when reexporting namespace with mjs proxy", async () => {

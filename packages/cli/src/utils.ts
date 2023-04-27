@@ -217,7 +217,7 @@ export function tsTemplate(
 }
 
 function getReexportStatement(namedExports: string[], source: string): string {
-  return `export {\n  ${namedExports.join(",  \n")}\n} from ${source};`;
+  return `export {\n  ${namedExports.join(",\n  ")}\n} from ${source};`;
 }
 
 export function mjsTemplate(exports: string[], relativePath: string) {
