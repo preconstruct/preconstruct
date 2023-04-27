@@ -195,15 +195,25 @@ export * from ${escapedPath};${
   }\n`;
 }
 
-export function tsTemplate(
-  filename: string,
+export function esmReexportTemplate(
   hasDefaultExport: boolean,
   relativePath: string
 ) {
   const escapedPath = JSON.stringify(relativePath);
   return `export * from ${escapedPath};${
     hasDefaultExport ? `\nexport { default } from ${escapedPath};` : ""
-  }\n//# sourceMappingURL=${filename}.map\n`;
+  }\n`;
+}
+
+export function tsTemplate(
+  filename: string,
+  hasDefaultExport: boolean,
+  relativePath: string
+) {
+  return `${esmReexportTemplate(
+    hasDefaultExport,
+    relativePath
+  )}//# sourceMappingURL=${filename}.map\n`;
 }
 
 function getReexportStatement(namedExports: string[], source: string): string {

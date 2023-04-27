@@ -401,7 +401,7 @@ async function readNormalizedFile(filePath: string): Promise<string> {
   let content = await fs.readFile(filePath, "utf8");
   // to normalise windows line endings
   content = content.replace(/\r\n/g, "\n");
-  if (/(?<!(\.d\.ts))\.map$/.test(filePath)) {
+  if (/(?<!(\.d\.[mc]?ts))\.map$/.test(filePath)) {
     const sourceMap = JSON.parse(content);
     sourceMap.sourcesContent = sourceMap.sourcesContent.map((source: string) =>
       source.replace(/\r\n/g, "\n")

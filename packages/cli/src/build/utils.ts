@@ -1,6 +1,6 @@
 import { Project } from "../project";
 import { isTsPath } from "../rollup-plugins/typescript-declarations";
-import { writeDevTSFile } from "../dev";
+import { entrypointHasDefaultExport, writeDevTSFiles } from "../dev";
 import * as fs from "fs-extra";
 import path from "path";
 
@@ -28,10 +28,14 @@ export async function cleanProjectBeforeBuild(project: Project) {
         pkg.entrypoints.map(async (entrypoint) => {
           if (isTsPath(entrypoint.source)) {
             await fs.mkdir(path.join(entrypoint.directory, "dist"));
-            await writeDevTSFile(entrypoint, {
-              contents: await fs.readFile(entrypoint.source, "utf8"),
-              filename: entrypoint.source,
-            });
+            await writeDevTSFiles(
+              entrypoint,
+              await entrypointHasDefaultExport(
+                entrypoint,
+                await fs.readFile(entrypoint.source, "utf8"),
+                entrypoint.source
+              )
+            );
           }
         })
       );

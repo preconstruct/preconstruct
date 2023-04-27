@@ -7,6 +7,7 @@ import {
   getExportsFieldOutputPath,
   tsReexportDeclMap,
   getExportsImportUnwrappingDefaultOutputPath,
+  esmReexportTemplate,
 } from "./utils";
 import * as babel from "@babel/core";
 import * as fs from "fs-extra";
@@ -47,7 +48,7 @@ async function getTypeSystem(entrypoint: Entrypoint): Promise<TypeSystemInfo> {
   return ret;
 }
 
-async function entrypointHasDefaultExport(
+export async function entrypointHasDefaultExport(
   entrypoint: Entrypoint,
   content: string,
   filename: string
@@ -87,9 +88,9 @@ async function entrypointHasDefaultExport(
   return false;
 }
 
-export async function writeDevTSFile(
+export async function writeDevTSFiles(
   entrypoint: Entrypoint,
-  tsishFile: { contents: string; filename: string }
+  hasDefaultExport: boolean
 ) {
   const dtsReexportFilename = path
     .join(entrypoint.directory, validFieldsForEntrypoint.main(entrypoint))
@@ -99,25 +100,57 @@ export async function writeDevTSFile(
   const relativePathWithExtension = normalizePath(
     path.relative(path.dirname(dtsReexportFilename), entrypoint.source)
   );
-  const output = await entrypointHasDefaultExport(
-    entrypoint,
-    tsishFile.contents,
-    tsishFile.filename
-  ).then((hasDefaultExport) =>
-    tsTemplate(
-      baseDtsFilename,
-      hasDefaultExport,
-      relativePathWithExtension.replace(/\.tsx?$/, "")
-    )
-  );
 
-  await Promise.all([
-    fs.outputFile(dtsReexportFilename, output),
+  let promises: Promise<unknown>[] = [
+    fs.outputFile(
+      dtsReexportFilename,
+      tsTemplate(
+        baseDtsFilename,
+        hasDefaultExport,
+        relativePathWithExtension.replace(/\.tsx?$/, "")
+      )
+    ),
     fs.outputFile(
       dtsReexportFilename + ".map",
       tsReexportDeclMap(baseDtsFilename, relativePathWithExtension)
     ),
-  ]);
+  ];
+
+  if (
+    entrypoint.package.exportsFieldConfig()?.importDefaultExport ===
+    "unwrapped-default"
+  ) {
+    const mdtsReexportFilename = path
+      .join(
+        entrypoint.package.directory,
+        getExportsImportUnwrappingDefaultOutputPath(entrypoint)
+      )
+      .replace(/\.mjs$/, ".d.mts");
+    const baseMdtsFilename = path.basename(mdtsReexportFilename);
+
+    const ext = path.extname(relativePathWithExtension).slice(1);
+    const mappedExt = { ts: "js", mts: "mjs", cts: "cjs" }[ext];
+
+    promises.push(
+      fs.outputFile(
+        mdtsReexportFilename,
+        tsTemplate(
+          baseMdtsFilename,
+          hasDefaultExport,
+          relativePathWithExtension.replace(
+            new RegExp(`\\.${ext}$`),
+            `.${mappedExt}`
+          )
+        )
+      ),
+      fs.outputFile(
+        mdtsReexportFilename + ".map",
+        tsReexportDeclMap(baseMdtsFilename, relativePathWithExtension)
+      )
+    );
+  }
+
+  await Promise.all(promises);
 }
 
 async function writeDevFlowFile(entrypoint: Entrypoint) {
@@ -151,11 +184,11 @@ export default async function dev(projectDir: string) {
   validateProject(project);
   info("project is valid!");
 
-  let promises: Promise<unknown>[] = [];
   await Promise.all(
     project.packages.map((pkg) => {
       return Promise.all(
         pkg.entrypoints.map(async (entrypoint) => {
+          let hasDefaultExportPromise: Promise<boolean> | undefined;
           let typeSystemPromise = getTypeSystem(entrypoint);
 
           let distDirectory = path.join(entrypoint.directory, "dist");
@@ -166,18 +199,26 @@ export default async function dev(projectDir: string) {
           await fs.remove(distDirectory);
           await fs.ensureDir(distDirectory);
 
-          let promises = [
+          let entrypointPromises: Promise<unknown>[] = [
             typeSystemPromise.then((typeSystemInfo) => {
-              let promises = [];
+              let typeSystemPromises = [];
               if (typeSystemInfo.flow) {
-                promises.push(writeDevFlowFile(entrypoint));
+                typeSystemPromises.push(writeDevFlowFile(entrypoint));
               }
               if (typeSystemInfo.typescript !== false) {
-                promises.push(
-                  writeDevTSFile(entrypoint, typeSystemInfo.typescript)
+                hasDefaultExportPromise ??= entrypointHasDefaultExport(
+                  entrypoint,
+                  typeSystemInfo.typescript.contents,
+                  typeSystemInfo.typescript.filename
+                );
+
+                typeSystemPromises.push(
+                  hasDefaultExportPromise.then((hasDefaultExport) =>
+                    writeDevTSFiles(entrypoint, hasDefaultExport)
+                  )
                 );
               }
-              return Promise.all(promises);
+              return Promise.all(typeSystemPromises);
             }),
             fs.writeFile(
               path.join(
@@ -218,18 +259,25 @@ unregister();
             pkg.exportsFieldConfig()?.importDefaultExport ===
             "unwrapped-default"
           ) {
-            promises.push(
-              fs.writeFile(
-                path.join(
-                  entrypoint.package.directory,
-                  getExportsImportUnwrappingDefaultOutputPath(entrypoint)
-                ),
-                `export * from ${JSON.stringify(entrypointPath)};\n`
+            hasDefaultExportPromise ??= entrypointHasDefaultExport(
+              entrypoint,
+              await fs.readFile(entrypoint.source, "utf8"),
+              entrypoint.source
+            );
+            entrypointPromises.push(
+              hasDefaultExportPromise.then((hasDefaultExport) =>
+                fs.writeFile(
+                  path.join(
+                    entrypoint.package.directory,
+                    getExportsImportUnwrappingDefaultOutputPath(entrypoint)
+                  ),
+                  esmReexportTemplate(hasDefaultExport, entrypointPath)
+                )
               )
             );
           }
           if (entrypoint.json.module) {
-            promises.push(
+            entrypointPromises.push(
               fs.symlink(
                 entrypoint.source,
                 path.join(
@@ -241,7 +289,7 @@ unregister();
           }
 
           if (pkg.exportsFieldConfig()?.envConditions?.has("worker")) {
-            promises.push(
+            entrypointPromises.push(
               fs.symlink(
                 entrypoint.source,
                 path.join(
@@ -255,7 +303,7 @@ unregister();
           if (entrypoint.json.browser) {
             let browserField = validFieldsForEntrypoint.browser(entrypoint);
             for (let output of Object.values(browserField)) {
-              promises.push(
+              entrypointPromises.push(
                 fs.symlink(
                   entrypoint.source,
                   path.join(entrypoint.directory, output)
@@ -264,13 +312,11 @@ unregister();
             }
           }
 
-          return Promise.all(promises);
+          return Promise.all(entrypointPromises);
         })
       );
     })
   );
-
-  await Promise.all(promises);
 
   success("created links!");
 }
