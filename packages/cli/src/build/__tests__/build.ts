@@ -1054,9 +1054,10 @@ test("correct default export using mjs and dmts proxies", async () => {
     } from "./declarations/src/index.js";
     import ns from "./declarations/src/index.js";
     export default ns.default;
+    //# sourceMappingURL=pkg-a.cjs.d.mts.map
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.d.mts.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    {"version":3,"file":"pkg-a.cjs.d.mts","sourceRoot":"","sources":["../src/index.ts"],"names":[],"mappings":"AAAA"}
+    {"version":3,"file":"pkg-a.cjs.d.mts","sourceRoot":"","sources":["./declarations/src/index.d.ts"],"names":[],"mappings":"AAAA"}
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     export * from "./declarations/src/index";
@@ -1229,9 +1230,10 @@ test("importing a package via dynamic import from another package provides the r
     export {
       thing
     } from "./declarations/src/index.js";
+    //# sourceMappingURL=pkg-b.cjs.d.mts.map
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-b/dist/pkg-b.cjs.d.mts.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    {"version":3,"file":"pkg-b.cjs.d.mts","sourceRoot":"","sources":["../src/index.ts"],"names":[],"mappings":"AAAA"}
+    {"version":3,"file":"pkg-b.cjs.d.mts","sourceRoot":"","sources":["./declarations/src/index.d.ts"],"names":[],"mappings":"AAAA"}
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-b/dist/pkg-b.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     export * from "./declarations/src/index";
@@ -1488,6 +1490,7 @@ test("importing another package via dynamic import and exporting something that 
     } from "./declarations/src/index.js";
     import ns from "./declarations/src/index.js";
     export default ns.default;
+    //# sourceMappingURL=pkg-a.cjs.d.mts.map
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     export * from "./declarations/src/index";
@@ -1503,6 +1506,7 @@ test("importing another package via dynamic import and exporting something that 
       pkgADefault,
       pkgAThing
     } from "./declarations/src/index.js";
+    //# sourceMappingURL=pkg-b.cjs.d.mts.map
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-b/dist/pkg-b.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     export * from "./declarations/src/index";

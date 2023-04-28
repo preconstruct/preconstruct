@@ -156,12 +156,27 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
         if (
           pkg.exportsFieldConfig()?.importDefaultExport === "unwrapped-default"
         ) {
+          const dmtsFilename = dtsFileName.replace(/\.d\.ts$/, ".d.mts");
+          const basedmtsFilename = baseDtsFilename.replace(
+            /\.d\.ts$/,
+            ".d.mts"
+          );
           this.emitFile({
             type: "asset",
-            fileName: dtsFileName.replace(/\.d\.ts$/, ".d.mts"),
+            fileName: dmtsFilename,
             // even though we are emitting a declaration file it's currently safe to reuse the `.mjs` template
             // it only has reexports, no runtime expressions and even no types in it
-            source: mjsTemplate(file.exports, `${relativeToSource}.js`),
+            source:
+              mjsTemplate(file.exports, `${relativeToSource}.js`) +
+              `//# sourceMappingURL=${basedmtsFilename}.map\n`,
+          });
+          this.emitFile({
+            type: "asset",
+            fileName: `${dmtsFilename}.map`,
+            source: tsReexportDeclMap(
+              basedmtsFilename,
+              `${relativeToSource}.d.ts`
+            ),
           });
         }
       }
