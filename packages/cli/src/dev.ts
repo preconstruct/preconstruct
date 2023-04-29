@@ -1,13 +1,14 @@
 import { Project } from "./project";
 import { success, info } from "./logger";
 import {
-  tsTemplate,
+  dtsTemplate,
   flowTemplate,
   validFieldsForEntrypoint,
   getExportsFieldOutputPath,
   tsReexportDeclMap,
   getExportsImportUnwrappingDefaultOutputPath,
-  esmReexportTemplate,
+  dmtsTemplate,
+  mjsTemplate,
 } from "./utils";
 import * as babel from "@babel/core";
 import * as fs from "fs-extra";
@@ -104,7 +105,7 @@ export async function writeDevTSFiles(
   let promises: Promise<unknown>[] = [
     fs.outputFile(
       dtsReexportFilename,
-      tsTemplate(
+      dtsTemplate(
         baseDtsFilename,
         hasDefaultExport,
         relativePathWithExtension.replace(/\.tsx?$/, "")
@@ -134,7 +135,7 @@ export async function writeDevTSFiles(
     promises.push(
       fs.outputFile(
         dmtsReexportFilename,
-        tsTemplate(
+        dmtsTemplate(
           baseDmtsFilename,
           hasDefaultExport,
           relativePathWithExtension.replace(
@@ -271,7 +272,16 @@ unregister();
                     entrypoint.package.directory,
                     getExportsImportUnwrappingDefaultOutputPath(entrypoint)
                   ),
-                  esmReexportTemplate(hasDefaultExport, entrypointPath)
+                  mjsTemplate(
+                    // the * won't really do anything right now
+                    // since cjs-module-lexer won't find anything
+                    // but that could be fixed by adding fake things
+                    // to the .cjs.js file that look like exports to cjs-module-lexer
+                    // but don't actually add the exports at runtime like esbuild does
+                    // (it would require re-running dev when adding new named exports)
+                    hasDefaultExport ? ["default", "*other"] : ["*other"],
+                    entrypointPath
+                  )
                 )
               )
             );

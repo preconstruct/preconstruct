@@ -495,7 +495,8 @@ test("with unwrapped-default", async () => {
   ).toMatchInlineSnapshot(`
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.d.mts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     export * from "../src/index.js";
-    export { default } from "../src/index.js";
+    import ns from "../src/index.js";
+    export default ns.default;
     //# sourceMappingURL=pkg-a.cjs.d.mts.map
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.d.mts.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
@@ -511,14 +512,16 @@ test("with unwrapped-default", async () => {
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.mjs ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     export * from "../src/index.ts";
-    export { default } from "../src/index.ts";
+    import ns from "../src/index.ts";
+    export default ns.default;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     export const thing = "index";
     export default true;
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/something/dist/pkg-a-something.cjs.d.mts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     export * from "../../src/something.js";
-    export { default } from "../../src/something.js";
+    import ns from "../../src/something.js";
+    export default ns.default;
     //# sourceMappingURL=pkg-a-something.cjs.d.mts.map
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/something/dist/pkg-a-something.cjs.d.mts.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
@@ -534,7 +537,8 @@ test("with unwrapped-default", async () => {
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/something/dist/pkg-a-something.cjs.mjs ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     export * from "../../src/something.ts";
-    export { default } from "../../src/something.ts";
+    import ns from "../../src/something.ts";
+    export default ns.default;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/something/dist/pkg-a-something.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     export const something = "something";

@@ -4,7 +4,7 @@ import { Plugin } from "rollup";
 import fs from "fs-extra";
 import { Package } from "../../package";
 import { getDeclarations } from "./get-declarations";
-import { mjsTemplate, tsReexportDeclMap, tsTemplate } from "../../utils";
+import { dmtsTemplate, tsReexportDeclMap, dtsTemplate } from "../../utils";
 import normalizePath from "normalize-path";
 import { overwriteDeclarationMapSourceRoot } from "./common";
 
@@ -134,9 +134,12 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
         }
         const dtsFileName = `${mainFieldPath}.d.ts`;
         const baseDtsFilename = path.basename(dtsFileName);
-        const dtsFileSource = tsTemplate(
+        // TODO: technically this is wrong because you could have a default type-only export
+        // (though i doubt that is very common)
+        const hasDefaultExport = file.exports.includes("default");
+        const dtsFileSource = dtsTemplate(
           baseDtsFilename,
-          file.exports.includes("default"),
+          hasDefaultExport,
           relativeToSource
         );
         this.emitFile({
@@ -164,11 +167,11 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
           this.emitFile({
             type: "asset",
             fileName: dmtsFilename,
-            // even though we are emitting a declaration file it's currently safe to reuse the `.mjs` template
-            // it only has reexports, no runtime expressions and even no types in it
-            source:
-              mjsTemplate(file.exports, `${relativeToSource}.js`) +
-              `//# sourceMappingURL=${basedmtsFilename}.map\n`,
+            source: dmtsTemplate(
+              basedmtsFilename,
+              hasDefaultExport,
+              `${relativeToSource}.js`
+            ),
           });
           this.emitFile({
             type: "asset",

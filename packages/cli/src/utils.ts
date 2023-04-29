@@ -206,7 +206,7 @@ export function esmReexportTemplate(
   }\n`;
 }
 
-export function tsTemplate(
+export function dtsTemplate(
   filename: string,
   hasDefaultExport: boolean,
   relativePath: string
@@ -218,6 +218,10 @@ export function tsTemplate(
 }
 
 function getReexportStatement(namedExports: string[], source: string): string {
+  // rollup will say a chunk has a "*external-pkg" export when it has an export * from 'external-pkg'
+  if (namedExports.some((exported) => exported[0] === "*")) {
+    return `export * from ${source};`;
+  }
   return `export {\n  ${namedExports.join(",\n  ")}\n} from ${source};`;
 }
 
@@ -230,6 +234,22 @@ export function mjsTemplate(exports: string[], relativePath: string) {
       ? `import ns from ${escapedPath};\nexport default ns.default;\n`
       : ""
   }`;
+}
+
+// the only reason we sometimes name exports explicitly in the mjs template is
+// to avoid adding __esModule as an export, this doesn't apply to the .d.mts
+// since __esModule doesn't exist in declaration files
+// just doing export * is nice because it means we don't have to bother
+// getting the type-only exports
+export function dmtsTemplate(
+  filename: string,
+  hasDefaultExport: boolean,
+  relativePath: string
+) {
+  return (
+    mjsTemplate(hasDefaultExport ? ["default", "*"] : ["*"], relativePath) +
+    `//# sourceMappingURL=${filename}.map\n`
+  );
 }
 
 export function tsReexportDeclMap(
