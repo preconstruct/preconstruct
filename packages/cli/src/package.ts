@@ -323,23 +323,11 @@ export class Package extends Item<{
   }
 
   exportsFieldConfig(): CanonicalExportsFieldConfig {
-    let defaultExportsFieldEnabled = false;
-    if (this.project.directory !== this.directory) {
-      const exportsFieldConfig = this.project.json.preconstruct.exports;
-      if (exportsFieldConfig !== undefined) {
-        if (typeof exportsFieldConfig === "boolean") {
-          defaultExportsFieldEnabled = exportsFieldConfig;
-        } else {
-          throw new FatalError(
-            'the "preconstruct.exports" field must be a boolean at the project level',
-            this.project.name
-          );
-        }
-      }
-    }
     return parseExportsFieldConfig(
       this.json.preconstruct.exports,
-      defaultExportsFieldEnabled,
+      this.project.directory !== this.directory
+        ? this.project.exportsFieldConfig()
+        : undefined,
       this.name
     );
   }
@@ -354,40 +342,35 @@ type CanonicalExportsFieldConfig =
     };
 
 function parseExportsFieldConfig(
-  _config: unknown,
-  defaultExportsFieldEnabled: boolean,
+  config: unknown,
+  defaultExportFieldConfig:
+    | undefined
+    | { importDefaultExport: "namespace" | "unwrapped-default" },
   name: string
 ): CanonicalExportsFieldConfig {
-  // the seperate assignment vs declaration is so that TypeScript's
-  // control flow analysis does what we want
-  let config;
-  config = _config;
   if (
-    (typeof config !== "boolean" &&
-      typeof config !== "object" &&
-      config !== undefined) ||
-    config === null ||
-    Array.isArray(config)
+    config === false ||
+    (config === undefined && defaultExportFieldConfig === undefined)
   ) {
-    throw new FatalError(
-      'the "preconstruct.exports" field must be a boolean or an object at the package level',
-      name
-    );
-  }
-  if (config === undefined) {
-    config = defaultExportsFieldEnabled;
-  }
-  if (config === false) {
     return undefined;
   }
   const parsedConfig: CanonicalExportsFieldConfig = {
     envConditions: new Set(),
     extra: {},
-    importDefaultExport: "namespace",
+    importDefaultExport:
+      defaultExportFieldConfig?.importDefaultExport ?? "namespace",
   };
-  if (config === true) {
+  if (config === true || config === undefined) {
     return parsedConfig;
   }
+
+  if (typeof config !== "object" || config === null || Array.isArray(config)) {
+    throw new FatalError(
+      'the "preconstruct.exports" field must be a boolean or an object',
+      name
+    );
+  }
+
   for (const [key, value] of Object.entries(config) as [string, unknown][]) {
     if (key === "extra") {
       if (

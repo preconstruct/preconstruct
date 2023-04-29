@@ -6,7 +6,7 @@ import { Item } from "./item";
 import { Package } from "./package";
 import { validateIncludedFiles } from "./validate-included-files";
 import { FatalError } from "./errors";
-import { JSONValue } from "./utils";
+import { JSONValue, parseImportDefaultExportOption } from "./utils";
 
 const allSettled = (promises: Promise<any>[]) =>
   Promise.all(
@@ -137,5 +137,45 @@ export class Project extends Item<{
     }
 
     return packages;
+  }
+
+  exportsFieldConfig():
+    | undefined
+    | { importDefaultExport: "namespace" | "unwrapped-default" } {
+    const exportsFieldConfig = this.json.preconstruct.exports;
+    if (exportsFieldConfig === false || exportsFieldConfig === undefined) {
+      return undefined;
+    }
+    let importDefaultExport: "namespace" | "unwrapped-default" = "namespace";
+    if (exportsFieldConfig === true) {
+      return { importDefaultExport };
+    }
+    if (
+      typeof exportsFieldConfig !== "object" ||
+      exportsFieldConfig === null ||
+      Array.isArray(exportsFieldConfig)
+    ) {
+      throw new FatalError(
+        'the "preconstruct.exports" field must be a boolean or an object',
+        this.name
+      );
+    }
+    for (const [key, val] of Object.entries(exportsFieldConfig)) {
+      if (key === "importDefaultExport") {
+        importDefaultExport = parseImportDefaultExportOption(val, this.name);
+        continue;
+      }
+      if (key === "extra" || key === "envConditions") {
+        throw new FatalError(
+          `the "preconstruct.exports.${key}" field can only be configured at the package level`,
+          this.name
+        );
+      }
+      throw new FatalError(
+        `the "preconstruct.exports" field contains an unknown key "${key}"`,
+        this.name
+      );
+    }
+    return { importDefaultExport };
   }
 }

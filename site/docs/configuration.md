@@ -154,7 +154,7 @@ Using the `exports` field enables a couple of things:
 
 Note that adding an `exports` field can arguably be a breaking change, you may want to use the `extra` option to add more exports so that imports that worked previously still work or only add the `exports` field in a major version.
 
-The `exports` field feature can be enabled at the project or package level like this. The `envConditions` and `extra` options can only be configured at a package level.
+The `exports` field feature can be enabled at the project or package level like this. The `envConditions` and `extra` options can only be configured at the package level. The `importConditionDefaultExport` option can be configured at the project or package level.
 
 ```diff
 {

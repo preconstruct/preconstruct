@@ -2,6 +2,7 @@ import normalizePath from "normalize-path";
 import { Entrypoint } from "./entrypoint";
 import { Package, ExportsConditions } from "./package";
 import * as nodePath from "path";
+import { FatalError } from "./errors";
 
 let fields = [
   "version",
@@ -254,3 +255,13 @@ export type JSONValue =
   | null
   | Array<JSONValue>
   | { [key: string]: JSONValue | undefined };
+
+export function parseImportDefaultExportOption(value: unknown, name: string) {
+  if (value === "unwrapped-default" || value === "namespace") {
+    return value;
+  }
+  throw new FatalError(
+    'the "preconstruct.exports.importDefaultExport" field must be set to "unwrapped-default" or "namespace" if it is present',
+    name
+  );
+}
