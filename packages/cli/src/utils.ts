@@ -138,8 +138,15 @@ export function getDistExtension(target: BuildTarget) {
   return `${buildTargetToExtensionPrefix[target]}.js`;
 }
 
+export function getBaseDistFilename(
+  entrypoint: MinimalEntrypoint,
+  target: BuildTarget
+) {
+  return `${getBaseDistName(entrypoint)}.${getDistExtension(target)}`;
+}
+
 function getDistFilename(entrypoint: MinimalEntrypoint, target: BuildTarget) {
-  return `dist/${getBaseDistName(entrypoint)}.${getDistExtension(target)}`;
+  return `dist/${getBaseDistFilename(entrypoint, target)}`;
 }
 
 export function getExportsFieldOutputPath(

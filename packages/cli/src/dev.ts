@@ -9,6 +9,7 @@ import {
   getExportsImportUnwrappingDefaultOutputPath,
   dmtsTemplate,
   mjsTemplate,
+  getBaseDistFilename,
 } from "./utils";
 import * as babel from "@babel/core";
 import * as fs from "fs-extra";
@@ -280,7 +281,7 @@ unregister();
                     // but don't actually add the exports at runtime like esbuild does
                     // (it would require re-running dev when adding new named exports)
                     hasDefaultExport ? ["default", "*other"] : ["*other"],
-                    entrypointPath
+                    `./${getBaseDistFilename(entrypoint, "cjs")}`
                   )
                 )
               )

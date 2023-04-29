@@ -511,8 +511,8 @@ test("with unwrapped-default", async () => {
     {"version":3,"file":"pkg-a.cjs.d.ts","sourceRoot":"","sources":["../src/index.ts"],"names":[],"mappings":"AAAA"}
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.mjs ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    export * from "../src/index.ts";
-    import ns from "../src/index.ts";
+    export * from "./pkg-a.cjs.js";
+    import ns from "./pkg-a.cjs.js";
     export default ns.default;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
@@ -536,8 +536,8 @@ test("with unwrapped-default", async () => {
     {"version":3,"file":"pkg-a-something.cjs.d.ts","sourceRoot":"","sources":["../../src/something.ts"],"names":[],"mappings":"AAAA"}
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/something/dist/pkg-a-something.cjs.mjs ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    export * from "../../src/something.ts";
-    import ns from "../../src/something.ts";
+    export * from "./pkg-a-something.cjs.js";
+    import ns from "./pkg-a-something.cjs.js";
     export default ns.default;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/something/dist/pkg-a-something.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
