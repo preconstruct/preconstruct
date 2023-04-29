@@ -209,6 +209,88 @@ Preconstruct will enforce that the `exports` field that is written can is direct
 }
 ```
 
+#### `importConditionDefaultExport`
+
+`"namespace" | "default"`
+
+Preconstruct doesn't generate bundles targeting Node ESM to avoid the [dual package hazard](https://nodejs.org/api/packages.html#dual-commonjses-module-packages). Instead of generating a bundle for Node ESM, the CommonJS bundle is used in Node ESM and because of Node's usage of [cjs-module-lexer](https://github.com/nodejs/cjs-module-lexer), importing named exports from CommonJS packages works correctly. Default exports are more complicated though. The way that Preconstruct and many other tools generate CommonJS bundles is like this.
+
+```js
+export default "a";
+```
+
+↓
+
+```js
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+
+var main = "a";
+
+exports.default = main;
+```
+
+And for compiling importing a default export from a CommonJS module like this,
+
+```js
+import a from "a";
+
+console.log(a);
+```
+
+↓
+
+```js
+"use strict";
+
+var x = require("b");
+
+function _interopDefault(e) {
+  return e && e.__esModule ? e : { default: e };
+}
+
+var x__default = /*#__PURE__*/ _interopDefault(x);
+
+console.log(x__default.default);
+```
+
+however, Node doesn't look at the `__esModule` convention to get the default export of a CommonJS module when importing in ESM. Instead, it uses the whole `module.exports` object as the default export.
+
+This means running `b.mjs` here would log `{ default: "a", __esModule: true }` instead of `"a"`.
+
+```js
+// a.cjs
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+
+var main = "a";
+
+exports.default = main;
+
+// b.mjs
+import a from "./a.cjs";
+
+console.log(a);
+```
+
+To get around this, you can set `preconstruct.exports.importConditionDefaultExport` to `"default"` which will make Preconstruct generate a ESM module for Node that re-exports the CommonJS bundle with the correct default export.
+
+Currently, this defaults to `"namespace"`, this will change to `"default"` in the next major version.
+
+```json
+{
+  "name": "@sample/package",
+  "version": "1.0.0",
+  "preconstruct": {
+    "exports": {
+      "importConditionDefaultExport": "default"
+    }
+  }
+}
+```
+
 ## Entrypoints {#entrypoints}
 
 Entrypoints are the lowest level configuration point and describe a set of bundles for a particular entrypoint. They are configured by the `package.json` in the folder of the entrypoint. We also have a guide on [adding a second entrypoint](/guides/adding-a-second-entrypoint)
