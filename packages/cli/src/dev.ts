@@ -120,22 +120,22 @@ export async function writeDevTSFiles(
     entrypoint.package.exportsFieldConfig()?.importDefaultExport ===
     "unwrapped-default"
   ) {
-    const mdtsReexportFilename = path
+    const dmtsReexportFilename = path
       .join(
         entrypoint.package.directory,
         getExportsImportUnwrappingDefaultOutputPath(entrypoint)
       )
       .replace(/\.mjs$/, ".d.mts");
-    const baseMdtsFilename = path.basename(mdtsReexportFilename);
+    const baseDmtsFilename = path.basename(dmtsReexportFilename);
 
     const ext = path.extname(relativePathWithExtension).slice(1);
     const mappedExt = { ts: "js", mts: "mjs", cts: "cjs" }[ext];
 
     promises.push(
       fs.outputFile(
-        mdtsReexportFilename,
+        dmtsReexportFilename,
         tsTemplate(
-          baseMdtsFilename,
+          baseDmtsFilename,
           hasDefaultExport,
           relativePathWithExtension.replace(
             new RegExp(`\\.${ext}$`),
@@ -144,8 +144,8 @@ export async function writeDevTSFiles(
         )
       ),
       fs.outputFile(
-        mdtsReexportFilename + ".map",
-        tsReexportDeclMap(baseMdtsFilename, relativePathWithExtension)
+        dmtsReexportFilename + ".map",
+        tsReexportDeclMap(baseDmtsFilename, relativePathWithExtension)
       )
     );
   }
