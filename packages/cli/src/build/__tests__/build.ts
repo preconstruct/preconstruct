@@ -14,6 +14,7 @@ import {
   basicPkgJson,
   getFiles,
   ts,
+  stripHashes,
 } from "../../../test-utils";
 import { doPromptInput as _doPromptInput } from "../../prompt";
 import { confirms as _confirms } from "../../messages";
@@ -1485,10 +1486,6 @@ test("no __esModule when reexporting namespace with mjs proxy", async () => {
         },
       },
     }),
-    "packages/pkg-a/something/package.json": JSON.stringify({
-      main: "dist/pkg-a-something.cjs.js",
-      module: "dist/pkg-a-something.esm.js",
-    }),
     "packages/pkg-a/src/index.js": ts`
       export * as somethingNs from "./something";
     `,
@@ -1840,4 +1837,116 @@ test("type only export imported in .mts", async () => {
     "
   `);
   expect(stderr.toString("utf8")).toMatchInlineSnapshot(`""`);
+});
+
+test("importConditionDefaultExport: default with use client", async () => {
+  let dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "pkg-a",
+      main: "dist/pkg-a.cjs.js",
+      module: "dist/pkg-a.esm.js",
+      exports: {
+        ".": {
+          module: "./dist/pkg-a.esm.js",
+          import: "./dist/pkg-a.cjs.mjs",
+          default: "./dist/pkg-a.cjs.js",
+        },
+        "./package.json": "./package.json",
+      },
+      preconstruct: {
+        exports: { importConditionDefaultExport: "default" },
+      },
+    }),
+    "src/index.js": js`
+      export { Something } from "./client";
+      export default "a";
+    `,
+    "src/client.js": js`
+      "use client";
+      export function Something() {}
+    `,
+  });
+  await build(dir);
+
+  expect(await getFiles(dir, ["dist/**"], stripHashes("client")))
+    .toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/client-this-is-not-the-real-hash-060b3d217893ddbe748563e6e98b804c.cjs.dev.js, dist/client-this-is-not-the-real-hash-060b3d217893ddbe748563e6e98b804c.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use client';
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    function Something() {}
+
+    exports.Something = Something;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/client-this-is-not-the-real-hash-309cc5e233da5126cc473e58b428ae77.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./client-some-hash.cjs.prod.js");
+    } else {
+      module.exports = require("./client-some-hash.cjs.dev.js");
+    }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/client-this-is-not-the-real-hash-5330ac3fb575d424e728f3c1abe81dfa.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use client';
+    function Something() {}
+
+    export { Something };
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg-a.cjs.dev.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    var client = require('./client-some-hash.cjs.dev.js');
+
+    var index = "a";
+
+    Object.defineProperty(exports, 'Something', {
+    	enumerable: true,
+    	get: function () { return client.Something; }
+    });
+    exports["default"] = index;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg-a.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./pkg-a.cjs.prod.js");
+    } else {
+      module.exports = require("./pkg-a.cjs.dev.js");
+    }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg-a.cjs.mjs ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export {
+      Something
+    } from "./pkg-a.cjs.js";
+    import ns from "./pkg-a.cjs.js";
+    export default ns.default;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg-a.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    var client = require('./client-some-hash.cjs.prod.js');
+
+    var index = "a";
+
+    Object.defineProperty(exports, 'Something', {
+    	enumerable: true,
+    	get: function () { return client.Something; }
+    });
+    exports["default"] = index;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg-a.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export { Something } from './client-some-hash.esm.js';
+
+    var index = "a";
+
+    export { index as default };
+
+  `);
 });

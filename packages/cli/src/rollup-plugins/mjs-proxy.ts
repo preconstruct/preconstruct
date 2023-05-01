@@ -1,8 +1,11 @@
+import normalizePath from "normalize-path";
 import path from "path";
 import { Plugin } from "rollup";
+import { Package } from "../package";
 import { mjsTemplate } from "../utils";
 
-export default function mjsProxyPlugin(): Plugin {
+export default function mjsProxyPlugin(pkg: Package): Plugin {
+  const entrypointSources = new Set(pkg.entrypoints.map((e) => e.source));
   return {
     name: "mjs-proxy",
     async generateBundle(opts, bundle) {
@@ -11,7 +14,8 @@ export default function mjsProxyPlugin(): Plugin {
         if (
           file.type === "asset" ||
           !file.isEntry ||
-          file.facadeModuleId == null
+          file.facadeModuleId == null ||
+          !entrypointSources.has(normalizePath(file.facadeModuleId))
         ) {
           continue;
         }
