@@ -1,6 +1,6 @@
 const whitespace = /\s/;
 
-type Directive = {
+export type Directive = {
   value: string;
   start: number;
   end: number;
@@ -15,30 +15,32 @@ export function getModuleDirectives(source: string): Directive[] {
       continue;
     }
     if (char === "/") {
-      if (source[i + 1] === "/") {
-        i += 2;
-        while (
-          i < source.length &&
-          (source[i] !== "\r" || source[i] !== "\n")
-        ) {
+      i++;
+      if (source[i] === "/") {
+        while (i < source.length && source[i] !== "\r" && source[i] !== "\n") {
           i++;
         }
+        continue;
       }
-      if (source[i + 1] === "*") {
-        i += 2;
+      if (source[i] === "*") {
         while (
           i < source.length &&
           (source[i] !== "*" || source[i + 1] !== "/")
         ) {
           i++;
         }
-        i += 2;
+        i += 1;
+        continue;
       }
+      break;
     }
-    if (char === ";" && lastDirectiveExpectingSemi !== undefined) {
-      lastDirectiveExpectingSemi.end = i + 1;
-      lastDirectiveExpectingSemi = undefined;
-      continue;
+    if (char === ";") {
+      if (lastDirectiveExpectingSemi !== undefined) {
+        lastDirectiveExpectingSemi.end = i + 1;
+        lastDirectiveExpectingSemi = undefined;
+        continue;
+      }
+      break;
     }
     if (char === '"' || char === "'") {
       let start = i;

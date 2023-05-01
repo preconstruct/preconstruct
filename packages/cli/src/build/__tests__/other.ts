@@ -1464,3 +1464,97 @@ test("import use client self as entrypoint", async () => {
 
   `);
 });
+
+test("simple use client with comment above directive", async () => {
+  const dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "pkg",
+      main: "dist/pkg.cjs.js",
+      module: "dist/pkg.esm.js",
+    }),
+    "src/index.js": js`
+      export { A } from "./client";
+    `,
+    "src/client.js": js`
+      /** blah */
+      "use client";
+      export const A = "something";
+      console.log("client");
+    `,
+  });
+  await build(dir);
+  expect(await getFiles(dir, ["dist/**"], stripHashes("client")))
+    .toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/client-this-is-not-the-real-hash-309cc5e233da5126cc473e58b428ae77.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./client-some-hash.cjs.prod.js");
+    } else {
+      module.exports = require("./client-some-hash.cjs.dev.js");
+    }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/client-this-is-not-the-real-hash-d42256f03593be08d8620d4b6456d377.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use client';
+    /** blah */
+
+    const A = "something";
+    console.log("client");
+
+    export { A };
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/client-this-is-not-the-real-hash-ef1aedc2ed504d143f108943a7d13c16.cjs.dev.js, dist/client-this-is-not-the-real-hash-ef1aedc2ed504d143f108943a7d13c16.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use client';
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    /** blah */
+
+    const A = "something";
+    console.log("client");
+
+    exports.A = A;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.dev.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    var client = require('./client-some-hash.cjs.dev.js');
+
+
+
+    Object.defineProperty(exports, 'A', {
+    	enumerable: true,
+    	get: function () { return client.A; }
+    });
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./pkg.cjs.prod.js");
+    } else {
+      module.exports = require("./pkg.cjs.dev.js");
+    }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    var client = require('./client-some-hash.cjs.prod.js');
+
+
+
+    Object.defineProperty(exports, 'A', {
+    	enumerable: true,
+    	get: function () { return client.A; }
+    });
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export { A } from './client-some-hash.esm.js';
+
+  `);
+});
