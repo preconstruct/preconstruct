@@ -417,3 +417,131 @@ test(".d.ts file with default export", async () => {
 
   `);
 });
+
+test("with default", async () => {
+  let dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "@mjs-proxy/repo",
+      preconstruct: {
+        packages: ["packages/pkg-a"],
+      },
+    }),
+    "packages/pkg-a/package.json": JSON.stringify({
+      name: "pkg-a",
+      main: "dist/pkg-a.cjs.js",
+      module: "dist/pkg-a.esm.js",
+      exports: {
+        ".": {
+          module: "./dist/pkg-a.esm.js",
+          import: "./dist/pkg-a.cjs.mjs",
+          default: "./dist/pkg-a.cjs.js",
+        },
+        "./something": {
+          module: "./something/dist/pkg-a-something.esm.js",
+          import: "./something/dist/pkg-a-something.cjs.mjs",
+          default: "./something/dist/pkg-a-something.cjs.js",
+        },
+        "./package.json": "./package.json",
+      },
+      preconstruct: {
+        entrypoints: ["index.ts", "something.ts"],
+        exports: {
+          importConditionDefaultExport: "default",
+        },
+      },
+    }),
+    "packages/pkg-a/something/package.json": JSON.stringify({
+      main: "dist/pkg-a-something.cjs.js",
+      module: "dist/pkg-a-something.esm.js",
+    }),
+    "packages/pkg-a/src/index.ts": ts`
+      export const thing = "index";
+      export default true;
+    `,
+    "packages/pkg-a/src/something.ts": ts`
+      export const something = "something";
+      export default 100;
+    `,
+    "packages/pkg-a/not-exported.ts": ts`
+      export const notExported = true;
+      export default "foo";
+    `,
+
+    "packages/pkg-a/node_modules": {
+      kind: "symlink",
+      path: repoNodeModules,
+    },
+    "tsconfig.json": JSON.stringify({
+      compilerOptions: {
+        module: "NodeNext",
+        moduleResolution: "nodenext",
+        strict: true,
+        declaration: true,
+      },
+    }),
+  });
+  await fs.ensureSymlink(
+    path.join(dir, "packages/pkg-a"),
+    path.join(dir, "node_modules/pkg-a")
+  );
+  await dev(dir);
+
+  expect(
+    await getFiles(dir, [
+      "packages/**/dist/**",
+      "!packages/**/dist/*.cjs.js",
+      "!**/node_modules",
+    ])
+  ).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.d.mts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export * from "../src/index.js";
+    import ns from "../src/index.js";
+    export default ns.default;
+    //# sourceMappingURL=pkg-a.cjs.d.mts.map
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.d.mts.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {"version":3,"file":"pkg-a.cjs.d.mts","sourceRoot":"","sources":["../src/index.ts"],"names":[],"mappings":"AAAA"}
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export * from "../src/index";
+    export { default } from "../src/index";
+    //# sourceMappingURL=pkg-a.cjs.d.ts.map
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.d.ts.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {"version":3,"file":"pkg-a.cjs.d.ts","sourceRoot":"","sources":["../src/index.ts"],"names":[],"mappings":"AAAA"}
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.mjs ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export * from "./pkg-a.cjs.js";
+    import ns from "./pkg-a.cjs.js";
+    export default ns.default;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export const thing = "index";
+    export default true;
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/something/dist/pkg-a-something.cjs.d.mts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export * from "../../src/something.js";
+    import ns from "../../src/something.js";
+    export default ns.default;
+    //# sourceMappingURL=pkg-a-something.cjs.d.mts.map
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/something/dist/pkg-a-something.cjs.d.mts.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {"version":3,"file":"pkg-a-something.cjs.d.mts","sourceRoot":"","sources":["../../src/something.ts"],"names":[],"mappings":"AAAA"}
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/something/dist/pkg-a-something.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export * from "../../src/something";
+    export { default } from "../../src/something";
+    //# sourceMappingURL=pkg-a-something.cjs.d.ts.map
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/something/dist/pkg-a-something.cjs.d.ts.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {"version":3,"file":"pkg-a-something.cjs.d.ts","sourceRoot":"","sources":["../../src/something.ts"],"names":[],"mappings":"AAAA"}
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/something/dist/pkg-a-something.cjs.mjs ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export * from "./pkg-a-something.cjs.js";
+    import ns from "./pkg-a-something.cjs.js";
+    export default ns.default;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/something/dist/pkg-a-something.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export const something = "something";
+    export default 100;
+  `);
+});

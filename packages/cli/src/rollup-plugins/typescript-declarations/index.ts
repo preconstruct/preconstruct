@@ -4,7 +4,7 @@ import { Plugin } from "rollup";
 import fs from "fs-extra";
 import { Package } from "../../package";
 import { getDeclarations } from "./get-declarations";
-import { tsReexportDeclMap, tsTemplate } from "../../utils";
+import { dmtsTemplate, tsReexportDeclMap, dtsTemplate } from "../../utils";
 import normalizePath from "normalize-path";
 import { overwriteDeclarationMapSourceRoot } from "./common";
 
@@ -134,9 +134,12 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
         }
         const dtsFileName = `${mainFieldPath}.d.ts`;
         const baseDtsFilename = path.basename(dtsFileName);
-        const dtsFileSource = tsTemplate(
+        // TODO: technically this is wrong because you could have a default type-only export
+        // (though i doubt that is very common)
+        const hasDefaultExport = file.exports.includes("default");
+        const dtsFileSource = dtsTemplate(
           baseDtsFilename,
-          file.exports.includes("default"),
+          hasDefaultExport,
           relativeToSource
         );
         this.emitFile({
@@ -152,6 +155,33 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
             `${relativeToSource}.d.ts`
           ),
         });
+
+        if (
+          pkg.exportsFieldConfig()?.importConditionDefaultExport === "default"
+        ) {
+          const dmtsFilename = dtsFileName.replace(/\.d\.ts$/, ".d.mts");
+          const basedmtsFilename = baseDtsFilename.replace(
+            /\.d\.ts$/,
+            ".d.mts"
+          );
+          this.emitFile({
+            type: "asset",
+            fileName: dmtsFilename,
+            source: dmtsTemplate(
+              basedmtsFilename,
+              hasDefaultExport,
+              `${relativeToSource}.js`
+            ),
+          });
+          this.emitFile({
+            type: "asset",
+            fileName: `${dmtsFilename}.map`,
+            source: tsReexportDeclMap(
+              basedmtsFilename,
+              `${relativeToSource}.d.ts`
+            ),
+          });
+        }
       }
     },
   };

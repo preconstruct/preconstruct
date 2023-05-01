@@ -2,6 +2,7 @@ import normalizePath from "normalize-path";
 import { Entrypoint } from "./entrypoint";
 import { Package, ExportsConditions } from "./package";
 import * as nodePath from "path";
+import { FatalError } from "./errors";
 
 let fields = [
   "version",
@@ -99,6 +100,9 @@ export function exportsField(
             default: esmBuild,
           }
         : esmBuild,
+      ...(exportsFieldConfig.importConditionDefaultExport === "default" && {
+        import: getExportsImportUnwrappingDefaultOutputPath(entrypoint),
+      }),
       default: getExportsFieldOutputPath(entrypoint, "cjs"),
     };
 
@@ -134,8 +138,15 @@ export function getDistExtension(target: BuildTarget) {
   return `${buildTargetToExtensionPrefix[target]}.js`;
 }
 
+export function getBaseDistFilename(
+  entrypoint: MinimalEntrypoint,
+  target: BuildTarget
+) {
+  return `${getBaseDistName(entrypoint)}.${getDistExtension(target)}`;
+}
+
 function getDistFilename(entrypoint: MinimalEntrypoint, target: BuildTarget) {
-  return `dist/${getBaseDistName(entrypoint)}.${getDistExtension(target)}`;
+  return `dist/${getBaseDistFilename(entrypoint, target)}`;
 }
 
 export function getExportsFieldOutputPath(
@@ -144,6 +155,12 @@ export function getExportsFieldOutputPath(
 ) {
   const prefix = entrypoint.name.replace(entrypoint.package.name, "");
   return `.${prefix}/${getDistFilename(entrypoint, target)}`;
+}
+
+export function getExportsImportUnwrappingDefaultOutputPath(
+  entrypoint: Entrypoint
+) {
+  return getExportsFieldOutputPath(entrypoint, "cjs").replace(/\.js$/, ".mjs");
 }
 
 export const validFieldsForEntrypoint = {
@@ -186,15 +203,57 @@ export * from ${escapedPath};${
   }\n`;
 }
 
-export function tsTemplate(
+function esmReexportTemplate(hasDefaultExport: boolean, relativePath: string) {
+  const escapedPath = JSON.stringify(relativePath);
+  return `export * from ${escapedPath};${
+    hasDefaultExport ? `\nexport { default } from ${escapedPath};` : ""
+  }\n`;
+}
+
+export function dtsTemplate(
   filename: string,
   hasDefaultExport: boolean,
   relativePath: string
 ) {
+  return `${esmReexportTemplate(
+    hasDefaultExport,
+    relativePath
+  )}//# sourceMappingURL=${filename}.map\n`;
+}
+
+function getReexportStatement(namedExports: string[], source: string): string {
+  // rollup will say a chunk has a "*external-pkg" export when it has an export * from 'external-pkg'
+  if (namedExports.some((exported) => exported[0] === "*")) {
+    return `export * from ${source};`;
+  }
+  return `export {\n  ${namedExports.join(",\n  ")}\n} from ${source};`;
+}
+
+export function mjsTemplate(exports: string[], relativePath: string) {
   const escapedPath = JSON.stringify(relativePath);
-  return `export * from ${escapedPath};${
-    hasDefaultExport ? `\nexport { default } from ${escapedPath};` : ""
-  }\n//# sourceMappingURL=${filename}.map\n`;
+  const nonDefaultExports = exports.filter((name) => name !== "default");
+  const hasDefaultExport = exports.length !== nonDefaultExports.length;
+  return `${getReexportStatement(nonDefaultExports, escapedPath)}\n${
+    hasDefaultExport
+      ? `import ns from ${escapedPath};\nexport default ns.default;\n`
+      : ""
+  }`;
+}
+
+// the only reason we sometimes name exports explicitly in the mjs template is
+// to avoid adding __esModule as an export, this doesn't apply to the .d.mts
+// since __esModule doesn't exist in declaration files
+// just doing export * is nice because it means we don't have to bother
+// getting the type-only exports
+export function dmtsTemplate(
+  filename: string,
+  hasDefaultExport: boolean,
+  relativePath: string
+) {
+  return (
+    mjsTemplate(hasDefaultExport ? ["default", "*"] : ["*"], relativePath) +
+    `//# sourceMappingURL=${filename}.map\n`
+  );
 }
 
 export function tsReexportDeclMap(
@@ -220,3 +279,16 @@ export type JSONValue =
   | null
   | Array<JSONValue>
   | { [key: string]: JSONValue | undefined };
+
+export function parseimportConditionDefaultExportOption(
+  value: unknown,
+  name: string
+) {
+  if (value === "default" || value === "namespace") {
+    return value;
+  }
+  throw new FatalError(
+    'the "preconstruct.exports.importConditionDefaultExport" field must be set to "default" or "namespace" if it is present',
+    name
+  );
+}

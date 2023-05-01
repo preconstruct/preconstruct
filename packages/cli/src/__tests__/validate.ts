@@ -684,13 +684,13 @@ describe("exports field config", () => {
     test("null", async () => {
       const tmpPath = await exportsFieldConfigTestDir(null);
       await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
-        `[Error: the "preconstruct.exports" field must be a boolean or an object at the package level]`
+        `[Error: the "preconstruct.exports" field must be a boolean or an object]`
       );
     });
     test("some string", async () => {
       const tmpPath = await exportsFieldConfigTestDir("blah");
       await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
-        `[Error: the "preconstruct.exports" field must be a boolean or an object at the package level]`
+        `[Error: the "preconstruct.exports" field must be a boolean or an object]`
       );
     });
     test("extra not object", async () => {
@@ -729,6 +729,14 @@ describe("exports field config", () => {
         `[Error: the "preconstruct.exports" field contains an unknown key "something"]`
       );
     });
+    test("invalid importConditionDefaultExport", async () => {
+      const tmpPath = await exportsFieldConfigTestDir({
+        importConditionDefaultExport: "something",
+      });
+      await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
+        `[Error: the "preconstruct.exports.importConditionDefaultExport" field must be set to "default" or "namespace" if it is present]`
+      );
+    });
   });
 
   describe("true", () => {
@@ -737,7 +745,14 @@ describe("exports field config", () => {
       { envConditions: [] },
       { envConditions: [], extra: {} },
       { extra: {} },
-      {},
+      { envConditions: [], importConditionDefaultExport: "namespace" },
+      {
+        envConditions: [],
+        extra: {},
+        importConditionDefaultExport: "namespace",
+      },
+      { extra: {}, importConditionDefaultExport: "namespace" },
+      { importConditionDefaultExport: "namespace" },
       true,
     ];
     for (const config of configsEquivalentToTrue) {
@@ -765,6 +780,147 @@ describe("exports field config", () => {
         await validate(tmpPath);
       });
     }
+  });
+  test('{ "importConditionDefaultExport": "default" }', async () => {
+    const tmpPath = await testdir({
+      "package.json": JSON.stringify({
+        name: "pkg-a",
+        main: "dist/pkg-a.cjs.js",
+        module: "dist/pkg-a.esm.js",
+        exports: {
+          ".": {
+            module: "./dist/pkg-a.esm.js",
+            import: "./dist/pkg-a.cjs.mjs",
+            default: "./dist/pkg-a.cjs.js",
+          },
+          "./package.json": "./package.json",
+        },
+        preconstruct: {
+          exports: {
+            importConditionDefaultExport: "default",
+          },
+        },
+      }),
+      "src/index.js": "",
+    });
+    await validate(tmpPath);
+  });
+});
+
+describe("project level exports field config", () => {
+  const exportsFieldConfigTestDir = (config: JSONValue) => {
+    return testdir({
+      "package.json": JSON.stringify({
+        name: "repo",
+        preconstruct: {
+          exports: config,
+          packages: ["packages/*"],
+        },
+      }),
+      "packages/pkg-a/package.json": JSON.stringify({
+        name: "pkg-a",
+        main: "dist/pkg-a.cjs.js",
+        module: "dist/pkg-a.esm.js",
+        exports: {
+          ".": {
+            module: "./dist/pkg-a.esm.js",
+            default: "./dist/pkg-a.cjs.js",
+          },
+          "./package.json": "./package.json",
+        },
+      }),
+      "packages/pkg-a/src/index.js": "",
+    });
+  };
+
+  describe("invalid", () => {
+    test("null", async () => {
+      const tmpPath = await exportsFieldConfigTestDir(null);
+      await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
+        `[Error: the "preconstruct.exports" field must be a boolean or an object]`
+      );
+    });
+    test("some string", async () => {
+      const tmpPath = await exportsFieldConfigTestDir("blah");
+      await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
+        `[Error: the "preconstruct.exports" field must be a boolean or an object]`
+      );
+    });
+    test("extra", async () => {
+      const tmpPath = await exportsFieldConfigTestDir({
+        extra: {
+          "./blah": "./blah.js",
+        },
+      });
+      await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
+        `[Error: the "preconstruct.exports.extra" field can only be configured at the package level]`
+      );
+    });
+    test("envConditions", async () => {
+      const tmpPath = await exportsFieldConfigTestDir({
+        envConditions: ["browser"],
+      });
+      await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
+        `[Error: the "preconstruct.exports.envConditions" field can only be configured at the package level]`
+      );
+    });
+    test("unknown key", async () => {
+      const tmpPath = await exportsFieldConfigTestDir({
+        something: true,
+      });
+      await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
+        `[Error: the "preconstruct.exports" field contains an unknown key "something"]`
+      );
+    });
+    test("invalid importConditionDefaultExport", async () => {
+      const tmpPath = await exportsFieldConfigTestDir({
+        importConditionDefaultExport: "something",
+      });
+      await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
+        `[Error: the "preconstruct.exports.importConditionDefaultExport" field must be set to "default" or "namespace" if it is present]`
+      );
+    });
+  });
+  describe("true", () => {
+    const configsEquivalentToTrue = [
+      {},
+      { importConditionDefaultExport: "namespace" },
+      true,
+    ];
+    for (const config of configsEquivalentToTrue) {
+      test(`${JSON.stringify(config)}`, async () => {
+        const tmpPath = await exportsFieldConfigTestDir(config);
+        await validate(tmpPath);
+      });
+    }
+  });
+  test('{ "importConditionDefaultExport": "default" }', async () => {
+    const tmpPath = await testdir({
+      "package.json": JSON.stringify({
+        name: "repo",
+        preconstruct: {
+          exports: {
+            importConditionDefaultExport: "default",
+          },
+          packages: ["packages/*"],
+        },
+      }),
+      "packages/pkg-a/package.json": JSON.stringify({
+        name: "pkg-a",
+        main: "dist/pkg-a.cjs.js",
+        module: "dist/pkg-a.esm.js",
+        exports: {
+          ".": {
+            module: "./dist/pkg-a.esm.js",
+            import: "./dist/pkg-a.cjs.mjs",
+            default: "./dist/pkg-a.cjs.js",
+          },
+          "./package.json": "./package.json",
+        },
+      }),
+      "packages/pkg-a/src/index.js": "",
+    });
+    await validate(tmpPath);
   });
 });
 

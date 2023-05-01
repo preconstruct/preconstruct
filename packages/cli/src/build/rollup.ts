@@ -14,6 +14,7 @@ import { FatalError, BatchError } from "../errors";
 import rewriteBabelRuntimeHelpers from "../rollup-plugins/rewrite-babel-runtime-helpers";
 import flowAndNodeDevProdEntry from "../rollup-plugins/flow-and-prod-dev-entry";
 import typescriptDeclarations from "../rollup-plugins/typescript-declarations";
+import mjsProxy from "../rollup-plugins/mjs-proxy";
 import json from "@rollup/plugin-json";
 import babel from "../rollup-plugins/babel";
 import terser from "../rollup-plugins/terser";
@@ -134,6 +135,9 @@ export let getRollupConfig = (
       type === "node-prod" && flowAndNodeDevProdEntry(),
       resolveErrorsPlugin(pkg, warnings, type === "umd"),
       type === "node-prod" && typescriptDeclarations(pkg),
+      type === "node-prod" &&
+        pkg.exportsFieldConfig()?.importConditionDefaultExport === "default" &&
+        mjsProxy(pkg),
       serverComponentsPlugin({ sourceMap: type === "umd" }),
       babel({
         cwd: pkg.project.directory,
