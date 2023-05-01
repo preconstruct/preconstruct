@@ -1558,3 +1558,89 @@ test("simple use client with comment above directive", async () => {
 
   `);
 });
+
+test("use server", async () => {
+  const dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "pkg",
+      main: "dist/pkg.cjs.js",
+      module: "dist/pkg.esm.js",
+    }),
+    "src/index.js": js`
+      export { doSomething } from "./server";
+    `,
+    "src/server.js": js`
+      "use server";
+      export function doSomething() {}
+    `,
+  });
+  await build(dir);
+  expect(await getFiles(dir, ["dist/**"], stripHashes("server")))
+    .toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.dev.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    var server = require('./server-some-hash.cjs.dev.js');
+
+
+
+    Object.defineProperty(exports, 'doSomething', {
+    	enumerable: true,
+    	get: function () { return server.doSomething; }
+    });
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./pkg.cjs.prod.js");
+    } else {
+      module.exports = require("./pkg.cjs.dev.js");
+    }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    var server = require('./server-some-hash.cjs.prod.js');
+
+
+
+    Object.defineProperty(exports, 'doSomething', {
+    	enumerable: true,
+    	get: function () { return server.doSomething; }
+    });
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export { doSomething } from './server-some-hash.esm.js';
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/server-this-is-not-the-real-hash-288a9f5076a34272a0270a4055aa266d.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use server';
+    function doSomething() {}
+
+    export { doSomething };
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/server-this-is-not-the-real-hash-4c6b8ec0a8b072aff1b26a3ac24de144.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./server-some-hash.cjs.prod.js");
+    } else {
+      module.exports = require("./server-some-hash.cjs.dev.js");
+    }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/server-this-is-not-the-real-hash-f9ea3f80de7afbb1e4ac2175565ef521.cjs.dev.js, dist/server-this-is-not-the-real-hash-f9ea3f80de7afbb1e4ac2175565ef521.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use server';
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    function doSomething() {}
+
+    exports.doSomething = doSomething;
+
+  `);
+});

@@ -21,7 +21,7 @@ export function serverComponentsPlugin({
       }
       const loaded = await this.load(resolved);
       if (
-        typeof loaded.meta.useClientReferenceId === "string" &&
+        typeof loaded.meta.directivePreservedFile?.referenceId === "string" &&
         importer !== undefined
       ) {
         // this name is appended for Rollup naming chunks/variables in the output
@@ -29,7 +29,7 @@ export function serverComponentsPlugin({
           .basename(resolved.id)
           .replace(/\.[tj]sx?$/, "")
           .replace(/[^\w]/g, "_");
-        const id = `__USE_CLIENT_IMPORT__${loaded.meta.useClientReferenceId}__USE_CLIENT_IMPORT__/${name}`;
+        const id = `__USE_CLIENT_IMPORT__${loaded.meta.directivePreservedFile.referenceId}__USE_CLIENT_IMPORT__/${name}`;
 
         return {
           id,
@@ -41,35 +41,35 @@ export function serverComponentsPlugin({
     transform(code, id) {
       if (id.startsWith("\0")) return null;
       const directives = getModuleDirectives(code);
-      const useClientDirective = directives.find(
-        (d) => d.value === "use client"
+      const directive = directives.find(
+        (d) => d.value === "use client" || d.value === "use server"
       );
-      if (useClientDirective) {
-        const magicString = new MagicString(code);
-        const referenceId = this.emitFile({
-          type: "chunk",
-          id,
-          preserveSignature: "allow-extension",
-        });
-        magicString.remove(useClientDirective.start, useClientDirective.end);
-        return {
-          code: magicString.toString(),
-          map: sourceMap
-            ? (magicString.generateMap({ hires: true }) as SourceMapInput)
-            : undefined,
-          meta: {
-            useClientReferenceId: referenceId,
-          },
-        };
-      }
-      return null;
+      if (!directive) return null;
+      const magicString = new MagicString(code);
+      const referenceId = this.emitFile({
+        type: "chunk",
+        id,
+        preserveSignature: "allow-extension",
+      });
+      magicString.remove(directive.start, directive.end);
+      return {
+        code: magicString.toString(),
+        map: sourceMap
+          ? (magicString.generateMap({ hires: true }) as SourceMapInput)
+          : undefined,
+        meta: {
+          directivePreservedFile: { referenceId, directive: directive.value },
+        },
+      };
     },
     renderChunk(code, chunk) {
       const magicString = new MagicString(code);
       if (chunk.facadeModuleId !== null) {
         const moduleInfo = this.getModuleInfo(chunk.facadeModuleId);
-        if (moduleInfo?.meta.useClientReferenceId) {
-          magicString.prepend("'use client';\n");
+        if (moduleInfo?.meta.directivePreservedFile) {
+          const directive: "use client" | "use server" =
+            moduleInfo?.meta.directivePreservedFile.directive;
+          magicString.prepend(`'${directive}';\n`);
         }
       }
 
