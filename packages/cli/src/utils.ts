@@ -203,10 +203,7 @@ export * from ${escapedPath};${
   }\n`;
 }
 
-export function esmReexportTemplate(
-  hasDefaultExport: boolean,
-  relativePath: string
-) {
+function esmReexportTemplate(hasDefaultExport: boolean, relativePath: string) {
   const escapedPath = JSON.stringify(relativePath);
   return `export * from ${escapedPath};${
     hasDefaultExport ? `\nexport { default } from ${escapedPath};` : ""
