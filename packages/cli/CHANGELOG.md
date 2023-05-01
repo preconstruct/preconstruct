@@ -1,5 +1,29 @@
 # preconstruct
 
+## 2.6.0
+
+### Minor Changes
+
+- [#543](https://github.com/preconstruct/preconstruct/pull/543) [`93106e3`](https://github.com/preconstruct/preconstruct/commit/93106e3dd75d579bf48dbce5cb8d942ed8ab34ef) Thanks [@Andarist](https://github.com/Andarist)! - Added a new `exports.importConditionDefaultExport` config option. It allows you to generate `import` exports condition (and corresponding files) to fix the export shape incompatibility between node and bundlers.
+
+  With this option set to `"default"` this will always resolve to what has been written as a default export:
+
+  ```ts
+  // lib/src/index.js
+  export default 42;
+  export const named = "awesome";
+
+  // app/consume.mjs
+  import smth from "lib";
+  smth; // 42, and not `{ default: 42, named: 'awesome' }`
+  ```
+
+* [`233ee25`](https://github.com/preconstruct/preconstruct/commit/233ee252c052c187c66889e03ccffd791e46e741) Thanks [@emmatown](https://github.com/emmatown)! - Top-level `'use server'` directives are now also preserved like `'use client'` directives.
+
+### Patch Changes
+
+- [`4e72d99`](https://github.com/preconstruct/preconstruct/commit/4e72d99e708e12a06486c62de5507c2a1dedf2f5) Thanks [@emmatown](https://github.com/emmatown)! - Fix `'use client'` directives with comments preceding them not being detected
+
 ## 2.5.0
 
 ### Minor Changes
