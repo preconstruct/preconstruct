@@ -157,7 +157,7 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
         });
 
         if (
-          pkg.exportsFieldConfig()?.importDefaultExport === "unwrapped-default"
+          pkg.exportsFieldConfig()?.importConditionDefaultExport === "default"
         ) {
           const dmtsFilename = dtsFileName.replace(/\.d\.ts$/, ".d.mts");
           const basedmtsFilename = baseDtsFilename.replace(

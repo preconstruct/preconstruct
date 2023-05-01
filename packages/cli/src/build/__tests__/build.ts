@@ -945,7 +945,7 @@ test("correct default export using mjs and dmts proxies", async () => {
       preconstruct: {
         entrypoints: ["index.ts", "something.ts"],
         exports: {
-          importDefaultExport: "unwrapped-default",
+          importConditionDefaultExport: "default",
         },
       },
     }),
@@ -1157,7 +1157,7 @@ test("importing a package via dynamic import from another package provides the r
       preconstruct: {
         entrypoints: ["index.ts"],
         exports: {
-          importDefaultExport: "unwrapped-default",
+          importConditionDefaultExport: "default",
         },
       },
     }),
@@ -1180,7 +1180,7 @@ test("importing a package via dynamic import from another package provides the r
       preconstruct: {
         entrypoints: ["index.ts"],
         exports: {
-          importDefaultExport: "unwrapped-default",
+          importConditionDefaultExport: "default",
         },
       },
       dependencies: {
@@ -1294,7 +1294,7 @@ test("importing another package via dynamic import and exporting the namespace p
       preconstruct: {
         entrypoints: ["index.ts"],
         exports: {
-          importDefaultExport: "unwrapped-default",
+          importConditionDefaultExport: "default",
         },
       },
     }),
@@ -1317,7 +1317,7 @@ test("importing another package via dynamic import and exporting the namespace p
       preconstruct: {
         entrypoints: ["index.ts"],
         exports: {
-          importDefaultExport: "unwrapped-default",
+          importConditionDefaultExport: "default",
         },
       },
       dependencies: {
@@ -1371,7 +1371,7 @@ test("importing another package via dynamic import and exporting something that 
       preconstruct: {
         entrypoints: ["index.ts"],
         exports: {
-          importDefaultExport: "unwrapped-default",
+          importConditionDefaultExport: "default",
         },
       },
     }),
@@ -1398,7 +1398,7 @@ test("importing another package via dynamic import and exporting something that 
       preconstruct: {
         entrypoints: ["index.ts"],
         exports: {
-          importDefaultExport: "unwrapped-default",
+          importConditionDefaultExport: "default",
         },
       },
       dependencies: {
@@ -1481,7 +1481,7 @@ test("no __esModule when reexporting namespace with mjs proxy", async () => {
       preconstruct: {
         entrypoints: ["index.js"],
         exports: {
-          importDefaultExport: "unwrapped-default",
+          importConditionDefaultExport: "default",
         },
       },
     }),
@@ -1605,7 +1605,7 @@ test("export * from external", async () => {
       },
       preconstruct: {
         exports: {
-          importDefaultExport: "unwrapped-default",
+          importConditionDefaultExport: "default",
         },
       },
       dependencies: {
@@ -1767,7 +1767,9 @@ test("type only export imported in .mts", async () => {
         },
         "./package.json": "./package.json",
       },
-      preconstruct: { exports: { importDefaultExport: "unwrapped-default" } },
+      preconstruct: {
+        exports: { importConditionDefaultExport: "default" },
+      },
     }),
     "packages/pkg-a/something/package.json": JSON.stringify({
       main: "dist/pkg-a-something.cjs.js",

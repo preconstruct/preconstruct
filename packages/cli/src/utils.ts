@@ -100,7 +100,7 @@ export function exportsField(
             default: esmBuild,
           }
         : esmBuild,
-      ...(exportsFieldConfig.importDefaultExport === "unwrapped-default" && {
+      ...(exportsFieldConfig.importConditionDefaultExport === "default" && {
         import: getExportsImportUnwrappingDefaultOutputPath(entrypoint),
       }),
       default: getExportsFieldOutputPath(entrypoint, "cjs"),
@@ -283,12 +283,15 @@ export type JSONValue =
   | Array<JSONValue>
   | { [key: string]: JSONValue | undefined };
 
-export function parseImportDefaultExportOption(value: unknown, name: string) {
-  if (value === "unwrapped-default" || value === "namespace") {
+export function parseimportConditionDefaultExportOption(
+  value: unknown,
+  name: string
+) {
+  if (value === "default" || value === "namespace") {
     return value;
   }
   throw new FatalError(
-    'the "preconstruct.exports.importDefaultExport" field must be set to "unwrapped-default" or "namespace" if it is present',
+    'the "preconstruct.exports.importConditionDefaultExport" field must be set to "default" or "namespace" if it is present',
     name
   );
 }

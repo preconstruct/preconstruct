@@ -136,7 +136,7 @@ export let getRollupConfig = (
       resolveErrorsPlugin(pkg, warnings, type === "umd"),
       type === "node-prod" && typescriptDeclarations(pkg),
       type === "node-prod" &&
-        pkg.exportsFieldConfig()?.importDefaultExport === "unwrapped-default" &&
+        pkg.exportsFieldConfig()?.importConditionDefaultExport === "default" &&
         mjsProxy(),
       serverComponentsPlugin({ sourceMap: type === "umd" }),
       babel({

@@ -418,7 +418,7 @@ test(".d.ts file with default export", async () => {
   `);
 });
 
-test("with unwrapped-default", async () => {
+test("with default", async () => {
   let dir = await testdir({
     "package.json": JSON.stringify({
       name: "@mjs-proxy/repo",
@@ -446,7 +446,7 @@ test("with unwrapped-default", async () => {
       preconstruct: {
         entrypoints: ["index.ts", "something.ts"],
         exports: {
-          importDefaultExport: "unwrapped-default",
+          importConditionDefaultExport: "default",
         },
       },
     }),

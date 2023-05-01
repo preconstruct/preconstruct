@@ -2,9 +2,9 @@
 "@preconstruct/cli": minor
 ---
 
-Added a new `exports.importDefaultExport` config option. It allows you to generate `import` exports condition (and corresponding files) to fix the export shape incompatibility between node and bundlers.
+Added a new `exports.importConditionDefaultExport` config option. It allows you to generate `import` exports condition (and corresponding files) to fix the export shape incompatibility between node and bundlers.
 
-With this option set to `"unwrapped-default"` this will always resolve to what has been written as a default export:
+With this option set to `"default"` this will always resolve to what has been written as a default export:
 
 ```ts
 // lib/src/index.js

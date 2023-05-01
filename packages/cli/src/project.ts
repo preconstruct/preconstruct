@@ -6,7 +6,7 @@ import { Item } from "./item";
 import { Package } from "./package";
 import { validateIncludedFiles } from "./validate-included-files";
 import { FatalError } from "./errors";
-import { JSONValue, parseImportDefaultExportOption } from "./utils";
+import { JSONValue, parseimportConditionDefaultExportOption } from "./utils";
 
 const allSettled = (promises: Promise<any>[]) =>
   Promise.all(
@@ -141,14 +141,14 @@ export class Project extends Item<{
 
   exportsFieldConfig():
     | undefined
-    | { importDefaultExport: "namespace" | "unwrapped-default" } {
+    | { importConditionDefaultExport: "namespace" | "default" } {
     const exportsFieldConfig = this.json.preconstruct.exports;
     if (exportsFieldConfig === false || exportsFieldConfig === undefined) {
       return undefined;
     }
-    let importDefaultExport: "namespace" | "unwrapped-default" = "namespace";
+    let importConditionDefaultExport: "namespace" | "default" = "namespace";
     if (exportsFieldConfig === true) {
-      return { importDefaultExport };
+      return { importConditionDefaultExport };
     }
     if (
       typeof exportsFieldConfig !== "object" ||
@@ -161,8 +161,11 @@ export class Project extends Item<{
       );
     }
     for (const [key, val] of Object.entries(exportsFieldConfig)) {
-      if (key === "importDefaultExport") {
-        importDefaultExport = parseImportDefaultExportOption(val, this.name);
+      if (key === "importConditionDefaultExport") {
+        importConditionDefaultExport = parseimportConditionDefaultExportOption(
+          val,
+          this.name
+        );
         continue;
       }
       if (key === "extra" || key === "envConditions") {
@@ -176,6 +179,6 @@ export class Project extends Item<{
         this.name
       );
     }
-    return { importDefaultExport };
+    return { importConditionDefaultExport };
   }
 }

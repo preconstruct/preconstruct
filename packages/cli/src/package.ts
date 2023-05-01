@@ -338,14 +338,14 @@ type CanonicalExportsFieldConfig =
   | {
       envConditions: Set<"worker" | "browser">;
       extra: Record<string, JSONValue>;
-      importDefaultExport: "namespace" | "unwrapped-default";
+      importConditionDefaultExport: "namespace" | "default";
     };
 
 function parseExportsFieldConfig(
   config: unknown,
   defaultExportFieldConfig:
     | undefined
-    | { importDefaultExport: "namespace" | "unwrapped-default" },
+    | { importConditionDefaultExport: "namespace" | "default" },
   name: string
 ): CanonicalExportsFieldConfig {
   if (
@@ -357,8 +357,8 @@ function parseExportsFieldConfig(
   const parsedConfig: CanonicalExportsFieldConfig = {
     envConditions: new Set(),
     extra: {},
-    importDefaultExport:
-      defaultExportFieldConfig?.importDefaultExport ?? "namespace",
+    importConditionDefaultExport:
+      defaultExportFieldConfig?.importConditionDefaultExport ?? "namespace",
   };
   if (config === true || config === undefined) {
     return parsedConfig;
@@ -405,12 +405,12 @@ function parseExportsFieldConfig(
           name
         );
       }
-    } else if (key === "importDefaultExport") {
-      if (value === "unwrapped-default" || value === "namespace") {
-        parsedConfig.importDefaultExport = value;
+    } else if (key === "importConditionDefaultExport") {
+      if (value === "default" || value === "namespace") {
+        parsedConfig.importConditionDefaultExport = value;
       } else {
         throw new FatalError(
-          'the "preconstruct.exports.importDefaultExport" field must be set to "unwrapped-default" or "namespace" if it is present',
+          'the "preconstruct.exports.importConditionDefaultExport" field must be set to "default" or "namespace" if it is present',
           name
         );
       }

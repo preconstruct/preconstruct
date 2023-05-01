@@ -119,8 +119,8 @@ export async function writeDevTSFiles(
   ];
 
   if (
-    entrypoint.package.exportsFieldConfig()?.importDefaultExport ===
-    "unwrapped-default"
+    entrypoint.package.exportsFieldConfig()?.importConditionDefaultExport ===
+    "default"
   ) {
     const dmtsReexportFilename = path
       .join(
@@ -258,8 +258,7 @@ unregister();
             ),
           ];
           if (
-            pkg.exportsFieldConfig()?.importDefaultExport ===
-            "unwrapped-default"
+            pkg.exportsFieldConfig()?.importConditionDefaultExport === "default"
           ) {
             hasDefaultExportPromise ??= entrypointHasDefaultExport(
               entrypoint,
