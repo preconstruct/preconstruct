@@ -418,7 +418,7 @@ test(".d.ts file with default export", async () => {
   `);
 });
 
-test("with default", async () => {
+test.skip("with default", async () => {
   let dir = await testdir({
     "package.json": JSON.stringify({
       name: "@mjs-proxy/repo",

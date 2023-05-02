@@ -17,6 +17,7 @@ import {
   setFieldInOrder,
   DistFilenameStrategy,
   MinimalEntrypoint,
+  parseImportConditionDefaultExportOption,
 } from "./utils";
 import normalizePath from "normalize-path";
 
@@ -406,14 +407,10 @@ function parseExportsFieldConfig(
         );
       }
     } else if (key === "importConditionDefaultExport") {
-      if (value === "default" || value === "namespace") {
-        parsedConfig.importConditionDefaultExport = value;
-      } else {
-        throw new FatalError(
-          'the "preconstruct.exports.importConditionDefaultExport" field must be set to "default" or "namespace" if it is present',
-          name
-        );
-      }
+      parsedConfig.importConditionDefaultExport = parseImportConditionDefaultExportOption(
+        value,
+        name
+      );
     } else {
       throw new FatalError(
         `the "preconstruct.exports" field contains an unknown key "${key}"`,

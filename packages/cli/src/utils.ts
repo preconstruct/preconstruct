@@ -280,15 +280,19 @@ export type JSONValue =
   | Array<JSONValue>
   | { [key: string]: JSONValue | undefined };
 
-export function parseimportConditionDefaultExportOption(
+export function parseImportConditionDefaultExportOption(
   value: unknown,
   name: string
-) {
-  if (value === "default" || value === "namespace") {
-    return value;
-  }
+): "default" | "namespace" {
   throw new FatalError(
-    'the "preconstruct.exports.importConditionDefaultExport" field must be set to "default" or "namespace" if it is present',
+    `the "preconstruct.exports.importConditionDefaultExport" is currently broken and disabled, it will be re-enabled with a different implemtation in a future version`,
     name
   );
+  // if (value === "default" || value === "namespace") {
+  //   return value;
+  // }
+  // throw new FatalError(
+  //   'the "preconstruct.exports.importConditionDefaultExport" field must be set to "default" or "namespace" if it is present',
+  //   name
+  // );
 }

@@ -918,7 +918,7 @@ test("self import", async () => {
   `);
 });
 
-test("correct default export using mjs and dmts proxies", async () => {
+test.skip("correct default export using mjs and dmts proxies", async () => {
   let dir = await testdir({
     "package.json": JSON.stringify({
       name: "@mjs-proxy/repo",
@@ -1135,7 +1135,7 @@ test("correct default export using mjs and dmts proxies", async () => {
   expect(node.stderr.toString("utf8")).toMatchInlineSnapshot(`""`);
 });
 
-test("importing a package via dynamic import from another package provides the right types", async () => {
+test.skip("importing a package via dynamic import from another package provides the right types", async () => {
   let dir = await testdir({
     "package.json": JSON.stringify({
       name: "@mjs-proxy/repo",
@@ -1272,7 +1272,7 @@ test("importing a package via dynamic import from another package provides the r
   `);
 });
 
-test("importing another package via dynamic import and exporting the namespace produces a typescript error because the type cannot be named", async () => {
+test.skip("importing another package via dynamic import and exporting the namespace produces a typescript error because the type cannot be named", async () => {
   let dir = await testdir({
     "package.json": JSON.stringify({
       name: "@mjs-proxy/repo",
@@ -1349,7 +1349,7 @@ test("importing another package via dynamic import and exporting the namespace p
   `);
 });
 
-test("importing another package via dynamic import and exporting something that requires importing a type from the other package works", async () => {
+test.skip("importing another package via dynamic import and exporting something that requires importing a type from the other package works", async () => {
   let dir = await testdir({
     "package.json": JSON.stringify({
       name: "@mjs-proxy/repo",
@@ -1459,7 +1459,7 @@ test("importing another package via dynamic import and exporting something that 
   `);
 });
 
-test("no __esModule when reexporting namespace with mjs proxy", async () => {
+test.skip("no __esModule when reexporting namespace with mjs proxy", async () => {
   let dir = await testdir({
     "package.json": JSON.stringify({
       name: "@mjs-proxy-no-__esmodule/repo",
@@ -1582,7 +1582,7 @@ test("no __esModule when reexporting namespace with mjs proxy", async () => {
   expect(node.stderr.toString("utf8")).toMatchInlineSnapshot(`""`);
 });
 
-test("export * from external", async () => {
+test.skip("export * from external", async () => {
   let dir = await testdir({
     "package.json": JSON.stringify({
       name: "repo",
@@ -1746,7 +1746,7 @@ test("export * from external", async () => {
   expect(stderr.toString("utf8")).toMatchInlineSnapshot(`""`);
 });
 
-test("type only export imported in .mts", async () => {
+test.skip("type only export imported in .mts", async () => {
   let dir = await testdir({
     "package.json": JSON.stringify({
       name: "repo",
@@ -1839,7 +1839,7 @@ test("type only export imported in .mts", async () => {
   expect(stderr.toString("utf8")).toMatchInlineSnapshot(`""`);
 });
 
-test("importConditionDefaultExport: default with use client", async () => {
+test.skip("importConditionDefaultExport: default with use client", async () => {
   let dir = await testdir({
     "package.json": JSON.stringify({
       name: "pkg-a",

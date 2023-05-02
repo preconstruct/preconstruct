@@ -6,7 +6,7 @@ import { Item } from "./item";
 import { Package } from "./package";
 import { validateIncludedFiles } from "./validate-included-files";
 import { FatalError } from "./errors";
-import { JSONValue, parseimportConditionDefaultExportOption } from "./utils";
+import { JSONValue, parseImportConditionDefaultExportOption } from "./utils";
 
 const allSettled = (promises: Promise<any>[]) =>
   Promise.all(
@@ -162,7 +162,7 @@ export class Project extends Item<{
     }
     for (const [key, val] of Object.entries(exportsFieldConfig)) {
       if (key === "importConditionDefaultExport") {
-        importConditionDefaultExport = parseimportConditionDefaultExportOption(
+        importConditionDefaultExport = parseImportConditionDefaultExportOption(
           val,
           this.name
         );
