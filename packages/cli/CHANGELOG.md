@@ -1,5 +1,11 @@
 # preconstruct
 
+## 2.6.1
+
+### Patch Changes
+
+- [`5380890`](https://github.com/preconstruct/preconstruct/commit/538089009c687e876a868cd5379c2d96b8c04a97) Thanks [@emmatown](https://github.com/emmatown)! - Disable specifying `importConditionDefaultExport` because it doesn't work correctly in `"moduleResoltion": "bundler"`, `@preconstruct/cli@2.6.0` is npm deprecated, `importConditionDefaultExport` will come back in the future.
+
 ## 2.6.0
 
 ### Minor Changes
