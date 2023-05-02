@@ -134,7 +134,7 @@ exports[`typescript with forced dts emit: dist/declarations/src/create-store.d.t
 "import { Action } from "@reduxjs/toolkit";
 import { ThunkAction } from "redux-thunk";
 import { RootState } from "./root-reducer";
-export declare type AppThunk = ThunkAction<void, RootState, unknown, Action<string>>;
+export type AppThunk = ThunkAction<void, RootState, unknown, Action<string>>;
 export declare function createStore(): any;
 "
 `;
@@ -148,7 +148,7 @@ export type { RootState } from "./root-reducer";
 
 exports[`typescript with forced dts emit: dist/declarations/src/root-reducer.d.ts 1`] = `
 "export declare const rootReducer: any;
-export declare type RootState = ReturnType<typeof rootReducer>;
+export type RootState = ReturnType<typeof rootReducer>;
 "
 `;
 

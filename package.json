@@ -35,7 +35,6 @@
     "@manypkg/cli": "^0.17.0",
     "@types/babel__code-frame": "^7.0.1",
     "@types/fs-extra": "^9.0.6",
-    "@types/inquirer": "^6.5.0",
     "@types/jest": "^29.2.2",
     "@types/meow": "^5.0.0",
     "@types/ms": "^0.7.31",
@@ -62,7 +61,7 @@
     "normalize-path": "^3.0.0",
     "outdent": "^0.7.1",
     "prettier": "^2.1.2",
-    "typescript": "^4.7.4"
+    "typescript": "^5.0.4"
   },
   "manypkg": {
     "defaultBranch": "main"

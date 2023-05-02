@@ -1041,11 +1041,11 @@ test("typescript declaration emit with unreferencable types emits diagnostic", a
       export const thing = x();
     `,
     "src/x.ts": ts`
-      class A {
-        private a?: string;
-      }
+      type A = {
+        a?: A;
+      };
 
-      export const x = () => new A();
+      export const x = (): A => ({});
     `,
   });
   const error = await build(dir).catch((x) => x);
