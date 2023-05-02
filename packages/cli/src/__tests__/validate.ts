@@ -729,7 +729,7 @@ describe("exports field config", () => {
         `[Error: the "preconstruct.exports" field contains an unknown key "something"]`
       );
     });
-    test.skip("invalid importConditionDefaultExport", async () => {
+    test("invalid importConditionDefaultExport", async () => {
       const tmpPath = await exportsFieldConfigTestDir({
         importConditionDefaultExport: "something",
       });
@@ -745,14 +745,14 @@ describe("exports field config", () => {
       { envConditions: [] },
       { envConditions: [], extra: {} },
       { extra: {} },
-      // { envConditions: [], importConditionDefaultExport: "namespace" },
-      // {
-      //   envConditions: [],
-      //   extra: {},
-      //   importConditionDefaultExport: "namespace",
-      // },
-      // { extra: {}, importConditionDefaultExport: "namespace" },
-      // { importConditionDefaultExport: "namespace" },
+      { envConditions: [], importConditionDefaultExport: "namespace" },
+      {
+        envConditions: [],
+        extra: {},
+        importConditionDefaultExport: "namespace",
+      },
+      { extra: {}, importConditionDefaultExport: "namespace" },
+      { importConditionDefaultExport: "namespace" },
       true,
     ];
     for (const config of configsEquivalentToTrue) {
@@ -781,7 +781,7 @@ describe("exports field config", () => {
       });
     }
   });
-  test.skip('{ "importConditionDefaultExport": "default" }', async () => {
+  test('{ "importConditionDefaultExport": "default" }', async () => {
     const tmpPath = await testdir({
       "package.json": JSON.stringify({
         name: "pkg-a",
@@ -877,14 +877,14 @@ describe("project level exports field config", () => {
         importConditionDefaultExport: "something",
       });
       await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
-        `[Error: the "preconstruct.exports.importConditionDefaultExport" is currently broken and disabled, it will be re-enabled with a different implemtation in a future version]`
+        `[Error: the "preconstruct.exports.importConditionDefaultExport" field must be set to "default" or "namespace" if it is present]`
       );
     });
   });
   describe("true", () => {
     const configsEquivalentToTrue = [
       {},
-      // { importConditionDefaultExport: "namespace" },
+      { importConditionDefaultExport: "namespace" },
       true,
     ];
     for (const config of configsEquivalentToTrue) {
@@ -894,7 +894,7 @@ describe("project level exports field config", () => {
       });
     }
   });
-  test.skip('{ "importConditionDefaultExport": "default" }', async () => {
+  test('{ "importConditionDefaultExport": "default" }', async () => {
     const tmpPath = await testdir({
       "package.json": JSON.stringify({
         name: "repo",

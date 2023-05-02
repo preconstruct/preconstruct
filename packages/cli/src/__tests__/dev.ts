@@ -418,7 +418,7 @@ test(".d.ts file with default export", async () => {
   `);
 });
 
-test.skip("with default", async () => {
+test("with default", async () => {
   let dir = await testdir({
     "package.json": JSON.stringify({
       name: "@mjs-proxy/repo",
@@ -444,7 +444,7 @@ test.skip("with default", async () => {
         "./package.json": "./package.json",
       },
       preconstruct: {
-        entrypoints: ["index.ts", "something.ts"],
+        entrypoints: ["index.ts", "something.tsx"],
         exports: {
           importConditionDefaultExport: "default",
         },
@@ -458,7 +458,7 @@ test.skip("with default", async () => {
       export const thing = "index";
       export default true;
     `,
-    "packages/pkg-a/src/something.ts": ts`
+    "packages/pkg-a/src/something.tsx": ts`
       export const something = "something";
       export default 100;
     `,
@@ -495,8 +495,7 @@ test.skip("with default", async () => {
   ).toMatchInlineSnapshot(`
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.d.mts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     export * from "../src/index.js";
-    import ns from "../src/index.js";
-    export default ns.default;
+    export { _default as default } from "./pkg-a.cjs.default.js";
     //# sourceMappingURL=pkg-a.cjs.d.mts.map
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.d.mts.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
@@ -510,22 +509,26 @@ test.skip("with default", async () => {
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.d.ts.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     {"version":3,"file":"pkg-a.cjs.d.ts","sourceRoot":"","sources":["../src/index.ts"],"names":[],"mappings":"AAAA"}
 
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.default.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export { default as _default } from "../src/index.js"
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.default.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    exports._default = require("./pkg-a.cjs.js").default;
+
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.mjs ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     export * from "./pkg-a.cjs.js";
-    import ns from "./pkg-a.cjs.js";
-    export default ns.default;
+    export { _default as default } from "./pkg-a.cjs.default.js";
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     export const thing = "index";
     export default true;
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/something/dist/pkg-a-something.cjs.d.mts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     export * from "../../src/something.js";
-    import ns from "../../src/something.js";
-    export default ns.default;
+    export { _default as default } from "./pkg-a-something.cjs.default.js";
     //# sourceMappingURL=pkg-a-something.cjs.d.mts.map
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/something/dist/pkg-a-something.cjs.d.mts.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    {"version":3,"file":"pkg-a-something.cjs.d.mts","sourceRoot":"","sources":["../../src/something.ts"],"names":[],"mappings":"AAAA"}
+    {"version":3,"file":"pkg-a-something.cjs.d.mts","sourceRoot":"","sources":["../../src/something.tsx"],"names":[],"mappings":"AAAA"}
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/something/dist/pkg-a-something.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     export * from "../../src/something";
@@ -533,12 +536,17 @@ test.skip("with default", async () => {
     //# sourceMappingURL=pkg-a-something.cjs.d.ts.map
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/something/dist/pkg-a-something.cjs.d.ts.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    {"version":3,"file":"pkg-a-something.cjs.d.ts","sourceRoot":"","sources":["../../src/something.ts"],"names":[],"mappings":"AAAA"}
+    {"version":3,"file":"pkg-a-something.cjs.d.ts","sourceRoot":"","sources":["../../src/something.tsx"],"names":[],"mappings":"AAAA"}
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/something/dist/pkg-a-something.cjs.default.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export { default as _default } from "../../src/something.js"
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/something/dist/pkg-a-something.cjs.default.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    exports._default = require("./pkg-a-something.cjs.js").default;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/something/dist/pkg-a-something.cjs.mjs ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     export * from "./pkg-a-something.cjs.js";
-    import ns from "./pkg-a-something.cjs.js";
-    export default ns.default;
+    export { _default as default } from "./pkg-a-something.cjs.default.js";
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/something/dist/pkg-a-something.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     export const something = "something";
