@@ -10,6 +10,10 @@ import {
   dmtsTemplate,
   mjsTemplate,
   getBaseDistFilename,
+  getJsDefaultForMjsFilepath,
+  jsDefaultForMjsTemplate,
+  dtsDefaultForDmtsTemplate,
+  getDtsDefaultForMtsFilepath,
 } from "./utils";
 import * as babel from "@babel/core";
 import * as fs from "fs-extra";
@@ -132,24 +136,28 @@ export async function writeDevTSFiles(
 
     const ext = path.extname(relativePathWithExtension).slice(1);
     const mappedExt = { ts: "js", mts: "mjs", cts: "cjs" }[ext];
-
+    const pathToImport = relativePathWithExtension.replace(
+      new RegExp(`\\.${ext}$`),
+      `.${mappedExt}`
+    );
     promises.push(
       fs.outputFile(
         dmtsReexportFilename,
-        dmtsTemplate(
-          baseDmtsFilename,
-          hasDefaultExport,
-          relativePathWithExtension.replace(
-            new RegExp(`\\.${ext}$`),
-            `.${mappedExt}`
-          )
-        )
+        dmtsTemplate(baseDmtsFilename, hasDefaultExport, pathToImport)
       ),
       fs.outputFile(
         dmtsReexportFilename + ".map",
         tsReexportDeclMap(baseDmtsFilename, relativePathWithExtension)
       )
     );
+    if (hasDefaultExport) {
+      promises.push(
+        fs.outputFile(
+          getDtsDefaultForMtsFilepath(dmtsReexportFilename),
+          dtsDefaultForDmtsTemplate(pathToImport)
+        )
+      );
+    }
   }
 
   await Promise.all(promises);
@@ -266,24 +274,38 @@ unregister();
               entrypoint.source
             );
             entrypointPromises.push(
-              hasDefaultExportPromise.then((hasDefaultExport) =>
-                fs.writeFile(
-                  path.join(
-                    entrypoint.package.directory,
-                    getExportsImportUnwrappingDefaultOutputPath(entrypoint)
+              hasDefaultExportPromise.then((hasDefaultExport) => {
+                const filepath = path.join(
+                  entrypoint.package.directory,
+                  getExportsImportUnwrappingDefaultOutputPath(entrypoint)
+                );
+                const importPath = `./${getBaseDistFilename(
+                  entrypoint,
+                  "cjs"
+                )}`;
+                return Promise.all([
+                  fs.writeFile(
+                    filepath,
+                    mjsTemplate(
+                      // the * won't really do anything right now
+                      // since cjs-module-lexer won't find anything
+                      // but that could be fixed by adding fake things
+                      // to the .cjs.js file that look like exports to cjs-module-lexer
+                      // but don't actually add the exports at runtime like esbuild does
+                      // (it would require re-running dev when adding new named exports)
+                      hasDefaultExport ? ["default", "*other"] : ["*other"],
+                      importPath,
+                      filepath
+                    )
                   ),
-                  mjsTemplate(
-                    // the * won't really do anything right now
-                    // since cjs-module-lexer won't find anything
-                    // but that could be fixed by adding fake things
-                    // to the .cjs.js file that look like exports to cjs-module-lexer
-                    // but don't actually add the exports at runtime like esbuild does
-                    // (it would require re-running dev when adding new named exports)
-                    hasDefaultExport ? ["default", "*other"] : ["*other"],
-                    `./${getBaseDistFilename(entrypoint, "cjs")}`
-                  )
-                )
-              )
+                  hasDefaultExport
+                    ? fs.writeFile(
+                        getJsDefaultForMjsFilepath(filepath),
+                        jsDefaultForMjsTemplate(importPath)
+                      )
+                    : undefined,
+                ]);
+              })
             );
           }
           if (entrypoint.json.module) {

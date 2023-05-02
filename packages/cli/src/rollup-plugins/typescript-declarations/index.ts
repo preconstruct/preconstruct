@@ -4,7 +4,13 @@ import { Plugin } from "rollup";
 import fs from "fs-extra";
 import { Package } from "../../package";
 import { getDeclarations } from "./get-declarations";
-import { dmtsTemplate, tsReexportDeclMap, dtsTemplate } from "../../utils";
+import {
+  dmtsTemplate,
+  tsReexportDeclMap,
+  dtsTemplate,
+  getDtsDefaultForMtsFilepath,
+  dtsDefaultForDmtsTemplate,
+} from "../../utils";
 import normalizePath from "normalize-path";
 import { overwriteDeclarationMapSourceRoot } from "./common";
 
@@ -164,15 +170,24 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
             /\.d\.ts$/,
             ".d.mts"
           );
+          const sourceWithExtension = `${relativeToSource}.js`;
+
           this.emitFile({
             type: "asset",
             fileName: dmtsFilename,
             source: dmtsTemplate(
               basedmtsFilename,
               hasDefaultExport,
-              `${relativeToSource}.js`
+              sourceWithExtension
             ),
           });
+          if (hasDefaultExport) {
+            this.emitFile({
+              type: "asset",
+              fileName: getDtsDefaultForMtsFilepath(dmtsFilename),
+              source: dtsDefaultForDmtsTemplate(sourceWithExtension),
+            });
+          }
           this.emitFile({
             type: "asset",
             fileName: `${dmtsFilename}.map`,

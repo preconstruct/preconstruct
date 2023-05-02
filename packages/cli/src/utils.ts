@@ -229,13 +229,39 @@ function getReexportStatement(namedExports: string[], source: string): string {
   return `export {\n  ${namedExports.join(",\n  ")}\n} from ${source};`;
 }
 
-export function mjsTemplate(exports: string[], relativePath: string) {
+export function getJsDefaultForMjsFilepath(mjsPath: string) {
+  return mjsPath.replace(/\.mjs$/, ".default.js");
+}
+
+export function getDtsDefaultForMtsFilepath(mjsPath: string) {
+  return mjsPath.replace(/\.d\.mts$/, ".default.d.ts");
+}
+
+export function jsDefaultForMjsTemplate(relativePath: string) {
+  return `exports._default = require(${JSON.stringify(
+    relativePath
+  )}).default;\n`;
+}
+
+export function dtsDefaultForDmtsTemplate(relativePath: string) {
+  return `export { default as _default } from ${JSON.stringify(
+    relativePath
+  )}\n`;
+}
+
+export function mjsTemplate(
+  exports: string[],
+  relativePath: string,
+  mjsPath: string
+) {
   const escapedPath = JSON.stringify(relativePath);
   const nonDefaultExports = exports.filter((name) => name !== "default");
   const hasDefaultExport = exports.length !== nonDefaultExports.length;
   return `${getReexportStatement(nonDefaultExports, escapedPath)}\n${
     hasDefaultExport
-      ? `import ns from ${escapedPath};\nexport default ns.default;\n`
+      ? `export { _default as default } from ${JSON.stringify(
+          "./" + getJsDefaultForMjsFilepath(nodePath.basename(mjsPath))
+        )};\n`
       : ""
   }`;
 }
@@ -250,10 +276,13 @@ export function dmtsTemplate(
   hasDefaultExport: boolean,
   relativePath: string
 ) {
-  return (
-    mjsTemplate(hasDefaultExport ? ["default", "*"] : ["*"], relativePath) +
-    `//# sourceMappingURL=${filename}.map\n`
-  );
+  return `export * from ${JSON.stringify(relativePath)};\n${
+    hasDefaultExport
+      ? `export { _default as default } from ${JSON.stringify(
+          "./" + nodePath.basename(filename).replace(/\.d\.mts$/, ".default.js")
+        )};\n`
+      : ""
+  }//# sourceMappingURL=${filename}.map\n`;
 }
 
 export function tsReexportDeclMap(
@@ -284,15 +313,11 @@ export function parseImportConditionDefaultExportOption(
   value: unknown,
   name: string
 ): "default" | "namespace" {
+  if (value === "default" || value === "namespace") {
+    return value;
+  }
   throw new FatalError(
-    `the "preconstruct.exports.importConditionDefaultExport" is currently broken and disabled, it will be re-enabled with a different implemtation in a future version`,
+    'the "preconstruct.exports.importConditionDefaultExport" field must be set to "default" or "namespace" if it is present',
     name
   );
-  // if (value === "default" || value === "namespace") {
-  //   return value;
-  // }
-  // throw new FatalError(
-  //   'the "preconstruct.exports.importConditionDefaultExport" field must be set to "default" or "namespace" if it is present',
-  //   name
-  // );
 }

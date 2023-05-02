@@ -2,7 +2,11 @@ import normalizePath from "normalize-path";
 import path from "path";
 import { Plugin } from "rollup";
 import { Package } from "../package";
-import { mjsTemplate } from "../utils";
+import {
+  getJsDefaultForMjsFilepath,
+  jsDefaultForMjsTemplate,
+  mjsTemplate,
+} from "../utils";
 
 export default function mjsProxyPlugin(pkg: Package): Plugin {
   const entrypointSources = new Set(pkg.entrypoints.map((e) => e.source));
@@ -21,15 +25,19 @@ export default function mjsProxyPlugin(pkg: Package): Plugin {
         }
 
         let mjsPath = file.fileName.replace(/\.prod\.js$/, ".mjs");
-
+        const cjsRelativePath = `./${path.basename(mjsPath, ".mjs")}.js`;
         this.emitFile({
           type: "asset",
           fileName: mjsPath,
-          source: mjsTemplate(
-            file.exports,
-            `./${path.basename(mjsPath, ".mjs")}.js`
-          ),
+          source: mjsTemplate(file.exports, cjsRelativePath, mjsPath),
         });
+        if (file.exports.includes("default")) {
+          this.emitFile({
+            type: "asset",
+            fileName: getJsDefaultForMjsFilepath(mjsPath),
+            source: jsDefaultForMjsTemplate(cjsRelativePath),
+          });
+        }
       }
     },
   };
