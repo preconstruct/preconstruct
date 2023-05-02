@@ -444,7 +444,7 @@ test("with default", async () => {
         "./package.json": "./package.json",
       },
       preconstruct: {
-        entrypoints: ["index.ts", "something.ts"],
+        entrypoints: ["index.ts", "something.tsx"],
         exports: {
           importConditionDefaultExport: "default",
         },
@@ -458,7 +458,7 @@ test("with default", async () => {
       export const thing = "index";
       export default true;
     `,
-    "packages/pkg-a/src/something.ts": ts`
+    "packages/pkg-a/src/something.tsx": ts`
       export const something = "something";
       export default 100;
     `,
@@ -528,7 +528,7 @@ test("with default", async () => {
     //# sourceMappingURL=pkg-a-something.cjs.d.mts.map
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/something/dist/pkg-a-something.cjs.d.mts.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    {"version":3,"file":"pkg-a-something.cjs.d.mts","sourceRoot":"","sources":["../../src/something.ts"],"names":[],"mappings":"AAAA"}
+    {"version":3,"file":"pkg-a-something.cjs.d.mts","sourceRoot":"","sources":["../../src/something.tsx"],"names":[],"mappings":"AAAA"}
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/something/dist/pkg-a-something.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     export * from "../../src/something";
@@ -536,7 +536,7 @@ test("with default", async () => {
     //# sourceMappingURL=pkg-a-something.cjs.d.ts.map
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/something/dist/pkg-a-something.cjs.d.ts.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    {"version":3,"file":"pkg-a-something.cjs.d.ts","sourceRoot":"","sources":["../../src/something.ts"],"names":[],"mappings":"AAAA"}
+    {"version":3,"file":"pkg-a-something.cjs.d.ts","sourceRoot":"","sources":["../../src/something.tsx"],"names":[],"mappings":"AAAA"}
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/something/dist/pkg-a-something.cjs.default.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     export { default as _default } from "../../src/something.js"
