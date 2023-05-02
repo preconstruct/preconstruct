@@ -1,5 +1,11 @@
 # preconstruct
 
+## 2.6.2
+
+### Patch Changes
+
+- [#546](https://github.com/preconstruct/preconstruct/pull/546) [`c28b10a`](https://github.com/preconstruct/preconstruct/commit/c28b10a04b3d3a88b8957cab8f0ead8c08d2cb17) Thanks [@emmatown](https://github.com/emmatown)! - `importConditionDefaultExport` is now re-enabled and works with `"moduleResolution": "bundler"`
+
 ## 2.6.1
 
 ### Patch Changes
