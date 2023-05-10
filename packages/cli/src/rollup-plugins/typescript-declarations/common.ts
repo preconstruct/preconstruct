@@ -137,7 +137,8 @@ export const getDeclarationsForFile = async (
   program: import("typescript").Program,
   normalizedPkgDir: string,
   projectDir: string,
-  diagnosticsHost: import("typescript").FormatDiagnosticsHost
+  diagnosticsHost: import("typescript").FormatDiagnosticsHost,
+  transformers?: import("typescript").CustomTransformers
 ): Promise<EmittedDeclarationOutput> => {
   if (filename.endsWith(".d.ts")) {
     return {
@@ -186,7 +187,8 @@ export const getDeclarationsForFile = async (
       }
     },
     undefined,
-    true
+    true,
+    transformers
   );
 
   if (!emitted.types || diagnostics.length) {
