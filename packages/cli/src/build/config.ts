@@ -1,7 +1,6 @@
 import { Package } from "../package";
 import { getRollupConfig } from "./rollup";
 import { OutputOptions, OutputPlugin, RollupOptions } from "rollup";
-import { Aliases } from "./aliases";
 import { PKG_JSON_CONFIG_FIELD } from "../constants";
 import { limit, doPromptInput } from "../prompt";
 import path from "path";
@@ -66,7 +65,7 @@ const babelHelperId = /@babel\/runtime(|-corejs[23])\/helpers\//;
 const interop = (id: string | null): "auto" | "default" =>
   id && babelHelperId.test(id) ? "default" : "auto";
 
-export function getRollupConfigs(pkg: Package, aliases: Aliases) {
+export function getRollupConfigs(pkg: Package) {
   const cjsPlugins: OutputPlugin[] = pkg.project.experimentalFlags
     .keepDynamicImportAsDynamicImportInCommonJS
     ? [
@@ -92,7 +91,6 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
     config: getRollupConfig(
       pkg,
       pkg.entrypoints,
-      aliases,
       "node-dev",
       pkg.project.experimentalFlags.logCompiledFiles
         ? (filename) => {
@@ -127,13 +125,7 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
   });
 
   configs.push({
-    config: getRollupConfig(
-      pkg,
-      pkg.entrypoints,
-      aliases,
-      "node-prod",
-      () => {}
-    ),
+    config: getRollupConfig(pkg, pkg.entrypoints, "node-prod", () => {}),
     outputs: [
       {
         format: "cjs",
@@ -153,7 +145,7 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
   if (pkg.entrypoints[0].json["umd:main"] !== undefined)
     pkg.entrypoints.forEach((entrypoint) => {
       configs.push({
-        config: getRollupConfig(pkg, [entrypoint], aliases, "umd", () => {}),
+        config: getRollupConfig(pkg, [entrypoint], "umd", () => {}),
         outputs: [
           {
             format: "umd" as const,
@@ -179,13 +171,7 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
 
   if (hasBrowserField) {
     configs.push({
-      config: getRollupConfig(
-        pkg,
-        pkg.entrypoints,
-        aliases,
-        "browser",
-        () => {}
-      ),
+      config: getRollupConfig(pkg, pkg.entrypoints, "browser", () => {}),
       outputs: [
         !exportsFieldConfig && {
           format: "cjs" as const,
@@ -215,13 +201,7 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
   // note module builds always exist when using the exports field
   if (exportsFieldConfig?.envConditions.has("worker")) {
     configs.push({
-      config: getRollupConfig(
-        pkg,
-        pkg.entrypoints,
-        aliases,
-        "worker",
-        () => {}
-      ),
+      config: getRollupConfig(pkg, pkg.entrypoints, "worker", () => {}),
       outputs: [
         {
           format: "es" as const,

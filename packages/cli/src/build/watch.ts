@@ -5,7 +5,6 @@ import chalk from "chalk";
 import path from "path";
 import ms from "ms";
 import { getRollupConfigs } from "./config";
-import { Aliases, getAliases } from "./aliases";
 import { success, info } from "../logger";
 import { successes } from "../messages";
 import { createWorker } from "../worker-client";
@@ -16,8 +15,8 @@ function relativePath(id: string) {
   return path.relative(process.cwd(), id);
 }
 
-async function watchPackage(pkg: Package, aliases: Aliases) {
-  const _configs = getRollupConfigs(pkg, aliases);
+async function watchPackage(pkg: Package) {
+  const _configs = getRollupConfigs(pkg);
 
   let configs = _configs.map((config) => {
     return { ...config.config, output: config.outputs };
@@ -86,12 +85,11 @@ async function watchPackage(pkg: Package, aliases: Aliases) {
 
 async function retryableWatch(
   pkg: Package,
-  aliases: Aliases,
   getPromises: (arg: { start: Promise<unknown> }) => unknown,
   depth: number
 ) {
   try {
-    let { error, start } = await watchPackage(pkg, aliases);
+    let { error, start } = await watchPackage(pkg);
     if (depth === 0) {
       getPromises({ start });
     }
@@ -99,7 +97,7 @@ async function retryableWatch(
   } catch (err) {
     if (err instanceof Promise) {
       await err;
-      await retryableWatch(pkg, aliases, getPromises, depth + 1);
+      await retryableWatch(pkg, getPromises, depth + 1);
       return;
     }
     throw err;
@@ -111,13 +109,11 @@ export default async function build(directory: string) {
   let project = await Project.create(directory);
   validateProject(project);
   await cleanProjectBeforeBuild(project);
-  let aliases = getAliases(project);
   let startCount = 0;
   await Promise.all(
     project.packages.map((pkg) =>
       retryableWatch(
         pkg,
-        aliases,
         async ({ start }) => {
           await start;
           startCount++;

@@ -2,7 +2,6 @@ import { Package } from "../package";
 import { Project } from "../project";
 import path from "path";
 import { rollup, OutputAsset, OutputChunk, OutputOptions } from "rollup";
-import { Aliases, getAliases } from "./aliases";
 import * as logger from "../logger";
 import * as fs from "fs-extra";
 import {
@@ -57,8 +56,8 @@ function writeOutputFile(
   return Promise.all([fs.outputFile(fileName, source), writeSourceMapPromise]);
 }
 
-async function buildPackage(pkg: Package, aliases: Aliases) {
-  let configs = getRollupConfigs(pkg, aliases);
+async function buildPackage(pkg: Package) {
+  let configs = getRollupConfigs(pkg);
 
   let outputs = await Promise.all(
     configs.map(async ({ config, outputs }) => {
@@ -88,13 +87,13 @@ async function buildPackage(pkg: Package, aliases: Aliases) {
   );
 }
 
-async function retryableBuild(pkg: Package, aliases: Aliases) {
+async function retryableBuild(pkg: Package) {
   try {
-    await buildPackage(pkg, aliases);
+    await buildPackage(pkg);
   } catch (err) {
     if (err instanceof Promise) {
       await err;
-      await retryableBuild(pkg, aliases);
+      await retryableBuild(pkg);
       return;
     }
     if (
@@ -123,13 +122,12 @@ export default async function build(directory: string) {
 
     await cleanProjectBeforeBuild(project);
 
-    let aliases = getAliases(project);
     let errors: FatalError[] = [];
 
     await Promise.all(
       project.packages.map(async (pkg) => {
         try {
-          await retryableBuild(pkg, aliases);
+          await retryableBuild(pkg);
         } catch (err) {
           if (err instanceof BatchError) {
             errors.push(...err.errors);

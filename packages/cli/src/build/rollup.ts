@@ -9,7 +9,6 @@ import builtInModules from "builtin-modules";
 import { Package } from "../package";
 import { Entrypoint } from "../entrypoint";
 import { RollupOptions, Plugin } from "rollup";
-import { Aliases } from "./aliases";
 import { FatalError, BatchError } from "../errors";
 import rewriteBabelRuntimeHelpers from "../rollup-plugins/rewrite-babel-runtime-helpers";
 import flowAndNodeDevProdEntry from "../rollup-plugins/flow-and-prod-dev-entry";
@@ -24,6 +23,7 @@ import { inlineProcessEnvNodeEnv } from "../rollup-plugins/inline-process-env-no
 import normalizePath from "normalize-path";
 import { serverComponentsPlugin } from "../rollup-plugins/server-components";
 import { resolveErrorsPlugin } from "../rollup-plugins/resolve";
+import { Project } from "../project";
 
 type ExternalPredicate = (source: string) => boolean;
 
@@ -46,7 +46,6 @@ export type RollupConfigType =
 export let getRollupConfig = (
   pkg: Package,
   entrypoints: Array<Entrypoint>,
-  aliases: Aliases,
   type: RollupConfigType,
   reportTransformedFile: (filename: string) => void
 ): RollupOptions => {
@@ -166,7 +165,7 @@ export let getRollupConfig = (
       }),
       type === "umd" &&
         alias({
-          entries: aliases,
+          entries: getAliases(pkg.project),
         }),
       resolve({
         extensions: EXTENSIONS,
@@ -202,3 +201,17 @@ export let getRollupConfig = (
 
   return config;
 };
+
+function getAliases(
+  project: Project
+): {
+  [key: string]: string;
+} {
+  let aliases: { [key: string]: string } = {};
+  project.packages.forEach((pkg) => {
+    pkg.entrypoints.forEach((entrypoint) => {
+      aliases[entrypoint.name] = entrypoint.source;
+    });
+  });
+  return aliases;
+}
