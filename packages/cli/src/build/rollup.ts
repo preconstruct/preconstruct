@@ -196,6 +196,8 @@ export let getRollupConfig = (
           },
           preventAssignment: true,
         }),
+      pkg.project.experimentalFlags
+        .keepDynamicImportAsDynamicImportInCommonJS && cjsDynamicImportPlugin,
     ].filter((x): x is Plugin => !!x),
   };
 
@@ -215,3 +217,14 @@ function getAliases(
   });
   return aliases;
 }
+
+const cjsDynamicImportPlugin: Plugin = {
+  name: "cjs render dynamic import",
+  renderDynamicImport({ format }) {
+    if (format !== "cjs") return;
+    return {
+      left: "import(",
+      right: ")",
+    };
+  },
+};

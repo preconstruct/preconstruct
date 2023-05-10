@@ -1,6 +1,6 @@
 import { Package } from "../package";
 import { getRollupConfig } from "./rollup";
-import { OutputOptions, OutputPlugin, RollupOptions } from "rollup";
+import { OutputOptions, RollupOptions } from "rollup";
 import { PKG_JSON_CONFIG_FIELD } from "../constants";
 import { limit, doPromptInput } from "../prompt";
 import path from "path";
@@ -66,21 +66,6 @@ const interop = (id: string | null): "auto" | "default" =>
   id && babelHelperId.test(id) ? "default" : "auto";
 
 export function getRollupConfigs(pkg: Package) {
-  const cjsPlugins: OutputPlugin[] = pkg.project.experimentalFlags
-    .keepDynamicImportAsDynamicImportInCommonJS
-    ? [
-        {
-          name: "cjs render dynamic import",
-          renderDynamicImport() {
-            return {
-              left: "import(",
-              right: ")",
-            };
-          },
-        },
-      ]
-    : [];
-
   let configs: Array<{
     config: RollupOptions;
     outputs: OutputOptions[];
@@ -109,7 +94,6 @@ export function getRollupConfigs(pkg: Package) {
         dir: pkg.directory,
         exports: "named" as const,
         interop,
-        plugins: cjsPlugins,
       },
       ...(hasModuleField
         ? [
@@ -134,7 +118,6 @@ export function getRollupConfigs(pkg: Package) {
         dir: pkg.directory,
         exports: "named",
         interop,
-        plugins: cjsPlugins,
       },
     ],
   });
@@ -182,7 +165,6 @@ export function getRollupConfigs(pkg: Package) {
           dir: pkg.directory,
           exports: "named" as const,
           interop,
-          plugins: cjsPlugins,
         },
         hasModuleField && {
           format: "es" as const,
