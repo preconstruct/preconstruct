@@ -1,3 +1,4 @@
+import { lazyRequire } from "lazy-require.macro";
 import { Project } from "./project";
 import { success, info } from "./logger";
 import {
@@ -15,7 +16,6 @@ import {
   dtsDefaultForDmtsTemplate,
   getDtsDefaultForMtsFilepath,
 } from "./utils";
-import * as babel from "@babel/core";
 import * as fs from "fs-extra";
 import path from "path";
 import normalizePath from "normalize-path";
@@ -69,6 +69,7 @@ export async function entrypointHasDefaultExport(
   ) {
     return false;
   }
+  const babel = lazyRequire<typeof import("@babel/core")>();
   let ast = (await babel.parseAsync(content, {
     filename,
     sourceType: "module",
