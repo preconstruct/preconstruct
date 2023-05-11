@@ -11,7 +11,7 @@ import { Entrypoint } from "../entrypoint";
 import { RollupOptions, Plugin } from "rollup";
 import { FatalError, BatchError } from "../errors";
 import rewriteBabelRuntimeHelpers from "../rollup-plugins/rewrite-babel-runtime-helpers";
-import flowAndNodeDevProdEntry from "../rollup-plugins/flow-and-prod-dev-entry";
+import nodeDevProdEntry from "../rollup-plugins/prod-dev-entry";
 import typescriptDeclarations from "../rollup-plugins/typescript-declarations";
 import mjsProxy from "../rollup-plugins/mjs-proxy";
 import json from "@rollup/plugin-json";
@@ -24,6 +24,7 @@ import normalizePath from "normalize-path";
 import { serverComponentsPlugin } from "../rollup-plugins/server-components";
 import { resolveErrorsPlugin } from "../rollup-plugins/resolve";
 import { Project } from "../project";
+import flow from "../rollup-plugins/flow";
 
 type ExternalPredicate = (source: string) => boolean;
 
@@ -131,7 +132,8 @@ export let getRollupConfig = (
           }
         },
       } as Plugin,
-      type === "node-prod" && flowAndNodeDevProdEntry(),
+      type === "node-prod" && nodeDevProdEntry(),
+      type === "node-prod" && flow(),
       resolveErrorsPlugin(pkg, warnings, type === "umd"),
       type === "node-prod" && typescriptDeclarations(pkg),
       type === "node-prod" &&
