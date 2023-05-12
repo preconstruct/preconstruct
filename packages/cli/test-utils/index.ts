@@ -427,7 +427,11 @@ export async function getFiles(
           try {
             link = await fs.readlink(path.join(dir, filename));
           } catch (err: any) {
-            if (err.code !== "EINVAL") {
+            if (
+              err.code !== "EINVAL" &&
+              // UNKNOWN is returned on Windows when it's not a symlink
+              err.code !== "UNKNOWN"
+            ) {
               throw err;
             }
           }
