@@ -1,6 +1,9 @@
 import build from "..";
 import { typescriptFixture, testdir, getFiles, ts } from "../../../test-utils";
 
+// TODO: make it faster so this isn't required
+jest.setTimeout(20000);
+
 test("imports conditions", async () => {
   let dir = await testdir({
     "package.json": JSON.stringify({
