@@ -1008,7 +1008,7 @@ test("import conditions fix", async () => {
       "preconstruct": {
         "exports": true,
         "___experimentalFlags_WILL_CHANGE_IN_PATCH": {
-          "importsConditions": true,
+          "importsConditions": true
         }
       },
       "imports": {
@@ -1103,7 +1103,7 @@ test("import conditions fix with importConditionDefaultExport: default", async (
           "importConditionDefaultExport": "default"
         },
         "___experimentalFlags_WILL_CHANGE_IN_PATCH": {
-          "importsConditions": true,
+          "importsConditions": true
         }
       },
       "imports": {

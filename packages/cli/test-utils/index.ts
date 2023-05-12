@@ -228,13 +228,9 @@ export async function install(tmpPath: string) {
   await spawn("yarn", ["install"], { cwd: tmpPath });
 }
 
-export const repoNodeModules = path.resolve(
-  __dirname,
-  "..",
-  "..",
-  "..",
-  "node_modules"
-);
+export const repoRoot = path.resolve(__dirname, "..", "..", "..");
+
+export const repoNodeModules = path.resolve(repoRoot, "node_modules");
 
 export const typescriptFixture = {
   node_modules: { kind: "symlink", path: repoNodeModules },
@@ -427,6 +423,25 @@ export async function getFiles(
     ...(
       await Promise.all(
         files.map(async (filename) => {
+          let link: string | undefined;
+          try {
+            link = await fs.readlink(path.join(dir, filename));
+          } catch (err: any) {
+            if (err.code !== "EINVAL") {
+              throw err;
+            }
+          }
+          if (link !== undefined) {
+            return [
+              filename,
+              `⎯ symlink to ${normalizePath(
+                path.relative(
+                  dir,
+                  path.resolve(path.dirname(path.join(dir, filename)), link)
+                )
+              )}`,
+            ] as const;
+          }
           const contents = transformContent(
             await readNormalizedFile(path.join(dir, filename))
           );
