@@ -419,6 +419,8 @@ export async function getFiles(
   } = {}
 ) {
   const files = await fastGlob(glob, { cwd: dir });
+  const realDir = await fs.realpath(dir);
+
   return Object.fromEntries([
     ...(
       await Promise.all(
@@ -440,8 +442,10 @@ export async function getFiles(
               filename,
               `⎯ symlink to ${normalizePath(
                 path.relative(
-                  dir,
-                  path.resolve(path.dirname(path.join(dir, filename)), link)
+                  realDir,
+                  await fs.realpath(
+                    path.resolve(path.dirname(path.join(dir, filename)), link)
+                  )
                 )
               )}`,
             ] as const;
