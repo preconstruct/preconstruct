@@ -24,8 +24,8 @@ export async function fixPackage(pkg: Package) {
     browser: pkg.entrypoints.some((x) => x.json.browser !== undefined),
   };
 
-  if (exportsFieldConfig) {
-    if (fields.browser || exportsFieldConfig.envConditions.has("browser")) {
+  if (exportsFieldConfig?.conditions.kind === "legacy") {
+    if (fields.browser || exportsFieldConfig.conditions.envs.has("browser")) {
       if (typeof pkg.json.preconstruct.exports !== "object") {
         pkg.json.preconstruct.exports = {};
       }
@@ -77,19 +77,21 @@ export function validatePackage(pkg: Package) {
     if (!fields.module) {
       throw new FixableError(errors.noModuleFieldWithExportsField, pkg.name);
     }
-    const hasField = fields.browser;
-    const hasCondition = exportsFieldConfig.envConditions.has("browser");
-    if (hasField && !hasCondition) {
-      throw new FixableError(
-        errors.missingBrowserConditionWithFieldPresent,
-        pkg.name
-      );
-    }
-    if (!hasField && hasCondition) {
-      throw new FixableError(
-        errors.missingBrowserFieldWithConditionPresent,
-        pkg.name
-      );
+    if (exportsFieldConfig.conditions.kind === "legacy") {
+      const hasField = fields.browser;
+      const hasCondition = exportsFieldConfig.conditions.envs.has("browser");
+      if (hasField && !hasCondition) {
+        throw new FixableError(
+          errors.missingBrowserConditionWithFieldPresent,
+          pkg.name
+        );
+      }
+      if (!hasField && hasCondition) {
+        throw new FixableError(
+          errors.missingBrowserFieldWithConditionPresent,
+          pkg.name
+        );
+      }
     }
   }
 

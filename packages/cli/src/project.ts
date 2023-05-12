@@ -30,6 +30,7 @@ export class Project extends Item<{
       logCompiledFiles?: JSONValue;
       keepDynamicImportAsDynamicImportInCommonJS?: JSONValue;
       onlyEmitUsedTypeScriptDeclarations?: JSONValue;
+      importsConditions?: JSONValue;
     };
   };
 }> {
@@ -40,6 +41,7 @@ export class Project extends Item<{
       logCompiledFiles: !!config.logCompiledFiles,
       keepDynamicImportAsDynamicImportInCommonJS: !!config.keepDynamicImportAsDynamicImportInCommonJS,
       onlyEmitUsedTypeScriptDeclarations: !!config.onlyEmitUsedTypeScriptDeclarations,
+      importsConditions: !!config.importsConditions,
     };
   }
   get configPackages(): Array<string> {

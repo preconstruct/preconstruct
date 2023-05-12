@@ -56,7 +56,7 @@
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-react": "^7.26.1",
     "fixturez": "^1.1.0",
-    "jest": "^29.3.1",
+    "jest": "^29.5.0",
     "lazy-require.macro": "^0.1.0",
     "normalize-path": "^3.0.0",
     "outdent": "^0.7.1",

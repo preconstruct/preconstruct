@@ -5,6 +5,7 @@ import {
   TS,
 } from "./common";
 import { Program, ResolvedModuleFull } from "typescript";
+import { getModuleSpecifier } from "./get-module-specifier";
 
 export async function getUsedDeclarations(
   typescript: TS,
@@ -43,32 +44,9 @@ export async function getUsedDeclarations(
             // files is actually reasonable
             if (typescript.isSourceFile(node)) {
               function handler(node: import("typescript").Node): void {
-                // import/export { x } from "x"
-                if (
-                  (typescript.isImportDeclaration(node) ||
-                    typescript.isExportDeclaration(node)) &&
-                  node.moduleSpecifier !== undefined &&
-                  typescript.isStringLiteral(node.moduleSpecifier)
-                ) {
-                  imports.add(node.moduleSpecifier.text);
-                  return;
-                }
-                // type x = import('a').Blah
-                if (
-                  typescript.isImportTypeNode(node) &&
-                  typescript.isLiteralTypeNode(node.argument) &&
-                  typescript.isStringLiteral(node.argument.literal)
-                ) {
-                  imports.add(node.argument.literal.text);
-                  return;
-                }
-                // import x = require("x")
-                if (
-                  typescript.isExternalModuleReference(node) &&
-                  typescript.isStringLiteral(node.expression)
-                ) {
-                  imports.add(node.expression.text);
-                  return;
+                const literal = getModuleSpecifier(node, typescript);
+                if (literal) {
+                  imports.add(literal.text);
                 }
                 typescript.forEachChild(node, handler);
               }

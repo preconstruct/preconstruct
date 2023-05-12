@@ -15,6 +15,7 @@ import {
   jsDefaultForMjsTemplate,
   dtsDefaultForDmtsTemplate,
   getDtsDefaultForMtsFilepath,
+  getDistFilenameForConditions,
 } from "./utils";
 import * as fs from "fs-extra";
 import path from "path";
@@ -22,42 +23,27 @@ import normalizePath from "normalize-path";
 import { Entrypoint } from "./entrypoint";
 import { validateProject } from "./validate";
 
-let tsExtensionPattern = /tsx?$/;
+let tsExtensionPattern = /\.tsx?$/;
 
-type TypeSystemInfo = {
-  flow: boolean;
-  typescript: false | { contents: string; filename: string };
-};
-
-async function getTypeSystem(entrypoint: Entrypoint): Promise<TypeSystemInfo> {
-  let sourceContents = await fs.readFile(entrypoint.source, "utf8");
-  const ret: TypeSystemInfo = {
-    flow: false,
-    typescript: false,
-  };
-  if (tsExtensionPattern.test(entrypoint.source)) {
-    ret.typescript = { contents: sourceContents, filename: entrypoint.source };
-  } else {
-    try {
-      const filename = entrypoint.source.replace(/\.jsx?/, ".d.ts");
-      let tsSourceContents = await fs.readFile(filename, "utf8");
-      ret.typescript = { contents: tsSourceContents, filename };
-    } catch (err) {
-      if (err.code !== "ENOENT") {
-        throw err;
-      }
+async function hasDtsFile(entrypoint: Entrypoint) {
+  try {
+    const filename = entrypoint.source.replace(/\.jsx?/, ".d.ts");
+    await fs.stat(filename);
+    return true;
+  } catch (err) {
+    if (err.code !== "ENOENT") {
+      throw err;
     }
   }
-  if (sourceContents.includes("@flow")) {
-    ret.flow = true;
-  }
-  return ret;
+  return false;
 }
 
+// technically we should consider three states 'no-default' | 'default' | 'type-only-default'
+// but we don't handle that correctly for builds right now anyway and i don't think people are
+// really doing type-only default exports so i'm not worrying about it right now
 export async function entrypointHasDefaultExport(
   entrypoint: Entrypoint,
-  content: string,
-  filename: string
+  content: string
 ) {
   // this regex won't tell us that a module definitely has a default export
   // if it doesn't match though, it will tell us that the module
@@ -71,7 +57,7 @@ export async function entrypointHasDefaultExport(
   }
   const babel = lazyRequire<typeof import("@babel/core")>();
   let ast = (await babel.parseAsync(content, {
-    filename,
+    filename: entrypoint.source,
     sourceType: "module",
     cwd: entrypoint.package.project.directory,
   }))! as babel.types.File;
@@ -197,85 +183,116 @@ export default async function dev(projectDir: string) {
 
   await Promise.all(
     project.packages.map((pkg) => {
+      const exportsFieldConfig = pkg.exportsFieldConfig();
+
       return Promise.all(
         pkg.entrypoints.map(async (entrypoint) => {
           let hasDefaultExportPromise: Promise<boolean> | undefined;
-          let typeSystemPromise = getTypeSystem(entrypoint);
-
-          let distDirectory = path.join(entrypoint.directory, "dist");
-          let entrypointPath = normalizePath(
-            path.relative(distDirectory, entrypoint.source)
-          );
-
-          await fs.remove(distDirectory);
-          await fs.ensureDir(distDirectory);
-
+          const contentsPromise = fs.readFile(entrypoint.source, "utf8");
+          const getHasDefaultExportPromise = () => {
+            if (hasDefaultExportPromise === undefined) {
+              hasDefaultExportPromise = contentsPromise.then((content) =>
+                entrypointHasDefaultExport(entrypoint, content)
+              );
+            }
+            return hasDefaultExportPromise;
+          };
+          await cleanEntrypoint(entrypoint);
           let entrypointPromises: Promise<unknown>[] = [
-            typeSystemPromise.then((typeSystemInfo) => {
-              let typeSystemPromises = [];
-              if (typeSystemInfo.flow) {
-                typeSystemPromises.push(writeDevFlowFile(entrypoint));
+            (async () => {
+              if ((await contentsPromise).includes("@flow")) {
+                await writeDevFlowFile(entrypoint);
               }
-              if (typeSystemInfo.typescript !== false) {
-                hasDefaultExportPromise ??= entrypointHasDefaultExport(
+            })(),
+            (async () => {
+              if (
+                tsExtensionPattern.test(entrypoint.source) ||
+                (await hasDtsFile(entrypoint))
+              ) {
+                await writeDevTSFiles(
                   entrypoint,
-                  typeSystemInfo.typescript.contents,
-                  typeSystemInfo.typescript.filename
-                );
-
-                typeSystemPromises.push(
-                  hasDefaultExportPromise.then((hasDefaultExport) =>
-                    writeDevTSFiles(entrypoint, hasDefaultExport)
-                  )
+                  await getHasDefaultExportPromise()
                 );
               }
-              return Promise.all(typeSystemPromises);
-            }),
+            })(),
+          ];
+          const cjsTemplate = commonjsRequireHookTemplate(entrypoint);
+          if (exportsFieldConfig?.conditions.kind === "imports") {
+            for (const conditions of exportsFieldConfig.conditions.groups.keys()) {
+              entrypointPromises.push(
+                fs.symlink(
+                  entrypoint.source,
+                  path.join(
+                    entrypoint.directory,
+                    getDistFilenameForConditions(
+                      entrypoint,
+                      conditions.concat("module")
+                    )
+                  )
+                ),
+                fs.writeFile(
+                  path.join(
+                    entrypoint.directory,
+                    getDistFilenameForConditions(entrypoint, conditions)
+                  ),
+                  cjsTemplate
+                )
+              );
+              if (
+                exportsFieldConfig.importConditionDefaultExport === "default"
+              ) {
+                entrypointPromises.push(
+                  getHasDefaultExportPromise().then((hasDefaultExport) => {
+                    const filepath = path.join(
+                      entrypoint.package.directory,
+                      getDistFilenameForConditions(
+                        entrypoint,
+                        conditions
+                      ).replace(/\.js$/, ".mjs")
+                    );
+                    const importPath = `./${getDistFilenameForConditions(
+                      entrypoint,
+                      conditions
+                    )}`;
+                    return Promise.all([
+                      fs.writeFile(
+                        filepath,
+                        mjsTemplate(
+                          // the * won't really do anything right now
+                          // since cjs-module-lexer won't find anything
+                          // but that could be fixed by adding fake things
+                          // to the .cjs.js file that look like exports to cjs-module-lexer
+                          // but don't actually add the exports at runtime like esbuild does
+                          // (it would require re-running dev when adding new named exports)
+                          hasDefaultExport ? ["default", "*other"] : ["*other"],
+                          importPath,
+                          filepath
+                        )
+                      ),
+                      hasDefaultExport &&
+                        fs.writeFile(
+                          getJsDefaultForMjsFilepath(filepath),
+                          jsDefaultForMjsTemplate(importPath)
+                        ),
+                    ]);
+                  })
+                );
+              }
+            }
+            return Promise.all(entrypointPromises);
+          }
+          entrypointPromises.push(
             fs.writeFile(
               path.join(
                 entrypoint.directory,
                 validFieldsForEntrypoint.main(entrypoint)
               ),
-              `"use strict";
-// this file might look strange and you might be wondering what it's for
-// it's lets you import your source files by importing this entrypoint
-// as you would import it if it was built with preconstruct build
-// this file is slightly different to some others though
-// it has a require hook which compiles your code with Babel
-// this means that you don't have to set up @babel/register or anything like that
-// but you can still require this module and it'll be compiled
-
-// this bit of code imports the require hook and registers it
-let unregister = require(${JSON.stringify(
-                normalizePath(
-                  path.relative(
-                    distDirectory,
-                    path.dirname(require.resolve("@preconstruct/hook"))
-                  )
-                )
-              )}).___internalHook(typeof __dirname === 'undefined' ? undefined : __dirname, ${JSON.stringify(
-                normalizePath(path.relative(distDirectory, project.directory))
-              )}, ${JSON.stringify(
-                normalizePath(path.relative(distDirectory, pkg.directory))
-              )});
-
-// this re-exports the source file
-module.exports = require(${JSON.stringify(entrypointPath)});
-
-unregister();
-`
-            ),
-          ];
-          if (
-            pkg.exportsFieldConfig()?.importConditionDefaultExport === "default"
-          ) {
-            hasDefaultExportPromise ??= entrypointHasDefaultExport(
-              entrypoint,
-              await fs.readFile(entrypoint.source, "utf8"),
-              entrypoint.source
-            );
+              cjsTemplate
+            )
+          );
+          if (exportsFieldConfig?.importConditionDefaultExport === "default") {
             entrypointPromises.push(
-              hasDefaultExportPromise.then((hasDefaultExport) => {
+              getHasDefaultExportPromise().then((hasDefaultExport) => {
                 const filepath = path.join(
                   entrypoint.package.directory,
                   getExportsImportUnwrappingDefaultOutputPath(entrypoint)
@@ -321,7 +338,7 @@ unregister();
             );
           }
 
-          if (pkg.exportsFieldConfig()?.envConditions?.has("worker")) {
+          if (exportsFieldConfig?.conditions.envs.has("worker")) {
             entrypointPromises.push(
               fs.symlink(
                 entrypoint.source,
@@ -352,4 +369,48 @@ unregister();
   );
 
   success("created links!");
+}
+
+async function cleanEntrypoint(entrypoint: Entrypoint) {
+  let distDirectory = path.join(entrypoint.directory, "dist");
+
+  await fs.remove(distDirectory);
+  await fs.ensureDir(distDirectory);
+}
+
+function commonjsRequireHookTemplate(entrypoint: Entrypoint) {
+  const distDirectory = path.join(entrypoint.directory, "dist");
+  let entrypointPath = normalizePath(
+    path.relative(distDirectory, entrypoint.source)
+  );
+  return `"use strict";
+// this file might look strange and you might be wondering what it's for
+// it's lets you import your source files by importing this entrypoint
+// as you would import it if it was built with preconstruct build
+// this file is slightly different to some others though
+// it has a require hook which compiles your code with Babel
+// this means that you don't have to set up @babel/register or anything like that
+// but you can still require this module and it'll be compiled
+
+// this bit of code imports the require hook and registers it
+let unregister = require(${JSON.stringify(
+    normalizePath(
+      path.relative(
+        distDirectory,
+        path.dirname(require.resolve("@preconstruct/hook"))
+      )
+    )
+  )}).___internalHook(typeof __dirname === 'undefined' ? undefined : __dirname, ${JSON.stringify(
+    normalizePath(
+      path.relative(distDirectory, entrypoint.package.project.directory)
+    )
+  )}, ${JSON.stringify(
+    normalizePath(path.relative(distDirectory, entrypoint.directory))
+  )});
+
+// this re-exports the source file
+module.exports = require(${JSON.stringify(entrypointPath)});
+
+unregister();
+`;
 }

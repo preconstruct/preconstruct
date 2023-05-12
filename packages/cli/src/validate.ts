@@ -132,6 +132,7 @@ export const EXPERIMENTAL_FLAGS = new Set([
   "logCompiledFiles",
   "keepDynamicImportAsDynamicImportInCommonJS",
   "onlyEmitUsedTypeScriptDeclarations",
+  "importsConditions",
 ]);
 
 export function validateProject(project: Project, log = false) {

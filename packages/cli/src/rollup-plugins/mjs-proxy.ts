@@ -13,6 +13,7 @@ export default function mjsProxyPlugin(pkg: Package): Plugin {
   return {
     name: "mjs-proxy",
     async generateBundle(opts, bundle) {
+      if (opts.format !== "cjs") return;
       for (const n in bundle) {
         const file = bundle[n];
         if (
@@ -24,7 +25,7 @@ export default function mjsProxyPlugin(pkg: Package): Plugin {
           continue;
         }
 
-        let mjsPath = file.fileName.replace(/\.prod\.js$/, ".mjs");
+        let mjsPath = file.fileName.replace(/(?:\.prod)?\.js$/, ".mjs");
         const cjsRelativePath = `./${path.basename(mjsPath, ".mjs")}.js`;
         this.emitFile({
           type: "asset",

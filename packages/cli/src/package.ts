@@ -20,6 +20,7 @@ import {
   parseImportConditionDefaultExportOption,
 } from "./utils";
 import normalizePath from "normalize-path";
+import { parseImportsField } from "./imports";
 
 function getFieldsUsedInEntrypoints(
   descriptors: { contents: string | undefined; filename: string }[]
@@ -118,6 +119,7 @@ export class Package extends Item<{
   exports?: Record<string, ExportsConditions | string>;
   dependencies?: Record<string, string>;
   peerDependencies?: Record<string, string>;
+  imports?: JSONValue;
 }> {
   project!: Project;
   entrypoints!: Array<Entrypoint>;
@@ -322,33 +324,45 @@ export class Package extends Item<{
     }
     return "full";
   }
-
-  exportsFieldConfig(): CanonicalExportsFieldConfig {
+  _parsedImportsGroups:
+    | Map<string[], [string[], ...string[][]]>
+    | false
+    | undefined;
+  exportsFieldConfig(): CanonicalExportsFieldConfig | undefined {
+    if (this._parsedImportsGroups === undefined) {
+      if (this.project.experimentalFlags.importsConditions) {
+        this._parsedImportsGroups = parseImportsField(this.json.imports);
+      } else {
+        this._parsedImportsGroups = false;
+      }
+    }
     return parseExportsFieldConfig(
       this.json.preconstruct.exports,
       this.project.directory !== this.directory
         ? this.project.exportsFieldConfig()
         : undefined,
-      this.name
+      this.name,
+      this._parsedImportsGroups
     );
   }
 }
 
-type CanonicalExportsFieldConfig =
-  | undefined
-  | {
-      envConditions: Set<"worker" | "browser">;
-      extra: Record<string, JSONValue>;
-      importConditionDefaultExport: "namespace" | "default";
-    };
+export type CanonicalExportsFieldConfig = {
+  extra: Record<string, JSONValue>;
+  importConditionDefaultExport: "namespace" | "default";
+  conditions:
+    | { kind: "legacy"; envs: Set<"worker" | "browser"> }
+    | { kind: "imports"; groups: Map<string[], [string[], ...string[][]]> };
+};
 
 function parseExportsFieldConfig(
   config: unknown,
   defaultExportFieldConfig:
     | undefined
     | { importConditionDefaultExport: "namespace" | "default" },
-  name: string
-): CanonicalExportsFieldConfig {
+  name: string,
+  importsConditions: false | Map<string[], [string[], ...string[][]]>
+): CanonicalExportsFieldConfig | undefined {
   if (
     config === false ||
     (config === undefined && defaultExportFieldConfig === undefined)
@@ -356,7 +370,10 @@ function parseExportsFieldConfig(
     return undefined;
   }
   const parsedConfig: CanonicalExportsFieldConfig = {
-    envConditions: new Set(),
+    conditions:
+      importsConditions === false
+        ? { kind: "legacy", envs: new Set() }
+        : { kind: "imports", groups: importsConditions },
     extra: {},
     importConditionDefaultExport:
       defaultExportFieldConfig?.importConditionDefaultExport ?? "namespace",
@@ -387,14 +404,20 @@ function parseExportsFieldConfig(
         );
       }
     } else if (key === "envConditions") {
+      if (parsedConfig.conditions.kind !== "legacy") {
+        throw new FatalError(
+          'the "preconstruct.exports.envConditions" field is not supported when the imports conditions feature is enabled',
+          name
+        );
+      }
       if (
         Array.isArray(value) &&
         value.every(
           (v): v is "worker" | "browser" => v === "worker" || v === "browser"
         )
       ) {
-        parsedConfig.envConditions = new Set(value);
-        if (parsedConfig.envConditions.size !== value.length) {
+        parsedConfig.conditions.envs = new Set(value);
+        if (parsedConfig.conditions.envs.size !== value.length) {
           throw new FatalError(
             'the "preconstruct.exports.envConditions" field must not have duplicates',
             name
