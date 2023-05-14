@@ -1,4 +1,5 @@
 import path from "path";
+import realFs from "fs";
 import * as fs from "fs-extra";
 import fastGlob from "fast-glob";
 import fixturez from "fixturez";
@@ -345,7 +346,7 @@ async function getSymlinkType(targetPath: string): Promise<"dir" | "file"> {
 }
 
 export async function testdir(dir: Fixture) {
-  const temp = f.temp();
+  const temp = realFs.realpathSync.native(f.temp());
   await Promise.all(
     Object.keys(dir).map(async (filename) => {
       const output = dir[filename];
@@ -419,7 +420,6 @@ export async function getFiles(
   } = {}
 ) {
   const files = await fastGlob(glob, { cwd: dir });
-  const realDir = await fs.realpath(dir);
 
   return Object.fromEntries([
     ...(
@@ -442,10 +442,8 @@ export async function getFiles(
               filename,
               `⎯ symlink to ${normalizePath(
                 path.relative(
-                  realDir,
-                  await fs.realpath(
-                    path.resolve(path.dirname(path.join(dir, filename)), link)
-                  )
+                  dir,
+                  path.resolve(path.dirname(path.join(dir, filename)), link)
                 )
               )}`,
             ] as const;
