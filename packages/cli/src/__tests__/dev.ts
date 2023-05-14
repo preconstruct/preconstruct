@@ -621,16 +621,23 @@ test("imports conditions", async () => {
     `,
   });
   await dev(dir);
-  const relativePathFromTestDirToPreconstructDir = normalizePath(
+  const maybeRelativePathFromTestDirToPreconstructDir = normalizePath(
     path.relative(dir, repoRoot)
   );
+  console.dir(dir);
+  console.dir(maybeRelativePathFromTestDirToPreconstructDir);
   expect(
     await getFiles(dir, ["dist/**"], {
       transformContent(content) {
-        return content.replace(
-          relativePathFromTestDirToPreconstructDir,
-          "<relative-from-testdir-to-preconstruct-dir>"
-        );
+        return content
+          .replace(
+            maybeRelativePathFromTestDirToPreconstructDir,
+            "<maybe-relative-from-testdir-to-preconstruct-dir>"
+          )
+          .replace(
+            "../<maybe-relative-from-testdir-to-preconstruct-dir>",
+            "<maybe-relative-from-testdir-to-preconstruct-dir>"
+          );
       },
     })
   ).toMatchInlineSnapshot(`
@@ -645,7 +652,7 @@ test("imports conditions", async () => {
     // but you can still require this module and it'll be compiled
 
     // this bit of code imports the require hook and registers it
-    let unregister = require("../<relative-from-testdir-to-preconstruct-dir>/packages/hook").___internalHook(typeof __dirname === 'undefined' ? undefined : __dirname, "..", "..");
+    let unregister = require("<maybe-relative-from-testdir-to-preconstruct-dir>/packages/hook").___internalHook(typeof __dirname === 'undefined' ? undefined : __dirname, "..", "..");
 
     // this re-exports the source file
     module.exports = require("../src/index.js");
