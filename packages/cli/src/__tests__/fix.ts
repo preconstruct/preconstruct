@@ -1164,3 +1164,56 @@ test("import conditions fix with importConditionDefaultExport: default", async (
 
   `);
 });
+
+test("nothing is written when another package's fixing throws an error", async () => {
+  const tmpPath = await testdir({
+    "package.json": JSON.stringify(
+      {
+        name: "repo",
+        preconstruct: {
+          packages: ["packages/*"],
+          exports: {
+            importConditionDefaultExport: "default",
+          },
+          ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+            importsConditions: true,
+          },
+        },
+      },
+      null,
+      2
+    ),
+    "packages/pkg-a/package.json": JSON.stringify(
+      {
+        name: "pkg-a",
+        preconstruct: { exports: { envConditions: ["browser"] } },
+      },
+      null,
+      2
+    ),
+    "packages/pkg-a/src/index.js": ``,
+    "packages/pkg-b/package.json": JSON.stringify({ name: "pkg-b" }, null, 2),
+    "packages/pkg-b/src/index.js": ``,
+  });
+  await expect(fix(tmpPath)).rejects.toMatchInlineSnapshot(
+    `[Error: the "preconstruct.exports.envConditions" field is not supported when the imports conditions feature is enabled]`
+  );
+  expect(await getFiles(tmpPath, ["packages/*/package.json"]))
+    .toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {
+      "name": "pkg-a",
+      "preconstruct": {
+        "exports": {
+          "envConditions": [
+            "browser"
+          ]
+        }
+      }
+    }
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-b/package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {
+      "name": "pkg-b"
+    }
+  `);
+});

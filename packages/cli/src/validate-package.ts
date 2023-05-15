@@ -4,55 +4,9 @@ import chalk from "chalk";
 import { errors } from "./messages";
 import { Package } from "./package";
 import { isFieldValid } from "./validate";
-import { setFieldInOrder, exportsField } from "./utils";
+import { exportsField } from "./utils";
 
 let keys: <Obj>(obj: Obj) => (keyof Obj)[] = Object.keys;
-
-export async function fixPackage(pkg: Package) {
-  if (pkg.entrypoints.length === 0) {
-    throw new FatalError(errors.noEntrypoints, pkg.name);
-  }
-
-  const exportsFieldConfig = pkg.exportsFieldConfig();
-
-  let fields = {
-    main: true,
-    module:
-      pkg.entrypoints.some((x) => x.json.module !== undefined) ||
-      !!exportsFieldConfig,
-    "umd:main": pkg.entrypoints.some((x) => x.json["umd:main"] !== undefined),
-    browser: pkg.entrypoints.some((x) => x.json.browser !== undefined),
-  };
-
-  if (exportsFieldConfig?.conditions.kind === "legacy") {
-    if (fields.browser || exportsFieldConfig.conditions.envs.has("browser")) {
-      if (typeof pkg.json.preconstruct.exports !== "object") {
-        pkg.json.preconstruct.exports = {};
-      }
-      if (!pkg.json.preconstruct.exports.envConditions) {
-        pkg.json.preconstruct.exports.envConditions = [];
-      }
-      if (!pkg.json.preconstruct.exports.envConditions.includes("browser")) {
-        pkg.json.preconstruct.exports.envConditions.push("browser");
-      }
-      fields.browser = true;
-    }
-  }
-
-  keys(fields)
-    .filter((x) => fields[x])
-    .forEach((field) => {
-      pkg.setFieldOnEntrypoints(field);
-    });
-
-  pkg.json = setFieldInOrder(pkg.json, "exports", exportsField(pkg));
-
-  await pkg.save();
-
-  return (await Promise.all(pkg.entrypoints.map((x) => x.save()))).some(
-    (x) => x
-  );
-}
 
 let unsafeRequire = require;
 

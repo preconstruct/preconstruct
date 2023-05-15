@@ -1,27 +1,76 @@
-import { Entrypoint } from "./entrypoint";
 import { Project } from "./project";
 import { promptInput } from "./prompt";
 import * as logger from "./logger";
-import { inputs } from "./messages";
+import { errors, inputs } from "./messages";
 import {
   isUmdNameSpecified,
   EXPERIMENTAL_FLAGS,
   FORMER_FLAGS_THAT_ARE_ENABLED_NOW,
 } from "./validate";
-import { fixPackage } from "./validate-package";
 import { BatchError, FatalError } from "./errors";
+import { Package } from "./package";
+import { setFieldInOrder, exportsField } from "./utils";
 
-async function fixEntrypoint(entrypoint: Entrypoint) {
-  if (
-    entrypoint.json["umd:main"] !== undefined &&
-    !isUmdNameSpecified(entrypoint)
-  ) {
-    let umdName = await promptInput(inputs.getUmdName, entrypoint);
-    entrypoint.json.preconstruct.umdName = umdName;
-    await entrypoint.save();
-    return true;
+let keys: <Obj>(obj: Obj) => (keyof Obj)[] = Object.keys;
+
+async function fixPackage(pkg: Package): Promise<() => Promise<boolean>> {
+  if (pkg.entrypoints.length === 0) {
+    throw new FatalError(errors.noEntrypoints, pkg.name);
   }
-  return false;
+
+  const exportsFieldConfig = pkg.exportsFieldConfig();
+
+  let fields = {
+    main: true,
+    module:
+      pkg.entrypoints.some((x) => x.json.module !== undefined) ||
+      !!exportsFieldConfig,
+    "umd:main": pkg.entrypoints.some((x) => x.json["umd:main"] !== undefined),
+    browser: pkg.entrypoints.some((x) => x.json.browser !== undefined),
+  };
+
+  if (exportsFieldConfig?.conditions.kind === "legacy") {
+    if (fields.browser || exportsFieldConfig.conditions.envs.has("browser")) {
+      if (typeof pkg.json.preconstruct.exports !== "object") {
+        pkg.json.preconstruct.exports = {};
+      }
+      if (!pkg.json.preconstruct.exports.envConditions) {
+        pkg.json.preconstruct.exports.envConditions = [];
+      }
+      if (!pkg.json.preconstruct.exports.envConditions.includes("browser")) {
+        pkg.json.preconstruct.exports.envConditions.push("browser");
+      }
+      fields.browser = true;
+    }
+  }
+
+  keys(fields)
+    .filter((x) => fields[x])
+    .forEach((field) => {
+      pkg.setFieldOnEntrypoints(field);
+    });
+
+  pkg.json = setFieldInOrder(pkg.json, "exports", exportsField(pkg));
+
+  for (const entrypoint of pkg.entrypoints) {
+    if (
+      entrypoint.json["umd:main"] !== undefined &&
+      !isUmdNameSpecified(entrypoint)
+    ) {
+      let umdName = await promptInput(inputs.getUmdName, entrypoint);
+      entrypoint.json.preconstruct.umdName = umdName;
+    }
+  }
+
+  return async () =>
+    (
+      await Promise.all([
+        pkg.save(),
+        ...pkg.entrypoints.map((x) =>
+          x.directory !== pkg.directory ? x.save() : false
+        ),
+      ])
+    ).some((x) => x);
 }
 
 export default async function fix(directory: string) {
@@ -63,17 +112,11 @@ export default async function fix(directory: string) {
     }
   }
 
-  let didModifyPackages = (
-    await Promise.all(
-      project.packages.map(async (pkg) => {
-        let didModifyInPkgFix = await fixPackage(pkg);
-        let didModifyInEntrypointsFix = (
-          await Promise.all(pkg.entrypoints.map(fixEntrypoint))
-        ).some((x) => x);
-        return didModifyInPkgFix || didModifyInEntrypointsFix;
-      })
-    )
-  ).some((x) => x);
+  const updaters = await Promise.all(project.packages.map(fixPackage));
+
+  const didModifyPackages = (await Promise.all(updaters.map((x) => x()))).some(
+    (x) => x
+  );
 
   logger.success(
     didModifyProject || didModifyPackages
