@@ -2,4 +2,4 @@
 "@preconstruct/cli": patch
 ---
 
-Add experimental `importsConditions` flag
+Add `importsConditions` experimental flag
