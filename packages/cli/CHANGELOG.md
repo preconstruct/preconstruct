@@ -1,5 +1,15 @@
 # preconstruct
 
+## 2.6.3
+
+### Patch Changes
+
+- [#551](https://github.com/preconstruct/preconstruct/pull/551) [`ff61fbf`](https://github.com/preconstruct/preconstruct/commit/ff61fbf095f67fe4f4a883969d156e563c84249a) Thanks [@emmatown](https://github.com/emmatown)! - Add `importsConditions` experimental flag
+
+* [#550](https://github.com/preconstruct/preconstruct/pull/550) [`41a8a4f`](https://github.com/preconstruct/preconstruct/commit/41a8a4fbbd7bf18ca13f7719090cc19fc1b7b63e) Thanks [@emmatown](https://github.com/emmatown)! - Add `onlyEmitUsedTypeScriptDeclarations` experimental flag
+
+- [#548](https://github.com/preconstruct/preconstruct/pull/548) [`db69133`](https://github.com/preconstruct/preconstruct/commit/db691338dc0dc6716c9614673cad69ba7aec1567) Thanks [@Andarist](https://github.com/Andarist)! - Load Babel lazily in the main thread to speed up init time as it isn't needed for all code paths.
+
 ## 2.6.2
 
 ### Patch Changes

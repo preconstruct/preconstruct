@@ -1,6 +1,6 @@
 {
   "name": "@preconstruct/cli",
-  "version": "2.6.2",
+  "version": "2.6.3",
   "description": "Dev and build your code painlessly in monorepos",
   "files": [
     "bin.js",
