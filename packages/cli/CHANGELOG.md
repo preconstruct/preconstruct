@@ -1,5 +1,11 @@
 # preconstruct
 
+## 2.6.4
+
+### Patch Changes
+
+- [`e78203b`](https://github.com/preconstruct/preconstruct/commit/e78203b101beb3e4e22ebaaf0d4bc55f36e91429) Thanks [@emmatown](https://github.com/emmatown)! - Fix `.d.ts` files under `importsConditions` experimental flag incorrectly pointing to the source files
+
 ## 2.6.3
 
 ### Patch Changes
