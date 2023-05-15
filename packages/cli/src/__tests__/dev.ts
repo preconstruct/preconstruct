@@ -624,8 +624,6 @@ test("imports conditions", async () => {
   const maybeRelativePathFromTestDirToPreconstructDir = normalizePath(
     path.relative(dir, repoRoot)
   );
-  console.dir(dir);
-  console.dir(maybeRelativePathFromTestDirToPreconstructDir);
   expect(
     await getFiles(dir, ["dist/**"], {
       transformContent(content) {
