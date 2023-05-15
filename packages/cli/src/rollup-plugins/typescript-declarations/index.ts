@@ -26,6 +26,7 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
   return {
     name: "typescript-declarations",
     async generateBundle(opts, bundle) {
+      if (opts.format !== "cjs") return;
       // we want do a naive check first and go into
       // so that we can avoid some extra fs operations if there is say some .ts entrypoints
       // and some .js entrypoints with a .d.ts
@@ -194,7 +195,7 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
           );
         }
 
-        let mainFieldPath = file.fileName.replace(/\.prod\.js$/, "");
+        let mainFieldPath = file.fileName.replace(/(?:\.prod)?\.js$/, "");
         let relativeToSource = normalizePath(
           path.relative(
             path.dirname(path.join(opts.dir!, file.fileName)),
