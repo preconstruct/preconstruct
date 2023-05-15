@@ -1,4 +1,5 @@
 import path from "path";
+import realFs from "fs";
 import * as fs from "fs-extra";
 import fastGlob from "fast-glob";
 import fixturez from "fixturez";
@@ -228,13 +229,9 @@ export async function install(tmpPath: string) {
   await spawn("yarn", ["install"], { cwd: tmpPath });
 }
 
-export const repoNodeModules = path.resolve(
-  __dirname,
-  "..",
-  "..",
-  "..",
-  "node_modules"
-);
+export const repoRoot = path.resolve(__dirname, "..", "..", "..");
+
+export const repoNodeModules = path.resolve(repoRoot, "node_modules");
 
 export const typescriptFixture = {
   node_modules: { kind: "symlink", path: repoNodeModules },
@@ -349,7 +346,7 @@ async function getSymlinkType(targetPath: string): Promise<"dir" | "file"> {
 }
 
 export async function testdir(dir: Fixture) {
-  const temp = f.temp();
+  const temp = realFs.realpathSync.native(f.temp());
   await Promise.all(
     Object.keys(dir).map(async (filename) => {
       const output = dir[filename];
@@ -423,10 +420,34 @@ export async function getFiles(
   } = {}
 ) {
   const files = await fastGlob(glob, { cwd: dir });
+
   return Object.fromEntries([
     ...(
       await Promise.all(
         files.map(async (filename) => {
+          let link: string | undefined;
+          try {
+            link = await fs.readlink(path.join(dir, filename));
+          } catch (err: any) {
+            if (
+              err.code !== "EINVAL" &&
+              // UNKNOWN is returned on Windows when it's not a symlink
+              err.code !== "UNKNOWN"
+            ) {
+              throw err;
+            }
+          }
+          if (link !== undefined) {
+            return [
+              filename,
+              `⎯ symlink to ${normalizePath(
+                path.relative(
+                  dir,
+                  path.resolve(path.dirname(path.join(dir, filename)), link)
+                )
+              )}`,
+            ] as const;
+          }
           const contents = transformContent(
             await readNormalizedFile(path.join(dir, filename))
           );

@@ -1,8 +1,13 @@
 import normalizePath from "normalize-path";
 import { Entrypoint } from "./entrypoint";
-import { Package, ExportsConditions } from "./package";
+import {
+  Package,
+  ExportsConditions,
+  CanonicalExportsFieldConfig,
+} from "./package";
 import * as nodePath from "path";
 import { FatalError } from "./errors";
+import { createExportsField } from "./imports";
 
 let fields = [
   "version",
@@ -84,37 +89,97 @@ export function exportsField(
   if (!exportsFieldConfig) {
     return;
   }
+  let output: Record<string, unknown> = {};
 
-  let output: Record<string, ExportsConditions> = {};
-  pkg.entrypoints.forEach((entrypoint) => {
-    const esmBuild = getExportsFieldOutputPath(entrypoint, "esm");
-    const exportConditions = {
-      module: exportsFieldConfig.envConditions.size
-        ? {
-            ...(exportsFieldConfig.envConditions.has("worker") && {
-              worker: getExportsFieldOutputPath(entrypoint, "worker"),
+  if (exportsFieldConfig.conditions.kind === "legacy") {
+    output = exportsFieldForLegacyConditions(
+      pkg,
+      exportsFieldConfig.conditions.envs,
+      exportsFieldConfig.importConditionDefaultExport
+    );
+  } else {
+    const hasSomeConditions = exportsFieldConfig.conditions.groups.size !== 0;
+    for (const entrypoint of pkg.entrypoints) {
+      output["." + entrypoint.afterPackageName] = {
+        ...(hasSomeConditions && {
+          // yes, i'm very intentionally pointing at the .js/.mjs rather than the .d.ts/.d.mts
+          // TODO: this should probably only be here if you're using ts
+          // or maybe we just generate more .d.ts files in the dist rather than having a types condition
+          types:
+            exportsFieldConfig.importConditionDefaultExport === "default"
+              ? {
+                  import: getExportsFieldOutputPathForConditions(entrypoint, [
+                    "import",
+                  ]),
+                  default: getExportsFieldOutputPathForConditions(
+                    entrypoint,
+                    []
+                  ),
+                }
+              : getExportsFieldOutputPathForConditions(entrypoint, []),
+        }),
+        ...createExportsField(
+          exportsFieldConfig.conditions.groups,
+          (conditions) => ({
+            module: getExportsFieldOutputPathForConditions(
+              entrypoint,
+              conditions.concat("module")
+            ),
+            ...(exportsFieldConfig.importConditionDefaultExport ===
+              "default" && {
+              import: getExportsFieldOutputPathForConditions(
+                entrypoint,
+                conditions.concat("import")
+              ),
             }),
-            ...(exportsFieldConfig.envConditions.has("browser") && {
-              browser: getExportsFieldOutputPath(entrypoint, "browser-esm"),
-            }),
-            default: esmBuild,
-          }
-        : esmBuild,
-      ...(exportsFieldConfig.importConditionDefaultExport === "default" && {
-        import: getExportsImportUnwrappingDefaultOutputPath(entrypoint),
-      }),
-      default: getExportsFieldOutputPath(entrypoint, "cjs"),
-    };
+            default: getExportsFieldOutputPathForConditions(
+              entrypoint,
+              conditions
+            ),
+          })
+        ),
+      };
+    }
+  }
 
-    output[
-      "." + entrypoint.name.replace(entrypoint.package.name, "")
-    ] = exportConditions;
-  });
   return {
     ...output,
     "./package.json": "./package.json",
     ...exportsFieldConfig.extra,
   };
+}
+
+function exportsFieldForLegacyConditions(
+  pkg: Package,
+  envs: ({
+    kind: "legacy";
+  } & CanonicalExportsFieldConfig["conditions"])["envs"],
+  importConditionDefaultExport: CanonicalExportsFieldConfig["importConditionDefaultExport"]
+) {
+  let output: Record<string, ExportsConditions> = {};
+  for (const entrypoint of pkg.entrypoints) {
+    const esmBuild = getExportsFieldOutputPath(entrypoint, "esm");
+    const exportConditions = {
+      module: envs.size
+        ? {
+            ...(envs.has("worker") && {
+              worker: getExportsFieldOutputPath(entrypoint, "worker"),
+            }),
+            ...(envs.has("browser") && {
+              browser: getExportsFieldOutputPath(entrypoint, "browser-esm"),
+            }),
+            default: esmBuild,
+          }
+        : esmBuild,
+      ...(importConditionDefaultExport === "default" && {
+        import: getExportsImportUnwrappingDefaultOutputPath(entrypoint),
+      }),
+      default: getExportsFieldOutputPath(entrypoint, "cjs"),
+    };
+
+    output["." + entrypoint.afterPackageName] = exportConditions;
+  }
+  return output;
 }
 
 export type BuildTarget =
@@ -138,6 +203,39 @@ export function getDistExtension(target: BuildTarget) {
   return `${buildTargetToExtensionPrefix[target]}.js`;
 }
 
+export function getDistExtensionForConditions(conditions: string[]) {
+  const forJoining: string[] = [];
+  let ext: "esm.js" | "cjs.js" | "cjs.mjs" = "cjs.js";
+  for (const condition of conditions) {
+    if (condition === "module") {
+      if (ext !== "cjs.js") {
+        throw new Error(`unexpected module and import conditions together`);
+      }
+      ext = "esm.js";
+      continue;
+    }
+    if (condition === "import") {
+      if (ext !== "cjs.js") {
+        throw new Error(`unexpected module and import conditions together`);
+      }
+      ext = "cjs.mjs";
+      continue;
+    }
+    forJoining.push(condition);
+  }
+  forJoining.push(ext);
+  return forJoining.join(".");
+}
+
+export function getDistFilenameForConditions(
+  entrypoint: MinimalEntrypoint,
+  conditions: string[]
+) {
+  return `dist/${getBaseDistName(entrypoint)}.${getDistExtensionForConditions(
+    conditions
+  )}`;
+}
+
 export function getBaseDistFilename(
   entrypoint: MinimalEntrypoint,
   target: BuildTarget
@@ -149,12 +247,28 @@ function getDistFilename(entrypoint: MinimalEntrypoint, target: BuildTarget) {
   return `dist/${getBaseDistFilename(entrypoint, target)}`;
 }
 
+function getExportsFieldEntrypointOutputPrefix(entrypoint: Entrypoint) {
+  return `.${entrypoint.afterPackageName}/`;
+}
+
 export function getExportsFieldOutputPath(
   entrypoint: Entrypoint,
   target: BuildTarget
 ) {
-  const prefix = entrypoint.name.replace(entrypoint.package.name, "");
-  return `.${prefix}/${getDistFilename(entrypoint, target)}`;
+  return (
+    getExportsFieldEntrypointOutputPrefix(entrypoint) +
+    getDistFilename(entrypoint, target)
+  );
+}
+
+export function getExportsFieldOutputPathForConditions(
+  entrypoint: Entrypoint,
+  conditions: string[]
+) {
+  return (
+    getExportsFieldEntrypointOutputPrefix(entrypoint) +
+    getDistFilenameForConditions(entrypoint, conditions)
+  );
 }
 
 export function getExportsImportUnwrappingDefaultOutputPath(

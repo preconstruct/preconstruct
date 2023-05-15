@@ -1,14 +1,13 @@
 import { Package } from "../package";
 import { getRollupConfig } from "./rollup";
-import { OutputOptions, OutputPlugin, RollupOptions } from "rollup";
-import { Aliases } from "./aliases";
+import { OutputOptions, RollupOptions } from "rollup";
 import { PKG_JSON_CONFIG_FIELD } from "../constants";
 import { limit, doPromptInput } from "../prompt";
 import path from "path";
 import resolveFrom from "resolve-from";
 import * as logger from "../logger";
 import { Project } from "../project";
-import { getDistExtension } from "../utils";
+import { getDistExtension, getDistExtensionForConditions } from "../utils";
 
 function getGlobal(project: Project, name: string) {
   if (
@@ -66,34 +65,65 @@ const babelHelperId = /@babel\/runtime(|-corejs[23])\/helpers\//;
 const interop = (id: string | null): "auto" | "default" =>
   id && babelHelperId.test(id) ? "default" : "auto";
 
-export function getRollupConfigs(pkg: Package, aliases: Aliases) {
-  const cjsPlugins: OutputPlugin[] = pkg.project.experimentalFlags
-    .keepDynamicImportAsDynamicImportInCommonJS
-    ? [
-        {
-          name: "cjs render dynamic import",
-          renderDynamicImport() {
-            return {
-              left: "import(",
-              right: ")",
-            };
-          },
-        },
-      ]
-    : [];
-
+export function getRollupConfigs(pkg: Package) {
   let configs: Array<{
     config: RollupOptions;
     outputs: OutputOptions[];
-  }> = [];
+  }> = umdBuilds(pkg);
+
+  const exportsFieldConfig = pkg.exportsFieldConfig();
+
+  if (exportsFieldConfig?.conditions.kind === "imports") {
+    for (const conditions of exportsFieldConfig.conditions.groups.keys()) {
+      configs.push({
+        config: getRollupConfig(
+          pkg,
+          pkg.entrypoints,
+          { kind: "conditions", conditions },
+          pkg.project.experimentalFlags.logCompiledFiles
+            ? (filename) => {
+                logger.info(
+                  "compiled " +
+                    filename.replace(pkg.project.directory + path.sep, "")
+                );
+              }
+            : () => {}
+        ),
+        outputs: [
+          {
+            format: "cjs" as const,
+            entryFileNames: `[name].${getDistExtensionForConditions(
+              conditions
+            )}`,
+            chunkFileNames: `dist/[name]-[hash].${getDistExtensionForConditions(
+              conditions
+            )}`,
+            dir: pkg.directory,
+            exports: "named" as const,
+            interop,
+          },
+          {
+            format: "es" as const,
+            entryFileNames: `[name].${getDistExtensionForConditions(
+              conditions.concat("module")
+            )}`,
+            chunkFileNames: `dist/[name]-[hash].${getDistExtensionForConditions(
+              conditions.concat("module")
+            )}`,
+            dir: pkg.directory,
+          },
+        ],
+      });
+    }
+    return configs;
+  }
 
   let hasModuleField = pkg.entrypoints[0].json.module !== undefined;
   configs.push({
     config: getRollupConfig(
       pkg,
       pkg.entrypoints,
-      aliases,
-      "node-dev",
+      { kind: "node-dev" },
       pkg.project.experimentalFlags.logCompiledFiles
         ? (filename) => {
             logger.info(
@@ -111,7 +141,6 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
         dir: pkg.directory,
         exports: "named" as const,
         interop,
-        plugins: cjsPlugins,
       },
       ...(hasModuleField
         ? [
@@ -130,8 +159,7 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
     config: getRollupConfig(
       pkg,
       pkg.entrypoints,
-      aliases,
-      "node-prod",
+      { kind: "node-prod" },
       () => {}
     ),
     outputs: [
@@ -142,38 +170,9 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
         dir: pkg.directory,
         exports: "named",
         interop,
-        plugins: cjsPlugins,
       },
     ],
   });
-
-  // umd builds are a bit special
-  // we don't guarantee that shared modules are shared across umd builds
-  // this is just like dependencies, they're bundled into the umd build
-  if (pkg.entrypoints[0].json["umd:main"] !== undefined)
-    pkg.entrypoints.forEach((entrypoint) => {
-      configs.push({
-        config: getRollupConfig(pkg, [entrypoint], aliases, "umd", () => {}),
-        outputs: [
-          {
-            format: "umd" as const,
-            sourcemap: true,
-            entryFileNames: `[name].${getDistExtension("umd")}`,
-            name: entrypoint.json.preconstruct.umdName as string,
-            dir: pkg.directory,
-            interop,
-            globals: (name: string) => {
-              if (name === (entrypoint.json.preconstruct.umdName as string)) {
-                return name;
-              }
-              return getGlobal(pkg.project, name);
-            },
-          },
-        ],
-      });
-    });
-
-  const exportsFieldConfig = pkg.exportsFieldConfig();
 
   let hasBrowserField = pkg.entrypoints[0].json.browser !== undefined;
 
@@ -182,8 +181,7 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
       config: getRollupConfig(
         pkg,
         pkg.entrypoints,
-        aliases,
-        "browser",
+        { kind: "browser" },
         () => {}
       ),
       outputs: [
@@ -196,7 +194,6 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
           dir: pkg.directory,
           exports: "named" as const,
           interop,
-          plugins: cjsPlugins,
         },
         hasModuleField && {
           format: "es" as const,
@@ -213,13 +210,15 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
   }
 
   // note module builds always exist when using the exports field
-  if (exportsFieldConfig?.envConditions.has("worker")) {
+  if (
+    exportsFieldConfig?.conditions.kind === "legacy" &&
+    exportsFieldConfig?.conditions.envs.has("worker")
+  ) {
     configs.push({
       config: getRollupConfig(
         pkg,
         pkg.entrypoints,
-        aliases,
-        "worker",
+        { kind: "worker" },
         () => {}
       ),
       outputs: [
@@ -234,4 +233,38 @@ export function getRollupConfigs(pkg: Package, aliases: Aliases) {
   }
 
   return configs;
+}
+
+function umdBuilds(
+  pkg: Package
+): Array<{
+  config: RollupOptions;
+  outputs: OutputOptions[];
+}> {
+  // umd builds are a bit special
+  // we don't guarantee that shared modules are shared across umd builds
+  // this is just like dependencies, they're bundled into the umd build
+  if (pkg.entrypoints[0].json["umd:main"] !== undefined)
+    return pkg.entrypoints.map((entrypoint) => {
+      return {
+        config: getRollupConfig(pkg, [entrypoint], { kind: "umd" }, () => {}),
+        outputs: [
+          {
+            format: "umd" as const,
+            sourcemap: true,
+            entryFileNames: `[name].${getDistExtension("umd")}`,
+            name: entrypoint.json.preconstruct.umdName as string,
+            dir: pkg.directory,
+            interop,
+            globals: (name: string) => {
+              if (name === (entrypoint.json.preconstruct.umdName as string)) {
+                return name;
+              }
+              return getGlobal(pkg.project, name);
+            },
+          },
+        ],
+      };
+    });
+  return [];
 }

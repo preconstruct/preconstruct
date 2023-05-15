@@ -9,10 +9,9 @@ import builtInModules from "builtin-modules";
 import { Package } from "../package";
 import { Entrypoint } from "../entrypoint";
 import { RollupOptions, Plugin } from "rollup";
-import { Aliases } from "./aliases";
 import { FatalError, BatchError } from "../errors";
 import rewriteBabelRuntimeHelpers from "../rollup-plugins/rewrite-babel-runtime-helpers";
-import flowAndNodeDevProdEntry from "../rollup-plugins/flow-and-prod-dev-entry";
+import nodeDevProdEntry from "../rollup-plugins/prod-dev-entry";
 import typescriptDeclarations from "../rollup-plugins/typescript-declarations";
 import mjsProxy from "../rollup-plugins/mjs-proxy";
 import json from "@rollup/plugin-json";
@@ -24,6 +23,8 @@ import { inlineProcessEnvNodeEnv } from "../rollup-plugins/inline-process-env-no
 import normalizePath from "normalize-path";
 import { serverComponentsPlugin } from "../rollup-plugins/server-components";
 import { resolveErrorsPlugin } from "../rollup-plugins/resolve";
+import { Project } from "../project";
+import flow from "../rollup-plugins/flow";
 
 type ExternalPredicate = (source: string) => boolean;
 
@@ -36,7 +37,7 @@ const makeExternalPredicate = (externalArr: string[]): ExternalPredicate => {
   return (id: string) => pattern.test(id);
 };
 
-export type RollupConfigType =
+type BasicRollupConfigType =
   | "umd"
   | "browser"
   | "worker"
@@ -46,15 +47,20 @@ export type RollupConfigType =
 export let getRollupConfig = (
   pkg: Package,
   entrypoints: Array<Entrypoint>,
-  aliases: Aliases,
-  type: RollupConfigType,
+  options:
+    | { kind: BasicRollupConfigType }
+    | {
+        kind: "conditions";
+        /** This should not include import, module or require, only the custom conditions specified in imports */
+        conditions: string[];
+      },
   reportTransformedFile: (filename: string) => void
 ): RollupOptions => {
   let external = [];
   if (pkg.json.peerDependencies) {
     external.push(...Object.keys(pkg.json.peerDependencies));
   }
-  if (pkg.json.dependencies && type !== "umd") {
+  if (pkg.json.dependencies && options.kind !== "umd") {
     external.push(...Object.keys(pkg.json.dependencies));
   }
   external.push(pkg.name);
@@ -62,7 +68,11 @@ export let getRollupConfig = (
   let wrapExternalPredicate = (inner: ExternalPredicate): ExternalPredicate =>
     inner;
 
-  if (type === "node-dev" || type === "node-prod") {
+  if (
+    options.kind === "node-dev" ||
+    options.kind === "node-prod" ||
+    options.kind === "conditions"
+  ) {
     external.push(...builtInModules);
     wrapExternalPredicate = (inner) => (source) =>
       source.startsWith("node:") || inner(source);
@@ -80,6 +90,8 @@ export let getRollupConfig = (
   });
 
   let warnings = new Set<string>();
+  const isDefaultConditionsBuild =
+    options.kind === "conditions" && options.conditions.length === 0;
 
   const config: RollupOptions = {
     input,
@@ -102,7 +114,7 @@ export let getRollupConfig = (
           break;
         }
         case "THIS_IS_UNDEFINED": {
-          if (type === "umd") {
+          if (options.kind === "umd") {
             return;
           }
           warnings.add(
@@ -132,13 +144,15 @@ export let getRollupConfig = (
           }
         },
       } as Plugin,
-      type === "node-prod" && flowAndNodeDevProdEntry(),
-      resolveErrorsPlugin(pkg, warnings, type === "umd"),
-      type === "node-prod" && typescriptDeclarations(pkg),
-      type === "node-prod" &&
+      options.kind === "node-prod" && nodeDevProdEntry(),
+      (options.kind === "node-prod" || isDefaultConditionsBuild) && flow(),
+      resolveErrorsPlugin(pkg, warnings, options.kind === "umd"),
+      (options.kind === "node-prod" || isDefaultConditionsBuild) &&
+        typescriptDeclarations(pkg),
+      (options.kind === "node-prod" || isDefaultConditionsBuild) &&
         pkg.exportsFieldConfig()?.importConditionDefaultExport === "default" &&
         mjsProxy(pkg),
-      serverComponentsPlugin({ sourceMap: type === "umd" }),
+      serverComponentsPlugin({ sourceMap: options.kind === "umd" }),
       babel({
         cwd: pkg.project.directory,
         reportTransformedFile,
@@ -155,7 +169,7 @@ export let getRollupConfig = (
           }
         })(),
       }),
-      type === "umd" &&
+      options.kind === "umd" &&
         cjs({
           include: ["**/node_modules/**", "node_modules/**"],
         }),
@@ -164,24 +178,27 @@ export let getRollupConfig = (
       json({
         namedExports: false,
       }),
-      type === "umd" &&
+      options.kind === "umd" &&
         alias({
-          entries: aliases,
+          entries: getAliases(pkg.project),
         }),
       resolve({
         extensions: EXTENSIONS,
+        exportConditions:
+          options.kind === "conditions" ? options.conditions : undefined,
         // only umd builds will actually load dependencies which is where this browser flag actually makes a difference
-        browser: type === "umd",
-        moduleDirectories: type === "umd" ? ["node_modules"] : [],
+        browser: options.kind === "umd",
+        moduleDirectories: options.kind === "umd" ? ["node_modules"] : [],
       }),
-      type === "umd" && inlineProcessEnvNodeEnv({ sourceMap: true }),
-      type === "umd" &&
+      options.kind === "umd" && inlineProcessEnvNodeEnv({ sourceMap: true }),
+      options.kind === "umd" &&
         terser({
           sourceMap: true,
           compress: true,
         }),
-      type === "node-prod" && inlineProcessEnvNodeEnv({ sourceMap: false }),
-      (type === "browser" || type === "umd") &&
+      options.kind === "node-prod" &&
+        inlineProcessEnvNodeEnv({ sourceMap: false }),
+      (options.kind === "browser" || options.kind === "umd") &&
         replace({
           values: {
             ["typeof " + "document"]: JSON.stringify("object"),
@@ -189,7 +206,7 @@ export let getRollupConfig = (
           },
           preventAssignment: true,
         }),
-      type === "worker" &&
+      options.kind === "worker" &&
         replace({
           values: {
             ["typeof " + "document"]: JSON.stringify("undefined"),
@@ -197,8 +214,35 @@ export let getRollupConfig = (
           },
           preventAssignment: true,
         }),
+      pkg.project.experimentalFlags
+        .keepDynamicImportAsDynamicImportInCommonJS && cjsDynamicImportPlugin,
     ].filter((x): x is Plugin => !!x),
   };
 
   return config;
+};
+
+function getAliases(
+  project: Project
+): {
+  [key: string]: string;
+} {
+  let aliases: { [key: string]: string } = {};
+  project.packages.forEach((pkg) => {
+    pkg.entrypoints.forEach((entrypoint) => {
+      aliases[entrypoint.name] = entrypoint.source;
+    });
+  });
+  return aliases;
+}
+
+const cjsDynamicImportPlugin: Plugin = {
+  name: "cjs render dynamic import",
+  renderDynamicImport({ format }) {
+    if (format !== "cjs") return;
+    return {
+      left: "import(",
+      right: ")",
+    };
+  },
 };

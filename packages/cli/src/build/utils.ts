@@ -32,8 +32,7 @@ export async function cleanProjectBeforeBuild(project: Project) {
               entrypoint,
               await entrypointHasDefaultExport(
                 entrypoint,
-                await fs.readFile(entrypoint.source, "utf8"),
-                entrypoint.source
+                await fs.readFile(entrypoint.source, "utf8")
               )
             );
           }

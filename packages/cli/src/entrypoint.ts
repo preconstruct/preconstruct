@@ -17,6 +17,7 @@ export class Entrypoint extends Item<{
 }> {
   package: Package;
   source: string;
+  afterPackageName: string;
   constructor(
     filePath: string,
     contents: string,
@@ -26,6 +27,13 @@ export class Entrypoint extends Item<{
     super(filePath, contents, pkg._jsonDataByPath);
     this.package = pkg;
     this.source = source;
+    this.afterPackageName =
+      pkg.directory === this.directory
+        ? ""
+        : "/" +
+          normalizePath(
+            nodePath.dirname(nodePath.relative(pkg.directory, filePath))
+          );
   }
 
   get hasModuleField() {
@@ -33,11 +41,6 @@ export class Entrypoint extends Item<{
   }
 
   get name(): string {
-    return normalizePath(
-      nodePath.join(
-        this.package.name,
-        nodePath.relative(this.package.directory, this.directory)
-      )
-    );
+    return this.package.name + this.afterPackageName;
   }
 }

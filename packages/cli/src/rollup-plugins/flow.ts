@@ -1,14 +1,13 @@
 import path from "path";
 import { Plugin } from "rollup";
-import { getDevPath, getProdPath } from "../build/utils";
 import { flowTemplate } from "../utils";
 
 import * as fs from "fs-extra";
 import normalizePath from "normalize-path";
 
-export default function flowAndNodeDevProdEntry(): Plugin {
+export default function flow(): Plugin {
   return {
-    name: "flow-and-prod-dev-entry",
+    name: "flow",
     async generateBundle(opts, bundle) {
       for (const n in bundle) {
         const file = bundle[n];
@@ -20,7 +19,7 @@ export default function flowAndNodeDevProdEntry(): Plugin {
           continue;
         }
 
-        let mainFieldPath = file.fileName.replace(/\.prod\.js$/, ".js");
+        let mainFieldPath = file.fileName.replace(/(?:\.prod)?\.js$/, ".js");
         let relativeToSource = path.relative(
           path.dirname(path.join(opts.dir!, file.fileName)),
           file.facadeModuleId
@@ -48,22 +47,6 @@ export default function flowAndNodeDevProdEntry(): Plugin {
             });
           }
         }
-
-        let mainEntrySource = `'use strict';
-
-if (${
-          // tricking static analysis is fun...
-          "process" + ".env.NODE_ENV"
-        } === "production") {
-  module.exports = require("./${path.basename(getProdPath(mainFieldPath))}");
-} else {
-  module.exports = require("./${path.basename(getDevPath(mainFieldPath))}");
-}\n`;
-        this.emitFile({
-          type: "asset",
-          fileName: mainFieldPath,
-          source: mainEntrySource,
-        });
       }
     },
   };

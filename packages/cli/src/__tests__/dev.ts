@@ -6,6 +6,7 @@ import {
   getFiles,
   js,
   repoNodeModules,
+  repoRoot,
   testdir,
   ts,
   typescriptFixture,
@@ -79,24 +80,22 @@ test("dev command works in node", async () => {
 
 test("all the build types", async () => {
   // TODO: maybe actually require them
-  let tmpPath = realFs.realpathSync.native(
-    await testdir({
-      "package.json": JSON.stringify({
-        name: "all-the-build-types",
-        main: "dist/all-the-build-types.cjs.js",
-        module: "dist/all-the-build-types.esm.js",
-        browser: {
-          "./dist/all-the-build-types.cjs.js":
-            "./dist/all-the-build-types.browser.cjs.js",
-          "./dist/all-the-build-types.esm.js":
-            "./dist/all-the-build-types.browser.esm.js",
-        },
-      }),
-      "src/index.js": js`
-        export default "some cool thing";
-      `,
-    })
-  );
+  let tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "all-the-build-types",
+      main: "dist/all-the-build-types.cjs.js",
+      module: "dist/all-the-build-types.esm.js",
+      browser: {
+        "./dist/all-the-build-types.cjs.js":
+          "./dist/all-the-build-types.browser.cjs.js",
+        "./dist/all-the-build-types.esm.js":
+          "./dist/all-the-build-types.browser.esm.js",
+      },
+    }),
+    "src/index.js": js`
+      export default "some cool thing";
+    `,
+  });
 
   await dev(tmpPath);
 
@@ -328,7 +327,7 @@ test("exports field with worker condition", async () => {
   ]);
   expect(files).toMatchInlineSnapshot(`
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/something-blah.esm.js, dist/something-blah.worker.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    console.log(1)
+    ⎯ symlink to src/index.js
   `);
   await Promise.all(
     Object.keys(files).map(async (filename) => {
@@ -370,9 +369,7 @@ test("flow and .d.ts", async () => {
     export * from "../src/index.js";
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    // @flow
-
-    export const x = "hello";
+    ⎯ symlink to src/index.js
   `);
 });
 test(".d.ts file with default export", async () => {
@@ -520,8 +517,7 @@ test("with default", async () => {
     export { _default as default } from "./pkg-a.cjs.default.js";
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    export const thing = "index";
-    export default true;
+    ⎯ symlink to packages/pkg-a/src/index.ts
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/something/dist/pkg-a-something.cjs.d.mts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     export * from "../../src/something.js";
     export { _default as default } from "./pkg-a-something.cjs.default.js";
@@ -549,7 +545,133 @@ test("with default", async () => {
     export { _default as default } from "./pkg-a-something.cjs.default.js";
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/something/dist/pkg-a-something.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    export const something = "something";
-    export default 100;
+    ⎯ symlink to packages/pkg-a/src/something.tsx
+  `);
+});
+
+test("imports conditions", async () => {
+  const dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "@scope/pkg",
+      preconstruct: {
+        exports: {
+          importConditionDefaultExport: "default",
+        },
+        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+          importsConditions: true,
+        },
+      },
+      imports: {
+        "#is-development": {
+          development: "./src/true.js",
+          default: "./src/false.js",
+        },
+        "#is-browser": {
+          worker: "./src/false.js",
+          browser: "./src/true.js",
+          default: "./src/false.js",
+        },
+        "#something": {
+          "condition-should-never-appear-anywhere": "./src/true.js",
+          default: "./src/true.js",
+        },
+      },
+      main: "dist/scope-pkg.cjs.js",
+      module: "dist/scope-pkg.esm.js",
+      exports: {
+        ".": {
+          types: {
+            import: "./dist/scope-pkg.cjs.mjs",
+            default: "./dist/scope-pkg.cjs.js",
+          },
+          development: {
+            worker: {
+              module: "./dist/scope-pkg.development.esm.js",
+              import: "./dist/scope-pkg.development.cjs.mjs",
+              default: "./dist/scope-pkg.development.cjs.js",
+            },
+            browser: {
+              module: "./dist/scope-pkg.browser.development.esm.js",
+              import: "./dist/scope-pkg.browser.development.cjs.mjs",
+              default: "./dist/scope-pkg.browser.development.cjs.js",
+            },
+            module: "./dist/scope-pkg.development.esm.js",
+            import: "./dist/scope-pkg.development.cjs.mjs",
+            default: "./dist/scope-pkg.development.cjs.js",
+          },
+          worker: {
+            module: "./dist/scope-pkg.esm.js",
+            import: "./dist/scope-pkg.cjs.mjs",
+            default: "./dist/scope-pkg.cjs.js",
+          },
+          browser: {
+            module: "./dist/scope-pkg.browser.esm.js",
+            import: "./dist/scope-pkg.browser.cjs.mjs",
+            default: "./dist/scope-pkg.browser.cjs.js",
+          },
+          module: "./dist/scope-pkg.esm.js",
+          import: "./dist/scope-pkg.cjs.mjs",
+          default: "./dist/scope-pkg.cjs.js",
+        },
+        "./package.json": "./package.json",
+      },
+    }),
+    "src/index.js": js`
+      export {};
+    `,
+  });
+  await dev(dir);
+  const maybeRelativePathFromTestDirToPreconstructDir = normalizePath(
+    path.relative(dir, repoRoot)
+  );
+  console.dir(dir);
+  console.dir(maybeRelativePathFromTestDirToPreconstructDir);
+  expect(
+    await getFiles(dir, ["dist/**"], {
+      transformContent(content) {
+        return content
+          .replace(
+            maybeRelativePathFromTestDirToPreconstructDir,
+            "<maybe-relative-from-testdir-to-preconstruct-dir>"
+          )
+          .replace(
+            "../<maybe-relative-from-testdir-to-preconstruct-dir>",
+            "<maybe-relative-from-testdir-to-preconstruct-dir>"
+          );
+      },
+    })
+  ).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-pkg.browser.cjs.js, dist/scope-pkg.browser.development.cjs.js, dist/scope-pkg.cjs.js, dist/scope-pkg.development.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    "use strict";
+    // this file might look strange and you might be wondering what it's for
+    // it's lets you import your source files by importing this entrypoint
+    // as you would import it if it was built with preconstruct build
+    // this file is slightly different to some others though
+    // it has a require hook which compiles your code with Babel
+    // this means that you don't have to set up @babel/register or anything like that
+    // but you can still require this module and it'll be compiled
+
+    // this bit of code imports the require hook and registers it
+    let unregister = require("<maybe-relative-from-testdir-to-preconstruct-dir>/packages/hook").___internalHook(typeof __dirname === 'undefined' ? undefined : __dirname, "..", "..");
+
+    // this re-exports the source file
+    module.exports = require("../src/index.js");
+
+    unregister();
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-pkg.browser.cjs.mjs ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export * from "./dist/scope-pkg.browser.cjs.js";
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-pkg.browser.development.cjs.mjs ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export * from "./dist/scope-pkg.browser.development.cjs.js";
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-pkg.browser.development.esm.js, dist/scope-pkg.browser.esm.js, dist/scope-pkg.development.esm.js, dist/scope-pkg.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    ⎯ symlink to src/index.js
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-pkg.cjs.mjs ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export * from "./dist/scope-pkg.cjs.js";
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-pkg.development.cjs.mjs ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export * from "./dist/scope-pkg.development.cjs.js";
+
   `);
 });

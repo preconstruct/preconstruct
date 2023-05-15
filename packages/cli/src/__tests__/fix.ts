@@ -10,6 +10,7 @@ import {
   testdir,
   js,
   getFiles,
+  ts,
 } from "../../test-utils";
 import { promptInput as _promptInput } from "../prompt";
 import fs from "fs-extra";
@@ -961,6 +962,201 @@ test("experimental exports flag is removed", async () => {
         ".": {
           "module": "./dist/pkg-a.esm.js",
           "default": "./dist/pkg-a.cjs.js"
+        },
+        "./package.json": "./package.json"
+      }
+    }
+
+  `);
+});
+
+test("import conditions fix", async () => {
+  const tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "@scope/pkg",
+      preconstruct: {
+        exports: true,
+        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+          importsConditions: true,
+        },
+      },
+      imports: {
+        "#is-development": {
+          development: "./src/true.js",
+          default: "./src/false.js",
+        },
+        "#is-browser": {
+          worker: "./src/false.js",
+          browser: "./src/true.js",
+          default: "./src/false.js",
+        },
+        "#something": {
+          "condition-should-never-appear-anywhere": "./src/true.js",
+          default: "./src/true.js",
+        },
+      },
+    }),
+    "src/index.ts": ts`
+      export {};
+    `,
+  });
+  await fix(tmpPath);
+  expect(await getFiles(tmpPath, ["package.json"])).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {
+      "name": "@scope/pkg",
+      "preconstruct": {
+        "exports": true,
+        "___experimentalFlags_WILL_CHANGE_IN_PATCH": {
+          "importsConditions": true
+        }
+      },
+      "imports": {
+        "#is-development": {
+          "development": "./src/true.js",
+          "default": "./src/false.js"
+        },
+        "#is-browser": {
+          "worker": "./src/false.js",
+          "browser": "./src/true.js",
+          "default": "./src/false.js"
+        },
+        "#something": {
+          "condition-should-never-appear-anywhere": "./src/true.js",
+          "default": "./src/true.js"
+        }
+      },
+      "main": "dist/scope-pkg.cjs.js",
+      "module": "dist/scope-pkg.esm.js",
+      "exports": {
+        ".": {
+          "types": "./dist/scope-pkg.cjs.js",
+          "development": {
+            "worker": {
+              "module": "./dist/scope-pkg.development.esm.js",
+              "default": "./dist/scope-pkg.development.cjs.js"
+            },
+            "browser": {
+              "module": "./dist/scope-pkg.browser.development.esm.js",
+              "default": "./dist/scope-pkg.browser.development.cjs.js"
+            },
+            "module": "./dist/scope-pkg.development.esm.js",
+            "default": "./dist/scope-pkg.development.cjs.js"
+          },
+          "worker": {
+            "module": "./dist/scope-pkg.esm.js",
+            "default": "./dist/scope-pkg.cjs.js"
+          },
+          "browser": {
+            "module": "./dist/scope-pkg.browser.esm.js",
+            "default": "./dist/scope-pkg.browser.cjs.js"
+          },
+          "module": "./dist/scope-pkg.esm.js",
+          "default": "./dist/scope-pkg.cjs.js"
+        },
+        "./package.json": "./package.json"
+      }
+    }
+
+  `);
+});
+
+test("import conditions fix with importConditionDefaultExport: default", async () => {
+  const tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "@scope/pkg",
+      preconstruct: {
+        exports: {
+          importConditionDefaultExport: "default",
+        },
+        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+          importsConditions: true,
+        },
+      },
+      imports: {
+        "#is-development": {
+          development: "./src/true.js",
+          default: "./src/false.js",
+        },
+        "#is-browser": {
+          worker: "./src/false.js",
+          browser: "./src/true.js",
+          default: "./src/false.js",
+        },
+        "#something": {
+          "condition-should-never-appear-anywhere": "./src/true.js",
+          default: "./src/true.js",
+        },
+      },
+    }),
+    "src/index.ts": ts`
+      export {};
+    `,
+  });
+  await fix(tmpPath);
+  expect(await getFiles(tmpPath, ["package.json"])).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {
+      "name": "@scope/pkg",
+      "preconstruct": {
+        "exports": {
+          "importConditionDefaultExport": "default"
+        },
+        "___experimentalFlags_WILL_CHANGE_IN_PATCH": {
+          "importsConditions": true
+        }
+      },
+      "imports": {
+        "#is-development": {
+          "development": "./src/true.js",
+          "default": "./src/false.js"
+        },
+        "#is-browser": {
+          "worker": "./src/false.js",
+          "browser": "./src/true.js",
+          "default": "./src/false.js"
+        },
+        "#something": {
+          "condition-should-never-appear-anywhere": "./src/true.js",
+          "default": "./src/true.js"
+        }
+      },
+      "main": "dist/scope-pkg.cjs.js",
+      "module": "dist/scope-pkg.esm.js",
+      "exports": {
+        ".": {
+          "types": {
+            "import": "./dist/scope-pkg.cjs.mjs",
+            "default": "./dist/scope-pkg.cjs.js"
+          },
+          "development": {
+            "worker": {
+              "module": "./dist/scope-pkg.development.esm.js",
+              "import": "./dist/scope-pkg.development.cjs.mjs",
+              "default": "./dist/scope-pkg.development.cjs.js"
+            },
+            "browser": {
+              "module": "./dist/scope-pkg.browser.development.esm.js",
+              "import": "./dist/scope-pkg.browser.development.cjs.mjs",
+              "default": "./dist/scope-pkg.browser.development.cjs.js"
+            },
+            "module": "./dist/scope-pkg.development.esm.js",
+            "import": "./dist/scope-pkg.development.cjs.mjs",
+            "default": "./dist/scope-pkg.development.cjs.js"
+          },
+          "worker": {
+            "module": "./dist/scope-pkg.esm.js",
+            "import": "./dist/scope-pkg.cjs.mjs",
+            "default": "./dist/scope-pkg.cjs.js"
+          },
+          "browser": {
+            "module": "./dist/scope-pkg.browser.esm.js",
+            "import": "./dist/scope-pkg.browser.cjs.mjs",
+            "default": "./dist/scope-pkg.browser.cjs.js"
+          },
+          "module": "./dist/scope-pkg.esm.js",
+          "import": "./dist/scope-pkg.cjs.mjs",
+          "default": "./dist/scope-pkg.cjs.js"
         },
         "./package.json": "./package.json"
       }

@@ -18,6 +18,7 @@ import {
   overwriteDeclarationMapSourceRoot,
 } from "./common";
 import { getUsedDeclarations } from "./get-used-declarations";
+import { getUsedDeclarationsWithPackageJsonImportsReplaced } from "./get-used-declaration-with-replacing";
 
 export let isTsPath = (source: string) => /\.tsx?/.test(source);
 
@@ -100,7 +101,16 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
       );
 
       const declarations = await (pkg.project.experimentalFlags
-        .onlyEmitUsedTypeScriptDeclarations
+        .importsConditions
+        ? getUsedDeclarationsWithPackageJsonImportsReplaced(
+            typescript,
+            program,
+            normalizedDirname,
+            pkg.project.directory,
+            resolveModule,
+            [...entrypointSourceToTypeScriptSource.values()]
+          )
+        : pkg.project.experimentalFlags.onlyEmitUsedTypeScriptDeclarations
         ? getUsedDeclarations(
             typescript,
             program,
