@@ -35,31 +35,18 @@ export async function getUsedDeclarationsWithPackageJsonImportsReplaced(
   const emitted: EmittedDeclarationOutput[] = [];
 
   for (const filename of depQueue) {
-    const importReplacements = new Map<string, string | false>();
-    const handleImport = (
-      moduleSpecifier: import("typescript").StringLiteral
-    ) => {
-      const imported = moduleSpecifier.text;
-      if (importReplacements.has(imported)) {
-        const replacedImportPath = importReplacements.get(imported)!;
-        if (replacedImportPath === false) {
-          return;
-        }
-        return typescript.factory.createStringLiteral(replacedImportPath);
-      }
+    const handleImport = (imported: string): string => {
       const resolvedModule = resolveModuleName(imported, filename);
       if (
         !resolvedModule ||
         !resolvedModule.resolvedFileName.startsWith(normalizedPkgDir) ||
         resolvedModule.resolvedFileName.startsWith(normalizedPkgDirNodeModules)
       ) {
-        importReplacements.set(imported, false);
-        return;
+        return imported;
       }
       depQueue.add(resolvedModule.resolvedFileName);
       if (imported[0] !== "#") {
-        importReplacements.set(imported, false);
-        return;
+        return imported;
       }
       let forImport = replaceExt(
         normalizePath(
@@ -69,8 +56,7 @@ export async function getUsedDeclarationsWithPackageJsonImportsReplaced(
       if (!forImport.startsWith("../")) {
         forImport = `./${forImport}`;
       }
-      importReplacements.set(imported, forImport);
-      return typescript.factory.createStringLiteral(forImport);
+      return forImport;
     };
     // this is mostly sync except for one bit so running this concurrently wouldn't really help
     const output = await getDeclarationsForFile(

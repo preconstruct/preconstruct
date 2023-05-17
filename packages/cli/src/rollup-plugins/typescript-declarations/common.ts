@@ -139,9 +139,8 @@ export const getDeclarationsForFile = async (
   normalizedPkgDir: string,
   projectDir: string,
   diagnosticsHost: import("typescript").FormatDiagnosticsHost,
-  visitModuleSpecifier?: (
-    moduleSpecifier: import("typescript").StringLiteral
-  ) => import("typescript").StringLiteral | undefined
+  /** This will only be called once per unique module specifier in a file */
+  visitModuleSpecifier?: (moduleSpecifier: string) => string
 ): Promise<EmittedDeclarationOutput> => {
   if (filename.endsWith(".d.ts")) {
     return {
@@ -205,6 +204,7 @@ export const getDeclarationsForFile = async (
             import("typescript").StringLiteral,
             import("typescript").StringLiteral
           >();
+          const moduleSpecifierToReplaced = new Map<string, string>();
 
           const visitor = (
             node: import("typescript").Node
@@ -214,9 +214,18 @@ export const getDeclarationsForFile = async (
             }
             const literal = getModuleSpecifier(node, typescript);
             if (literal) {
-              const replaced = visitModuleSpecifier(literal);
-              if (replaced) {
-                replacedNodes.set(literal, replaced);
+              if (!moduleSpecifierToReplaced.has(literal.text)) {
+                moduleSpecifierToReplaced.set(
+                  literal.text,
+                  visitModuleSpecifier(literal.text)
+                );
+              }
+              const replaced = moduleSpecifierToReplaced.get(literal.text)!;
+              if (replaced !== literal.text) {
+                replacedNodes.set(
+                  literal,
+                  typescript.factory.createStringLiteral(replaced)
+                );
               }
             }
             return typescript.visitEachChild(node, visitor, context);

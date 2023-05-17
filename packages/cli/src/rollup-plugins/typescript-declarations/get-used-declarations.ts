@@ -23,7 +23,6 @@ export async function getUsedDeclarations(
   const emitted: EmittedDeclarationOutput[] = [];
 
   for (const filename of depQueue) {
-    const imports = new Set<string>();
     // this is mostly sync except for one bit so running this concurrently wouldn't really help
     const output = await getDeclarationsForFile(
       filename,
@@ -32,22 +31,20 @@ export async function getUsedDeclarations(
       normalizedPkgDir,
       projectDir,
       diagnosticsHost,
-      (moduleSpecifier) => {
-        imports.add(moduleSpecifier.text);
-        return undefined;
+      (imported) => {
+        const resolvedModule = resolveModuleName(imported, filename);
+        if (
+          resolvedModule &&
+          !resolvedModule.isExternalLibraryImport &&
+          resolvedModule.resolvedFileName.includes(normalizedPkgDir)
+        ) {
+          depQueue.add(resolvedModule.resolvedFileName);
+        }
+
+        return imported;
       }
     );
     emitted.push(output);
-    for (const imported of imports) {
-      const resolvedModule = resolveModuleName(imported, filename);
-      if (
-        resolvedModule &&
-        !resolvedModule.isExternalLibraryImport &&
-        resolvedModule.resolvedFileName.includes(normalizedPkgDir)
-      ) {
-        depQueue.add(resolvedModule.resolvedFileName);
-      }
-    }
   }
   return emitted;
 }
