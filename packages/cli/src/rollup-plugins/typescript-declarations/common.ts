@@ -74,11 +74,10 @@ function weakMemoize<Arg extends object, Return>(
 }
 
 function memoize<V>(fn: (arg: string) => V): (arg: string) => V {
-  const cache: { [key: string]: V } = {};
-
+  const cache = new Map<string, V>();
   return (arg: string) => {
-    if (cache[arg] === undefined) cache[arg] = fn(arg);
-    return cache[arg];
+    if (!cache.has(arg)) cache.set(arg, fn(arg));
+    return cache.get(arg)!;
   };
 }
 
@@ -200,11 +199,12 @@ export const getDeclarationsForFile = async (
             return node;
           }
 
+          const cachedVisitModuleSpecifier = memoize(visitModuleSpecifier);
+
           const replacedNodes = new Map<
             import("typescript").StringLiteral,
             import("typescript").StringLiteral
           >();
-          const moduleSpecifierToReplaced = new Map<string, string>();
 
           const visitor = (
             node: import("typescript").Node
@@ -214,13 +214,7 @@ export const getDeclarationsForFile = async (
             }
             const literal = getModuleSpecifier(node, typescript);
             if (literal) {
-              if (!moduleSpecifierToReplaced.has(literal.text)) {
-                moduleSpecifierToReplaced.set(
-                  literal.text,
-                  visitModuleSpecifier(literal.text)
-                );
-              }
-              const replaced = moduleSpecifierToReplaced.get(literal.text)!;
+              const replaced = cachedVisitModuleSpecifier(literal.text);
               if (replaced !== literal.text) {
                 replacedNodes.set(
                   literal,
