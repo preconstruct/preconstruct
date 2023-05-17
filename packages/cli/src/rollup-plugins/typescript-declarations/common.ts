@@ -201,37 +201,22 @@ export const getDeclarationsForFile = async (
             return node;
           }
 
-          function replaceDescendentNode<
-            Parent extends import("typescript").Node
-          >(
-            root: Parent,
-            oldNode: import("typescript").Node,
-            newNode: import("typescript").Node,
-            context: import("typescript").TransformationContext
-          ): Parent {
-            const visitor = (
-              node: import("typescript").Node
-            ): import("typescript").Node => {
-              if (node === oldNode) return newNode;
-              return typescript.visitEachChild(node, visitor, context);
-            };
-            return typescript.visitEachChild(root, visitor, context);
-          }
+          const replacedNodes = new Map<
+            import("typescript").StringLiteral,
+            import("typescript").StringLiteral
+          >();
 
-          // typescript has a exportedModulesFromDeclarationEmit property
-          // on these source files, it's marked @internal though so i'm not using it
-          // might want to detect at runtime if it exists and use it in that case otherwise defer to this
-          // i'm not terribly worried though
-          // you should not have massive declarations files in the way that having massive source
-          // files is actually reasonable
-          const visitor = <TNode extends import("typescript").Node>(
-            node: TNode
-          ): TNode => {
+          const visitor = (
+            node: import("typescript").Node
+          ): import("typescript").Node => {
+            if (typescript.isStringLiteral(node) && replacedNodes.has(node)) {
+              return replacedNodes.get(node)!;
+            }
             const literal = getModuleSpecifier(node, typescript);
             if (literal) {
               const replaced = visitModuleSpecifier(literal);
               if (replaced) {
-                return replaceDescendentNode(node, literal, replaced, context);
+                replacedNodes.set(literal, replaced);
               }
             }
             return typescript.visitEachChild(node, visitor, context);
