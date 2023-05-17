@@ -4,6 +4,7 @@ import { FatalError } from "../../errors";
 import * as fs from "fs-extra";
 import path from "path";
 import normalizePath from "normalize-path";
+import { getModuleSpecifier } from "./get-module-specifier";
 
 export type DeclarationFile = {
   name: string;
@@ -138,7 +139,9 @@ export const getDeclarationsForFile = async (
   normalizedPkgDir: string,
   projectDir: string,
   diagnosticsHost: import("typescript").FormatDiagnosticsHost,
-  transformers?: import("typescript").CustomTransformers
+  visitModuleSpecifier?: (
+    moduleSpecifier: import("typescript").StringLiteral
+  ) => import("typescript").StringLiteral | undefined
 ): Promise<EmittedDeclarationOutput> => {
   if (filename.endsWith(".d.ts")) {
     return {
@@ -161,6 +164,7 @@ export const getDeclarationsForFile = async (
       `Could not find source file at ${filename} in TypeScript declaration generation, this is likely a bug in Preconstruct`
     );
   }
+
   const emitted: Partial<EmittedDeclarationOutput> = {};
   const otherEmitted: { name: string; text: string }[] = [];
   const { diagnostics } = program.emit(
@@ -188,7 +192,54 @@ export const getDeclarationsForFile = async (
     },
     undefined,
     true,
-    transformers
+    {
+      afterDeclarations: [
+        (context) => (
+          node
+        ): import("typescript").Bundle | import("typescript").SourceFile => {
+          if (!visitModuleSpecifier) {
+            return node;
+          }
+
+          function replaceDescendentNode<
+            Parent extends import("typescript").Node
+          >(
+            root: Parent,
+            oldNode: import("typescript").Node,
+            newNode: import("typescript").Node,
+            context: import("typescript").TransformationContext
+          ): Parent {
+            const visitor = (
+              node: import("typescript").Node
+            ): import("typescript").Node => {
+              if (node === oldNode) return newNode;
+              return typescript.visitEachChild(node, visitor, context);
+            };
+            return typescript.visitEachChild(root, visitor, context);
+          }
+
+          // typescript has a exportedModulesFromDeclarationEmit property
+          // on these source files, it's marked @internal though so i'm not using it
+          // might want to detect at runtime if it exists and use it in that case otherwise defer to this
+          // i'm not terribly worried though
+          // you should not have massive declarations files in the way that having massive source
+          // files is actually reasonable
+          const visitor = <TNode extends import("typescript").Node>(
+            node: TNode
+          ): TNode => {
+            const literal = getModuleSpecifier(node, typescript);
+            if (literal) {
+              const replaced = visitModuleSpecifier(literal);
+              if (replaced) {
+                return replaceDescendentNode(node, literal, replaced, context);
+              }
+            }
+            return typescript.visitEachChild(node, visitor, context);
+          };
+          return typescript.visitEachChild(node, visitor, context);
+        },
+      ],
+    }
   );
 
   if (!emitted.types || diagnostics.length) {
