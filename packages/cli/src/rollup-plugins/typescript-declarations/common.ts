@@ -4,6 +4,7 @@ import { FatalError } from "../../errors";
 import * as fs from "fs-extra";
 import path from "path";
 import normalizePath from "normalize-path";
+import { getModuleSpecifier } from "./get-module-specifier";
 
 export type DeclarationFile = {
   name: string;
@@ -73,11 +74,10 @@ function weakMemoize<Arg extends object, Return>(
 }
 
 function memoize<V>(fn: (arg: string) => V): (arg: string) => V {
-  const cache: { [key: string]: V } = {};
-
+  const cache = new Map<string, V>();
   return (arg: string) => {
-    if (cache[arg] === undefined) cache[arg] = fn(arg);
-    return cache[arg];
+    if (!cache.has(arg)) cache.set(arg, fn(arg));
+    return cache.get(arg)!;
   };
 }
 
@@ -138,7 +138,8 @@ export const getDeclarationsForFile = async (
   normalizedPkgDir: string,
   projectDir: string,
   diagnosticsHost: import("typescript").FormatDiagnosticsHost,
-  transformers?: import("typescript").CustomTransformers
+  /** This will only be called once per unique module specifier in a file */
+  visitModuleSpecifier?: (moduleSpecifier: string) => string
 ): Promise<EmittedDeclarationOutput> => {
   if (filename.endsWith(".d.ts")) {
     return {
@@ -161,6 +162,7 @@ export const getDeclarationsForFile = async (
       `Could not find source file at ${filename} in TypeScript declaration generation, this is likely a bug in Preconstruct`
     );
   }
+
   const emitted: Partial<EmittedDeclarationOutput> = {};
   const otherEmitted: { name: string; text: string }[] = [];
   const { diagnostics } = program.emit(
@@ -188,7 +190,44 @@ export const getDeclarationsForFile = async (
     },
     undefined,
     true,
-    transformers
+    {
+      afterDeclarations: [
+        (context) => (
+          node
+        ): import("typescript").Bundle | import("typescript").SourceFile => {
+          if (!visitModuleSpecifier) {
+            return node;
+          }
+
+          const cachedVisitModuleSpecifier = memoize(visitModuleSpecifier);
+
+          const replacedNodes = new Map<
+            import("typescript").StringLiteral,
+            import("typescript").StringLiteral
+          >();
+
+          const visitor = (
+            node: import("typescript").Node
+          ): import("typescript").Node => {
+            if (typescript.isStringLiteral(node) && replacedNodes.has(node)) {
+              return replacedNodes.get(node)!;
+            }
+            const literal = getModuleSpecifier(node, typescript);
+            if (literal) {
+              const replaced = cachedVisitModuleSpecifier(literal.text);
+              if (replaced !== literal.text) {
+                replacedNodes.set(
+                  literal,
+                  typescript.factory.createStringLiteral(replaced)
+                );
+              }
+            }
+            return typescript.visitEachChild(node, visitor, context);
+          };
+          return typescript.visitEachChild(node, visitor, context);
+        },
+      ],
+    }
   );
 
   if (!emitted.types || diagnostics.length) {
