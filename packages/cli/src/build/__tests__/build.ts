@@ -1778,10 +1778,6 @@ test("type only export imported in .mts", async () => {
         exports: { importConditionDefaultExport: "default" },
       },
     }),
-    "packages/pkg-a/something/package.json": JSON.stringify({
-      main: "dist/pkg-a-something.cjs.js",
-      module: "dist/pkg-a-something.esm.js",
-    }),
     "packages/pkg-a/src/index.ts": ts`
       export type SomeType = string;
     `,
@@ -1831,9 +1827,7 @@ test("type only export imported in .mts", async () => {
     }
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.mjs ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    export {
-      
-    } from "./pkg-a.cjs.js";
+    import "./pkg-a.cjs.js";
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
 
@@ -2187,6 +2181,66 @@ test("correct default export using mjs and dmts proxies with moduleResolution: b
     4 actual 100 expected 100
     5 actual true expected true
     6 actual 100 expected 100
+    "
+  `);
+  expect(node.stderr.toString("utf8")).toMatchInlineSnapshot(`""`);
+});
+
+test("module with no runtime exports but with init-time side-effects with importConditionDefaultExport", async () => {
+  let dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "repo",
+      preconstruct: {
+        packages: ["packages/pkg-a"],
+        exports: {
+          importConditionDefaultExport: "default",
+        },
+      },
+    }),
+    "packages/pkg-a/package.json": JSON.stringify({
+      name: "pkg-a",
+      main: "dist/pkg-a.cjs.js",
+      module: "dist/pkg-a.esm.js",
+      exports: {
+        ".": {
+          module: "./dist/pkg-a.esm.js",
+          import: "./dist/pkg-a.cjs.mjs",
+          default: "./dist/pkg-a.cjs.js",
+        },
+        "./package.json": "./package.json",
+      },
+    }),
+    "packages/pkg-a/src/index.ts": ts`
+      console.log("hey!");
+    `,
+    ...tsSetupFiles,
+    "runtime-blah.mjs": js`
+      import "pkg-a";
+    `,
+    "runtime-blah.cjs": js`
+      require("pkg-a");
+    `,
+  });
+  await fs.ensureSymlink(
+    path.join(dir, "packages/pkg-a"),
+    path.join(dir, "node_modules/pkg-a")
+  );
+  await build(dir);
+
+  let node = await spawn("node", ["runtime-blah.mjs"], { cwd: dir });
+
+  expect(node.code).toBe(0);
+  expect(node.stdout.toString("utf8")).toMatchInlineSnapshot(`
+    "hey!
+    "
+  `);
+  expect(node.stderr.toString("utf8")).toMatchInlineSnapshot(`""`);
+
+  node = await spawn("node", ["runtime-blah.cjs"], { cwd: dir });
+
+  expect(node.code).toBe(0);
+  expect(node.stdout.toString("utf8")).toMatchInlineSnapshot(`
+    "hey!
     "
   `);
   expect(node.stderr.toString("utf8")).toMatchInlineSnapshot(`""`);
