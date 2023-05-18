@@ -8,3 +8,4 @@ coverage/
 public/
 dist/
 *.log
+.vscode/settings.json
