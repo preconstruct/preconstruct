@@ -16,7 +16,7 @@ function replaceExt(filename: string) {
   });
 }
 
-export async function getUsedDeclarationsWithPackageJsonImportsReplaced(
+export async function getDeclarationsWithImportedModuleSpecifiersReplacing(
   typescript: TS,
   program: Program,
   normalizedPkgDir: string,
@@ -25,7 +25,8 @@ export async function getUsedDeclarationsWithPackageJsonImportsReplaced(
     moduleName: string,
     containingFile: string
   ) => ResolvedModuleFull | undefined,
-  resolvedEntrypointSources: string[]
+  resolvedEntrypointSources: string[],
+  emitOnlyUsedDeclarations = false
 ): Promise<EmittedDeclarationOutput[]> {
   const depQueue = new Set(resolvedEntrypointSources);
   const diagnosticsHost = getDiagnosticsHost(typescript, projectDir);
@@ -44,10 +45,9 @@ export async function getUsedDeclarationsWithPackageJsonImportsReplaced(
       ) {
         return imported;
       }
+
       depQueue.add(resolvedModule.resolvedFileName);
-      if (imported[0] !== "#") {
-        return imported;
-      }
+
       let forImport = replaceExt(
         normalizePath(
           path.relative(path.dirname(filename), resolvedModule.resolvedFileName)
@@ -68,6 +68,7 @@ export async function getUsedDeclarationsWithPackageJsonImportsReplaced(
       diagnosticsHost,
       handleImport
     );
+
     emitted.push(output);
   }
   return emitted;

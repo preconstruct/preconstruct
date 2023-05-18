@@ -107,7 +107,7 @@ test("onlyEmitUsedTypeScriptDeclarations", async () => {
   await build(dir);
   expect(await getFiles(dir, ["dist/**/*.d.ts"])).toMatchInlineSnapshot(`
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/index.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    import { A } from "./other";
+    import { A } from "./other.js";
     export declare function thing(): A;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/other.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
@@ -164,7 +164,7 @@ test("onlyEmitUsedTypeScriptDeclarations with export from", async () => {
   await build(dir);
   expect(await getFiles(dir, ["dist/**/*.d.ts"])).toMatchInlineSnapshot(`
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/index.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    export type { A } from "./other";
+    export type { A } from "./other.js";
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/other.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     export type A = {
@@ -193,7 +193,7 @@ test("onlyEmitUsedTypeScriptDeclarations with inline import type", async () => {
   await build(dir);
   expect(await getFiles(dir, ["dist/**/*.d.ts"])).toMatchInlineSnapshot(`
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/index.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    export declare function a(): import("./other").A;
+    export declare function a(): import("./other.js").A;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/other.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     export type A = {
@@ -226,7 +226,7 @@ test("onlyEmitUsedTypeScriptDeclarations with import x = require('')", async () 
   expect(await getFiles(dir, ["dist/**/*.d.ts"])).toMatchInlineSnapshot(`
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/index.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     declare namespace something {
-        export import x = require("./other");
+        export import x = require("./other.js");
     }
     export declare function a(): something.x.A;
     export {};
