@@ -195,11 +195,32 @@ export const getDeclarationsForFile = async (
         (context) => (
           node
         ): import("typescript").Bundle | import("typescript").SourceFile => {
-          if (!visitModuleSpecifier) {
-            return node;
-          }
-
-          const cachedVisitModuleSpecifier = memoize(visitModuleSpecifier);
+          const replaceTsExtensions = (moduleSpecifier: string) => {
+            if (!moduleSpecifier.startsWith(".")) {
+              return moduleSpecifier;
+            }
+            return moduleSpecifier.replace(
+              /(\.d)?\.(ts|tsx|mts|cts)$/,
+              (match) => {
+                return {
+                  ".ts": ".js",
+                  ".tsx": ".js",
+                  ".mts": ".mjs",
+                  ".cts": ".cjs",
+                  ".d.ts": ".js",
+                  ".d.tsx": ".js", // `.d.tsx` is not quite a thing but the current regex matches it, so it's included here for completeness
+                  ".d.mts": ".mjs",
+                  ".d.cts": ".cjs",
+                }[match]!;
+              }
+            );
+          };
+          const cachedVisitModuleSpecifier = memoize(
+            visitModuleSpecifier
+              ? (moduleSpecifier) =>
+                  replaceTsExtensions(visitModuleSpecifier(moduleSpecifier))
+              : replaceTsExtensions
+          );
 
           const replacedNodes = new Map<
             import("typescript").StringLiteral,

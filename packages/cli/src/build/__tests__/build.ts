@@ -2191,3 +2191,54 @@ test("correct default export using mjs and dmts proxies with moduleResolution: b
   `);
   expect(node.stderr.toString("utf8")).toMatchInlineSnapshot(`""`);
 });
+
+test("replaces ts extensions in module specifiers within generated declarations", async () => {
+  let dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "@explicit-ts-extensions/repo",
+      preconstruct: {
+        packages: ["packages/pkg-a"],
+      },
+    }),
+    "packages/pkg-a/package.json": JSON.stringify({
+      name: "pkg-a",
+      main: "dist/pkg-a.cjs.js",
+      module: "dist/pkg-a.esm.js",
+    }),
+    "packages/pkg-a/src/index.ts": ts`
+      export { fromTsExt } from "./foo.ts";
+    `,
+    "packages/pkg-a/src/foo.ts": ts`
+      export const fromTsExt = 1;
+    `,
+    ...tsSetupFiles,
+    "tsconfig.json": JSON.stringify({
+      compilerOptions: {
+        module: "ESNext",
+        moduleResolution: "node",
+        allowImportingTsExtensions: true,
+        strict: true,
+        declaration: true,
+      },
+    }),
+  });
+  await fs.ensureSymlink(
+    path.join(dir, "packages/pkg-a"),
+    path.join(dir, "node_modules/pkg-a")
+  );
+  await build(dir);
+
+  expect(await getFiles(dir, ["packages/*/dist/**/*.d.{ts,tsx,mts,cts}"]))
+    .toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/declarations/src/foo.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export declare const fromTsExt = 1;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/declarations/src/index.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export { fromTsExt } from "./foo.js";
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export * from "./declarations/src/index";
+    //# sourceMappingURL=pkg-a.cjs.d.ts.map
+
+  `);
+});
