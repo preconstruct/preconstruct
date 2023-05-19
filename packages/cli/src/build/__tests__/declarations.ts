@@ -464,3 +464,58 @@ test("replaces declaration extensions with their runtime counterparts", async ()
 
   `);
 });
+
+test("replaces package.json#imports in declaration files without importConditions flags", async () => {
+  let dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "@imports-replacing/repo",
+      preconstruct: {
+        packages: ["packages/pkg-a"],
+        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+          onlyEmitUsedTypeScriptDeclarations: true,
+        },
+      },
+    }),
+    "packages/pkg-a/package.json": JSON.stringify({
+      name: "pkg-a",
+      main: "dist/pkg-a.cjs.js",
+      module: "dist/pkg-a.esm.js",
+      imports: {
+        "#hidden": "./src/hidden_stuff.ts",
+      },
+    }),
+    "packages/pkg-a/src/index.ts": ts`
+      export { gem } from "#hidden";
+    `,
+    "packages/pkg-a/src/hidden_stuff.ts": ts`
+      export const gem = "🎁";
+    `,
+    node_modules: typescriptFixture.node_modules,
+    "tsconfig.json": JSON.stringify({
+      compilerOptions: {
+        module: "ESNext",
+        moduleResolution: "node16",
+        strict: true,
+        declaration: true,
+      },
+    }),
+  });
+  await build(dir);
+
+  expect(await getFiles(dir, ["packages/*/dist/**/*.d.*"]))
+    .toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/declarations/src/hidden_stuff.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export declare const gem = "\\uD83C\\uDF81";
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/declarations/src/index.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export { gem } from "./hidden_stuff.js";
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export * from "./declarations/src/index";
+    //# sourceMappingURL=pkg-a.cjs.d.ts.map
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.d.ts.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {"version":3,"file":"pkg-a.cjs.d.ts","sourceRoot":"","sources":["./declarations/src/index.d.ts"],"names":[],"mappings":"AAAA"}
+
+  `);
+});
