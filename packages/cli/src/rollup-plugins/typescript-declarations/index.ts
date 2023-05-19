@@ -100,26 +100,26 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
         })
       );
 
-      const declarations = await (pkg.project.experimentalFlags
-        .importsConditions ||
-      pkg.project.experimentalFlags.onlyEmitUsedTypeScriptDeclarations
-        ? getDeclarationsWithImportedModuleSpecifiersReplacing(
-            typescript,
-            program,
-            normalizedDirname,
-            pkg.project.directory,
-            resolveModule,
-            [...entrypointSourceToTypeScriptSource.values()]
-          )
-        : getDeclarations(
-            typescript,
-            program,
-            normalizedDirname,
-            pkg.project.directory,
-            pkg.name,
-            resolveModule,
-            [...entrypointSourceToTypeScriptSource.values()]
-          ));
+      const declarations =
+        pkg.project.experimentalFlags.importsConditions ||
+        pkg.project.experimentalFlags.onlyEmitUsedTypeScriptDeclarations
+          ? getDeclarationsWithImportedModuleSpecifiersReplacing(
+              typescript,
+              program,
+              normalizedDirname,
+              pkg.project.directory,
+              resolveModule,
+              [...entrypointSourceToTypeScriptSource.values()]
+            )
+          : getDeclarations(
+              typescript,
+              program,
+              normalizedDirname,
+              pkg.project.directory,
+              pkg.name,
+              resolveModule,
+              [...entrypointSourceToTypeScriptSource.values()]
+            );
 
       let srcFilenameToDtsFilenameMap = new Map<string, string>();
 

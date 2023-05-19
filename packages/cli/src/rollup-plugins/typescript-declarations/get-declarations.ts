@@ -7,7 +7,7 @@ import {
 } from "./common";
 import { Program, ResolvedModuleFull } from "typescript";
 
-export async function getDeclarations(
+export function getDeclarations(
   typescript: TS,
   program: Program,
   normalizedPkgDir: string,
@@ -18,7 +18,7 @@ export async function getDeclarations(
     containingFile: string
   ) => ResolvedModuleFull | undefined,
   resolvedEntrypointSources: string[]
-): Promise<EmittedDeclarationOutput[]> {
+): EmittedDeclarationOutput[] {
   let allDeps = new Set(resolvedEntrypointSources);
 
   for (let dep of allDeps) {
@@ -49,16 +49,14 @@ export async function getDeclarations(
 
   const diagnosticsHost = getDiagnosticsHost(typescript, projectDir);
 
-  return Promise.all(
-    [...allDeps].map((filename) => {
-      return getDeclarationsForFile(
-        filename,
-        typescript,
-        program,
-        normalizedPkgDir,
-        projectDir,
-        diagnosticsHost
-      );
-    })
-  );
+  return [...allDeps].map((filename) => {
+    return getDeclarationsForFile(
+      filename,
+      typescript,
+      program,
+      normalizedPkgDir,
+      projectDir,
+      diagnosticsHost
+    );
+  });
 }

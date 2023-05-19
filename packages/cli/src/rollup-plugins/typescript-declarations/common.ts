@@ -132,7 +132,7 @@ export async function getProgram(dirname: string, pkgName: string, ts: TS) {
     : memoizedGetProgram(ts)(configFileName);
 }
 
-export const getDeclarationsForFile = async (
+export function getDeclarationsForFile(
   filename: string,
   typescript: TS,
   program: import("typescript").Program,
@@ -141,7 +141,7 @@ export const getDeclarationsForFile = async (
   diagnosticsHost: import("typescript").FormatDiagnosticsHost,
   /** This will only be called once per unique module specifier in a file */
   visitModuleSpecifier?: (moduleSpecifier: string) => string
-): Promise<EmittedDeclarationOutput> => {
+): EmittedDeclarationOutput {
   const cachedVisitModuleSpecifier = memoize(
     visitModuleSpecifier ?? ((x) => x)
   );
@@ -154,7 +154,7 @@ export const getDeclarationsForFile = async (
     );
   }
   if (filename.endsWith(".d.ts")) {
-    let content = await fs.readFile(filename, "utf8");
+    let content = sourceFile.text;
     if (visitModuleSpecifier) {
       const magicString = new MagicString(content);
       const visitor = (node: import("typescript").Node): void => {
@@ -269,7 +269,7 @@ export const getDeclarationsForFile = async (
     );
   }
   return { types: emitted.types, map: emitted.map, filename };
-};
+}
 
 export function overwriteDeclarationMapSourceRoot(
   content: string,

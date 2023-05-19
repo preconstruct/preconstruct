@@ -16,7 +16,7 @@ function replaceExt(filename: string) {
   });
 }
 
-export async function getDeclarationsWithImportedModuleSpecifiersReplacing(
+export function getDeclarationsWithImportedModuleSpecifiersReplacing(
   typescript: TS,
   program: Program,
   normalizedPkgDir: string,
@@ -26,7 +26,7 @@ export async function getDeclarationsWithImportedModuleSpecifiersReplacing(
     containingFile: string
   ) => ResolvedModuleFull | undefined,
   resolvedEntrypointSources: string[]
-): Promise<EmittedDeclarationOutput[]> {
+): EmittedDeclarationOutput[] {
   const depQueue = new Set(resolvedEntrypointSources);
   const diagnosticsHost = getDiagnosticsHost(typescript, projectDir);
   const normalizedPkgDirNodeModules = normalizePath(
@@ -57,8 +57,7 @@ export async function getDeclarationsWithImportedModuleSpecifiersReplacing(
       }
       return forImport;
     };
-    // this is mostly sync except for one bit so running this concurrently wouldn't really help
-    const output = await getDeclarationsForFile(
+    const output = getDeclarationsForFile(
       filename,
       typescript,
       program,
