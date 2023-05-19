@@ -198,7 +198,6 @@ export const getDeclarationsForFile = async (
           if (!visitModuleSpecifier) {
             return node;
           }
-
           const cachedVisitModuleSpecifier = memoize(visitModuleSpecifier);
 
           const replacedNodes = new Map<

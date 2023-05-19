@@ -107,7 +107,7 @@ test("onlyEmitUsedTypeScriptDeclarations", async () => {
   await build(dir);
   expect(await getFiles(dir, ["dist/**/*.d.ts"])).toMatchInlineSnapshot(`
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/index.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    import { A } from "./other";
+    import { A } from "./other.js";
     export declare function thing(): A;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/other.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
@@ -164,7 +164,7 @@ test("onlyEmitUsedTypeScriptDeclarations with export from", async () => {
   await build(dir);
   expect(await getFiles(dir, ["dist/**/*.d.ts"])).toMatchInlineSnapshot(`
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/index.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    export type { A } from "./other";
+    export type { A } from "./other.js";
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/other.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     export type A = {
@@ -193,7 +193,7 @@ test("onlyEmitUsedTypeScriptDeclarations with inline import type", async () => {
   await build(dir);
   expect(await getFiles(dir, ["dist/**/*.d.ts"])).toMatchInlineSnapshot(`
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/index.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    export declare function a(): import("./other").A;
+    export declare function a(): import("./other.js").A;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/other.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     export type A = {
@@ -226,7 +226,7 @@ test("onlyEmitUsedTypeScriptDeclarations with import x = require('')", async () 
   expect(await getFiles(dir, ["dist/**/*.d.ts"])).toMatchInlineSnapshot(`
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/index.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     declare namespace something {
-        export import x = require("./other");
+        export import x = require("./other.js");
     }
     export declare function a(): something.x.A;
     export {};
@@ -239,6 +239,283 @@ test("onlyEmitUsedTypeScriptDeclarations with import x = require('')", async () 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     export * from "./declarations/src/index";
     //# sourceMappingURL=scope-test.cjs.d.ts.map
+
+  `);
+});
+
+test("replaces ts extensions in module specifiers within generated declarations with importsConditions", async () => {
+  let dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "@explicit-ts-extensions/repo",
+      preconstruct: {
+        packages: ["packages/pkg-a"],
+        exports: {},
+        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+          importsConditions: true,
+        },
+      },
+    }),
+    "packages/pkg-a/package.json": JSON.stringify({
+      name: "pkg-a",
+      main: "dist/pkg-a.cjs.js",
+      module: "dist/pkg-a.esm.js",
+      exports: {
+        ".": {
+          types: "./dist/pkg-a.cjs.js",
+          module: "./dist/pkg-a.esm.js",
+          default: "./dist/pkg-a.cjs.js",
+        },
+        "./package.json": "./package.json",
+      },
+    }),
+    "packages/pkg-a/src/index.ts": ts`
+      export { fromTsExt } from "./foo.ts";
+    `,
+    "packages/pkg-a/src/foo.ts": ts`
+      export const fromTsExt = 1;
+    `,
+    node_modules: typescriptFixture.node_modules,
+    "tsconfig.json": JSON.stringify({
+      compilerOptions: {
+        module: "ESNext",
+        moduleResolution: "node",
+        allowImportingTsExtensions: true,
+        strict: true,
+        declaration: true,
+      },
+    }),
+  });
+  await build(dir);
+
+  expect(await getFiles(dir, ["packages/*/dist/**/*.d.*"]))
+    .toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/declarations/src/foo.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export declare const fromTsExt = 1;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/declarations/src/index.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export { fromTsExt } from "./foo.js";
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export * from "./declarations/src/index";
+    //# sourceMappingURL=pkg-a.cjs.d.ts.map
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.d.ts.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {"version":3,"file":"pkg-a.cjs.d.ts","sourceRoot":"","sources":["./declarations/src/index.d.ts"],"names":[],"mappings":"AAAA"}
+
+  `);
+});
+
+test("replaces ts extensions in module specifiers within generated declarations with onlyEmitUsedTypeScriptDeclarations", async () => {
+  let dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "@explicit-ts-extensions/repo",
+      preconstruct: {
+        packages: ["packages/pkg-a"],
+        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+          onlyEmitUsedTypeScriptDeclarations: true,
+        },
+      },
+    }),
+    "packages/pkg-a/package.json": JSON.stringify({
+      name: "pkg-a",
+      main: "dist/pkg-a.cjs.js",
+      module: "dist/pkg-a.esm.js",
+    }),
+    "packages/pkg-a/src/index.ts": ts`
+      export { fromTsExt } from "./foo.ts";
+    `,
+    "packages/pkg-a/src/foo.ts": ts`
+      export const fromTsExt = 1;
+    `,
+    node_modules: typescriptFixture.node_modules,
+    "tsconfig.json": JSON.stringify({
+      compilerOptions: {
+        module: "ESNext",
+        moduleResolution: "node",
+        allowImportingTsExtensions: true,
+        strict: true,
+        declaration: true,
+      },
+    }),
+  });
+  await build(dir);
+
+  expect(await getFiles(dir, ["packages/*/dist/**/*.d.*"]))
+    .toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/declarations/src/foo.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export declare const fromTsExt = 1;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/declarations/src/index.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export { fromTsExt } from "./foo.js";
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export * from "./declarations/src/index";
+    //# sourceMappingURL=pkg-a.cjs.d.ts.map
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.d.ts.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {"version":3,"file":"pkg-a.cjs.d.ts","sourceRoot":"","sources":["./declarations/src/index.d.ts"],"names":[],"mappings":"AAAA"}
+
+  `);
+});
+
+test('doesn\'t replace ts "extensions" in module specifiers that are only parts of the actual filenames and not their extensions', async () => {
+  let dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "@explicit-ts-extensions/repo",
+      preconstruct: {
+        packages: ["packages/pkg-a"],
+        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+          onlyEmitUsedTypeScriptDeclarations: true,
+        },
+      },
+    }),
+    "packages/pkg-a/package.json": JSON.stringify({
+      name: "pkg-a",
+      main: "dist/pkg-a.cjs.js",
+      module: "dist/pkg-a.esm.js",
+    }),
+    "packages/pkg-a/src/index.ts": ts`
+      export { fromPseudoTsExt } from "./foo.ts";
+    `,
+    "packages/pkg-a/src/foo.ts.ts": ts`
+      export const fromPseudoTsExt = 1;
+    `,
+    node_modules: typescriptFixture.node_modules,
+    "tsconfig.json": JSON.stringify({
+      compilerOptions: {
+        module: "ESNext",
+        moduleResolution: "node",
+        allowImportingTsExtensions: true,
+        strict: true,
+        declaration: true,
+      },
+    }),
+  });
+  await build(dir);
+
+  expect(await getFiles(dir, ["packages/*/dist/**/*.d.*"]))
+    .toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/declarations/src/foo.ts.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export declare const fromPseudoTsExt = 1;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/declarations/src/index.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export { fromPseudoTsExt } from "./foo.ts.js";
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export * from "./declarations/src/index";
+    //# sourceMappingURL=pkg-a.cjs.d.ts.map
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.d.ts.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {"version":3,"file":"pkg-a.cjs.d.ts","sourceRoot":"","sources":["./declarations/src/index.d.ts"],"names":[],"mappings":"AAAA"}
+
+  `);
+});
+
+test("replaces declaration extensions with their runtime counterparts", async () => {
+  let dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "@explicit-dts-extension/repo",
+      preconstruct: {
+        packages: ["packages/pkg-a"],
+        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+          onlyEmitUsedTypeScriptDeclarations: true,
+        },
+      },
+    }),
+    "packages/pkg-a/package.json": JSON.stringify({
+      name: "pkg-a",
+      main: "dist/pkg-a.cjs.js",
+      module: "dist/pkg-a.esm.js",
+    }),
+    "packages/pkg-a/src/index.ts": ts`
+      export type { DtsExt } from "./types.d.ts";
+    `,
+    "packages/pkg-a/src/types.d.ts": ts`
+      export type DtsExt = 1;
+    `,
+    node_modules: typescriptFixture.node_modules,
+    "tsconfig.json": JSON.stringify({
+      compilerOptions: {
+        module: "ESNext",
+        moduleResolution: "node",
+        strict: true,
+        declaration: true,
+      },
+    }),
+    "babel.config.json": JSON.stringify({
+      presets: [require.resolve("@babel/preset-typescript")],
+    }),
+  });
+  await build(dir);
+
+  expect(await getFiles(dir, ["packages/*/dist/**/*.d.*"]))
+    .toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/declarations/src/index.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export type { DtsExt } from "./types.js";
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/declarations/src/types.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export type DtsExt = 1;
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export * from "./declarations/src/index";
+    //# sourceMappingURL=pkg-a.cjs.d.ts.map
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.d.ts.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {"version":3,"file":"pkg-a.cjs.d.ts","sourceRoot":"","sources":["./declarations/src/index.d.ts"],"names":[],"mappings":"AAAA"}
+
+  `);
+});
+
+test("replaces package.json#imports in declaration files without importConditions flags", async () => {
+  let dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "@imports-replacing/repo",
+      preconstruct: {
+        packages: ["packages/pkg-a"],
+        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+          onlyEmitUsedTypeScriptDeclarations: true,
+        },
+      },
+    }),
+    "packages/pkg-a/package.json": JSON.stringify({
+      name: "pkg-a",
+      main: "dist/pkg-a.cjs.js",
+      module: "dist/pkg-a.esm.js",
+      imports: {
+        "#hidden": "./src/hidden_stuff.ts",
+      },
+    }),
+    "packages/pkg-a/src/index.ts": ts`
+      export { gem } from "#hidden";
+    `,
+    "packages/pkg-a/src/hidden_stuff.ts": ts`
+      export const gem = "🎁";
+    `,
+    node_modules: typescriptFixture.node_modules,
+    "tsconfig.json": JSON.stringify({
+      compilerOptions: {
+        module: "ESNext",
+        moduleResolution: "node16",
+        strict: true,
+        declaration: true,
+      },
+    }),
+  });
+  await build(dir);
+
+  expect(await getFiles(dir, ["packages/*/dist/**/*.d.*"]))
+    .toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/declarations/src/hidden_stuff.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export declare const gem = "\\uD83C\\uDF81";
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/declarations/src/index.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export { gem } from "./hidden_stuff.js";
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export * from "./declarations/src/index";
+    //# sourceMappingURL=pkg-a.cjs.d.ts.map
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.d.ts.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {"version":3,"file":"pkg-a.cjs.d.ts","sourceRoot":"","sources":["./declarations/src/index.d.ts"],"names":[],"mappings":"AAAA"}
 
   `);
 });

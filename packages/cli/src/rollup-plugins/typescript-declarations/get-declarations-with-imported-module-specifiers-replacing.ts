@@ -9,14 +9,14 @@ import {
 import { Program, ResolvedModuleFull } from "typescript";
 
 function replaceExt(filename: string) {
-  return filename.replace(/\.([cm]?ts|tsx)$/, (match) => {
-    if (match === ".cts") return ".cjs";
-    if (match === ".mts") return ".mjs";
+  return filename.replace(/(\.d)?\.([cm]?ts|tsx)$/, (match, p1, p2) => {
+    if (p2 === ".cts") return ".cjs";
+    if (p2 === ".mts") return ".mjs";
     return ".js";
   });
 }
 
-export async function getUsedDeclarationsWithPackageJsonImportsReplaced(
+export async function getDeclarationsWithImportedModuleSpecifiersReplacing(
   typescript: TS,
   program: Program,
   normalizedPkgDir: string,
@@ -44,10 +44,9 @@ export async function getUsedDeclarationsWithPackageJsonImportsReplaced(
       ) {
         return imported;
       }
+
       depQueue.add(resolvedModule.resolvedFileName);
-      if (imported[0] !== "#") {
-        return imported;
-      }
+
       let forImport = replaceExt(
         normalizePath(
           path.relative(path.dirname(filename), resolvedModule.resolvedFileName)
@@ -68,6 +67,7 @@ export async function getUsedDeclarationsWithPackageJsonImportsReplaced(
       diagnosticsHost,
       handleImport
     );
+
     emitted.push(output);
   }
   return emitted;
