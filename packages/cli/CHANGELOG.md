@@ -1,5 +1,15 @@
 # preconstruct
 
+## 2.7.0
+
+### Minor Changes
+
+- [#556](https://github.com/preconstruct/preconstruct/pull/556) [`908c43e`](https://github.com/preconstruct/preconstruct/commit/908c43ec4c291eff6bcb4365d6b97887bc8637bb) Thanks [@Andarist](https://github.com/Andarist)! - Always emit relative paths used in generated TS declaration files with resolved extensions of their runtime equivalents. This currently requires one of the 2 experimental flags: `importsConditions` or `onlyEmitUsedTypeScriptDeclarations`
+
+### Patch Changes
+
+- [#554](https://github.com/preconstruct/preconstruct/pull/554) [`1147fee`](https://github.com/preconstruct/preconstruct/commit/1147fee9cf6ee0a4d1174114c979f59bb531eb93) Thanks [@Andarist](https://github.com/Andarist)! - Fix types like `import('#foo').Foo<import('#bar').Bar>` not replacing the import to `#bar` in generated declarations under the `importsConditions` experimental flag
+
 ## 2.6.4
 
 ### Patch Changes
