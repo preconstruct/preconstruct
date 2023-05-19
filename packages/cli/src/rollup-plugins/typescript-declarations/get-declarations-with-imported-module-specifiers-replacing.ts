@@ -9,9 +9,9 @@ import {
 import { Program, ResolvedModuleFull } from "typescript";
 
 function replaceExt(filename: string) {
-  return filename.replace(/\.([cm]?ts|tsx)$/, (match) => {
-    if (match === ".cts") return ".cjs";
-    if (match === ".mts") return ".mjs";
+  return filename.replace(/(\.d)?\.([cm]?ts|tsx)$/, (match, p1, p2) => {
+    if (p2 === ".cts") return ".cjs";
+    if (p2 === ".mts") return ".mjs";
     return ".js";
   });
 }
@@ -25,8 +25,7 @@ export async function getDeclarationsWithImportedModuleSpecifiersReplacing(
     moduleName: string,
     containingFile: string
   ) => ResolvedModuleFull | undefined,
-  resolvedEntrypointSources: string[],
-  emitOnlyUsedDeclarations = false
+  resolvedEntrypointSources: string[]
 ): Promise<EmittedDeclarationOutput[]> {
   const depQueue = new Set(resolvedEntrypointSources);
   const diagnosticsHost = getDiagnosticsHost(typescript, projectDir);

@@ -410,3 +410,57 @@ test('doesn\'t replace ts "extensions" in module specifiers that are only parts 
 
   `);
 });
+
+test("replaces declaration extensions with their runtime counterparts", async () => {
+  let dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "@explicit-dts-extension/repo",
+      preconstruct: {
+        packages: ["packages/pkg-a"],
+        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+          onlyEmitUsedTypeScriptDeclarations: true,
+        },
+      },
+    }),
+    "packages/pkg-a/package.json": JSON.stringify({
+      name: "pkg-a",
+      main: "dist/pkg-a.cjs.js",
+      module: "dist/pkg-a.esm.js",
+    }),
+    "packages/pkg-a/src/index.ts": ts`
+      export type { DtsExt } from "./types.d.ts";
+    `,
+    "packages/pkg-a/src/types.d.ts": ts`
+      export type DtsExt = 1;
+    `,
+    node_modules: typescriptFixture.node_modules,
+    "tsconfig.json": JSON.stringify({
+      compilerOptions: {
+        module: "ESNext",
+        moduleResolution: "node",
+        strict: true,
+        declaration: true,
+      },
+    }),
+    "babel.config.json": JSON.stringify({
+      presets: [require.resolve("@babel/preset-typescript")],
+    }),
+  });
+  await build(dir);
+
+  expect(await getFiles(dir, ["packages/*/dist/**/*.d.*"]))
+    .toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/declarations/src/index.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export type { DtsExt } from "./types.js";
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/declarations/src/types.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export type DtsExt = 1;
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export * from "./declarations/src/index";
+    //# sourceMappingURL=pkg-a.cjs.d.ts.map
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.d.ts.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {"version":3,"file":"pkg-a.cjs.d.ts","sourceRoot":"","sources":["./declarations/src/index.d.ts"],"names":[],"mappings":"AAAA"}
+
+  `);
+});
