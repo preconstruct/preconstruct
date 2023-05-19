@@ -5,6 +5,7 @@ import * as fs from "fs-extra";
 import path from "path";
 import normalizePath from "normalize-path";
 import { getModuleSpecifier } from "./get-module-specifier";
+import MagicString from "magic-string";
 
 export type DeclarationFile = {
   name: string;
@@ -131,7 +132,7 @@ export async function getProgram(dirname: string, pkgName: string, ts: TS) {
     : memoizedGetProgram(ts)(configFileName);
 }
 
-export const getDeclarationsForFile = async (
+export function getDeclarationsForFile(
   filename: string,
   typescript: TS,
   program: import("typescript").Program,
@@ -140,20 +141,10 @@ export const getDeclarationsForFile = async (
   diagnosticsHost: import("typescript").FormatDiagnosticsHost,
   /** This will only be called once per unique module specifier in a file */
   visitModuleSpecifier?: (moduleSpecifier: string) => string
-): Promise<EmittedDeclarationOutput> => {
-  if (filename.endsWith(".d.ts")) {
-    return {
-      types: {
-        name: filename.replace(
-          normalizedPkgDir,
-          normalizePath(path.join(normalizedPkgDir, "dist", "declarations"))
-        ),
-        content: await fs.readFile(filename, "utf8"),
-      },
-      filename,
-    };
-  }
-
+): EmittedDeclarationOutput {
+  const cachedVisitModuleSpecifier = memoize(
+    visitModuleSpecifier ?? ((x) => x)
+  );
   const sourceFile = program.getSourceFile(
     typescript.sys.useCaseSensitiveFileNames ? filename : filename.toLowerCase()
   );
@@ -161,6 +152,38 @@ export const getDeclarationsForFile = async (
     throw new Error(
       `Could not find source file at ${filename} in TypeScript declaration generation, this is likely a bug in Preconstruct`
     );
+  }
+  if (filename.endsWith(".d.ts")) {
+    let content = sourceFile.text;
+    if (visitModuleSpecifier) {
+      const magicString = new MagicString(content);
+      const visitor = (node: import("typescript").Node): void => {
+        const moduleSpecifier = getModuleSpecifier(node, typescript);
+        if (moduleSpecifier) {
+          const replaced = cachedVisitModuleSpecifier(moduleSpecifier.text);
+          if (replaced !== moduleSpecifier.text) {
+            magicString.update(
+              moduleSpecifier.getStart(sourceFile, false),
+              moduleSpecifier.getEnd(),
+              JSON.stringify(replaced)
+            );
+          }
+        }
+        typescript.forEachChild(node, visitor);
+      };
+      typescript.forEachChild(sourceFile, visitor);
+      content = magicString.toString();
+    }
+    return {
+      types: {
+        name: filename.replace(
+          normalizedPkgDir,
+          normalizePath(path.join(normalizedPkgDir, "dist", "declarations"))
+        ),
+        content,
+      },
+      filename,
+    };
   }
 
   const emitted: Partial<EmittedDeclarationOutput> = {};
@@ -198,7 +221,6 @@ export const getDeclarationsForFile = async (
           if (!visitModuleSpecifier) {
             return node;
           }
-          const cachedVisitModuleSpecifier = memoize(visitModuleSpecifier);
 
           const replacedNodes = new Map<
             import("typescript").StringLiteral,
@@ -247,7 +269,7 @@ export const getDeclarationsForFile = async (
     );
   }
   return { types: emitted.types, map: emitted.map, filename };
-};
+}
 
 export function overwriteDeclarationMapSourceRoot(
   content: string,
