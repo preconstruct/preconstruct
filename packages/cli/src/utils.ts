@@ -336,6 +336,10 @@ export function dtsTemplate(
 }
 
 function getReexportStatement(namedExports: string[], source: string): string {
+  if (!namedExports.length) {
+    // side-effects are important
+    return `import ${source};`;
+  }
   // rollup will say a chunk has a "*external-pkg" export when it has an export * from 'external-pkg'
   if (namedExports.some((exported) => exported[0] === "*")) {
     return `export * from ${source};`;
