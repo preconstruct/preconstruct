@@ -72,6 +72,101 @@ test("set main and module field", async () => {
   `);
 });
 
+test("set types with no extra entrypoints", async () => {
+  let tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "@blah/something",
+      main: "index.js",
+      types: "invalid.d.ts",
+    }),
+    "src/index.js": "",
+  });
+
+  await fix(tmpPath);
+
+  expect(await getFiles(tmpPath, ["**/package.json"])).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {
+      "name": "@blah/something",
+      "main": "dist/blah-something.cjs.js",
+      "types": "dist/blah-something.cjs.d.ts"
+    }
+
+  `);
+});
+
+test("set typings with no extra entrypoints", async () => {
+  let tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "@blah/something",
+      main: "index.js",
+      typings: "invalid.d.ts",
+    }),
+    "src/index.js": "",
+  });
+
+  await fix(tmpPath);
+
+  expect(await getFiles(tmpPath, ["**/package.json"])).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {
+      "name": "@blah/something",
+      "main": "dist/blah-something.cjs.js",
+      "typings": "dist/blah-something.cjs.d.ts"
+    }
+
+  `);
+});
+
+test("set types field with multiple entrypoints", async () => {
+  let tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "@blah/something",
+      main: "index.js",
+      types: "invalid.d.ts",
+      preconstruct: {
+        entrypoints: ["index.js", "other.js", "deep/something.js"],
+      },
+    }),
+    "other/package.json": JSON.stringify({}),
+    "deep/something/package.json": JSON.stringify({}),
+    "src/index.js": "",
+    "src/other.js": "",
+    "src/deep/something.js": "",
+  });
+
+  await fix(tmpPath);
+
+  expect(await getFiles(tmpPath, ["**/package.json"])).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ deep/something/package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {
+      "main": "dist/blah-something-deep-something.cjs.js",
+      "types": "dist/blah-something-deep-something.cjs.d.ts"
+    }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ other/package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {
+      "main": "dist/blah-something-other.cjs.js",
+      "types": "dist/blah-something-other.cjs.d.ts"
+    }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {
+      "name": "@blah/something",
+      "main": "dist/blah-something.cjs.js",
+      "types": "dist/blah-something.cjs.d.ts",
+      "preconstruct": {
+        "entrypoints": [
+          "index.js",
+          "other.js",
+          "deep/something.js"
+        ]
+      }
+    }
+
+  `);
+});
+
 test("set exports field when opt-in", async () => {
   let tmpPath = await testdir({
     "package.json": JSON.stringify({

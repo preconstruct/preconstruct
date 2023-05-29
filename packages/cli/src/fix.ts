@@ -27,6 +27,8 @@ async function fixPackage(pkg: Package): Promise<() => Promise<boolean>> {
       !!exportsFieldConfig,
     "umd:main": pkg.entrypoints.some((x) => x.json["umd:main"] !== undefined),
     browser: pkg.entrypoints.some((x) => x.json.browser !== undefined),
+    types: pkg.entrypoints.some((x) => x.json.types !== undefined),
+    typings: pkg.entrypoints.some((x) => x.json.typings !== undefined),
   };
 
   if (exportsFieldConfig?.conditions.kind === "legacy") {

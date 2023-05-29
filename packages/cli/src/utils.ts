@@ -21,7 +21,7 @@ let fields = [
 
 export function setFieldInOrder<
   Obj extends { [key: string]: any },
-  Key extends "main" | "module" | "umd:main" | "browser" | "exports",
+  Key extends keyof typeof validFieldsForEntrypoint | "exports",
   Val extends any
 >(obj: Obj, field: Key, value: Val): Obj & { [k in Key]: Val } {
   if (field in obj) {
@@ -277,6 +277,9 @@ export function getExportsImportUnwrappingDefaultOutputPath(
   return getExportsFieldOutputPath(entrypoint, "cjs").replace(/\.js$/, ".mjs");
 }
 
+const validTypesFieldForEntrypoint = (entrypoint: MinimalEntrypoint) =>
+  validFieldsForEntrypoint.main(entrypoint).replace(/\.js$/, ".d.ts");
+
 export const validFieldsForEntrypoint = {
   main(entrypoint: MinimalEntrypoint) {
     return getDistFilename(entrypoint, "cjs");
@@ -307,6 +310,8 @@ export const validFieldsForEntrypoint = {
       ...(entrypoint.hasModuleField && moduleBuild),
     };
   },
+  types: validTypesFieldForEntrypoint,
+  typings: validTypesFieldForEntrypoint,
 };
 
 export function flowTemplate(hasDefaultExport: boolean, relativePath: string) {
