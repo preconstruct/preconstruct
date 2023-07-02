@@ -2,6 +2,27 @@
   "name": "@preconstruct/cli",
   "version": "2.7.0",
   "description": "Dev and build your code painlessly in monorepos",
+  "exports": {
+    "./cli": {
+      "types": {
+        "import": "./cli/dist/preconstruct-cli-cli.cjs.mjs",
+        "default": "./cli/dist/preconstruct-cli-cli.cjs.js"
+      },
+      "module": "./cli/dist/preconstruct-cli-cli.esm.js",
+      "import": "./cli/dist/preconstruct-cli-cli.cjs.mjs",
+      "default": "./cli/dist/preconstruct-cli-cli.cjs.js"
+    },
+    "./worker": {
+      "types": {
+        "import": "./worker/dist/preconstruct-cli-worker.cjs.mjs",
+        "default": "./worker/dist/preconstruct-cli-worker.cjs.js"
+      },
+      "module": "./worker/dist/preconstruct-cli-worker.esm.js",
+      "import": "./worker/dist/preconstruct-cli-worker.cjs.mjs",
+      "default": "./worker/dist/preconstruct-cli-worker.cjs.js"
+    },
+    "./package.json": "./package.json"
+  },
   "files": [
     "bin.js",
     "cli",
@@ -56,8 +77,8 @@
   },
   "preconstruct": {
     "entrypoints": [
-      "cli",
-      "worker"
+      "./cli.ts",
+      "./worker.ts"
     ]
   },
   "devDependencies": {

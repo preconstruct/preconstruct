@@ -1,6 +1,4 @@
 {
-  "main": "dist/cli.cjs.js",
-  "preconstruct": {
-    "source": "../src/cli"
-  }
+  "main": "dist/preconstruct-cli-cli.cjs.js",
+  "module": "dist/preconstruct-cli-cli.esm.js"
 }

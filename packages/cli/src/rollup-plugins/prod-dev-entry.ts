@@ -20,10 +20,7 @@ export default function nodeDevProdEntry(): Plugin {
 
         let mainEntrySource = `'use strict';
 
-if (${
-          // tricking static analysis is fun...
-          "process" + ".env.NODE_ENV"
-        } === "production") {
+if (process.env.NODE_ENV === "production") {
   module.exports = require("./${path.basename(getProdPath(mainFieldPath))}");
 } else {
   module.exports = require("./${path.basename(getDevPath(mainFieldPath))}");
