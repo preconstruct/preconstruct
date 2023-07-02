@@ -673,3 +673,35 @@ test("imports conditions", async () => {
 
   `);
 });
+
+test("dev command entrypoint", async () => {
+  let tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "pkg",
+      preconstruct: {
+        entrypoints: ["something.ts"],
+      },
+    }),
+    "something/package.json": JSON.stringify({
+      main: "dist/pkg-something.cjs.js",
+      module: "dist/pkg-something.esm.js",
+    }),
+    ".babelrc": JSON.stringify({
+      presets: [require.resolve("@babel/preset-typescript")],
+    }),
+    "src/something.ts": js`
+      const a: string = "message from something";
+      console.log(a);
+    `,
+  });
+
+  await dev(tmpPath);
+
+  // i would require it but i don't want jest to do magical things
+  let { code, stdout, stderr } = await spawn("node", [
+    path.join(tmpPath, "something"),
+  ]);
+  expect(stderr.toString()).toBe("");
+  expect(stdout.toString().split("\n")).toEqual(["message from something", ""]);
+  expect(code).toBe(0);
+});

@@ -405,7 +405,7 @@ let unregister = require(${JSON.stringify(
       path.relative(distDirectory, entrypoint.package.project.directory)
     )
   )}, ${JSON.stringify(
-    normalizePath(path.relative(distDirectory, entrypoint.directory))
+    normalizePath(path.relative(distDirectory, entrypoint.package.directory))
   )});
 
 // this re-exports the source file
