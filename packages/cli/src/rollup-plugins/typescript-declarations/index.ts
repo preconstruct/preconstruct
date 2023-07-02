@@ -3,7 +3,6 @@ import { FatalError } from "../../errors";
 import { Plugin } from "rollup";
 import fs from "fs-extra";
 import { Package } from "../../package";
-import { getDeclarations } from "./get-declarations";
 import {
   dmtsTemplate,
   tsReexportDeclMap,
@@ -100,26 +99,14 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
         })
       );
 
-      const declarations =
-        pkg.project.experimentalFlags.importsConditions ||
-        pkg.project.experimentalFlags.onlyEmitUsedTypeScriptDeclarations
-          ? getDeclarationsWithImportedModuleSpecifiersReplacing(
-              typescript,
-              program,
-              normalizedDirname,
-              pkg.project.directory,
-              resolveModule,
-              [...entrypointSourceToTypeScriptSource.values()]
-            )
-          : getDeclarations(
-              typescript,
-              program,
-              normalizedDirname,
-              pkg.project.directory,
-              pkg.name,
-              resolveModule,
-              [...entrypointSourceToTypeScriptSource.values()]
-            );
+      const declarations = getDeclarationsWithImportedModuleSpecifiersReplacing(
+        typescript,
+        program,
+        normalizedDirname,
+        pkg.project.directory,
+        resolveModule,
+        [...entrypointSourceToTypeScriptSource.values()]
+      );
 
       let srcFilenameToDtsFilenameMap = new Map<string, string>();
 

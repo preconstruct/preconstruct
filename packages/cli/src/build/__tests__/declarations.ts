@@ -28,11 +28,11 @@ test("circular dependency typescript", async () => {
   await build(dir);
   expect(await getDist(dir)).toMatchInlineSnapshot(`
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/a.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    export { thing } from "./index";
+    export { thing } from "./index.js";
     export declare function blah(): void;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/index.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    export { blah } from "./a";
+    export { blah } from "./a.js";
     export declare function thing(): void;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
@@ -78,11 +78,6 @@ const onlyEmitUsedDeclsBasic = {
     name: "@scope/test",
     main: "dist/scope-test.cjs.js",
     module: "dist/scope-test.esm.js",
-    preconstruct: {
-      ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
-        onlyEmitUsedTypeScriptDeclarations: true,
-      },
-    },
   }),
   "tsconfig.json": typescriptFixture["tsconfig.json"],
   node_modules: typescriptFixture.node_modules,
@@ -311,9 +306,6 @@ test("replaces ts extensions in module specifiers within generated declarations 
       name: "@explicit-ts-extensions/repo",
       preconstruct: {
         packages: ["packages/pkg-a"],
-        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
-          onlyEmitUsedTypeScriptDeclarations: true,
-        },
       },
     }),
     "packages/pkg-a/package.json": JSON.stringify({
@@ -364,9 +356,6 @@ test('doesn\'t replace ts "extensions" in module specifiers that are only parts 
       name: "@explicit-ts-extensions/repo",
       preconstruct: {
         packages: ["packages/pkg-a"],
-        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
-          onlyEmitUsedTypeScriptDeclarations: true,
-        },
       },
     }),
     "packages/pkg-a/package.json": JSON.stringify({
@@ -417,9 +406,6 @@ test("replaces declaration extensions with their runtime counterparts", async ()
       name: "@explicit-dts-extension/repo",
       preconstruct: {
         packages: ["packages/pkg-a"],
-        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
-          onlyEmitUsedTypeScriptDeclarations: true,
-        },
       },
     }),
     "packages/pkg-a/package.json": JSON.stringify({
@@ -471,9 +457,6 @@ test("replaces package.json#imports in declaration files without importCondition
       name: "@imports-replacing/repo",
       preconstruct: {
         packages: ["packages/pkg-a"],
-        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
-          onlyEmitUsedTypeScriptDeclarations: true,
-        },
       },
     }),
     "packages/pkg-a/package.json": JSON.stringify({
@@ -526,9 +509,6 @@ test("normalises imports in manually authored .d.ts files", async () => {
       name: "@imports-replacing/repo",
       preconstruct: {
         packages: ["packages/pkg-a"],
-        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
-          onlyEmitUsedTypeScriptDeclarations: true,
-        },
       },
     }),
     "packages/pkg-a/package.json": JSON.stringify({

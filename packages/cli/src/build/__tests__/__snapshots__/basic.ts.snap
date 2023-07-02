@@ -53,16 +53,6 @@ exports[`typescript thing: declarations/src/index.d.ts 1`] = `
 "
 `;
 
-exports[`typescript thing: declarations/src/other.d.ts 1`] = `
-"export declare const thing: () => "wow";
-"
-`;
-
-exports[`typescript thing: declarations/src/thing.d.ts 1`] = `
-"export declare const makeThing: () => "wow";
-"
-`;
-
 exports[`typescript thing: weird-typescript-thing.cjs.d.ts 1`] = `
 "export * from "./declarations/src/index";
 //# sourceMappingURL=weird-typescript-thing.cjs.d.ts.map

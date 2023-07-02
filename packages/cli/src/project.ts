@@ -29,7 +29,6 @@ export class Project extends Item<{
     ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
       logCompiledFiles?: JSONValue;
       keepDynamicImportAsDynamicImportInCommonJS?: JSONValue;
-      onlyEmitUsedTypeScriptDeclarations?: JSONValue;
       importsConditions?: JSONValue;
     };
   };
@@ -40,7 +39,6 @@ export class Project extends Item<{
     return {
       logCompiledFiles: !!config.logCompiledFiles,
       keepDynamicImportAsDynamicImportInCommonJS: !!config.keepDynamicImportAsDynamicImportInCommonJS,
-      onlyEmitUsedTypeScriptDeclarations: !!config.onlyEmitUsedTypeScriptDeclarations,
       importsConditions: !!config.importsConditions,
     };
   }
