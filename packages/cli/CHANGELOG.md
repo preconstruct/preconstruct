@@ -1,5 +1,11 @@
 # preconstruct
 
+## 2.8.1
+
+### Patch Changes
+
+- [#567](https://github.com/preconstruct/preconstruct/pull/567) [`d4006c8`](https://github.com/preconstruct/preconstruct/commit/d4006c8b550a165ed4153527e7b07ffdea9ae68d) Thanks [@Andarist](https://github.com/Andarist)! - Fixed `.mjs` proxies generation with `___experimentalFlags_WILL_CHANGE_IN_PATCH.importsConditions` and `exports.importConditionDefaultExport: 'default'`
+
 ## 2.8.0
 
 ### Minor Changes
