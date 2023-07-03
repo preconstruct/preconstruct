@@ -1,5 +1,19 @@
 # preconstruct
 
+## 2.8.0
+
+### Minor Changes
+
+- [#565](https://github.com/preconstruct/preconstruct/pull/565) [`484c6a7`](https://github.com/preconstruct/preconstruct/commit/484c6a7306236d741a89f7ca6ddef7ff60799f7e) Thanks [@Andarist](https://github.com/Andarist)! - `package.json#exports` have been added to limit what (and how) code might be imported from the package.
+
+* [#566](https://github.com/preconstruct/preconstruct/pull/566) [`9d4f0dc`](https://github.com/preconstruct/preconstruct/commit/9d4f0dccb1a5e6af79cd7e9fa253fc127eb14489) Thanks [@emmatown](https://github.com/emmatown)! - Preconstruct no longer emits unnecessary `.d.ts` files that aren't referenced by an entrypoint
+
+### Patch Changes
+
+- [`58df49f`](https://github.com/preconstruct/preconstruct/commit/58df49f057361be69aa9d7a91ff8b36efaf9d4d8) Thanks [@emmatown](https://github.com/emmatown)! - Fix require hook skipping compiling files when just an entrypoint is loaded
+
+* [#559](https://github.com/preconstruct/preconstruct/pull/559) [`a58f021`](https://github.com/preconstruct/preconstruct/commit/a58f021a79fa93208beb8b351fd17522de6dbcda) Thanks [@emmatown](https://github.com/emmatown)! - Extend import path normalisation in generated declaration files to manually written declaration files as well
+
 ## 2.7.0
 
 ### Minor Changes
