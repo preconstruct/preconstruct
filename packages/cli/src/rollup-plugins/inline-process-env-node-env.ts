@@ -11,7 +11,7 @@ export function inlineProcessEnvNodeEnv({
   return {
     name: "inline-process-env-node-env-production",
     transform(code, id) {
-      if (code.includes("process.env" + ".NODE_ENV")) {
+      if (code.includes("process.env.NODE_ENV")) {
         let magicString = new MagicString(code);
         const ast = (() => {
           const babelMeta = this.getModuleInfo(id)!.meta.babel;

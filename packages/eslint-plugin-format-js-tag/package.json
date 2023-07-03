@@ -1,7 +1,20 @@
 {
   "name": "@preconstruct/eslint-plugin-format-js-tag",
   "version": "0.3.0",
-  "main": "dist/eslint-plugin-format-js-tag.cjs.js",
+  "main": "dist/preconstruct-eslint-plugin-format-js-tag.cjs.js",
+  "module": "dist/preconstruct-eslint-plugin-format-js-tag.esm.js",
+  "exports": {
+    ".": {
+      "types": {
+        "import": "./dist/preconstruct-eslint-plugin-format-js-tag.cjs.mjs",
+        "default": "./dist/preconstruct-eslint-plugin-format-js-tag.cjs.js"
+      },
+      "module": "./dist/preconstruct-eslint-plugin-format-js-tag.esm.js",
+      "import": "./dist/preconstruct-eslint-plugin-format-js-tag.cjs.mjs",
+      "default": "./dist/preconstruct-eslint-plugin-format-js-tag.cjs.js"
+    },
+    "./package.json": "./package.json"
+  },
   "files": [
     "dist"
   ],

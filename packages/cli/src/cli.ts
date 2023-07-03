@@ -14,9 +14,7 @@ import {
   BatchError,
 } from "./errors";
 
-// tricking static analysis is fun
-// @ts-ignore
-process["e" + "nv"].NODE_ENV = "production";
+process.env.NODE_ENV = "production";
 
 let { input } = meow(
   `
