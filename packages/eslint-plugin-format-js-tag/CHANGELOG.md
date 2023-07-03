@@ -1,5 +1,11 @@
 # @preconstruct/eslint-plugin-format-js-tag
 
+## 0.4.0
+
+### Minor Changes
+
+- [#565](https://github.com/preconstruct/preconstruct/pull/565) [`484c6a7`](https://github.com/preconstruct/preconstruct/commit/484c6a7306236d741a89f7ca6ddef7ff60799f7e) Thanks [@Andarist](https://github.com/Andarist)! - `package.json#exports` have been added to limit what (and how) code might be imported from the package.
+
 ## 0.3.0
 
 ### Minor Changes
