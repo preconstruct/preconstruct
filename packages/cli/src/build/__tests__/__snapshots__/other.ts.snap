@@ -133,16 +133,16 @@ exports[`should lazily get globals: src/index.js 1`] = `"export default "somethi
 exports[`typescript with forced dts emit: dist/declarations/src/create-store.d.ts 1`] = `
 "import { Action } from "@reduxjs/toolkit";
 import { ThunkAction } from "redux-thunk";
-import { RootState } from "./root-reducer";
+import { RootState } from "./root-reducer.js";
 export type AppThunk = ThunkAction<void, RootState, unknown, Action<string>>;
 export declare function createStore(): any;
 "
 `;
 
 exports[`typescript with forced dts emit: dist/declarations/src/index.d.ts 1`] = `
-"export { createStore } from "./create-store";
-export type { AppThunk } from "./create-store";
-export type { RootState } from "./root-reducer";
+"export { createStore } from "./create-store.js";
+export type { AppThunk } from "./create-store.js";
+export type { RootState } from "./root-reducer.js";
 "
 `;
 

@@ -159,8 +159,8 @@ test("typescript", async () => {
     export type SomeType = string;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/index.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    import { SomeType } from "./another-thing";
-    export * from "./one-more-thing";
+    import { SomeType } from "./another-thing.js";
+    export * from "./one-more-thing.js";
     import * as path from "path";
     export { path };
     declare let thing: SomeType;
@@ -1146,8 +1146,8 @@ test("use client with typescript", async () => {
     export declare const B = 2;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/index.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    export { A } from "./a";
-    export { B } from "./b";
+    export { A } from "./a.js";
+    export { B } from "./b.js";
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     export * from "./declarations/src/index";

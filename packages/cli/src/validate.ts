@@ -126,12 +126,12 @@ export const FORMER_FLAGS_THAT_ARE_ENABLED_NOW = new Set<string>([
   "newDistFilenames",
   "newProcessEnvNodeEnvReplacementStrategyAndSkipTerserOnCJSProdBuild",
   "exports",
+  "onlyEmitUsedTypeScriptDeclarations",
 ]);
 
 export const EXPERIMENTAL_FLAGS = new Set([
   "logCompiledFiles",
   "keepDynamicImportAsDynamicImportInCommonJS",
-  "onlyEmitUsedTypeScriptDeclarations",
   "importsConditions",
 ]);
 
