@@ -143,13 +143,13 @@ export let getRollupConfig = (
             );
           }
         },
-      } as Plugin,
+      } satisfies Plugin,
       options.kind === "node-prod" && nodeDevProdEntry(),
       (options.kind === "node-prod" || isDefaultConditionsBuild) && flow(),
       resolveErrorsPlugin(pkg, warnings, options.kind === "umd"),
       (options.kind === "node-prod" || isDefaultConditionsBuild) &&
         typescriptDeclarations(pkg),
-      (options.kind === "node-prod" || isDefaultConditionsBuild) &&
+      (options.kind === "node-prod" || options.kind === "conditions") &&
         pkg.exportsFieldConfig()?.importConditionDefaultExport === "default" &&
         mjsProxy(pkg),
       serverComponentsPlugin({ sourceMap: options.kind === "umd" }),
