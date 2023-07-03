@@ -143,7 +143,7 @@ export let getRollupConfig = (
             );
           }
         },
-      } satisfies Plugin,
+      } as Plugin,
       options.kind === "node-prod" && nodeDevProdEntry(),
       (options.kind === "node-prod" || isDefaultConditionsBuild) && flow(),
       resolveErrorsPlugin(pkg, warnings, options.kind === "umd"),
