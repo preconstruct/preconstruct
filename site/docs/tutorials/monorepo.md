@@ -78,7 +78,7 @@ We're going to add it to a postinstall script so that yarn will run it after pac
   "private": true,
   "workspaces": ["packages/*"],
   "dependencies": {
-    "@preconstruct/cli": "^1.0.0"
+    "@preconstruct/cli": "^2.8.1"
   },
   "preconstruct": {
     "packages": ["packages/*"]
