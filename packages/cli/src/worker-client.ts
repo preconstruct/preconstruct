@@ -1,6 +1,5 @@
 import Worker from "jest-worker";
-// @ts-ignore
-import isCI from "is-ci";
+import { isCI } from "ci-info";
 
 let shouldUseWorker =
   process.env.DISABLE_PRECONSTRUCT_WORKER !== "true" &&
