@@ -1,5 +1,12 @@
+import spawn from "spawndamnit";
 import build from "..";
-import { typescriptFixture, testdir, getFiles, ts } from "../../../test-utils";
+import {
+  typescriptFixture,
+  testdir,
+  getFiles,
+  ts,
+  js,
+} from "../../../test-utils";
 
 // TODO: make it faster so this isn't required
 jest.setTimeout(20000);
@@ -251,6 +258,137 @@ test("imports conditions", async () => {
     export { something };
 
   `);
+});
+
+describe("imports conditions runtime check with importConditionDefaultExport: default", () => {
+  // we should be able to just type this as string and assign to it from within `beforeAll`
+  // but Jest doesn't wait on `beforeAll`'s completion before executing concurrent tests
+  // see https://github.com/jestjs/jest/issues/7997
+  let dirPromise: Promise<string>;
+
+  beforeAll(async () => {
+    let resolve: (dir: string) => void;
+    dirPromise = new Promise((_resolve) => (resolve = _resolve));
+
+    const dir = await testdir({
+      "package.json": JSON.stringify({
+        name: "@scope/pkg",
+        main: "dist/scope-pkg.cjs.js",
+        module: "dist/scope-pkg.esm.js",
+        exports: {
+          ".": {
+            types: {
+              import: "./dist/scope-pkg.cjs.mjs",
+              default: "./dist/scope-pkg.cjs.js",
+            },
+            browser: {
+              development: {
+                module: "./dist/scope-pkg.browser.development.esm.js",
+                import: "./dist/scope-pkg.browser.development.cjs.mjs",
+                default: "./dist/scope-pkg.browser.development.cjs.js",
+              },
+              module: "./dist/scope-pkg.browser.esm.js",
+              import: "./dist/scope-pkg.browser.cjs.mjs",
+              default: "./dist/scope-pkg.browser.cjs.js",
+            },
+            development: {
+              module: "./dist/scope-pkg.development.esm.js",
+              import: "./dist/scope-pkg.development.cjs.mjs",
+              default: "./dist/scope-pkg.development.cjs.js",
+            },
+            module: "./dist/scope-pkg.esm.js",
+            import: "./dist/scope-pkg.cjs.mjs",
+            default: "./dist/scope-pkg.cjs.js",
+          },
+          "./package.json": "./package.json",
+        },
+        preconstruct: {
+          exports: {
+            importConditionDefaultExport: "default",
+          },
+          ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+            importsConditions: true,
+          },
+        },
+        imports: {
+          "#is-development": {
+            development: "./src/true.js",
+            default: "./src/false.js",
+          },
+          "#is-browser": {
+            browser: "./src/true.js",
+            default: "./src/false.js",
+          },
+        },
+      }),
+      "src/true.js": js`
+        export default true;
+      `,
+      "src/false.js": js`
+        export default false;
+      `,
+      "src/index.js": js`
+        import isDevelopment from "#is-development";
+        import isBrowser from "#is-browser";
+        if (isDevelopment) {
+          console.log("development");
+        } else {
+          console.log("production");
+        }
+        if (isBrowser) {
+          console.log("browser");
+        } else {
+          console.log("node");
+        }
+      `,
+      node_modules: typescriptFixture.node_modules,
+      "runtime-check.mjs": js`
+        import "@scope/pkg";
+      `,
+      "runtime-check.cjs": js`
+        require("@scope/pkg");
+      `,
+    });
+    await build(dir);
+
+    resolve!(dir);
+  });
+
+  describe.each(["cjs", "mjs"] as const)("with %s", (moduleType) => {
+    test.each([
+      {
+        conditions: [],
+        expected: ["production", "node"],
+      },
+      {
+        conditions: ["development"],
+        expected: ["development", "node"],
+      },
+      {
+        conditions: ["browser"],
+        expected: ["production", "browser"],
+      },
+      {
+        conditions: ["development", "browser"],
+        expected: ["development", "browser"],
+      },
+    ])("and conditions: $conditions", async ({ conditions, expected }) => {
+      let node = await spawn(
+        "node",
+        [
+          ...conditions.flatMap((condition) => ["-C", condition]),
+          `./runtime-check.${moduleType}`,
+        ],
+        {
+          cwd: await dirPromise,
+        }
+      );
+
+      expect(node.code).toBe(0);
+      expect(node.stdout.toString("utf8")).toBe(expected.join("\n") + "\n");
+      expect(node.stderr.toString("utf8")).toMatchInlineSnapshot(`""`);
+    });
+  });
 });
 
 test("import with #something inside import type type arguments", async () => {
