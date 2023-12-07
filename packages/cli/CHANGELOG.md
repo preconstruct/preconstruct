@@ -1,5 +1,13 @@
 # preconstruct
 
+## 2.8.2
+
+### Patch Changes
+
+- [#584](https://github.com/preconstruct/preconstruct/pull/584) [`d79abf2`](https://github.com/preconstruct/preconstruct/commit/d79abf2c78f01c2bfbd50a5288242469defbc630) Thanks [@emmatown](https://github.com/emmatown)! - Fix `.d.cts`/`.d.mts` files breaking declaration generation
+
+* [#570](https://github.com/preconstruct/preconstruct/pull/570) [`edb4320`](https://github.com/preconstruct/preconstruct/commit/edb4320bc2355c0e61060a8c21b821d02e9535ca) Thanks [@Andarist](https://github.com/Andarist)! - Replace the dependency `is-ci` with `ci-info`.
+
 ## 2.8.1
 
 ### Patch Changes
