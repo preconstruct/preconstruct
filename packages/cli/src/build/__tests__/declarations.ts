@@ -563,3 +563,63 @@ test("normalises imports in manually authored .d.ts files", async () => {
 
   `);
 });
+
+test("normalises imports in manually authored .d.cts files", async () => {
+  let dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "@imports-replacing/repo",
+      preconstruct: {
+        packages: ["packages/pkg-a"],
+      },
+    }),
+    "packages/pkg-a/package.json": JSON.stringify({
+      name: "pkg-a",
+      main: "dist/pkg-a.cjs.js",
+      module: "dist/pkg-a.esm.js",
+      imports: {
+        "#hidden": "./src/hidden_stuff.cjs",
+      },
+    }),
+    "packages/pkg-a/src/index.js": ts`
+    `,
+    "packages/pkg-a/src/index.d.ts": ts`
+      export type A = typeof import(/** comment */ "#hidden").gem;
+      export type B = typeof import(/* non-jsdoc comment */ "./hidden_stuff.cjs").gem;
+      export type C = typeof import("./hidden_stuff.cjs").gem;
+    `,
+    "packages/pkg-a/src/hidden_stuff.cjs": ts`
+      export const gem = "🎁";
+    `,
+    "packages/pkg-a/src/hidden_stuff.d.cts": ts`
+      export const gem = "🎁";
+    `,
+    node_modules: typescriptFixture.node_modules,
+    "tsconfig.json": JSON.stringify({
+      compilerOptions: {
+        module: "ESNext",
+        moduleResolution: "node16",
+        allowImportingTsExtensions: true,
+        strict: true,
+        declaration: true,
+      },
+    }),
+  });
+  await build(dir);
+
+  expect(await getFiles(dir, ["packages/*/dist/**/*.d.*"]))
+    .toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/declarations/src/hidden_stuff.d.cts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export const gem = "🎁";
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/declarations/src/index.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export type A = typeof import(/** comment */ "./hidden_stuff.js").gem;
+    export type B = typeof import(/* non-jsdoc comment */ "./hidden_stuff.js").gem;
+    export type C = typeof import("./hidden_stuff.js").gem;
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export * from "./declarations/src/index";
+    //# sourceMappingURL=pkg-a.cjs.d.ts.map
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.d.ts.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {"version":3,"file":"pkg-a.cjs.d.ts","sourceRoot":"","sources":["./declarations/src/index.d.ts"],"names":[],"mappings":"AAAA"}
+
+  `);
+});
