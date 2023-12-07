@@ -132,6 +132,8 @@ export async function getProgram(dirname: string, pkgName: string, ts: TS) {
     : memoizedGetProgram(ts)(configFileName);
 }
 
+const dtsFileRegex = /\.d\.[cm]?ts$/;
+
 export function getDeclarationsForFile(
   filename: string,
   typescript: TS,
@@ -153,7 +155,7 @@ export function getDeclarationsForFile(
       `Could not find source file at ${filename} in TypeScript declaration generation, this is likely a bug in Preconstruct`
     );
   }
-  if (filename.endsWith(".d.ts")) {
+  if (dtsFileRegex.test(filename)) {
     let content = sourceFile.text;
     if (visitModuleSpecifier) {
       const magicString = new MagicString(content);

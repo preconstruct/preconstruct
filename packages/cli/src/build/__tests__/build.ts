@@ -1124,7 +1124,10 @@ test("correct default export using mjs and dmts proxies", async () => {
   `);
   expect(tsc.stderr.toString("utf8")).toMatchInlineSnapshot(`""`);
 
-  let node = await spawn("node", ["runtime-blah.mjs"], { cwd: dir });
+  let node = await spawn("node", ["runtime-blah.mjs"], {
+    cwd: dir,
+    env: { ...process.env, FORCE_COLOR: undefined, NO_COLOR: "1" },
+  });
 
   expect(node.code).toBe(0);
   expect(node.stdout.toString("utf8")).toMatchInlineSnapshot(`
@@ -1576,7 +1579,10 @@ test("no __esModule when reexporting namespace with mjs proxy", async () => {
 
   `);
 
-  let node = await spawn("node", ["runtime-blah.mjs"], { cwd: dir });
+  let node = await spawn("node", ["runtime-blah.mjs"], {
+    cwd: dir,
+    env: { ...process.env, FORCE_COLOR: undefined, NO_COLOR: "1" },
+  });
 
   expect(node.code).toBe(0);
   expect(node.stdout.toString("utf8")).toMatchInlineSnapshot(`
@@ -1735,7 +1741,10 @@ test("export * from external", async () => {
 
   `);
 
-  let node = await spawn("node", ["runtime-blah.mjs"], { cwd: dir });
+  let node = await spawn("node", ["runtime-blah.mjs"], {
+    cwd: dir,
+    env: { ...process.env, FORCE_COLOR: undefined, NO_COLOR: "1" },
+  });
 
   expect(node.code).toBe(0);
   expect(node.stdout.toString("utf8")).toMatchInlineSnapshot(`
@@ -2171,7 +2180,10 @@ test("correct default export using mjs and dmts proxies with moduleResolution: b
   `);
   expect(tsc.stderr.toString("utf8")).toMatchInlineSnapshot(`""`);
 
-  let node = await spawn("node", ["runtime-blah.mjs"], { cwd: dir });
+  let node = await spawn("node", ["runtime-blah.mjs"], {
+    cwd: dir,
+    env: { ...process.env, FORCE_COLOR: undefined, NO_COLOR: "1" },
+  });
 
   expect(node.code).toBe(0);
   expect(node.stdout.toString("utf8")).toMatchInlineSnapshot(`
