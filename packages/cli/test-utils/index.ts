@@ -352,7 +352,7 @@ export async function testdir(dir: Fixture) {
       const output = dir[filename];
       const fullPath = path.join(temp, filename);
       if (typeof output === "string") {
-        await fs.outputFile(fullPath, dir[filename]);
+        await fs.outputFile(fullPath, output);
       } else {
         const dir = path.dirname(fullPath);
         await fs.ensureDir(dir);
