@@ -2227,3 +2227,87 @@ test("module with no runtime exports but with init-time side-effects with import
   `);
   expect(node.stderr.toString("utf8")).toMatchInlineSnapshot(`""`);
 });
+
+test("type: module", async () => {
+  let dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "multiple-entrypoints",
+      type: "module",
+      exports: {
+        ".": "./dist/multiple-entrypoints.js",
+        "./multiply": "./dist/multiple-entrypoints-multiply.js",
+        "./package.json": "./package.json",
+      },
+      preconstruct: {
+        exports: true,
+        entrypoints: ["index.ts", "multiply.ts"],
+        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+          importsConditions: true,
+          distInRoot: true,
+          typeModule: true,
+        },
+      },
+    }),
+    "src/index.ts": js`
+      export let a = "a";
+    `,
+    "src/multiply.ts": js`
+      export let b = "b";
+    `,
+    "runtime-blah.mjs": js`
+      import { b } from "multiple-entrypoints/multiply";
+      console.log(b);
+    `,
+    ...tsSetupFiles,
+  });
+
+  await build(dir);
+
+  expect(await getFiles(dir, ["**/dist/**"])).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/index.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export declare let a: string;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/multiply.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export declare let b: string;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/multiple-entrypoints-multiply.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export * from "./declarations/src/multiply";
+    //# sourceMappingURL=multiple-entrypoints-multiply.d.ts.map
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/multiple-entrypoints-multiply.d.ts.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {"version":3,"file":"multiple-entrypoints-multiply.d.ts","sourceRoot":"","sources":["./declarations/src/multiply.d.ts"],"names":[],"mappings":"AAAA"}
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/multiple-entrypoints-multiply.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    let b = "b";
+
+    export { b };
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/multiple-entrypoints.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export * from "./declarations/src/index";
+    //# sourceMappingURL=multiple-entrypoints.d.ts.map
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/multiple-entrypoints.d.ts.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {"version":3,"file":"multiple-entrypoints.d.ts","sourceRoot":"","sources":["./declarations/src/index.d.ts"],"names":[],"mappings":"AAAA"}
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/multiple-entrypoints.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    let a = "a";
+
+    export { a };
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ multiply/dist/multiple-entrypoints-multiply.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export * from "../../src/multiply";
+    //# sourceMappingURL=multiple-entrypoints-multiply.d.ts.map
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ multiply/dist/multiple-entrypoints-multiply.d.ts.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {"version":3,"file":"multiple-entrypoints-multiply.d.ts","sourceRoot":"","sources":["../../src/multiply.ts"],"names":[],"mappings":"AAAA"}
+
+  `);
+  let node = await spawn("node", ["runtime-blah.mjs"], { cwd: dir });
+
+  expect(node.stdout.toString("utf8")).toMatchInlineSnapshot(`
+    "b
+    "
+  `);
+  expect(node.stderr.toString("utf8")).toMatchInlineSnapshot(`""`);
+  expect(node.code).toBe(0);
+});
