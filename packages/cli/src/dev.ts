@@ -216,11 +216,14 @@ export default async function dev(projectDir: string) {
           const cjsTemplate = commonjsRequireHookTemplate(entrypoint);
           if (exportsFieldConfig?.conditions.kind === "imports") {
             for (const conditions of exportsFieldConfig.conditions.groups.keys()) {
+              const distRoot = project.experimentalFlags.distInRoot
+                ? pkg.directory
+                : entrypoint.directory;
               entrypointPromises.push(
                 fs.symlink(
                   entrypoint.source,
                   path.join(
-                    entrypoint.directory,
+                    distRoot,
                     getDistFilenameForConditions(
                       entrypoint,
                       conditions.concat("module")
@@ -229,7 +232,7 @@ export default async function dev(projectDir: string) {
                 ),
                 fs.writeFile(
                   path.join(
-                    entrypoint.directory,
+                    distRoot,
                     getDistFilenameForConditions(entrypoint, conditions)
                   ),
                   cjsTemplate
@@ -376,7 +379,13 @@ async function cleanEntrypoint(entrypoint: Entrypoint) {
 }
 
 function commonjsRequireHookTemplate(entrypoint: Entrypoint) {
-  const distDirectory = path.join(entrypoint.directory, "dist");
+  const distDirectory = path.join(
+    (entrypoint.package.project.experimentalFlags.distInRoot
+      ? entrypoint.package
+      : entrypoint
+    ).directory,
+    "dist"
+  );
   let entrypointPath = normalizePath(
     path.relative(distDirectory, entrypoint.source)
   );
