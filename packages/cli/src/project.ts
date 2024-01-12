@@ -30,16 +30,24 @@ export class Project extends Item<{
       logCompiledFiles?: JSONValue;
       keepDynamicImportAsDynamicImportInCommonJS?: JSONValue;
       importsConditions?: JSONValue;
+      distInRoot?: JSONValue;
     };
   };
 }> {
   get experimentalFlags() {
     let config =
       this.json.preconstruct.___experimentalFlags_WILL_CHANGE_IN_PATCH || {};
+    if (config.distInRoot && !config.importsConditions) {
+      throw new FatalError(
+        "distInRoot is not supported without importsConditions",
+        this.name
+      );
+    }
     return {
       logCompiledFiles: !!config.logCompiledFiles,
       keepDynamicImportAsDynamicImportInCommonJS: !!config.keepDynamicImportAsDynamicImportInCommonJS,
       importsConditions: !!config.importsConditions,
+      distInRoot: !!config.distInRoot,
     };
   }
   get configPackages(): Array<string> {

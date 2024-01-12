@@ -57,6 +57,7 @@ export function resolveErrorsPlugin(
       if (isUmd || resolved.id?.startsWith("__USE_CLIENT_IMPORT__")) {
         return resolved;
       }
+      debugger;
       warnings.add(
         `all relative imports in a package should only import modules inside of their package directory but ${
           importer
