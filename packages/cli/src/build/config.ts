@@ -7,7 +7,11 @@ import path from "path";
 import resolveFrom from "resolve-from";
 import * as logger from "../logger";
 import { Project } from "../project";
-import { getDistExtension, getDistExtensionForConditions } from "../utils";
+import {
+  getDistExtension,
+  getDistExtensionForConditions,
+  getDistExtensionForConditionsWithTypeModule,
+} from "../utils";
 
 function getGlobal(project: Project, name: string) {
   if (
@@ -75,20 +79,39 @@ export function getRollupConfigs(pkg: Package) {
 
   if (exportsFieldConfig?.conditions.kind === "imports") {
     for (const conditions of exportsFieldConfig.conditions.groups.keys()) {
+      const config = getRollupConfig(
+        pkg,
+        pkg.entrypoints,
+        { kind: "conditions", conditions },
+        pkg.project.experimentalFlags.logCompiledFiles
+          ? (filename) => {
+              logger.info(
+                "compiled " +
+                  filename.replace(pkg.project.directory + path.sep, "")
+              );
+            }
+          : () => {}
+      );
+      if (pkg.isTypeModule()) {
+        configs.push({
+          config,
+          outputs: [
+            {
+              format: "es" as const,
+              entryFileNames: `[name].${getDistExtensionForConditionsWithTypeModule(
+                conditions
+              )}`,
+              chunkFileNames: `dist/[name]-[hash].${getDistExtensionForConditionsWithTypeModule(
+                conditions
+              )}`,
+              dir: pkg.directory,
+            },
+          ],
+        });
+        continue;
+      }
       configs.push({
-        config: getRollupConfig(
-          pkg,
-          pkg.entrypoints,
-          { kind: "conditions", conditions },
-          pkg.project.experimentalFlags.logCompiledFiles
-            ? (filename) => {
-                logger.info(
-                  "compiled " +
-                    filename.replace(pkg.project.directory + path.sep, "")
-                );
-              }
-            : () => {}
-        ),
+        config,
         outputs: [
           {
             format: "cjs" as const,
