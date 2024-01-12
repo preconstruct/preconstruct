@@ -118,14 +118,14 @@ export function exportsField(
         );
         const key = "." + entrypoint.afterPackageName;
         if (
-          !hasNoConditions &&
+          hasNoConditions &&
           Object.keys(exportsField).length === 1 &&
           exportsField.default
         ) {
           output[key] = exportsField.default;
           continue;
         }
-        output["." + entrypoint.afterPackageName] = {
+        output[key] = {
           // yes, i'm very intentionally pointing at the .js/.mjs rather than the .d.ts/.d.mts
           // TODO: this should probably only be here if you're using ts
           // or maybe we just generate more .d.ts files in the dist rather than having a types condition

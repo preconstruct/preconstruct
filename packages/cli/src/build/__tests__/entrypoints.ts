@@ -238,7 +238,7 @@ test("multiple entrypoints", async () => {
     `,
     "runtime-blah.js": js`
       const { multiply } = require("multiple-entrypoints/multiply");
-      console.log(multiply(2, 2));
+      console.log(multiply(2, 2) + "");
     `,
   });
 
