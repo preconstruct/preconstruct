@@ -323,7 +323,9 @@ To use `"type": "module"`, you need to enable the experimental flags and the exp
 "preconstruct": {
   "exports": true,
   "___experimentalFlags_WILL_CHANGE_IN_PATCH": {
-    "nodeESM": true
+    "typeModule": true,
+    "distInRoot": true,
+    "importsConditions": true
   },
 }
 ```
