@@ -15,6 +15,7 @@ import {
   dtsDefaultForDmtsTemplate,
   getDtsDefaultForMtsFilepath,
   getDistFilenameForConditions,
+  getBaseDistName,
 } from "./utils";
 import * as fs from "fs-extra";
 import path from "path";
@@ -84,9 +85,15 @@ export async function writeDevTSFiles(
   entrypoint: Entrypoint,
   hasDefaultExport: boolean
 ) {
-  const dtsReexportFilename = path
-    .join(entrypoint.directory, validFieldsForEntrypoint.main(entrypoint))
-    .replace(/\.js$/, ".d.ts");
+  const dtsReexportFilename = entrypoint.package.isTypeModule()
+    ? path.join(
+        entrypoint.directory,
+        "dist",
+        getBaseDistName(entrypoint) + ".d.ts"
+      )
+    : path
+        .join(entrypoint.directory, validFieldsForEntrypoint.main(entrypoint))
+        .replace(/\.js$/, ".d.ts");
 
   const baseDtsFilename = path.basename(dtsReexportFilename);
   const relativePathWithExtension = normalizePath(

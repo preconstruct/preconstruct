@@ -31,6 +31,7 @@ export class Project extends Item<{
       keepDynamicImportAsDynamicImportInCommonJS?: JSONValue;
       importsConditions?: JSONValue;
       distInRoot?: JSONValue;
+      typeModule?: JSONValue;
     };
   };
 }> {
@@ -43,11 +44,18 @@ export class Project extends Item<{
         this.name
       );
     }
+    if (config.typeModule && !config.distInRoot) {
+      throw new FatalError(
+        "exportsOnly is not supported without distInRoot",
+        this.name
+      );
+    }
     return {
       logCompiledFiles: !!config.logCompiledFiles,
       keepDynamicImportAsDynamicImportInCommonJS: !!config.keepDynamicImportAsDynamicImportInCommonJS,
       importsConditions: !!config.importsConditions,
       distInRoot: !!config.distInRoot,
+      typeModule: !!config.typeModule,
     };
   }
   get configPackages(): Array<string> {

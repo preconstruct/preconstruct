@@ -23,7 +23,7 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
   return {
     name: "typescript-declarations",
     async generateBundle(opts, bundle) {
-      if (opts.format !== "cjs") return;
+      if (opts.format !== "cjs" && !pkg.isTypeModule()) return;
       // we want do a naive check first and go into
       // so that we can avoid some extra fs operations if there is say some .ts entrypoints
       // and some .js entrypoints with a .d.ts
