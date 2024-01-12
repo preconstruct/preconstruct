@@ -98,9 +98,13 @@ export function exportsField(
       exportsFieldConfig.importConditionDefaultExport
     );
   } else {
-    const hasSomeConditions =
-      exportsFieldConfig.conditions.groups.size === 1 &&
-      exportsFieldConfig.conditions.groups.values().next().value.length === 0;
+    const groups = [...exportsFieldConfig.conditions.groups];
+    const hasSomeConditions = !(
+      groups.length === 1 &&
+      groups[0][0].length === 0 &&
+      groups[0][1].length === 1 &&
+      groups[0][1][0].length === 0
+    );
     const isTypeModule = pkg.isTypeModule();
     for (const entrypoint of pkg.entrypoints) {
       if (isTypeModule) {
