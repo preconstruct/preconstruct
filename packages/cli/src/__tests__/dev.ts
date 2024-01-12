@@ -314,7 +314,7 @@ test("exports field with worker condition", async () => {
           },
         },
       }),
-      "src/index.js": "console.log(1)",
+      "src/index.js": 'console.log("1")',
     })
   );
   await dev(tmpPath);
@@ -739,7 +739,7 @@ test("multiple entrypoints", async () => {
     `,
     "something.js": js`
       const { multiply } = require("multiple-entrypoints/multiply");
-      console.log(multiply(2, 2));
+      console.log(multiply(2, 2) + "");
     `,
   });
 
