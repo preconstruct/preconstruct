@@ -98,16 +98,15 @@ export function exportsField(
       exportsFieldConfig.importConditionDefaultExport
     );
   } else {
-    const groups = [...exportsFieldConfig.conditions.groups];
-    const hasSomeConditions = !(
-      groups.length === 1 &&
-      groups[0][0].length === 0 &&
-      groups[0][1].length === 1 &&
-      groups[0][1][0].length === 0
-    );
     const isTypeModule = pkg.isTypeModule();
     for (const entrypoint of pkg.entrypoints) {
       if (isTypeModule) {
+        const groups = [...exportsFieldConfig.conditions.groups];
+        const hasNoConditions =
+          groups.length === 1 &&
+          groups[0][0].length === 0 &&
+          groups[0][1].length === 1 &&
+          groups[0][1][0].length === 0;
         const exportsField = createExportsField(
           exportsFieldConfig.conditions.groups,
           (conditions) => ({
@@ -119,7 +118,7 @@ export function exportsField(
         );
         const key = "." + entrypoint.afterPackageName;
         if (
-          !hasSomeConditions &&
+          !hasNoConditions &&
           Object.keys(exportsField).length === 1 &&
           exportsField.default
         ) {
@@ -127,15 +126,13 @@ export function exportsField(
           continue;
         }
         output["." + entrypoint.afterPackageName] = {
-          ...(hasSomeConditions && {
-            // yes, i'm very intentionally pointing at the .js/.mjs rather than the .d.ts/.d.mts
-            // TODO: this should probably only be here if you're using ts
-            // or maybe we just generate more .d.ts files in the dist rather than having a types condition
-            types: getExportsFieldOutputPathForConditionsWithTypeModule(
-              entrypoint,
-              []
-            ),
-          }),
+          // yes, i'm very intentionally pointing at the .js/.mjs rather than the .d.ts/.d.mts
+          // TODO: this should probably only be here if you're using ts
+          // or maybe we just generate more .d.ts files in the dist rather than having a types condition
+          types: getExportsFieldOutputPathForConditionsWithTypeModule(
+            entrypoint,
+            []
+          ),
           ...createExportsField(
             exportsFieldConfig.conditions.groups,
             (conditions) => ({
@@ -149,23 +146,18 @@ export function exportsField(
         continue;
       }
       output["." + entrypoint.afterPackageName] = {
-        ...(hasSomeConditions && {
-          // yes, i'm very intentionally pointing at the .js/.mjs rather than the .d.ts/.d.mts
-          // TODO: this should probably only be here if you're using ts
-          // or maybe we just generate more .d.ts files in the dist rather than having a types condition
-          types:
-            exportsFieldConfig.importConditionDefaultExport === "default"
-              ? {
-                  import: getExportsFieldOutputPathForConditions(entrypoint, [
-                    "import",
-                  ]),
-                  default: getExportsFieldOutputPathForConditions(
-                    entrypoint,
-                    []
-                  ),
-                }
-              : getExportsFieldOutputPathForConditions(entrypoint, []),
-        }),
+        // yes, i'm very intentionally pointing at the .js/.mjs rather than the .d.ts/.d.mts
+        // TODO: this should probably only be here if you're using ts
+        // or maybe we just generate more .d.ts files in the dist rather than having a types condition
+        types:
+          exportsFieldConfig.importConditionDefaultExport === "default"
+            ? {
+                import: getExportsFieldOutputPathForConditions(entrypoint, [
+                  "import",
+                ]),
+                default: getExportsFieldOutputPathForConditions(entrypoint, []),
+              }
+            : getExportsFieldOutputPathForConditions(entrypoint, []),
         ...createExportsField(
           exportsFieldConfig.conditions.groups,
           (conditions) => ({
