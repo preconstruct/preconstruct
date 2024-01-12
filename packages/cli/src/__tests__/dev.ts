@@ -687,3 +687,68 @@ test("dev command entrypoint", async () => {
   expect(stdout.toString().split("\n")).toEqual(["message from something", ""]);
   expect(code).toBe(0);
 });
+
+test("multiple entrypoints", async () => {
+  let dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "multiple-entrypoints",
+      main: "dist/multiple-entrypoints.cjs.js",
+      module: "dist/multiple-entrypoints.esm.js",
+      exports: {
+        ".": {
+          types: {
+            import: "./dist/multiple-entrypoints.cjs.mjs",
+            default: "./dist/multiple-entrypoints.cjs.js",
+          },
+          module: "./dist/multiple-entrypoints.esm.js",
+          import: "./dist/multiple-entrypoints.cjs.mjs",
+          default: "./dist/multiple-entrypoints.cjs.js",
+        },
+        "./multiply": {
+          types: {
+            import: "./dist/multiple-entrypoints-multiply.cjs.mjs",
+            default: "./dist/multiple-entrypoints-multiply.cjs.js",
+          },
+          module: "./dist/multiple-entrypoints-multiply.esm.js",
+          import: "./dist/multiple-entrypoints-multiply.cjs.mjs",
+          default: "./dist/multiple-entrypoints-multiply.cjs.js",
+        },
+        "./package.json": "./package.json",
+      },
+      preconstruct: {
+        exports: {
+          importConditionDefaultExport: "default",
+        },
+        entrypoints: ["index.ts", "multiply.ts"],
+        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+          importsConditions: true,
+          distInRoot: true,
+        },
+      },
+    }),
+    "multiply/package.json": JSON.stringify({
+      main: "../dist/multiple-entrypoints-multiply.cjs.js",
+      module: "../dist/multiple-entrypoints-multiply.esm.js",
+    }),
+    "src/index.ts": js`
+      export let sum = (a, b) => a + b;
+      export default "a";
+    `,
+    "src/multiply.ts": js`
+      export let multiply = (a, b) => a * b;
+    `,
+    "something.js": js`
+      const { multiply } = require("multiple-entrypoints/multiply");
+      console.log(multiply(2, 2));
+    `,
+  });
+
+  await dev(dir);
+
+  let { code, stdout, stderr } = await spawn("node", [
+    path.join(dir, "something"),
+  ]);
+  expect(stderr.toString()).toBe("");
+  expect(stdout.toString().split("\n")).toEqual(["4", ""]);
+  expect(code).toBe(0);
+});

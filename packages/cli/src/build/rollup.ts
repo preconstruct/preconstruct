@@ -79,15 +79,19 @@ export let getRollupConfig = (
   }
 
   let input: Record<string, string> = {};
-
-  entrypoints.forEach((entrypoint) => {
+  const { distInRoot } = pkg.project.experimentalFlags;
+  for (const entrypoint of entrypoints) {
+    if (distInRoot) {
+      input[`dist/${getBaseDistName(entrypoint)}`] = entrypoint.source;
+      continue;
+    }
     input[
       path.relative(
         pkg.directory,
         path.join(entrypoint.directory, "dist", getBaseDistName(entrypoint))
       )
     ] = entrypoint.source;
-  });
+  }
 
   let warnings = new Set<string>();
   const isDefaultConditionsBuild =
