@@ -28,7 +28,7 @@ export function validatePackage(pkg: Package) {
   const exportsFieldConfig = pkg.exportsFieldConfig();
 
   if (exportsFieldConfig) {
-    if (!fields.module) {
+    if (!fields.module && !pkg.isTypeModule()) {
       throw new FixableError(errors.noModuleFieldWithExportsField, pkg.name);
     }
     if (exportsFieldConfig.conditions.kind === "legacy") {
@@ -54,6 +54,10 @@ export function validatePackage(pkg: Package) {
       errors.invalidField("exports", pkg.json.exports, exportsField(pkg)),
       pkg.name
     );
+  }
+
+  if (pkg.isTypeModule()) {
+    return;
   }
 
   pkg.entrypoints.forEach((entrypoint) => {

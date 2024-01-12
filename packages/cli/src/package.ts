@@ -74,6 +74,25 @@ function createEntrypoints(
 
   return Promise.all(
     descriptors.map(async ({ filename, contents, hasAccepted, sourceFile }) => {
+      if (pkg.isTypeModule()) {
+        if (contents !== undefined && pkg.path !== filename) {
+          throw new FatalError(
+            "this package has an entrypoint package.json but the typeModule feature is enabled, please remove the package.json",
+            pkg.name
+          );
+        }
+        return new Entrypoint(
+          filename,
+          getPlainEntrypointContent(
+            pkg,
+            fields,
+            nodePath.dirname(filename),
+            pkg.indent
+          ),
+          pkg,
+          sourceFile
+        );
+      }
       if (contents === undefined) {
         if (!hasAccepted) {
           const entrypointName = getEntrypointName(
@@ -109,6 +128,7 @@ export type EnvCondition = "browser" | "worker";
 
 export class Package extends Item<{
   name?: JSONValue;
+  type?: JSONValue;
   preconstruct: {
     exports?: {
       extra?: Record<string, JSONValue>;
@@ -297,6 +317,12 @@ export class Package extends Item<{
         validFieldsForEntrypoint[field](entrypoint)
       );
     });
+  }
+
+  isTypeModule() {
+    return (
+      this.project.experimentalFlags.typeModule && this.json.type === "module"
+    );
   }
 
   get name(): string {

@@ -98,8 +98,52 @@ export function exportsField(
       exportsFieldConfig.importConditionDefaultExport
     );
   } else {
-    const hasSomeConditions = exportsFieldConfig.conditions.groups.size !== 0;
+    const hasSomeConditions =
+      exportsFieldConfig.conditions.groups.size === 1 &&
+      exportsFieldConfig.conditions.groups.values().next().value.length === 0;
+    const isTypeModule = pkg.isTypeModule();
     for (const entrypoint of pkg.entrypoints) {
+      if (isTypeModule) {
+        const exportsField = createExportsField(
+          exportsFieldConfig.conditions.groups,
+          (conditions) => ({
+            default: getExportsFieldOutputPathForConditionsWithTypeModule(
+              entrypoint,
+              conditions
+            ),
+          })
+        );
+        const key = "." + entrypoint.afterPackageName;
+        if (
+          !hasSomeConditions &&
+          Object.keys(exportsField).length === 1 &&
+          exportsField.default
+        ) {
+          output[key] = exportsField.default;
+          continue;
+        }
+        output["." + entrypoint.afterPackageName] = {
+          ...(hasSomeConditions && {
+            // yes, i'm very intentionally pointing at the .js/.mjs rather than the .d.ts/.d.mts
+            // TODO: this should probably only be here if you're using ts
+            // or maybe we just generate more .d.ts files in the dist rather than having a types condition
+            types: getExportsFieldOutputPathForConditionsWithTypeModule(
+              entrypoint,
+              []
+            ),
+          }),
+          ...createExportsField(
+            exportsFieldConfig.conditions.groups,
+            (conditions) => ({
+              default: getExportsFieldOutputPathForConditionsWithTypeModule(
+                entrypoint,
+                conditions
+              ),
+            })
+          ),
+        };
+        continue;
+      }
       output["." + entrypoint.afterPackageName] = {
         ...(hasSomeConditions && {
           // yes, i'm very intentionally pointing at the .js/.mjs rather than the .d.ts/.d.mts
@@ -281,6 +325,32 @@ export function getExportsFieldOutputPathForConditions(
     getExportsFieldEntrypointOutputPrefix(entrypoint) +
     getDistFilenameForConditions(entrypoint, conditions)
   );
+}
+
+export function getExportsFieldOutputPathForConditionsWithTypeModule(
+  entrypoint: Entrypoint,
+  conditions: string[]
+) {
+  return (
+    getExportsFieldEntrypointOutputPrefix(entrypoint) +
+    getDistFilenameForConditionsWithTypeModule(entrypoint, conditions)
+  );
+}
+
+export function getDistFilenameForConditionsWithTypeModule(
+  entrypoint: MinimalEntrypoint,
+  conditions: string[]
+) {
+  return `dist/${getBaseDistName(
+    entrypoint
+  )}.${getDistExtensionForConditionsWithTypeModule(conditions)}`;
+}
+
+export function getDistExtensionForConditionsWithTypeModule(
+  conditions: string[]
+) {
+  if (conditions.length === 0) return "js";
+  return `${conditions.join(".")}.js`;
 }
 
 export function getExportsImportUnwrappingDefaultOutputPath(
