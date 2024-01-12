@@ -244,10 +244,22 @@ export function getBaseDistFilename(
 }
 
 function getDistFilename(entrypoint: MinimalEntrypoint, target: BuildTarget) {
+  if (entrypoint.package.project.experimentalFlags.distInRoot) {
+    if (entrypoint.package.name === entrypoint.name) {
+      return `dist/${getBaseDistFilename(entrypoint, target)}`;
+    }
+    return (
+      "../".repeat(
+        entrypoint.name.slice(entrypoint.package.name.length + 1).split("/")
+          .length
+      ) + `dist/${getBaseDistFilename(entrypoint, target)}`
+    );
+  }
   return `dist/${getBaseDistFilename(entrypoint, target)}`;
 }
 
 function getExportsFieldEntrypointOutputPrefix(entrypoint: Entrypoint) {
+  if (entrypoint.package.project.experimentalFlags.distInRoot) return "./";
   return `.${entrypoint.afterPackageName}/`;
 }
 
