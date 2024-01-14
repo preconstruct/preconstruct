@@ -19,7 +19,7 @@ jobs:
       - uses: ./.github/actions/setup-deps
 
       - name: version packages
-        run: pnpm changeset version --snapshot ${{ inputs.tag }}
+        run: yarn changeset version --snapshot ${{ inputs.tag }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -29,10 +29,10 @@ jobs:
           git config --global user.email 'automation+github@thinkmill.com.au'
           git commit -a -m 'rc'
 
-      - run: pnpm build:packages
+      - run: yarn build
 
       - name: npm publish, git tag
-        run: pnpm changeset publish --tag ${{ inputs.tag }}
+        run: yarn changeset publish --tag ${{ inputs.tag }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
