@@ -23,11 +23,14 @@ export async function cleanProjectBeforeBuild(project: Project) {
             return fs.remove(path.join(entrypoint.directory, "dist"));
           }),
       ]);
+      const isTypeModule = pkg.isTypeModule();
 
       await Promise.all(
         pkg.entrypoints.map(async (entrypoint) => {
           if (isTsPath(entrypoint.source)) {
-            await fs.mkdir(path.join(entrypoint.directory, "dist"));
+            if (!isTypeModule) {
+              await fs.mkdir(path.join(entrypoint.directory, "dist"));
+            }
             await writeDevTSFiles(
               entrypoint,
               await entrypointHasDefaultExport(
