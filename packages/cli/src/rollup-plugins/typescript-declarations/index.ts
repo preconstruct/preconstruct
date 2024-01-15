@@ -5,7 +5,6 @@ import fs from "fs-extra";
 import { Package } from "../../package";
 import {
   dmtsTemplate,
-  tsReexportDeclMap,
   dtsTemplate,
   getDtsDefaultForMtsFilepath,
   dtsDefaultForDmtsTemplate,
@@ -191,20 +190,13 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
         const dtsFileSource = dtsTemplate(
           baseDtsFilename,
           hasDefaultExport,
-          relativeToSource
+          relativeToSource,
+          `${relativeToSource}.d.ts`
         );
         this.emitFile({
           type: "asset",
           fileName: dtsFileName,
           source: dtsFileSource,
-        });
-        this.emitFile({
-          type: "asset",
-          fileName: `${dtsFileName}.map`,
-          source: tsReexportDeclMap(
-            baseDtsFilename,
-            `${relativeToSource}.d.ts`
-          ),
         });
 
         if (
@@ -225,7 +217,8 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
             source: dmtsTemplate(
               basedmtsFilename,
               hasDefaultExport,
-              sourceWithExtension
+              sourceWithExtension,
+              `${relativeToSource}.d.ts`
             ),
           });
           if (hasDefaultExport) {
@@ -235,14 +228,6 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
               source: dtsDefaultForDmtsTemplate(sourceWithExtension),
             });
           }
-          this.emitFile({
-            type: "asset",
-            fileName: `${dmtsFilename}.map`,
-            source: tsReexportDeclMap(
-              basedmtsFilename,
-              `${relativeToSource}.d.ts`
-            ),
-          });
         }
       }
     },

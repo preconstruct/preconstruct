@@ -6,7 +6,6 @@ import {
   flowTemplate,
   validFieldsForEntrypoint,
   getExportsFieldOutputPath,
-  tsReexportDeclMap,
   getExportsImportUnwrappingDefaultOutputPath,
   dmtsTemplate,
   mjsTemplate,
@@ -109,12 +108,9 @@ export async function writeDevTSFiles(
       dtsTemplate(
         baseDtsFilename,
         hasDefaultExport,
-        relativePathWithExtension.replace(/\.tsx?$/, "")
+        relativePathWithExtension.replace(/\.tsx?$/, ""),
+        relativePathWithExtension
       )
-    ),
-    fs.outputFile(
-      dtsReexportFilename + ".map",
-      tsReexportDeclMap(baseDtsFilename, relativePathWithExtension)
     ),
   ];
 
@@ -137,11 +133,12 @@ export async function writeDevTSFiles(
     promises.push(
       fs.outputFile(
         dmtsReexportFilename,
-        dmtsTemplate(baseDmtsFilename, hasDefaultExport, pathToImport)
-      ),
-      fs.outputFile(
-        dmtsReexportFilename + ".map",
-        tsReexportDeclMap(baseDmtsFilename, relativePathWithExtension)
+        dmtsTemplate(
+          baseDmtsFilename,
+          hasDefaultExport,
+          pathToImport,
+          relativePathWithExtension
+        )
       )
     );
     if (hasDefaultExport) {
