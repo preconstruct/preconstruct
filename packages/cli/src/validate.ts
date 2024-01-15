@@ -54,6 +54,9 @@ function validateEntrypoint(entrypoint: Entrypoint, log: boolean) {
   if (log) {
     logger.info(infos.validEntrypoint, entrypoint.name);
   }
+  if (entrypoint.package.isTypeModule()) {
+    return;
+  }
   const fatalErrors: FatalError[] = [];
   for (const field of ["main", "module", "umd:main", "browser"] as const) {
     if (field !== "main" && entrypoint.json[field] === undefined) {
@@ -133,6 +136,8 @@ export const EXPERIMENTAL_FLAGS = new Set([
   "logCompiledFiles",
   "keepDynamicImportAsDynamicImportInCommonJS",
   "importsConditions",
+  "distInRoot",
+  "typeModule",
 ]);
 
 export function validateProject(project: Project, log = false) {

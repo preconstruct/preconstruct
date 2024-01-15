@@ -15,6 +15,8 @@ import {
   dtsDefaultForDmtsTemplate,
   getDtsDefaultForMtsFilepath,
   getDistFilenameForConditions,
+  getBaseDistName,
+  getDistFilenameForConditionsWithTypeModule,
 } from "./utils";
 import * as fs from "fs-extra";
 import path from "path";
@@ -84,9 +86,16 @@ export async function writeDevTSFiles(
   entrypoint: Entrypoint,
   hasDefaultExport: boolean
 ) {
-  const dtsReexportFilename = path
-    .join(entrypoint.directory, validFieldsForEntrypoint.main(entrypoint))
-    .replace(/\.js$/, ".d.ts");
+  const dtsReexportFilename = path.join(
+    (entrypoint.package.project.experimentalFlags.distInRoot
+      ? entrypoint.package
+      : entrypoint
+    ).directory,
+    "dist",
+    getBaseDistName(entrypoint) +
+      (entrypoint.package.isTypeModule() ? "" : ".cjs") +
+      ".d.ts"
+  );
 
   const baseDtsFilename = path.basename(dtsReexportFilename);
   const relativePathWithExtension = normalizePath(
@@ -107,14 +116,12 @@ export async function writeDevTSFiles(
 
   if (
     entrypoint.package.exportsFieldConfig()?.importConditionDefaultExport ===
-    "default"
+      "default" &&
+    !entrypoint.package.isTypeModule()
   ) {
     const dmtsReexportFilename = path
-      .join(
-        entrypoint.package.directory,
-        getExportsImportUnwrappingDefaultOutputPath(entrypoint)
-      )
-      .replace(/\.mjs$/, ".d.mts");
+      .join(entrypoint.directory, validFieldsForEntrypoint.main(entrypoint))
+      .replace(/\.js$/, ".d.mts");
     const baseDmtsFilename = path.basename(dmtsReexportFilename);
 
     const ext = path.extname(relativePathWithExtension).slice(1);
@@ -179,8 +186,11 @@ export default async function dev(projectDir: string) {
   info("project is valid!");
 
   await Promise.all(
-    project.packages.map((pkg) => {
+    project.packages.map(async (pkg) => {
       const exportsFieldConfig = pkg.exportsFieldConfig();
+      let distDirectory = path.join(pkg.directory, "dist");
+      await fs.remove(distDirectory);
+      await fs.ensureDir(distDirectory);
 
       return Promise.all(
         pkg.entrypoints.map(async (entrypoint) => {
@@ -213,14 +223,38 @@ export default async function dev(projectDir: string) {
               }
             })(),
           ];
-          const cjsTemplate = commonjsRequireHookTemplate(entrypoint);
-          if (exportsFieldConfig?.conditions.kind === "imports") {
+          if (
+            pkg.isTypeModule() &&
+            exportsFieldConfig &&
+            exportsFieldConfig.conditions.kind === "imports"
+          ) {
             for (const conditions of exportsFieldConfig.conditions.groups.keys()) {
               entrypointPromises.push(
                 fs.symlink(
                   entrypoint.source,
                   path.join(
-                    entrypoint.directory,
+                    pkg.directory,
+                    getDistFilenameForConditionsWithTypeModule(
+                      entrypoint,
+                      conditions
+                    )
+                  )
+                )
+              );
+            }
+            return Promise.all(entrypointPromises);
+          }
+          const cjsTemplate = commonjsRequireHookTemplate(entrypoint);
+          if (exportsFieldConfig?.conditions.kind === "imports") {
+            for (const conditions of exportsFieldConfig.conditions.groups.keys()) {
+              const distRoot = project.experimentalFlags.distInRoot
+                ? pkg.directory
+                : entrypoint.directory;
+              entrypointPromises.push(
+                fs.symlink(
+                  entrypoint.source,
+                  path.join(
+                    distRoot,
                     getDistFilenameForConditions(
                       entrypoint,
                       conditions.concat("module")
@@ -229,7 +263,7 @@ export default async function dev(projectDir: string) {
                 ),
                 fs.writeFile(
                   path.join(
-                    entrypoint.directory,
+                    distRoot,
                     getDistFilenameForConditions(entrypoint, conditions)
                   ),
                   cjsTemplate
@@ -369,14 +403,23 @@ export default async function dev(projectDir: string) {
 }
 
 async function cleanEntrypoint(entrypoint: Entrypoint) {
+  if (entrypoint.package.name === entrypoint.name) return;
   let distDirectory = path.join(entrypoint.directory, "dist");
 
   await fs.remove(distDirectory);
-  await fs.ensureDir(distDirectory);
+  if (!entrypoint.package.project.experimentalFlags.distInRoot) {
+    await fs.ensureDir(distDirectory);
+  }
 }
 
 function commonjsRequireHookTemplate(entrypoint: Entrypoint) {
-  const distDirectory = path.join(entrypoint.directory, "dist");
+  const distDirectory = path.join(
+    (entrypoint.package.project.experimentalFlags.distInRoot
+      ? entrypoint.package
+      : entrypoint
+    ).directory,
+    "dist"
+  );
   let entrypointPath = normalizePath(
     path.relative(distDirectory, entrypoint.source)
   );

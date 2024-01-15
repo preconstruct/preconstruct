@@ -7,6 +7,7 @@ import {
   js,
   getFiles,
 } from "../../../test-utils";
+import spawn from "spawndamnit";
 
 jest.setTimeout(10000);
 
@@ -195,4 +196,90 @@ test("two entrypoints where one requires the other entrypoint", async () => {
   let { multiply } = require(path.join(tmpPath, "multiply"));
 
   expect(multiply(2, 3)).toBe(6);
+});
+
+test("multiple entrypoints", async () => {
+  let dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "multiple-entrypoints",
+      main: "dist/multiple-entrypoints.cjs.js",
+      module: "dist/multiple-entrypoints.esm.js",
+      exports: {
+        ".": {
+          types: "./dist/multiple-entrypoints.cjs.js",
+          module: "./dist/multiple-entrypoints.esm.js",
+          default: "./dist/multiple-entrypoints.cjs.js",
+        },
+        "./multiply": {
+          types: "./dist/multiple-entrypoints-multiply.cjs.js",
+          module: "./dist/multiple-entrypoints-multiply.esm.js",
+          default: "./dist/multiple-entrypoints-multiply.cjs.js",
+        },
+        "./package.json": "./package.json",
+      },
+      preconstruct: {
+        exports: true,
+        entrypoints: ["index.js", "multiply.js"],
+        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+          importsConditions: true,
+          distInRoot: true,
+        },
+      },
+    }),
+    "multiply/package.json": JSON.stringify({
+      main: "../dist/multiple-entrypoints-multiply.cjs.js",
+      module: "../dist/multiple-entrypoints-multiply.esm.js",
+    }),
+    "src/index.js": js`
+      export let sum = (a, b) => a + b;
+    `,
+    "src/multiply.js": js`
+      export let multiply = (a, b) => a * b;
+    `,
+    "runtime-blah.js": js`
+      const { multiply } = require("multiple-entrypoints/multiply");
+      console.log(multiply(2, 2) + "");
+    `,
+  });
+
+  await build(dir);
+
+  expect(await getFiles(dir, ["**/dist/**"])).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/multiple-entrypoints-multiply.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    let multiply = (a, b) => a * b;
+
+    exports.multiply = multiply;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/multiple-entrypoints-multiply.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    let multiply = (a, b) => a * b;
+
+    export { multiply };
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/multiple-entrypoints.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    let sum = (a, b) => a + b;
+
+    exports.sum = sum;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/multiple-entrypoints.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    let sum = (a, b) => a + b;
+
+    export { sum };
+
+  `);
+  let node = await spawn("node", ["runtime-blah.js"], { cwd: dir });
+
+  expect(node.stdout.toString("utf8")).toMatchInlineSnapshot(`
+    "4
+    "
+  `);
+  expect(node.stderr.toString("utf8")).toMatchInlineSnapshot(`""`);
+  expect(node.code).toBe(0);
 });

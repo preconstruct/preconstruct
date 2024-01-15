@@ -23,7 +23,7 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
   return {
     name: "typescript-declarations",
     async generateBundle(opts, bundle) {
-      if (opts.format !== "cjs") return;
+      if (opts.format !== "cjs" && !pkg.isTypeModule()) return;
       // we want do a naive check first and go into
       // so that we can avoid some extra fs operations if there is say some .ts entrypoints
       // and some .js entrypoints with a .d.ts
@@ -200,7 +200,9 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
         });
 
         if (
-          pkg.exportsFieldConfig()?.importConditionDefaultExport === "default"
+          pkg.exportsFieldConfig()?.importConditionDefaultExport ===
+            "default" &&
+          !pkg.isTypeModule()
         ) {
           const dmtsFilename = dtsFileName.replace(/\.d\.ts$/, ".d.mts");
           const basedmtsFilename = baseDtsFilename.replace(

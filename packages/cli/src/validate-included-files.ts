@@ -18,6 +18,7 @@ export async function validateIncludedFiles(pkg: Package) {
     await Promise.all(
       pkg.entrypoints
         .map(async (entrypoint) => {
+          if (pkg.isTypeModule() && entrypoint.name !== pkg.name) return;
           let filename = path.join(
             entrypoint.directory,
             "dist",
@@ -44,6 +45,7 @@ export async function validateIncludedFiles(pkg: Package) {
     // TODO: add Flow and TS check and if they're ignored, don't write them
     let messages: string[] = [];
     pkg.entrypoints.forEach((entrypoint) => {
+      if (pkg.isTypeModule() && entrypoint.name !== pkg.name) return;
       let pkgJsonPath = path.relative(
         pkg.directory,
         path.resolve(entrypoint.directory, "package.json")
