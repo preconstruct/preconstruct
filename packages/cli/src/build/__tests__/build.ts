@@ -2324,13 +2324,6 @@ test("type: module", async () => {
 
     export { a };
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ multiply/dist/multiple-entrypoints-multiply.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    export * from "../../src/multiply";
-    //# sourceMappingURL=multiple-entrypoints-multiply.d.ts.map
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ multiply/dist/multiple-entrypoints-multiply.d.ts.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    {"version":3,"file":"multiple-entrypoints-multiply.d.ts","sourceRoot":"","sources":["../../src/multiply.ts"],"names":[],"mappings":"AAAA"}
-
   `);
   let node = await spawn("node", ["runtime-blah.mjs"], { cwd: dir });
 

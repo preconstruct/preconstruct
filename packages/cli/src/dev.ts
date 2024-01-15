@@ -87,15 +87,16 @@ export async function writeDevTSFiles(
   entrypoint: Entrypoint,
   hasDefaultExport: boolean
 ) {
-  const dtsReexportFilename = entrypoint.package.isTypeModule()
-    ? path.join(
-        entrypoint.package.directory,
-        "dist",
-        getBaseDistName(entrypoint) + ".d.ts"
-      )
-    : path
-        .join(entrypoint.directory, validFieldsForEntrypoint.main(entrypoint))
-        .replace(/\.js$/, ".d.ts");
+  const dtsReexportFilename = path.join(
+    (entrypoint.package.project.experimentalFlags.distInRoot
+      ? entrypoint.package
+      : entrypoint
+    ).directory,
+    "dist",
+    getBaseDistName(entrypoint) +
+      (entrypoint.package.isTypeModule() ? "" : ".cjs") +
+      ".d.ts"
+  );
 
   const baseDtsFilename = path.basename(dtsReexportFilename);
   const relativePathWithExtension = normalizePath(
@@ -123,11 +124,8 @@ export async function writeDevTSFiles(
     !entrypoint.package.isTypeModule()
   ) {
     const dmtsReexportFilename = path
-      .join(
-        entrypoint.package.directory,
-        getExportsImportUnwrappingDefaultOutputPath(entrypoint)
-      )
-      .replace(/\.mjs$/, ".d.mts");
+      .join(entrypoint.directory, validFieldsForEntrypoint.main(entrypoint))
+      .replace(/\.js$/, ".d.mts");
     const baseDmtsFilename = path.basename(dmtsReexportFilename);
 
     const ext = path.extname(relativePathWithExtension).slice(1);
@@ -191,8 +189,11 @@ export default async function dev(projectDir: string) {
   info("project is valid!");
 
   await Promise.all(
-    project.packages.map((pkg) => {
+    project.packages.map(async (pkg) => {
       const exportsFieldConfig = pkg.exportsFieldConfig();
+      let distDirectory = path.join(pkg.directory, "dist");
+      await fs.remove(distDirectory);
+      await fs.ensureDir(distDirectory);
 
       return Promise.all(
         pkg.entrypoints.map(async (entrypoint) => {
@@ -253,16 +254,27 @@ export default async function dev(projectDir: string) {
                 ? pkg.directory
                 : entrypoint.directory;
               entrypointPromises.push(
-                fs.symlink(
-                  entrypoint.source,
-                  path.join(
-                    distRoot,
-                    getDistFilenameForConditions(
-                      entrypoint,
-                      conditions.concat("module")
+                fs
+                  .symlink(
+                    entrypoint.source,
+                    path.join(
+                      distRoot,
+                      getDistFilenameForConditions(
+                        entrypoint,
+                        conditions.concat("module")
+                      )
                     )
                   )
-                ),
+                  .catch((err) => {
+                    console.log(
+                      distRoot,
+                      err,
+                      getDistFilenameForConditions(
+                        entrypoint,
+                        conditions.concat("module")
+                      )
+                    );
+                  }),
                 fs.writeFile(
                   path.join(
                     distRoot,
@@ -361,13 +373,22 @@ export default async function dev(projectDir: string) {
           }
           if (entrypoint.json.module) {
             entrypointPromises.push(
-              fs.symlink(
-                entrypoint.source,
-                path.join(
-                  entrypoint.directory,
-                  validFieldsForEntrypoint.module(entrypoint)
+              fs
+                .symlink(
+                  entrypoint.source,
+                  path.join(
+                    entrypoint.directory,
+                    validFieldsForEntrypoint.module(entrypoint)
+                  )
                 )
-              )
+                .catch((err) => {
+                  console.log(
+                    path.join(
+                      entrypoint.directory,
+                      validFieldsForEntrypoint.module(entrypoint)
+                    )
+                  );
+                })
             );
           }
 
@@ -405,10 +426,13 @@ export default async function dev(projectDir: string) {
 }
 
 async function cleanEntrypoint(entrypoint: Entrypoint) {
+  if (entrypoint.package.name === entrypoint.name) return;
   let distDirectory = path.join(entrypoint.directory, "dist");
 
   await fs.remove(distDirectory);
-  await fs.ensureDir(distDirectory);
+  if (!entrypoint.package.project.experimentalFlags.distInRoot) {
+    await fs.ensureDir(distDirectory);
+  }
 }
 
 function commonjsRequireHookTemplate(entrypoint: Entrypoint) {
