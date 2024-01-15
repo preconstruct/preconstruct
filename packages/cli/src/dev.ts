@@ -17,6 +17,7 @@ import {
   getDtsDefaultForMtsFilepath,
   getDistFilenameForConditions,
   getBaseDistName,
+  getDistFilenameForConditionsWithTypeModule,
 } from "./utils";
 import * as fs from "fs-extra";
 import path from "path";
@@ -88,7 +89,7 @@ export async function writeDevTSFiles(
 ) {
   const dtsReexportFilename = entrypoint.package.isTypeModule()
     ? path.join(
-        entrypoint.directory,
+        entrypoint.package.directory,
         "dist",
         getBaseDistName(entrypoint) + ".d.ts"
       )
@@ -118,7 +119,8 @@ export async function writeDevTSFiles(
 
   if (
     entrypoint.package.exportsFieldConfig()?.importConditionDefaultExport ===
-    "default"
+      "default" &&
+    !entrypoint.package.isTypeModule()
   ) {
     const dmtsReexportFilename = path
       .join(
@@ -223,6 +225,27 @@ export default async function dev(projectDir: string) {
               }
             })(),
           ];
+          if (
+            pkg.isTypeModule() &&
+            exportsFieldConfig &&
+            exportsFieldConfig.conditions.kind === "imports"
+          ) {
+            for (const conditions of exportsFieldConfig.conditions.groups.keys()) {
+              entrypointPromises.push(
+                fs.symlink(
+                  entrypoint.source,
+                  path.join(
+                    pkg.directory,
+                    getDistFilenameForConditionsWithTypeModule(
+                      entrypoint,
+                      conditions
+                    )
+                  )
+                )
+              );
+            }
+            return Promise.all(entrypointPromises);
+          }
           const cjsTemplate = commonjsRequireHookTemplate(entrypoint);
           if (exportsFieldConfig?.conditions.kind === "imports") {
             for (const conditions of exportsFieldConfig.conditions.groups.keys()) {
