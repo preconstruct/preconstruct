@@ -8,6 +8,7 @@ import {
   testdir,
   js,
   repoNodeModules,
+  getFiles,
 } from "../../test-utils";
 import { confirms as _confirms } from "../messages";
 import { JSONValue } from "../utils";
@@ -1029,4 +1030,51 @@ test("experimental exports flag is removed", async () => {
   await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
     `[Error: The behaviour from the experimental flag "exports" is the current behaviour now, the flag should be removed]`
   );
+});
+
+test("type: module removes package.json", async () => {
+  let dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "multiple-entrypoints",
+      type: "module",
+      exports: {
+        ".": "./dist/multiple-entrypoints.js",
+        "./multiply": "./dist/multiple-entrypoints-multiply.js",
+        "./package.json": "./package.json",
+      },
+      preconstruct: {
+        exports: true,
+        entrypoints: ["index.ts", "multiply.ts"],
+        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+          importsConditions: true,
+          distInRoot: true,
+          typeModule: true,
+        },
+      },
+    }),
+    "multiply/package.json": JSON.stringify({
+      name: "multiple-entrypoints/multiply",
+      main: "dist/multiple-entrypoints-multiply.cjs.js",
+      module: "dist/multiple-entrypoints-multiply.esm.js",
+    }),
+    "src/index.ts": js`
+      export let a = "a";
+    `,
+    "src/multiply.ts": js`
+      export let b = "b";
+    `,
+    "runtime-blah.mjs": js`
+      import { b } from "multiple-entrypoints/multiply";
+      console.log(b);
+    `,
+  });
+
+  await confirms.deleteEntrypointPkgJson.mockResolvedValue(true);
+
+  await validate(dir);
+
+  expect(await getFiles(dir, ["**/package.json"])).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {"name":"multiple-entrypoints","type":"module","exports":{".":"./dist/multiple-entrypoints.js","./multiply":"./dist/multiple-entrypoints-multiply.js","./package.json":"./package.json"},"preconstruct":{"exports":true,"entrypoints":["index.ts","multiply.ts"],"___experimentalFlags_WILL_CHANGE_IN_PATCH":{"importsConditions":true,"distInRoot":true,"typeModule":true}}}
+  `);
 });

@@ -2298,3 +2298,90 @@ test("type: module", async () => {
   expect(node.stderr.toString("utf8")).toMatchInlineSnapshot(`""`);
   expect(node.code).toBe(0);
 });
+
+test("type: module with conditions", async () => {
+  let dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "multiple-entrypoints",
+      type: "module",
+      exports: {
+        ".": {
+          types: "./dist/multiple-entrypoints.js",
+          node: "./dist/multiple-entrypoints.node.js",
+          default: "./dist/multiple-entrypoints.js",
+        },
+        "./multiply": {
+          types: "./dist/multiple-entrypoints-multiply.js",
+          node: "./dist/multiple-entrypoints-multiply.node.js",
+          default: "./dist/multiple-entrypoints-multiply.js",
+        },
+        "./package.json": "./package.json",
+      },
+      preconstruct: {
+        exports: true,
+        entrypoints: ["index.ts", "multiply.ts"],
+        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+          importsConditions: true,
+          distInRoot: true,
+          typeModule: true,
+        },
+      },
+      imports: {
+        "#something": {
+          node: "./src/node.ts",
+          default: "./src/default.ts",
+        },
+      },
+    }),
+    "src/index.ts": js`
+      export { env } from "#something";
+    `,
+    "src/multiply.ts": js`
+      export let b = "b";
+    `,
+    "src/node.ts": js`
+      export let env = "node";
+    `,
+    "src/default.ts": js`
+      export let env = "default";
+    `,
+    ...tsSetupFiles,
+  });
+
+  await build(dir);
+
+  expect(await getFiles(dir, ["**/dist/**"])).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/index.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export { env } from "./node.js";
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/multiply.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export declare let b: string;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/node.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export declare let env: string;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/multiple-entrypoints-multiply.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export * from "./declarations/src/multiply";
+    //# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoibXVsdGlwbGUtZW50cnlwb2ludHMtbXVsdGlwbHkuZC50cyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4vZGVjbGFyYXRpb25zL3NyYy9tdWx0aXBseS5kLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBIn0=
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/multiple-entrypoints-multiply.js, dist/multiple-entrypoints-multiply.node.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    let b = "b";
+
+    export { b };
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/multiple-entrypoints.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export * from "./declarations/src/index";
+    //# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoibXVsdGlwbGUtZW50cnlwb2ludHMuZC50cyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4vZGVjbGFyYXRpb25zL3NyYy9pbmRleC5kLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBIn0=
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/multiple-entrypoints.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    let env = "default";
+
+    export { env };
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/multiple-entrypoints.node.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    let env = "node";
+
+    export { env };
+
+  `);
+});

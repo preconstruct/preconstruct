@@ -251,27 +251,16 @@ export default async function dev(projectDir: string) {
                 ? pkg.directory
                 : entrypoint.directory;
               entrypointPromises.push(
-                fs
-                  .symlink(
-                    entrypoint.source,
-                    path.join(
-                      distRoot,
-                      getDistFilenameForConditions(
-                        entrypoint,
-                        conditions.concat("module")
-                      )
+                fs.symlink(
+                  entrypoint.source,
+                  path.join(
+                    distRoot,
+                    getDistFilenameForConditions(
+                      entrypoint,
+                      conditions.concat("module")
                     )
                   )
-                  .catch((err) => {
-                    console.log(
-                      distRoot,
-                      err,
-                      getDistFilenameForConditions(
-                        entrypoint,
-                        conditions.concat("module")
-                      )
-                    );
-                  }),
+                ),
                 fs.writeFile(
                   path.join(
                     distRoot,
@@ -370,22 +359,13 @@ export default async function dev(projectDir: string) {
           }
           if (entrypoint.json.module) {
             entrypointPromises.push(
-              fs
-                .symlink(
-                  entrypoint.source,
-                  path.join(
-                    entrypoint.directory,
-                    validFieldsForEntrypoint.module(entrypoint)
-                  )
+              fs.symlink(
+                entrypoint.source,
+                path.join(
+                  entrypoint.directory,
+                  validFieldsForEntrypoint.module(entrypoint)
                 )
-                .catch((err) => {
-                  console.log(
-                    path.join(
-                      entrypoint.directory,
-                      validFieldsForEntrypoint.module(entrypoint)
-                    )
-                  );
-                })
+              )
             );
           }
 

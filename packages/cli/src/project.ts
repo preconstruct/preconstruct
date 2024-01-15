@@ -46,7 +46,7 @@ export class Project extends Item<{
     }
     if (config.typeModule && !config.distInRoot) {
       throw new FatalError(
-        "exportsOnly is not supported without distInRoot",
+        "typeModule is not supported without distInRoot",
         this.name
       );
     }

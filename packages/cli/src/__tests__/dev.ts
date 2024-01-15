@@ -752,3 +752,91 @@ test("multiple entrypoints", async () => {
   expect(stdout.toString().split("\n")).toEqual(["4", ""]);
   expect(code).toBe(0);
 });
+
+test("type: module", async () => {
+  let dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "multiple-entrypoints",
+      type: "module",
+      exports: {
+        ".": "./dist/multiple-entrypoints.js",
+        "./multiply": "./dist/multiple-entrypoints-multiply.js",
+        "./package.json": "./package.json",
+      },
+      preconstruct: {
+        exports: true,
+        entrypoints: ["index.ts", "multiply.ts"],
+        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+          importsConditions: true,
+          distInRoot: true,
+          typeModule: true,
+        },
+      },
+    }),
+    "src/index.ts": js`
+      export let a = "a";
+    `,
+    "src/multiply.ts": js`
+      export let b = "b";
+    `,
+  });
+
+  await dev(dir);
+
+  expect(await getFiles(dir, ["**/dist/**/*"])).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/multiple-entrypoints-multiply.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export * from "../src/multiply";
+    //# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoibXVsdGlwbGUtZW50cnlwb2ludHMtbXVsdGlwbHkuZC50cyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uL3NyYy9tdWx0aXBseS50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSJ9
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/multiple-entrypoints-multiply.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    ⎯ symlink to src/multiply.ts
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/multiple-entrypoints.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export * from "../src/index";
+    //# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoibXVsdGlwbGUtZW50cnlwb2ludHMuZC50cyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uL3NyYy9pbmRleC50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSJ9
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/multiple-entrypoints.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    ⎯ symlink to src/index.ts
+  `);
+});
+
+test("type: module running", async () => {
+  let dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "multiple-entrypoints",
+      type: "module",
+      exports: {
+        ".": "./dist/multiple-entrypoints.js",
+        "./multiply": "./dist/multiple-entrypoints-multiply.js",
+        "./package.json": "./package.json",
+      },
+      preconstruct: {
+        exports: true,
+        entrypoints: ["index.js", "multiply.js"],
+        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+          importsConditions: true,
+          distInRoot: true,
+          typeModule: true,
+        },
+      },
+    }),
+    "src/index.js": js`
+      export let a = "a";
+    `,
+    "src/multiply.js": js`
+      export let b = "b";
+    `,
+    "runtime-blah.mjs": js`
+      import { b } from "multiple-entrypoints/multiply";
+      console.log(b);
+    `,
+  });
+
+  await dev(dir);
+
+  let { code, stdout, stderr } = await spawn("node", [
+    path.join(dir, "runtime-blah.mjs"),
+  ]);
+  expect(stderr.toString()).toBe("");
+  expect(stdout.toString().split("\n")).toEqual(["b", ""]);
+  expect(code).toBe(0);
+});
