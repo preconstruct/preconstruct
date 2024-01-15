@@ -1,5 +1,15 @@
 # preconstruct
 
+## 0.0.0-test-20240115012511
+
+### Patch Changes
+
+- [#586](https://github.com/preconstruct/preconstruct/pull/586) [`61f8fb1`](https://github.com/preconstruct/preconstruct/commit/61f8fb1c6d2d5538b929efac9aa9c10f788885be) Thanks [@emmatown](https://github.com/emmatown)! - Add `typeModule` experimental flag
+
+- [#586](https://github.com/preconstruct/preconstruct/pull/586) [`a83fb31`](https://github.com/preconstruct/preconstruct/commit/a83fb31d0c09fc6d00bb7eb96810a52005e1e5d3) Thanks [@emmatown](https://github.com/emmatown)! - Add `distInRoot` experimental flag
+
+- [#586](https://github.com/preconstruct/preconstruct/pull/586) [`cf6267d`](https://github.com/preconstruct/preconstruct/commit/cf6267d789abf79f71d3bdd5a32de2d0b35315d6) Thanks [@emmatown](https://github.com/emmatown)! - Use inline source maps for declaration file redirects
+
 ## 2.8.2
 
 ### Patch Changes
