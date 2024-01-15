@@ -47,6 +47,9 @@ export let confirms = {
   createEntrypoint: createPromptConfirmLoader(
     "This glob does not match anything, would you like to create an entrypoint for it?"
   ),
+  deleteEntrypointPkgJson: createPromptConfirmLoader(
+    "The package.json file this entrypoint is unnecessary with type: module, would you like to delete it?"
+  ),
 };
 
 export let inputs = {
