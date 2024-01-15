@@ -125,6 +125,14 @@ export function exportsField(
           output[key] = exportsField.default;
           continue;
         }
+        const exports = createExportsField(
+          exportsFieldConfig.conditions.groups,
+          (conditions) =>
+            getExportsFieldOutputPathForConditionsWithTypeModule(
+              entrypoint,
+              conditions
+            )
+        );
         output[key] = {
           // yes, i'm very intentionally pointing at the .js/.mjs rather than the .d.ts/.d.mts
           // TODO: this should probably only be here if you're using ts
@@ -133,15 +141,7 @@ export function exportsField(
             entrypoint,
             []
           ),
-          ...createExportsField(
-            exportsFieldConfig.conditions.groups,
-            (conditions) => ({
-              default: getExportsFieldOutputPathForConditionsWithTypeModule(
-                entrypoint,
-                conditions
-              ),
-            })
-          ),
+          ...(typeof exports === "string" ? { default: exports } : exports),
         };
         continue;
       }
