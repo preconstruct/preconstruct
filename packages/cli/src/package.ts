@@ -1,6 +1,7 @@
 // based on https://github.com/jamiebuilds/std-pkg but reading fewer things, adding setters and reading the file
 import fastGlob from "fast-glob";
 import * as fs from "fs-extra";
+import fsPromises from "fs/promises";
 import nodePath from "path";
 import { Item } from "./item";
 import { BatchError, FatalError } from "./errors";
@@ -76,10 +77,31 @@ function createEntrypoints(
     descriptors.map(async ({ filename, contents, hasAccepted, sourceFile }) => {
       if (pkg.isTypeModule()) {
         if (contents !== undefined && pkg.path !== filename) {
-          throw new FatalError(
-            "this package has an entrypoint package.json but the typeModule feature is enabled, please remove the package.json",
-            pkg.name
-          );
+          if (!hasAccepted) {
+            const entrypointName = getEntrypointName(
+              pkg,
+              nodePath.dirname(filename)
+            );
+            let shouldDeleteEntrypointPkgJson = await confirms.deleteEntrypointPkgJson(
+              { name: entrypointName }
+            );
+            if (!shouldDeleteEntrypointPkgJson) {
+              throw new FatalError(
+                "this package has an entrypoint package.json but the typeModule feature is enabled, please remove the package.json",
+                pkg.name
+              );
+            }
+          }
+          await fs.remove(filename);
+          const contents = await fs.readdir(nodePath.dirname(filename));
+          if (
+            contents.length === 0 ||
+            (contents.length === 1 && contents[0] === "dist")
+          ) {
+            await fsPromises.rm(nodePath.dirname(filename), {
+              recursive: true,
+            });
+          }
         }
         return new Entrypoint(
           filename,
