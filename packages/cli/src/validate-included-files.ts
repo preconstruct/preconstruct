@@ -18,6 +18,7 @@ export async function validateIncludedFiles(pkg: Package) {
     await Promise.all(
       pkg.entrypoints
         .map(async (entrypoint) => {
+          if (pkg.isTypeModule() && entrypoint.name !== pkg.name) return;
           let filename = path.join(
             entrypoint.directory,
             "dist",
