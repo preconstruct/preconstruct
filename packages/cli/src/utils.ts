@@ -409,7 +409,7 @@ function getDeclSourceMapComment(
   dtsFilename: string,
   relativePathWithExtension: string
 ) {
-  return `//# sourceMappingURL=data:;base64,${Buffer.from(
+  return `//# sourceMappingURL=data:application/json;charset=utf-8;base64,${Buffer.from(
     JSON.stringify({
       version: 3,
       file: dtsFilename,
