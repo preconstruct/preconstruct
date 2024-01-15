@@ -208,7 +208,9 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
         });
 
         if (
-          pkg.exportsFieldConfig()?.importConditionDefaultExport === "default"
+          pkg.exportsFieldConfig()?.importConditionDefaultExport ===
+            "default" &&
+          !pkg.isTypeModule()
         ) {
           const dmtsFilename = dtsFileName.replace(/\.d\.ts$/, ".d.mts");
           const basedmtsFilename = baseDtsFilename.replace(
