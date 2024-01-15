@@ -1,5 +1,13 @@
 # preconstruct
 
+## 0.0.0-test-20240115010206
+
+### Patch Changes
+
+- [#586](https://github.com/preconstruct/preconstruct/pull/586) [`51f2b8c`](https://github.com/preconstruct/preconstruct/commit/51f2b8c4a01cd4d8ef7d71e26b88fe8a67f8851e) Thanks [@emmatown](https://github.com/emmatown)! - Add `typeModule` experimental flag
+
+- [#586](https://github.com/preconstruct/preconstruct/pull/586) [`535ba93`](https://github.com/preconstruct/preconstruct/commit/535ba9302f4cd05a55643f29411e54496d2d1ed9) Thanks [@emmatown](https://github.com/emmatown)! - Add `distInRoot` experimental flag
+
 ## 2.8.2
 
 ### Patch Changes
