@@ -327,12 +327,13 @@ function esmReexportTemplate(hasDefaultExport: boolean, relativePath: string) {
 export function dtsTemplate(
   filename: string,
   hasDefaultExport: boolean,
-  relativePath: string
+  relativePath: string,
+  relativePathWithExtension: string
 ) {
   return `${esmReexportTemplate(
     hasDefaultExport,
     relativePath
-  )}//# sourceMappingURL=${filename}.map\n`;
+  )}${getDeclSourceMapComment(filename, relativePathWithExtension)}`;
 }
 
 function getReexportStatement(namedExports: string[], source: string): string {
@@ -392,7 +393,8 @@ export function mjsTemplate(
 export function dmtsTemplate(
   filename: string,
   hasDefaultExport: boolean,
-  relativePath: string
+  relativePath: string,
+  relativePathWithExtension: string
 ) {
   return `export * from ${JSON.stringify(relativePath)};\n${
     hasDefaultExport
@@ -400,14 +402,14 @@ export function dmtsTemplate(
           "./" + nodePath.basename(filename).replace(/\.d\.mts$/, ".default.js")
         )};\n`
       : ""
-  }//# sourceMappingURL=${filename}.map\n`;
+  }${getDeclSourceMapComment(filename, relativePathWithExtension)}`;
 }
 
-export function tsReexportDeclMap(
+function getDeclSourceMapComment(
   dtsFilename: string,
   relativePathWithExtension: string
 ) {
-  return (
+  return `//# sourceMappingURL=data:application/json;charset=utf-8;base64,${Buffer.from(
     JSON.stringify({
       version: 3,
       file: dtsFilename,
@@ -415,8 +417,8 @@ export function tsReexportDeclMap(
       sources: [relativePathWithExtension],
       names: [],
       mappings: "AAAA",
-    }) + "\n"
-  );
+    })
+  ).toString("base64")}\n`;
 }
 
 export type JSONValue =

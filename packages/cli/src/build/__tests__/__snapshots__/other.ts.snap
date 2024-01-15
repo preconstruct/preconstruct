@@ -154,12 +154,7 @@ export type RootState = ReturnType<typeof rootReducer>;
 
 exports[`typescript with forced dts emit: dist/typescript-force-dts-emit.cjs.d.ts 1`] = `
 "export * from "./declarations/src/index";
-//# sourceMappingURL=typescript-force-dts-emit.cjs.d.ts.map
-"
-`;
-
-exports[`typescript with forced dts emit: dist/typescript-force-dts-emit.cjs.d.ts.map 1`] = `
-"{"version":3,"file":"typescript-force-dts-emit.cjs.d.ts","sourceRoot":"","sources":["./declarations/src/index.d.ts"],"names":[],"mappings":"AAAA"}
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoidHlwZXNjcmlwdC1mb3JjZS1kdHMtZW1pdC5janMuZC50cyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4vZGVjbGFyYXRpb25zL3NyYy9pbmRleC5kLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBIn0=
 "
 `;
 
