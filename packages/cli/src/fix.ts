@@ -44,11 +44,13 @@ async function fixPackage(pkg: Package): Promise<() => Promise<boolean>> {
     }
   }
 
-  keys(fields)
-    .filter((x) => fields[x])
-    .forEach((field) => {
-      pkg.setFieldOnEntrypoints(field);
-    });
+  if (!pkg.isTypeModule()) {
+    keys(fields)
+      .filter((x) => fields[x])
+      .forEach((field) => {
+        pkg.setFieldOnEntrypoints(field);
+      });
+  }
 
   pkg.json = setFieldInOrder(pkg.json, "exports", exportsField(pkg));
 
@@ -66,9 +68,11 @@ async function fixPackage(pkg: Package): Promise<() => Promise<boolean>> {
     (
       await Promise.all([
         pkg.save(),
-        ...pkg.entrypoints.map((x) =>
-          x.directory !== pkg.directory ? x.save() : false
-        ),
+        ...(pkg.isTypeModule()
+          ? []
+          : pkg.entrypoints.map((x) =>
+              x.directory !== pkg.directory ? x.save() : false
+            )),
       ])
     ).some((x) => x);
 }
