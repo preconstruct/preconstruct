@@ -1048,6 +1048,134 @@ test("use client", async () => {
   `);
 });
 
+test("use client (importConditionDefaultExport: default)", async () => {
+  const dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "pkg",
+      main: "dist/pkg.cjs.js",
+      module: "dist/pkg.esm.js",
+      exports: {
+        ".": {
+          types: {
+            import: "./dist/pkg.cjs.mjs",
+            default: "./dist/pkg.cjs.js",
+          },
+          module: "./dist/pkg.esm.js",
+          import: "./dist/pkg.cjs.mjs",
+          default: "./dist/pkg.cjs.js",
+        },
+        "./package.json": "./package.json",
+      },
+      preconstruct: {
+        exports: {
+          importConditionDefaultExport: "default",
+        },
+        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+          importsConditions: true,
+        },
+      },
+    }),
+    "src/index.js": js`
+      export { A } from "./client";
+      export { C } from "./c";
+      export { B } from "./b";
+    `,
+    "src/client.js": js`
+      "use client";
+      export const A = "something";
+    `,
+    "src/b.js": js`
+      export const B = "b";
+    `,
+    "src/c.js": js`
+      import { D } from "./d";
+      export function C() {
+        return D;
+      }
+    `,
+    "src/d.js": js`
+      "use client";
+      export const D = "d";
+    `,
+  });
+  await build(dir);
+  expect(await getFiles(dir, ["dist/**"], stripHashes("client", "d")))
+    .toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/client-this-is-not-the-real-hash-58cd7e7ea387bdad7ade6e69ad459a33.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use client';
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    const A = "something";
+
+    exports.A = A;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/client-this-is-not-the-real-hash-b139dd137c1582a38e35a32f7605ab74.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use client';
+    const A = "something";
+
+    export { A };
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/d-this-is-not-the-real-hash-24ae31ff9082854e1c87c472a0860694.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use client';
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    const D = "d";
+
+    exports.D = D;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/d-this-is-not-the-real-hash-edd08facffb57479ea67330357004b7f.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use client';
+    const D = "d";
+
+    export { D };
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    var client = require('./client-some-hash.cjs.js');
+    var d = require('./d-some-hash.cjs.js');
+
+    function C() {
+      return d.D;
+    }
+
+    const B = "b";
+
+    Object.defineProperty(exports, 'A', {
+      enumerable: true,
+      get: function () { return client.A; }
+    });
+    exports.B = B;
+    exports.C = C;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.mjs ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export {
+      A,
+      B,
+      C
+    } from "./pkg.cjs.js";
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export { A } from './client-some-hash.esm.js';
+    import { D } from './d-some-hash.esm.js';
+
+    function C() {
+      return D;
+    }
+
+    const B = "b";
+
+    export { B, C };
+
+  `);
+});
+
 test("use client as entrypoint", async () => {
   const dir = await testdir({
     "package.json": JSON.stringify({
@@ -1080,6 +1208,65 @@ test("use client as entrypoint", async () => {
     } else {
       module.exports = require("./pkg.cjs.dev.js");
     }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use client';
+    const a = true;
+
+    export { a };
+
+  `);
+});
+
+test("use client as entrypoint (importConditionDefaultExport: default)", async () => {
+  const dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "pkg",
+      main: "dist/pkg.cjs.js",
+      module: "dist/pkg.esm.js",
+      exports: {
+        ".": {
+          types: {
+            import: "./dist/pkg.cjs.mjs",
+            default: "./dist/pkg.cjs.js",
+          },
+          module: "./dist/pkg.esm.js",
+          import: "./dist/pkg.cjs.mjs",
+          default: "./dist/pkg.cjs.js",
+        },
+        "./package.json": "./package.json",
+      },
+      preconstruct: {
+        exports: {
+          importConditionDefaultExport: "default",
+        },
+        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+          importsConditions: true,
+        },
+      },
+    }),
+    "src/index.js": js`
+      "use client";
+      export const a = true;
+    `,
+  });
+  await build(dir);
+  expect(await getFiles(dir, ["dist/**"])).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use client';
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    const a = true;
+
+    exports.a = a;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.mjs ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use client';
+    export {
+      a
+    } from "./pkg.cjs.js";
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use client';
