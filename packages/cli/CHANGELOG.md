@@ -1,5 +1,11 @@
 # preconstruct
 
+## 2.8.4
+
+### Patch Changes
+
+- [`fa66c34`](https://github.com/preconstruct/preconstruct/commit/fa66c3496745ed186bfa0884e1a71c9107cf6612) Thanks [@emmatown](https://github.com/emmatown)! - Fix `preconstruct dev` with `exports: { importConditionDefaultExport: "default" }` with a `.d.ts` file
+
 ## 2.8.3
 
 ### Patch Changes
