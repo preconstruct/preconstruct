@@ -840,3 +840,53 @@ test("type: module running", async () => {
   expect(stdout.toString().split("\n")).toEqual(["b", ""]);
   expect(code).toBe(0);
 });
+
+test(".d.ts", async () => {
+  let tmpPath = await testdir({
+    "tsconfig.json": typescriptFixture["tsconfig.json"],
+    ".babelrc": typescriptFixture[".babelrc"],
+    node_modules: typescriptFixture.node_modules,
+    "package.json": JSON.stringify({
+      name: "pkg",
+      main: "dist/pkg.cjs.js",
+      module: "dist/pkg.esm.js",
+      exports: {
+        ".": {
+          module: "./dist/pkg.esm.js",
+          import: "./dist/pkg.cjs.mjs",
+          default: "./dist/pkg.cjs.js",
+        },
+        "./package.json": "./package.json",
+      },
+      preconstruct: {
+        exports: {
+          importConditionDefaultExport: "default",
+        },
+      },
+    }),
+    "src/index.js": ts`
+      export const a = "a";
+      export default a;
+    `,
+    "src/index.d.ts": ts`
+      export const a: string;
+      export default a;
+    `,
+  });
+  await dev(tmpPath);
+  expect(await getFiles(tmpPath, ["dist/**.d.{,m}ts"])).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.d.mts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export * from "../src/index.js";
+    export { _default as default } from "./pkg.cjs.default.js";
+    //# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicGtnLmNqcy5kLm10cyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uL3NyYy9pbmRleC5qcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSJ9
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export * from "../src/index.js";
+    export { default } from "../src/index.js";
+    //# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicGtnLmNqcy5kLnRzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi4vc3JjL2luZGV4LmpzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBIn0=
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.default.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export { default as _default } from "../src/index.js"
+
+  `);
+});

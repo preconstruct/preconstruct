@@ -126,10 +126,12 @@ export async function writeDevTSFiles(
 
     const ext = path.extname(relativePathWithExtension).slice(1);
     const mappedExt = { ts: "js", tsx: "js", mts: "mjs", cts: "cjs" }[ext];
-    const pathToImport = relativePathWithExtension.replace(
-      new RegExp(`\\.${ext}$`),
-      `.${mappedExt}`
-    );
+    const pathToImport = mappedExt
+      ? relativePathWithExtension.replace(
+          new RegExp(`\\.${ext}$`),
+          `.${mappedExt}`
+        )
+      : relativePathWithExtension;
     promises.push(
       fs.outputFile(
         dmtsReexportFilename,
