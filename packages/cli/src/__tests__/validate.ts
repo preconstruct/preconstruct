@@ -140,6 +140,36 @@ test("valid browser", async () => {
   `);
 });
 
+test("invalid types field", async () => {
+  let tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "@blah/something",
+      main: "dist/blah-something.cjs.js",
+      types: "invalid.d.ts",
+    }),
+    "src/index.js": "",
+  });
+
+  await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
+    `[Error: types field is invalid, found \`"invalid.d.ts"\`, expected \`"dist/blah-something.cjs.d.ts"\`]`
+  );
+});
+
+test("invalid typings field", async () => {
+  let tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "@blah/something",
+      main: "dist/blah-something.cjs.js",
+      typings: "invalid.d.ts",
+    }),
+    "src/index.js": "",
+  });
+
+  await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
+    `[Error: typings field is invalid, found \`"invalid.d.ts"\`, expected \`"dist/blah-something.cjs.d.ts"\`]`
+  );
+});
+
 test("monorepo single package", async () => {
   let tmpPath = f.copy("monorepo-single-package");
 
