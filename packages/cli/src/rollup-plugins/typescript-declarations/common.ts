@@ -187,6 +187,18 @@ export function getDeclarationsForFile(
       filename,
     };
   }
+  if (filename.endsWith(".json")) {
+    return {
+      types: {
+        name: filename.replace(
+          normalizedPkgDir,
+          normalizePath(path.join(normalizedPkgDir, "dist", "declarations"))
+        ),
+        content: sourceFile.text,
+      },
+      filename,
+    };
+  }
 
   const emitted: Partial<EmittedDeclarationOutput> = {};
   const otherEmitted: { name: string; text: string }[] = [];
