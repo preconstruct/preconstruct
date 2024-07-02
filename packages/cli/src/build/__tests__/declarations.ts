@@ -891,3 +891,79 @@ test("self-import with exports field and importConditionDefaultExport: defaul an
 
   `);
 });
+
+test("importing json where json import is emitted in declaration files", async () => {
+  let dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "a",
+      main: "dist/a.cjs.js",
+      module: "dist/a.esm.js",
+      exports: {
+        ".": {
+          module: "./dist/a.esm.js",
+          default: "./dist/a.cjs.js",
+        },
+        "./package.json": "./package.json",
+      },
+    }),
+
+    "src/index.ts": ts`
+      import json from "./b.json";
+
+      export { json };
+    `,
+    "src/b.json": JSON.stringify({ something: "a" }),
+
+    node_modules: typescriptFixture.node_modules,
+    "tsconfig.json": JSON.stringify({
+      compilerOptions: {
+        module: "ESNext",
+        moduleResolution: "bundler",
+        allowImportingTsExtensions: true,
+        strict: true,
+        declaration: true,
+      },
+    }),
+  });
+  await build(dir);
+
+  expect(await getFiles(dir, ["dist/**/*"])).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/a.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export * from "./declarations/src/index";
+    //# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiYS5janMuZC50cyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4vZGVjbGFyYXRpb25zL3NyYy9pbmRleC5kLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBIn0=
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/a.cjs.dev.js, dist/a.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    var b = {
+    	something: "a"
+    };
+
+    exports.json = b;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/a.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./a.cjs.prod.js");
+    } else {
+      module.exports = require("./a.cjs.dev.js");
+    }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/a.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    var b = {
+    	something: "a"
+    };
+
+    export { b as json };
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/b.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {"something":"a"}
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/index.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    import json from "./b.json";
+    export { json };
+
+  `);
+});
