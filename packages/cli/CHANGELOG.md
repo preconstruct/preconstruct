@@ -1,5 +1,11 @@
 # preconstruct
 
+## 2.8.5
+
+### Patch Changes
+
+- [#592](https://github.com/preconstruct/preconstruct/pull/592) [`c05b2a9`](https://github.com/preconstruct/preconstruct/commit/c05b2a9e579bb5e1f46a8616220645f6e600db28) Thanks [@emmatown](https://github.com/emmatown)! - Fix generating TypeScript declarations where imports to JSON files are emitted in the `.d.ts` files
+
 ## 2.8.4
 
 ### Patch Changes
