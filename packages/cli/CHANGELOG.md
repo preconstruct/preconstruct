@@ -1,5 +1,11 @@
 # preconstruct
 
+## 2.8.6
+
+### Patch Changes
+
+- [#594](https://github.com/preconstruct/preconstruct/pull/594) [`9f45824`](https://github.com/preconstruct/preconstruct/commit/9f45824d1da261a68c396ead71eaeeef4ea92144) Thanks [@emmatown](https://github.com/emmatown)! - Add `checkTypeDependencies` experimental flag
+
 ## 2.8.5
 
 ### Patch Changes
