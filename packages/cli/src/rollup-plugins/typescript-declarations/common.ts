@@ -142,7 +142,7 @@ export function getDeclarationsForFile(
   projectDir: string,
   diagnosticsHost: import("typescript").FormatDiagnosticsHost,
   /** This will only be called once per unique module specifier in a file */
-  visitModuleSpecifier?: (moduleSpecifier: string) => string
+  visitModuleSpecifier: (moduleSpecifier: string) => string
 ): EmittedDeclarationOutput {
   const cachedVisitModuleSpecifier = memoize(
     visitModuleSpecifier ?? ((x) => x)
@@ -156,26 +156,24 @@ export function getDeclarationsForFile(
     );
   }
   if (dtsFileRegex.test(filename)) {
-    let content = sourceFile.text;
-    if (visitModuleSpecifier) {
-      const magicString = new MagicString(content);
-      const visitor = (node: import("typescript").Node): void => {
-        const moduleSpecifier = getModuleSpecifier(node, typescript);
-        if (moduleSpecifier) {
-          const replaced = cachedVisitModuleSpecifier(moduleSpecifier.text);
-          if (replaced !== moduleSpecifier.text) {
-            magicString.update(
-              moduleSpecifier.getStart(sourceFile, false),
-              moduleSpecifier.getEnd(),
-              JSON.stringify(replaced)
-            );
-          }
+    const magicString = new MagicString(sourceFile.text);
+    const visitor = (node: import("typescript").Node): void => {
+      const moduleSpecifier = getModuleSpecifier(node, typescript);
+      if (moduleSpecifier) {
+        const replaced = cachedVisitModuleSpecifier(moduleSpecifier.text);
+        if (replaced !== moduleSpecifier.text) {
+          magicString.update(
+            moduleSpecifier.getStart(sourceFile, false),
+            moduleSpecifier.getEnd(),
+            JSON.stringify(replaced)
+          );
         }
-        typescript.forEachChild(node, visitor);
-      };
-      typescript.forEachChild(sourceFile, visitor);
-      content = magicString.toString();
-    }
+      }
+      typescript.forEachChild(node, visitor);
+    };
+    typescript.forEachChild(sourceFile, visitor);
+    const content = magicString.toString();
+
     return {
       types: {
         name: filename.replace(
@@ -232,10 +230,6 @@ export function getDeclarationsForFile(
         (context) => (
           node
         ): import("typescript").Bundle | import("typescript").SourceFile => {
-          if (!visitModuleSpecifier) {
-            return node;
-          }
-
           const replacedNodes = new Map<
             import("typescript").StringLiteral,
             import("typescript").StringLiteral

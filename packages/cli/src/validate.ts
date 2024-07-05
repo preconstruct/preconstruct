@@ -138,6 +138,7 @@ export const EXPERIMENTAL_FLAGS = new Set([
   "importsConditions",
   "distInRoot",
   "typeModule",
+  "checkTypeDependencies",
 ]);
 
 export function validateProject(project: Project, log = false) {

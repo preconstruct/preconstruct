@@ -102,7 +102,7 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
         typescript,
         program,
         normalizedDirname,
-        pkg.project.directory,
+        pkg,
         resolveModule,
         [...entrypointSourceToTypeScriptSource.values()]
       );
