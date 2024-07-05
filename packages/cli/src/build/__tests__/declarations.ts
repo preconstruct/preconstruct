@@ -1,3 +1,4 @@
+import path from "path";
 import build from "..";
 import {
   testdir,
@@ -5,6 +6,7 @@ import {
   getDist,
   getFiles,
   ts,
+  repoNodeModules,
 } from "../../../test-utils";
 
 test("circular dependency typescript", async () => {
@@ -964,6 +966,231 @@ test("importing json where json import is emitted in declaration files", async (
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/index.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     import json from "./b.json";
     export { json };
+
+  `);
+});
+
+test("type dep missing", async () => {
+  let dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "a",
+      main: "dist/a.cjs.js",
+      module: "dist/a.esm.js",
+      exports: {
+        ".": {
+          module: "./dist/a.esm.js",
+          default: "./dist/a.cjs.js",
+        },
+        "./package.json": "./package.json",
+      },
+      preconstruct: {
+        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+          checkTypeDependencies: true,
+        },
+      },
+    }),
+
+    "src/index.ts": ts`
+      export type { a } from "something";
+    `,
+    "node_modules/typescript": {
+      kind: "symlink",
+      path: path.join(repoNodeModules, "typescript"),
+    },
+    "node_modules/something/index.js": "export const a = 'blah';",
+    "node_modules/something/index.d.ts": "export const a = 'blah';",
+    "node_modules/something/package.json": JSON.stringify({
+      name: "something",
+      main: "index.js",
+    }),
+    ".babelrc": typescriptFixture[".babelrc"],
+    "tsconfig.json": JSON.stringify({
+      compilerOptions: {
+        module: "ESNext",
+        moduleResolution: "bundler",
+        allowImportingTsExtensions: true,
+        strict: true,
+        declaration: true,
+      },
+    }),
+  });
+  await expect(build(dir)).rejects.toMatchInlineSnapshot(
+    `[Error: 🎁 a dependency "something" used by types for src/index.ts is not declared in dependencies or peerDependencies]`
+  );
+});
+
+test("@types/ dep missing", async () => {
+  let dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "a",
+      main: "dist/a.cjs.js",
+      module: "dist/a.esm.js",
+      exports: {
+        ".": {
+          module: "./dist/a.esm.js",
+          default: "./dist/a.cjs.js",
+        },
+        "./package.json": "./package.json",
+      },
+      preconstruct: {
+        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+          checkTypeDependencies: true,
+        },
+      },
+    }),
+
+    "src/index.ts": ts`
+      export type { a } from "something";
+    `,
+    ".babelrc": typescriptFixture[".babelrc"],
+    "node_modules/typescript": {
+      kind: "symlink",
+      path: path.join(repoNodeModules, "typescript"),
+    },
+    "node_modules/something/index.js": "export const a = 'blah';",
+    "node_modules/something/package.json": JSON.stringify({
+      name: "something",
+      main: "index.js",
+    }),
+    "node_modules/@types/something/index.d.ts": "export const a = 'blah';",
+    "node_modules/@types/something/package.json": JSON.stringify({
+      name: "something",
+      main: "index.js",
+    }),
+    "tsconfig.json": JSON.stringify({
+      compilerOptions: {
+        module: "ESNext",
+        moduleResolution: "bundler",
+        allowImportingTsExtensions: true,
+        strict: true,
+        declaration: true,
+      },
+    }),
+  });
+  await expect(build(dir)).rejects.toMatchInlineSnapshot(
+    `[Error: 🎁 a dependency "@types/something" used by types for src/index.ts is not declared in dependencies or peerDependencies]`
+  );
+});
+
+test("type dep not missing", async () => {
+  let dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "a",
+      main: "dist/a.cjs.js",
+      module: "dist/a.esm.js",
+      exports: {
+        ".": {
+          module: "./dist/a.esm.js",
+          default: "./dist/a.cjs.js",
+        },
+        "./package.json": "./package.json",
+      },
+      preconstruct: {
+        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+          checkTypeDependencies: true,
+        },
+      },
+      dependencies: {
+        something: "1.0.0",
+      },
+    }),
+
+    "src/index.ts": ts`
+      export type { a } from "something";
+    `,
+    "node_modules/typescript": {
+      kind: "symlink",
+      path: path.join(repoNodeModules, "typescript"),
+    },
+    "node_modules/something/index.js": "export const a = 'blah';",
+    "node_modules/something/index.d.ts": "export const a = 'blah';",
+    "node_modules/something/package.json": JSON.stringify({
+      name: "something",
+      main: "index.js",
+    }),
+    ".babelrc": typescriptFixture[".babelrc"],
+    "tsconfig.json": JSON.stringify({
+      compilerOptions: {
+        module: "ESNext",
+        moduleResolution: "bundler",
+        allowImportingTsExtensions: true,
+        strict: true,
+        declaration: true,
+      },
+    }),
+  });
+  await build(dir);
+  expect(await getFiles(dir, ["dist/**/*.d.*"])).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/a.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export * from "./declarations/src/index";
+    //# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiYS5janMuZC50cyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4vZGVjbGFyYXRpb25zL3NyYy9pbmRleC5kLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBIn0=
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/index.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export type { a } from "something";
+
+  `);
+});
+
+test("type dep not used", async () => {
+  let dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "a",
+      main: "dist/a.cjs.js",
+      module: "dist/a.esm.js",
+      exports: {
+        ".": {
+          module: "./dist/a.esm.js",
+          default: "./dist/a.cjs.js",
+        },
+        "./package.json": "./package.json",
+      },
+      preconstruct: {
+        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+          checkTypeDependencies: true,
+        },
+      },
+      dependencies: {
+        something: "1.0.0",
+      },
+    }),
+
+    "src/index.ts": ts`
+      import { a } from "something";
+      export const b = a;
+    `,
+    ".babelrc": typescriptFixture[".babelrc"],
+    "node_modules/typescript": {
+      kind: "symlink",
+      path: path.join(repoNodeModules, "typescript"),
+    },
+    "node_modules/something/index.js": "export const a = 'blah';",
+    "node_modules/something/package.json": JSON.stringify({
+      name: "something",
+      main: "index.js",
+    }),
+    "node_modules/@types/something/index.d.ts": "export const a = 'blah';",
+    "node_modules/@types/something/package.json": JSON.stringify({
+      name: "something",
+      main: "index.js",
+    }),
+    "tsconfig.json": JSON.stringify({
+      compilerOptions: {
+        module: "ESNext",
+        moduleResolution: "bundler",
+        allowImportingTsExtensions: true,
+        strict: true,
+        declaration: true,
+      },
+    }),
+  });
+  await build(dir);
+  expect(await getFiles(dir, ["dist/**/*.d.*"])).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/a.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export * from "./declarations/src/index";
+    //# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiYS5janMuZC50cyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4vZGVjbGFyYXRpb25zL3NyYy9pbmRleC5kLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBIn0=
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/index.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export declare const b = "blah";
 
   `);
 });

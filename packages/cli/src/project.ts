@@ -32,6 +32,7 @@ export class Project extends Item<{
       importsConditions?: JSONValue;
       distInRoot?: JSONValue;
       typeModule?: JSONValue;
+      checkTypeDependencies?: JSONValue;
     };
   };
 }> {
@@ -56,6 +57,7 @@ export class Project extends Item<{
       importsConditions: !!config.importsConditions,
       distInRoot: !!config.distInRoot,
       typeModule: !!config.typeModule,
+      checkTypeDependencies: !!config.checkTypeDependencies,
     };
   }
   get configPackages(): Array<string> {
