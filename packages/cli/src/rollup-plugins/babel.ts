@@ -113,8 +113,16 @@ let rollupPluginBabel = ({
       }
       let helpersSourceDescription = externalHelpersCache.get(helperName);
       if (helpersSourceDescription === undefined) {
-        const helperNodes = babelHelpers.get(helperName).nodes;
-
+        const result = babelHelpers.get(
+          helperName,
+          undefined,
+          // @ts-ignore
+          {
+            type: "Identifier",
+            name: `_${helperName}`,
+          }
+        );
+        const helperNodes = result.nodes;
         let helpers = babelGenerator.default(
           // @ts-ignore
           {
@@ -122,6 +130,20 @@ let rollupPluginBabel = ({
             body: helperNodes,
           }
         ).code;
+        if (
+          helperNodes.every(
+            (statement) =>
+              statement.type !== "ExportDefaultDeclaration" &&
+              statement.type !== "ExportNamedDeclaration"
+          )
+        ) {
+          const deps = babelHelpers.getDependencies(helperName);
+          helpers = `${deps
+            .map(
+              (dep) => `import ${dep} from "${babelHelpersModuleStart + dep}";`
+            )
+            .join("\n")}\n${helpers}\n export { _${helperName} as default };`;
+        }
 
         helpersSourceDescription = {
           ast: this.parse(helpers, undefined),
