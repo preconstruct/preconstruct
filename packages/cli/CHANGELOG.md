@@ -1,5 +1,11 @@
 # preconstruct
 
+## 2.8.7
+
+### Patch Changes
+
+- [#596](https://github.com/preconstruct/preconstruct/pull/596) [`022bbc4`](https://github.com/preconstruct/preconstruct/commit/022bbc4487587ab9600017b7d619e8616cd57e88) Thanks [@emmatown](https://github.com/emmatown)! - Fix `Error when using sourcemap for reporting an error: Can't resolve original location of error` error caused by changes to `@babel/helpers` in newer versions of Babel
+
 ## 2.8.6
 
 ### Patch Changes
