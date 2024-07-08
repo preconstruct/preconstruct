@@ -419,7 +419,10 @@ export async function getFiles(
     transformContent?: (content: string) => string;
   } = {}
 ) {
-  const files = await fastGlob(glob, { cwd: dir });
+  const files = await fastGlob(glob, {
+    cwd: dir,
+    ignore: ["**/node_modules/**"],
+  });
 
   return Object.fromEntries([
     ...(
