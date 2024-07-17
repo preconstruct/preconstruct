@@ -34,7 +34,6 @@
     "@types/babel__code-frame": "^7.0.1",
     "@types/fs-extra": "^9.0.6",
     "@types/jest": "^29.2.2",
-    "@types/meow": "^5.0.0",
     "@types/ms": "^0.7.31",
     "@types/node": "^18.11.9",
     "@types/normalize-path": "^3.0.0",

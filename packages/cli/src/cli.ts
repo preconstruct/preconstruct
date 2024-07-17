@@ -1,4 +1,3 @@
-import meow from "meow";
 import init from "./init";
 import validate from "./validate";
 import build from "./build";
@@ -16,8 +15,7 @@ import {
 
 process.env.NODE_ENV = "production";
 
-let { input } = meow(
-  `
+const HELP_TEXT = `
 Usage
   $ preconstruct [command]
 Commands
@@ -27,10 +25,7 @@ Commands
   validate     validate the project
   fix          infer as much information as possible and fix the project
   dev          create links so entrypoints can be imported
-
-`,
-  {}
-);
+`;
 
 let errors = {
   commandNotFound: "Command not found",
@@ -39,8 +34,15 @@ let errors = {
 class CommandNotFoundError extends Error {}
 
 (async () => {
+  const input = process.argv.slice(2);
+
   if (input.length === 1) {
     switch (input[0]) {
+      case "--help":
+      case "-h": {
+        console.log(HELP_TEXT);
+        return;
+      }
       case "init": {
         await init(process.cwd());
         return;

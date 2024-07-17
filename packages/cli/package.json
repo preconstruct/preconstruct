@@ -59,7 +59,6 @@
     "is-reference": "^1.2.1",
     "jest-worker": "^26.3.0",
     "magic-string": "^0.30.0",
-    "meow": "^7.1.0",
     "ms": "^2.1.2",
     "normalize-path": "^3.0.0",
     "npm-packlist": "^2.1.2",
