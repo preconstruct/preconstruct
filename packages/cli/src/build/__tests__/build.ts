@@ -2385,3 +2385,173 @@ test("type: module with conditions", async () => {
 
   `);
 });
+
+test("using type from a package with .d.ts at entrypoint in another package", async () => {
+  let dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "@test/repo",
+      preconstruct: {
+        packages: ["packages/*"],
+        exports: true,
+      },
+    }),
+    "packages/pkg-a/package.json": JSON.stringify({
+      name: "pkg-a",
+      main: "dist/pkg-a.cjs.js",
+      module: "dist/pkg-a.esm.js",
+      exports: {
+        ".": {
+          module: "./dist/pkg-a.esm.js",
+          default: "./dist/pkg-a.cjs.js",
+        },
+        "./package.json": "./package.json",
+      },
+    }),
+    "packages/pkg-a/src/index.js": ts`
+      export {};
+    `,
+    "packages/pkg-a/src/index.d.ts": ts`
+      export type Something = {
+        a: string;
+      };
+    `,
+    "packages/pkg-b/package.json": JSON.stringify({
+      name: "pkg-b",
+      main: "dist/pkg-b.cjs.js",
+      module: "dist/pkg-b.esm.js",
+      exports: {
+        ".": {
+          module: "./dist/pkg-b.esm.js",
+          default: "./dist/pkg-b.cjs.js",
+        },
+        "./package.json": "./package.json",
+      },
+    }),
+    "packages/pkg-b/src/index.ts": ts`
+      import { createSomething } from "./b";
+      export const something = createSomething();
+    `,
+    "packages/pkg-b/src/b.ts": ts`
+      import { Something } from "pkg-a";
+
+      export function createSomething(): Something {
+        return { a: "a" };
+      }
+    `,
+    ...tsSetupFiles,
+  });
+  await fs.ensureSymlink(
+    path.join(dir, "packages/pkg-a"),
+    path.join(dir, "node_modules/pkg-a")
+  );
+  await build(dir);
+
+  expect(await getFiles(dir, ["packages/*/dist/**/*.d.*"]))
+    .toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/declarations/src/index.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export type Something = {
+      a: string;
+    };
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export * from "./declarations/src/index";
+    //# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicGtnLWEuY2pzLmQudHMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuL2RlY2xhcmF0aW9ucy9zcmMvaW5kZXguZC50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSJ9
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-b/dist/declarations/src/index.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export declare const something: import("pkg-a").Something;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-b/dist/pkg-b.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export * from "./declarations/src/index";
+    //# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicGtnLWIuY2pzLmQudHMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuL2RlY2xhcmF0aW9ucy9zcmMvaW5kZXguZC50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSJ9
+
+  `);
+});
+
+test("using type from a package with .d.ts at entrypoint in another package with a re-export", async () => {
+  let dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "@test/repo",
+      preconstruct: {
+        packages: ["packages/*"],
+        exports: true,
+      },
+    }),
+    "packages/pkg-a/package.json": JSON.stringify({
+      name: "pkg-a",
+      main: "dist/pkg-a.cjs.js",
+      module: "dist/pkg-a.esm.js",
+      exports: {
+        ".": {
+          module: "./dist/pkg-a.esm.js",
+          default: "./dist/pkg-a.cjs.js",
+        },
+        "./package.json": "./package.json",
+      },
+    }),
+    "packages/pkg-a/src/index.js": ts`
+      export {};
+    `,
+    "packages/pkg-a/src/index.d.ts": ts`
+      export type Something = {
+        a: string;
+      };
+    `,
+    "packages/pkg-b/package.json": JSON.stringify({
+      name: "pkg-b",
+      main: "dist/pkg-b.cjs.js",
+      module: "dist/pkg-b.esm.js",
+      exports: {
+        ".": {
+          module: "./dist/pkg-b.esm.js",
+          default: "./dist/pkg-b.cjs.js",
+        },
+        "./package.json": "./package.json",
+      },
+      dependencies: {
+        "pkg-a": "*",
+      },
+    }),
+    "packages/pkg-b/src/index.ts": ts`
+      import { createSomething } from "./b";
+      export const something = createSomething();
+    `,
+    "packages/pkg-b/src/b.ts": ts`
+      import { Something } from "pkg-a";
+
+      export type { Something };
+
+      export function createSomething(): Something {
+        return { a: "a" };
+      }
+    `,
+    ...tsSetupFiles,
+  });
+  await fs.ensureSymlink(
+    path.join(dir, "packages/pkg-a"),
+    path.join(dir, "node_modules/pkg-a")
+  );
+  await build(dir);
+
+  expect(await getFiles(dir, ["packages/*/dist/**/*.d.*"]))
+    .toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/declarations/src/index.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export type Something = {
+      a: string;
+    };
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export * from "./declarations/src/index";
+    //# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicGtnLWEuY2pzLmQudHMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuL2RlY2xhcmF0aW9ucy9zcmMvaW5kZXguZC50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSJ9
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-b/dist/declarations/src/b.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    import { Something } from "pkg-a";
+    export type { Something };
+    export declare function createSomething(): Something;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-b/dist/declarations/src/index.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export declare const something: import("./b.js").Something;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-b/dist/pkg-b.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export * from "./declarations/src/index";
+    //# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicGtnLWIuY2pzLmQudHMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuL2RlY2xhcmF0aW9ucy9zcmMvaW5kZXguZC50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSJ9
+
+  `);
+});

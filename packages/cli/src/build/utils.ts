@@ -1,6 +1,10 @@
 import { Project } from "../project";
 import { isTsPath } from "../rollup-plugins/typescript-declarations";
-import { entrypointHasDefaultExport, writeDevTSFiles } from "../dev";
+import {
+  entrypointHasDefaultExport,
+  hasDtsFile,
+  writeDevTSFiles,
+} from "../dev";
 import * as fs from "fs-extra";
 import path from "path";
 
@@ -27,7 +31,7 @@ export async function cleanProjectBeforeBuild(project: Project) {
 
       await Promise.all(
         pkg.entrypoints.map(async (entrypoint) => {
-          if (isTsPath(entrypoint.source)) {
+          if (isTsPath(entrypoint.source) || (await hasDtsFile(entrypoint))) {
             if (!isTypeModule) {
               await fs.mkdir(path.join(entrypoint.directory, "dist"));
             }

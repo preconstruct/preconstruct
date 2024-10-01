@@ -26,7 +26,7 @@ import { validateProject } from "./validate";
 
 let tsExtensionPattern = /\.tsx?$/;
 
-async function hasDtsFile(entrypoint: Entrypoint) {
+export async function hasDtsFile(entrypoint: Entrypoint) {
   try {
     const filename = entrypoint.source.replace(/\.jsx?/, ".d.ts");
     await fs.stat(filename);
