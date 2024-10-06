@@ -146,7 +146,7 @@ export type ExportsConditions = {
   default: string;
 };
 
-export type EnvCondition = "browser" | "worker";
+type EnvCondition = "browser" | "worker";
 
 export class Package extends Item<{
   name?: JSONValue;

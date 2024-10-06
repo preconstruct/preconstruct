@@ -5,8 +5,5 @@
   "license": "MIT",
   "dependencies": {
     "@preconstruct/cli": "^2.8.6"
-  },
-  "resolutions": {
-    "**/@babel/parser": "^7.21.2"
   }
 }

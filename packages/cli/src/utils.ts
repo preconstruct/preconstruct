@@ -222,7 +222,7 @@ function exportsFieldForLegacyConditions(
   return output;
 }
 
-export type BuildTarget =
+type BuildTarget =
   | "cjs"
   | "esm"
   | "umd"
@@ -313,7 +313,7 @@ export function getExportsFieldOutputPath(
   );
 }
 
-export function getExportsFieldOutputPathForConditions(
+function getExportsFieldOutputPathForConditions(
   entrypoint: Entrypoint,
   conditions: string[]
 ) {
@@ -323,7 +323,7 @@ export function getExportsFieldOutputPathForConditions(
   );
 }
 
-export function getExportsFieldOutputPathForConditionsWithTypeModule(
+function getExportsFieldOutputPathForConditionsWithTypeModule(
   entrypoint: Entrypoint,
   conditions: string[]
 ) {
