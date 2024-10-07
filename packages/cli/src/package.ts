@@ -1,5 +1,5 @@
 // based on https://github.com/jamiebuilds/std-pkg but reading fewer things, adding setters and reading the file
-import fastGlob from "fast-glob";
+import { glob } from "tinyglobby";
 import * as fs from "fs-extra";
 import fsPromises from "fs/promises";
 import nodePath from "path";
@@ -191,8 +191,9 @@ export class Package extends Item<{
     let contents = await fs.readFile(filePath, "utf-8");
     let pkg = new Package(filePath, contents, project._jsonDataByPath);
     pkg.project = project;
-    let entrypoints = await fastGlob(pkg.configEntrypoints, {
+    let entrypoints = await glob(pkg.configEntrypoints, {
       cwd: nodePath.join(pkg.directory, "src"),
+      expandDirectories: false,
       onlyFiles: true,
       absolute: true,
     });
@@ -211,8 +212,9 @@ export class Package extends Item<{
       }),
     ];
     if (!entrypoints.length) {
-      let oldEntrypoints = await fastGlob(pkg.configEntrypoints, {
+      let oldEntrypoints = await glob(pkg.configEntrypoints, {
         cwd: pkg.directory,
+        expandDirectories: false,
         onlyDirectories: true,
         absolute: true,
       });
