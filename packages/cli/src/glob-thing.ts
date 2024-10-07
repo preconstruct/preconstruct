@@ -1,4 +1,4 @@
-import parseGlob from "parse-glob";
+import picomatch from "picomatch";
 import * as fs from "fs-extra";
 import path from "path";
 import normalizePath from "normalize-path";
@@ -12,8 +12,8 @@ export async function getUselessGlobsThatArentReallyGlobsForNewEntrypoints(
   return (
     await Promise.all(
       globs.map(async (glob) => {
-        let parsedGlobResult = parseGlob(glob);
-        if (!parsedGlobResult.is.glob) {
+        let parsedGlobResult = picomatch.scan(glob);
+        if (!(parsedGlobResult.isGlob || parsedGlobResult.negated)) {
           let filename = normalizePath(path.resolve(cwd, "src", glob));
           if (filesSet.has(filename)) return;
           try {
