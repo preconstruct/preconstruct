@@ -1,6 +1,6 @@
 import { FatalError, FixableError } from "./errors";
 import resolveFrom from "resolve-from";
-import chalk from "chalk";
+import pc from "picocolors";
 import { errors } from "./messages";
 import { Package } from "./package";
 import { isFieldValid } from "./validate";
@@ -111,17 +111,17 @@ export function validatePackage(pkg: Package) {
         for (let pkgName in depPkgJson.peerDependencies) {
           if (!sortaAllDeps.has(pkgName)) {
             throw new FatalError(
-              `the package ${chalk.blue(pkg.name)} depends on ${chalk.blue(
+              `the package ${pc.blue(pkg.name)} depends on ${pc.blue(
                 depName
-              )} which has a peerDependency on ${chalk.blue(
+              )} which has a peerDependency on ${pc.blue(
                 pkgName
-              )} but ${chalk.blue(
+              )} but ${pc.blue(
                 pkgName
-              )} is not specified in the dependencies or peerDependencies of ${chalk.blue(
+              )} is not specified in the dependencies or peerDependencies of ${pc.blue(
                 pkg.name
-              )}. please add ${chalk.blue(
+              )}. please add ${pc.blue(
                 pkgName
-              )} to the dependencies or peerDependencies of ${chalk.blue(
+              )} to the dependencies or peerDependencies of ${pc.blue(
                 pkg.name
               )}`,
               pkg.name

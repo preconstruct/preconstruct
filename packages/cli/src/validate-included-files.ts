@@ -1,5 +1,5 @@
 import path from "path";
-import chalk from "chalk";
+import pc from "picocolors";
 import * as fs from "fs-extra";
 import packlist from "npm-packlist";
 import { Package } from "./package";
@@ -57,7 +57,7 @@ export async function validateIncludedFiles(pkg: Package) {
       let entrypointName = path.relative(pkg.directory, entrypoint.directory);
       if (!result.has(pkgJsonPath)) {
         messages.push(
-          `the entrypoint ${chalk.cyan(
+          `the entrypoint ${pc.cyan(
             entrypointName
           )} isn't included in the published files for this package, please add it to the files field in the package's package.json`
         );
@@ -66,7 +66,7 @@ export async function validateIncludedFiles(pkg: Package) {
           `the dist directory ${
             entrypointName === ""
               ? ""
-              : `for entrypoint ${chalk.cyan(entrypointName)} `
+              : `for entrypoint ${pc.cyan(entrypointName)} `
           }isn't included in the published files for this package, please add it to the files field in the package's package.json`
         );
       }

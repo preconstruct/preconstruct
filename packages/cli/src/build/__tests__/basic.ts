@@ -1221,7 +1221,7 @@ test("importing css fails with a nice error", async () => {
     "src/blah.css": "",
   });
   await expect(build(dir)).rejects.toMatchInlineSnapshot(
-    `[Error: 🎁 @scope/test only .ts, .tsx, .js, .jsx, and .json files can be imported but "./blah.css" is imported in "src/index.js"]`
+    `[Error: 🎁 [36m@scope/test[39m only .ts, .tsx, .js, .jsx, and .json files can be imported but "./blah.css" is imported in "src/index.js"]`
   );
 });
 

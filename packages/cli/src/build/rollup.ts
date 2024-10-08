@@ -3,7 +3,7 @@ import resolve from "@rollup/plugin-node-resolve";
 import alias from "@rollup/plugin-alias";
 import cjs from "@rollup/plugin-commonjs";
 import replace from "@rollup/plugin-replace";
-import chalk from "chalk";
+import pc from "picocolors";
 import path from "path";
 import builtInModules from "builtin-modules";
 import { Package } from "../package";
@@ -103,7 +103,7 @@ export let getRollupConfig = (
     onwarn: (warning) => {
       if (typeof warning === "string") {
         warnings.add(
-          `An unhandled Rollup error occurred: ${chalk.red(
+          `An unhandled Rollup error occurred: ${pc.red(
             // @ts-ignore
             warning.toString()
           )}`
@@ -130,9 +130,7 @@ export let getRollupConfig = (
         }
         default: {
           warnings.add(
-            `An unhandled Rollup error occurred: ${chalk.red(
-              warning.toString()
-            )}`
+            `An unhandled Rollup error occurred: ${pc.red(warning.toString())}`
           );
         }
       }
