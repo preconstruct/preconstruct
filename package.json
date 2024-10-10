@@ -12,7 +12,8 @@
     "release": "yarn build && changeset publish",
     "start:site": "cd site && yarn start",
     "build:site": "cd site && yarn build",
-    "lint": "eslint . --ext tsx,ts,js"
+    "lint": "eslint . --ext tsx,ts,js",
+    "lint:knip": "knip"
   },
   "repository": "https://github.com/preconstruct/preconstruct",
   "license": "MIT",
@@ -23,7 +24,6 @@
   "private": true,
   "dependencies": {
     "@babel/core": "^7.7.7",
-    "@babel/parser": "^7.7.7",
     "@babel/plugin-transform-runtime": "^7.7.6",
     "@babel/preset-env": "^7.7.7",
     "@babel/preset-flow": "^7.10.4",
@@ -40,13 +40,10 @@
     "@types/npm-packlist": "^1.1.1",
     "@types/parse-glob": "^3.0.29",
     "@types/parse-json": "^4.0.0",
-    "@types/rollup-plugin-json": "^3.0.2",
     "@types/source-map-support": "^0.5.0",
     "@types/terser": "^3.12.0",
     "@typescript-eslint/parser": "^5.4.0",
-    "babel-jest": "^29.3.1",
     "babel-plugin-macros": "^2.8.0",
-    "codecov": "^3.6.1",
     "cross-env": "^7.0.2",
     "eslint": "^8.0.0",
     "eslint-plugin-import": "^2.25.2",
@@ -54,8 +51,8 @@
     "eslint-plugin-react": "^7.26.1",
     "fixturez": "^1.1.0",
     "jest": "^29.5.0",
+    "knip": "^5.32.0",
     "lazy-require.macro": "^0.1.0",
-    "normalize-path": "^3.0.0",
     "outdent": "^0.7.1",
     "prettier": "^2.1.2",
     "typescript": "^5.0.4"

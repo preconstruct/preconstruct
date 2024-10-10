@@ -50,3 +50,13 @@ jobs:
 
       - name: Run ESLint
         run: yarn lint
+  knip:
+    name: Knip
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+
+      - uses: ./.github/actions/setup-deps
+
+      - name: Run Knip
+        run: yarn lint:knip
