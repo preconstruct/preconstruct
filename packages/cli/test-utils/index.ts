@@ -1,4 +1,4 @@
-import path from "path";
+import path from "node:path";
 import fs from "node:fs/promises";
 import fastGlob from "fast-glob";
 import fixturez from "fixturez";
@@ -28,8 +28,7 @@ afterEach(() => {
 
 import init from "../src/init";
 import { confirms } from "../src/messages";
-import normalizePath from "normalize-path";
-import { fsOutputFile } from "../src/utils";
+import { fsOutputFile, normalizePath } from "../src/utils";
 
 let mockedConfirms = confirms as jest.Mocked<typeof confirms>;
 

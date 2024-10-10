@@ -1,8 +1,7 @@
-import nodePath from "path";
+import path from "node:path";
 import { Item } from "./item";
 import { Package, ExportsConditions } from "./package";
-import { JSONValue } from "./utils";
-import normalizePath from "normalize-path";
+import { JSONValue, normalizePath } from "./utils";
 
 export class Entrypoint extends Item<{
   main?: JSONValue;
@@ -31,9 +30,7 @@ export class Entrypoint extends Item<{
       pkg.directory === this.directory
         ? ""
         : "/" +
-          normalizePath(
-            nodePath.dirname(nodePath.relative(pkg.directory, filePath))
-          );
+          normalizePath(path.dirname(path.relative(pkg.directory, filePath)));
   }
 
   get hasModuleField() {

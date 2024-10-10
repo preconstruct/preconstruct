@@ -4,7 +4,7 @@ import fs from "node:fs/promises";
 import packlist from "npm-packlist";
 import { Package } from "./package";
 import { FatalError } from "./errors";
-import { fsOutputFile } from "./utils";
+import { fsOutputFile, normalizePath } from "./utils";
 
 export async function validateIncludedFiles(pkg: Package) {
   try {
@@ -40,7 +40,7 @@ export async function validateIncludedFiles(pkg: Package) {
     // checks on Windows. This value will have a forward slash (dist/preconstruct-test-file), whereas the value
     // of distFilePath below will have a backslash (dist\preconstruct-test-file). Obviously these two won't match,
     // so the distfile check will fail.
-    let result = new Set(packedFilesArr.map((p) => path.normalize(p)));
+    let result = new Set(packedFilesArr.map((p) => normalizePath(p)));
 
     // check that we're including the package.json and main file
     // TODO: add Flow and TS check and if they're ignored, don't write them

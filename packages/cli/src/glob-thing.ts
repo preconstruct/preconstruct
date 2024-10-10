@@ -1,7 +1,7 @@
 import picomatch from "picomatch";
 import fs from "node:fs/promises";
-import path from "path";
-import normalizePath from "normalize-path";
+import path from "node:path";
+import { normalizePath } from "./utils";
 
 export async function getUselessGlobsThatArentReallyGlobsForNewEntrypoints(
   globs: string[],

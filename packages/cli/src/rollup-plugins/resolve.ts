@@ -1,8 +1,8 @@
 import { Package } from "../package";
 import { FatalError } from "../errors";
 import { Plugin } from "rollup";
-import normalizePath from "normalize-path";
-import path from "path";
+import path from "node:path";
+import { normalizePath } from "../utils";
 
 const allowedExtensionRegex = /\.([tj]sx?|json)$/;
 

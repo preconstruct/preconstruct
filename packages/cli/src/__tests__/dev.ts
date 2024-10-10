@@ -1,5 +1,5 @@
 import spawn from "spawndamnit";
-import path from "path";
+import path from "node:path";
 import fs from "node:fs/promises";
 import {
   getFiles,
@@ -11,9 +11,8 @@ import {
   typescriptFixture,
 } from "../../test-utils";
 import dev from "../dev";
-import normalizePath from "normalize-path";
 import escapeStringRegexp from "escape-string-regexp";
-import { fsEnsureSymlink } from "../utils";
+import { fsEnsureSymlink, normalizePath } from "../utils";
 
 jest.mock("../prompt");
 

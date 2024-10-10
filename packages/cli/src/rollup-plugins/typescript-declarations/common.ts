@@ -2,10 +2,10 @@ import { EOL } from "os";
 import resolveFrom from "resolve-from";
 import { FatalError } from "../../errors";
 import fs from "node:fs/promises";
-import path from "path";
-import normalizePath from "normalize-path";
+import path from "node:path";
 import { getModuleSpecifier } from "./get-module-specifier";
 import MagicString from "magic-string";
+import { normalizePath } from "../../utils";
 
 export type DeclarationFile = {
   name: string;

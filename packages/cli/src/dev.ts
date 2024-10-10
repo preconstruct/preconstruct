@@ -18,10 +18,10 @@ import {
   getBaseDistName,
   getDistFilenameForConditionsWithTypeModule,
   fsOutputFile,
+  normalizePath,
 } from "./utils";
 import fs from "node:fs/promises";
-import path from "path";
-import normalizePath from "normalize-path";
+import path from "node:path";
 import { Entrypoint } from "./entrypoint";
 import { validateProject } from "./validate";
 

@@ -2,7 +2,7 @@
 import { glob } from "tinyglobby";
 import fs from "node:fs/promises";
 import fsPromises from "fs/promises";
-import nodePath from "path";
+import path from "node:path";
 import { Item } from "./item";
 import { BatchError, FatalError } from "./errors";
 import { Entrypoint } from "./entrypoint";
@@ -20,8 +20,8 @@ import {
   MinimalEntrypoint,
   parseImportConditionDefaultExportOption,
   fsOutputFile,
+  normalizePath,
 } from "./utils";
-import normalizePath from "normalize-path";
 import { parseImportsField } from "./imports";
 
 function getFieldsUsedInEntrypoints(
@@ -81,7 +81,7 @@ function createEntrypoints(
           if (!hasAccepted) {
             const entrypointName = getEntrypointName(
               pkg,
-              nodePath.dirname(filename)
+              path.dirname(filename)
             );
             let shouldDeleteEntrypointPkgJson = await confirms.deleteEntrypointPkgJson(
               { name: entrypointName }
@@ -94,12 +94,12 @@ function createEntrypoints(
             }
           }
           await fs.rm(filename, { force: true });
-          const contents = await fs.readdir(nodePath.dirname(filename));
+          const contents = await fs.readdir(path.dirname(filename));
           if (
             contents.length === 0 ||
             (contents.length === 1 && contents[0] === "dist")
           ) {
-            await fsPromises.rm(nodePath.dirname(filename), {
+            await fsPromises.rm(path.dirname(filename), {
               recursive: true,
             });
           }
@@ -109,7 +109,7 @@ function createEntrypoints(
           getPlainEntrypointContent(
             pkg,
             fields,
-            nodePath.dirname(filename),
+            path.dirname(filename),
             pkg.indent
           ),
           pkg,
@@ -118,10 +118,7 @@ function createEntrypoints(
       }
       if (contents === undefined) {
         if (!hasAccepted) {
-          const entrypointName = getEntrypointName(
-            pkg,
-            nodePath.dirname(filename)
-          );
+          const entrypointName = getEntrypointName(pkg, path.dirname(filename));
           let shouldCreateEntrypointPkgJson = await confirms.createEntrypointPkgJson(
             { name: entrypointName }
           );
@@ -132,7 +129,7 @@ function createEntrypoints(
         contents = getPlainEntrypointContent(
           pkg,
           fields,
-          nodePath.dirname(filename),
+          path.dirname(filename),
           pkg.indent
         );
         await fsOutputFile(filename, contents);
@@ -187,13 +184,13 @@ export class Package extends Item<{
     project: Project,
     isFix: boolean
   ): Promise<Package> {
-    let filePath = nodePath.join(directory, "package.json");
+    let filePath = path.join(directory, "package.json");
 
     let contents = await fs.readFile(filePath, "utf-8");
     let pkg = new Package(filePath, contents, project._jsonDataByPath);
     pkg.project = project;
     let entrypoints = await glob(pkg.configEntrypoints, {
-      cwd: nodePath.join(pkg.directory, "src"),
+      cwd: path.join(pkg.directory, "src"),
       expandDirectories: false,
       onlyFiles: true,
       absolute: true,
@@ -230,7 +227,7 @@ export class Package extends Item<{
       entrypoints.map(async (sourceFile) => {
         if (!/\.[tj]sx?$/.test(sourceFile)) {
           throw new FatalError(
-            `entrypoint source files must end in .js, .jsx, .ts or .tsx but ${nodePath.relative(
+            `entrypoint source files must end in .js, .jsx, .ts or .tsx but ${path.relative(
               pkg.directory,
               sourceFile
             )} does not`,
@@ -239,27 +236,27 @@ export class Package extends Item<{
         }
         if (
           !normalizePath(sourceFile).includes(
-            normalizePath(nodePath.join(pkg.directory, "src"))
+            normalizePath(path.join(pkg.directory, "src"))
           )
         ) {
           throw new FatalError(
             `entrypoint source files must be inside of the src directory of a package but ${normalizePath(
-              nodePath.relative(pkg.directory, sourceFile)
+              path.relative(pkg.directory, sourceFile)
             )} is not`,
             pkg.name
           );
         }
-        let directory = nodePath.join(
+        let directory = path.join(
           pkg.directory,
-          nodePath
+          path
             .resolve(sourceFile)
-            .replace(nodePath.join(pkg.directory, "src"), "")
+            .replace(path.join(pkg.directory, "src"), "")
             .replace(/\.[tj]sx?$/, "")
         );
-        if (nodePath.basename(directory) === "index") {
-          directory = nodePath.dirname(directory);
+        if (path.basename(directory) === "index") {
+          directory = path.dirname(directory);
         }
-        let filename = nodePath.join(directory, "package.json");
+        let filename = path.join(directory, "package.json");
 
         let contents: string | undefined = undefined;
 
@@ -318,12 +315,12 @@ export class Package extends Item<{
           `this package has multiple source files for the same entrypoint of ${
             entrypoint.name
           } at ${normalizePath(
-            nodePath.relative(
+            path.relative(
               pkg.directory,
               entrypointsWithSourcePath.get(entrypoint.name)!
             )
           )} and ${normalizePath(
-            nodePath.relative(pkg.directory, entrypoint.source)
+            path.relative(pkg.directory, entrypoint.source)
           )}`,
           pkg.name
         );

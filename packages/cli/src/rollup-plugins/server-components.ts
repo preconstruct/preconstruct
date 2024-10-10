@@ -1,8 +1,8 @@
 import { Plugin, SourceMapInput } from "rollup";
 import MagicString from "magic-string";
-import normalizePath from "normalize-path";
-import path from "path";
+import path from "node:path";
 import { getModuleDirectives } from "./directives";
+import { normalizePath } from "../utils";
 
 export function serverComponentsPlugin({
   sourceMap,

@@ -1,5 +1,4 @@
-import normalizePath from "normalize-path";
-import path from "path";
+import path from "node:path";
 import {
   EmittedDeclarationOutput,
   getDeclarationsForFile,
@@ -9,6 +8,7 @@ import {
 import { Program, ResolvedModuleFull } from "typescript";
 import { FatalError } from "../../errors";
 import { Package } from "../../package";
+import { normalizePath } from "../../utils";
 
 function replaceExt(filename: string) {
   return filename.replace(/(\.d)?\.([cm]?ts|tsx)$/, (match, p1, p2) => {

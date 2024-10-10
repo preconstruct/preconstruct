@@ -1,4 +1,4 @@
-import path from "path";
+import path from "node:path";
 import { FatalError } from "../../errors";
 import { Plugin } from "rollup";
 import fs from "node:fs/promises";
@@ -8,8 +8,8 @@ import {
   dtsTemplate,
   getDtsDefaultForMtsFilepath,
   dtsDefaultForDmtsTemplate,
+  normalizePath,
 } from "../../utils";
-import normalizePath from "normalize-path";
 import {
   getProgram,
   loadTypeScript,

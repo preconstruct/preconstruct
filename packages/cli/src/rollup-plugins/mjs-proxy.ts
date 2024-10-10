@@ -1,11 +1,11 @@
-import normalizePath from "normalize-path";
-import path from "path";
+import path from "node:path";
 import { Plugin } from "rollup";
 import { Package } from "../package";
 import {
   getJsDefaultForMjsFilepath,
   jsDefaultForMjsTemplate,
   mjsTemplate,
+  normalizePath,
 } from "../utils";
 
 export default function mjsProxyPlugin(pkg: Package): Plugin {
