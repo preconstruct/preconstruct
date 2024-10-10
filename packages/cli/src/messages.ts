@@ -1,6 +1,6 @@
 import { PKG_JSON_CONFIG_FIELD } from "./constants";
 import { createPromptConfirmLoader } from "./prompt";
-import chalk from "chalk";
+import pc from "picocolors";
 
 type Field = "main" | "module" | "browser" | "umd:main" | "exports";
 
@@ -11,9 +11,9 @@ export let errors = {
   invalidField: (field: Field, found: unknown, expected: unknown) =>
     `${field} field ${
       found === undefined
-        ? chalk.red("was not found")
-        : `is invalid, found \`${chalk.red(JSON.stringify(found))}\``
-    }, expected \`${chalk.green(JSON.stringify(expected))}\``,
+        ? pc.red("was not found")
+        : `is invalid, found \`${pc.red(JSON.stringify(found))}\``
+    }, expected \`${pc.green(JSON.stringify(expected))}\``,
   umdNameNotSpecified: `the umd:main field is specified but a umdName option is not specified. please add it to the ${PKG_JSON_CONFIG_FIELD} field in your package.json`,
   noEntrypointPkgJson: "There is a missing package.json for an entrypoint",
   noEntrypoints:

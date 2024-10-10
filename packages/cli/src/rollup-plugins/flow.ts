@@ -1,9 +1,7 @@
-import path from "path";
+import path from "node:path";
 import { Plugin } from "rollup";
 import { flowTemplate } from "../utils";
-
-import * as fs from "fs-extra";
-import normalizePath from "normalize-path";
+import fs from "node:fs/promises";
 
 export default function flow(): Plugin {
   return {
@@ -37,7 +35,7 @@ export default function flow(): Plugin {
           if (flowMode !== false) {
             let flowFileSource = flowTemplate(
               flowMode === "all",
-              normalizePath(relativeToSource)
+              path.posix.normalize(relativeToSource)
             );
             let flowFileName = mainFieldPath + ".flow";
             this.emitFile({

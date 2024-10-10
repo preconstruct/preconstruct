@@ -1,4 +1,4 @@
-import chalk from "chalk";
+import pc from "picocolors";
 
 export function format(
   message: string,
@@ -6,12 +6,12 @@ export function format(
   scope?: string
 ) {
   let prefix = {
-    error: " " + chalk.red("error"),
-    success: " " + chalk.green("success"),
-    info: " " + chalk.cyan("info"),
+    error: " " + pc.red("error"),
+    success: " " + pc.green("success"),
+    info: " " + pc.cyan("info"),
     none: "",
   }[messageType];
-  let fullPrefix = "🎁" + prefix + (scope ? " " + chalk.cyan(scope) : "");
+  let fullPrefix = "🎁" + prefix + (scope ? " " + pc.cyan(scope) : "");
   return String(message)
     .split("\n")
     .map((line) => {

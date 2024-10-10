@@ -1,9 +1,10 @@
 import path from "path";
-import chalk from "chalk";
-import * as fs from "fs-extra";
+import pc from "picocolors";
+import fs from "node:fs/promises";
 import packlist from "npm-packlist";
 import { Package } from "./package";
 import { FatalError } from "./errors";
+import { fsOutputFile } from "./utils";
 
 export async function validateIncludedFiles(pkg: Package) {
   try {
@@ -24,11 +25,11 @@ export async function validateIncludedFiles(pkg: Package) {
             "dist",
             "preconstruct-test-file"
           );
-          return fs.outputFile(filename, "test content");
+          return fsOutputFile(filename, "test content");
         })
         .concat(
           hasNoEntrypointAtRootOfPackage
-            ? fs.outputFile(rootDistDirectoryTestFilepath, "test content")
+            ? fsOutputFile(rootDistDirectoryTestFilepath, "test content")
             : []
         )
     );
@@ -39,7 +40,7 @@ export async function validateIncludedFiles(pkg: Package) {
     // checks on Windows. This value will have a forward slash (dist/preconstruct-test-file), whereas the value
     // of distFilePath below will have a backslash (dist\preconstruct-test-file). Obviously these two won't match,
     // so the distfile check will fail.
-    let result = new Set(packedFilesArr.map((p) => path.normalize(p)));
+    let result = new Set(packedFilesArr.map((p) => path.posix.normalize(p)));
 
     // check that we're including the package.json and main file
     // TODO: add Flow and TS check and if they're ignored, don't write them
@@ -57,7 +58,7 @@ export async function validateIncludedFiles(pkg: Package) {
       let entrypointName = path.relative(pkg.directory, entrypoint.directory);
       if (!result.has(pkgJsonPath)) {
         messages.push(
-          `the entrypoint ${chalk.cyan(
+          `the entrypoint ${pc.cyan(
             entrypointName
           )} isn't included in the published files for this package, please add it to the files field in the package's package.json`
         );
@@ -66,7 +67,7 @@ export async function validateIncludedFiles(pkg: Package) {
           `the dist directory ${
             entrypointName === ""
               ? ""
-              : `for entrypoint ${chalk.cyan(entrypointName)} `
+              : `for entrypoint ${pc.cyan(entrypointName)} `
           }isn't included in the published files for this package, please add it to the files field in the package's package.json`
         );
       }
@@ -85,8 +86,9 @@ export async function validateIncludedFiles(pkg: Package) {
   } finally {
     await Promise.all(
       pkg.entrypoints.map((entrypoint) =>
-        fs.remove(
-          path.join(entrypoint.directory, "dist", "preconstruct-test-file")
+        fs.rm(
+          path.join(entrypoint.directory, "dist", "preconstruct-test-file"),
+          { force: true, recursive: true }
         )
       )
     );

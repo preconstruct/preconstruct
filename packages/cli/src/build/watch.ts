@@ -1,7 +1,7 @@
 import { Project } from "../project";
 import { Package } from "../package";
 import { watch } from "rollup";
-import chalk from "chalk";
+import pc from "picocolors";
 import path from "path";
 import ms from "ms";
 import { getRollupConfigs } from "./config";
@@ -44,8 +44,8 @@ async function watchPackage(pkg: Package) {
 
       case "BUNDLE_START": {
         info(
-          chalk.cyan(
-            `bundles ${chalk.bold(
+          pc.cyan(
+            `bundles ${pc.bold(
               typeof event.input === "string"
                 ? relativePath(event.input)
                 : Array.isArray(event.input)
@@ -56,7 +56,7 @@ async function watchPackage(pkg: Package) {
                     // @ts-ignore
                     .map(relativePath)
                     .join(", ")
-            )} → ${chalk.bold(event.output.map(relativePath).join(", "))}...`
+            )} → ${pc.bold(event.output.map(relativePath).join(", "))}...`
           ),
           pkg.name
         );
@@ -65,10 +65,10 @@ async function watchPackage(pkg: Package) {
 
       case "BUNDLE_END": {
         info(
-          chalk.green(
-            `created ${chalk.bold(
+          pc.green(
+            `created ${pc.bold(
               event.output.map(relativePath).join(", ")
-            )} in ${chalk.bold(ms(event.duration))}`
+            )} in ${pc.bold(ms(event.duration))}`
           ),
           pkg.name
         );

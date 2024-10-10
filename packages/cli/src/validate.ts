@@ -7,7 +7,7 @@ import { exportsField, validFieldsForEntrypoint } from "./utils";
 import * as logger from "./logger";
 import equal from "fast-deep-equal";
 import { validatePackage } from "./validate-package";
-import chalk from "chalk";
+import pc from "picocolors";
 
 // this doesn't offer to fix anything
 // just does validation
@@ -90,7 +90,7 @@ function validateEntrypoint(entrypoint: Entrypoint, log: boolean) {
           `it looks like you're using the dist filenames of Preconstruct v1, the default dist filename strategy has changed in v2`
         );
         logger.info(
-          `you can run ${chalk.green(
+          `you can run ${pc.green(
             "preconstruct fix"
           )} to use the new dist filenames`
         );

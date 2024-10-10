@@ -1,13 +1,13 @@
 import enquirer from "enquirer";
 import pLimit from "p-limit";
 import DataLoader from "dataloader";
-import chalk from "chalk";
+import pc from "picocolors";
 
 export let limit = pLimit(1);
 
 // there might be a simpler solution to this than using dataloader but it works so ¯\_(ツ)_/¯
 
-let prefix = `🎁 ${chalk.green("?")}`;
+let prefix = `🎁 ${pc.green("?")}`;
 
 type NamedThing = { readonly name: string };
 

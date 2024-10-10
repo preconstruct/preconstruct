@@ -1,7 +1,6 @@
 import spawn from "spawndamnit";
-import path from "path";
-import * as fs from "fs-extra";
-import * as realFs from "fs";
+import path from "node:path";
+import fs from "node:fs/promises";
 import {
   getFiles,
   js,
@@ -12,8 +11,8 @@ import {
   typescriptFixture,
 } from "../../test-utils";
 import dev from "../dev";
-import normalizePath from "normalize-path";
 import escapeStringRegexp from "escape-string-regexp";
+import { fsEnsureSymlink } from "../utils";
 
 jest.mock("../prompt");
 
@@ -114,7 +113,7 @@ test("all the build types", async () => {
         "utf-8"
       )
     ).replace(
-      normalizePath(
+      path.posix.normalize(
         path.relative(
           distPath,
           path.dirname(require.resolve("@preconstruct/hook"))
@@ -292,7 +291,7 @@ test("typescript", async () => {
 });
 
 test("exports field with worker condition", async () => {
-  let tmpPath = realFs.realpathSync.native(
+  let tmpPath = await fs.realpath(
     await testdir({
       "package.json": JSON.stringify({
         name: "@something/blah",
@@ -471,7 +470,7 @@ test("with default", async () => {
       },
     }),
   });
-  await fs.ensureSymlink(
+  await fsEnsureSymlink(
     path.join(dir, "packages/pkg-a"),
     path.join(dir, "node_modules/pkg-a")
   );
@@ -603,7 +602,7 @@ test("imports conditions", async () => {
     `,
   });
   await dev(dir);
-  const maybeRelativePathFromTestDirToPreconstructDir = normalizePath(
+  const maybeRelativePathFromTestDirToPreconstructDir = path.posix.normalize(
     path.relative(dir, repoRoot)
   );
   expect(

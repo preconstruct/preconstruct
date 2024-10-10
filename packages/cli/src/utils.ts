@@ -1,13 +1,13 @@
-import normalizePath from "normalize-path";
 import { Entrypoint } from "./entrypoint";
 import {
   Package,
   ExportsConditions,
   CanonicalExportsFieldConfig,
 } from "./package";
-import * as nodePath from "path";
+import path from "node:path";
 import { FatalError } from "./errors";
 import { createExportsField } from "./imports";
+import fs from "node:fs/promises";
 
 let fields = [
   "version",
@@ -55,13 +55,10 @@ export function setFieldInOrder<
 }
 
 export function getEntrypointName(pkg: Package, entrypointDir: string) {
-  return normalizePath(
-    nodePath.join(
+  return path.posix.normalize(
+    path.join(
       pkg.name,
-      nodePath.relative(
-        pkg.directory,
-        nodePath.resolve(pkg.directory, entrypointDir)
-      )
+      path.relative(pkg.directory, path.resolve(pkg.directory, entrypointDir))
     )
   );
 }
@@ -457,7 +454,7 @@ export function mjsTemplate(
   return `${getReexportStatement(nonDefaultExports, escapedPath)}\n${
     hasDefaultExport
       ? `export { _default as default } from ${JSON.stringify(
-          "./" + getJsDefaultForMjsFilepath(nodePath.basename(mjsPath))
+          "./" + getJsDefaultForMjsFilepath(path.basename(mjsPath))
         )};\n`
       : ""
   }`;
@@ -477,7 +474,7 @@ export function dmtsTemplate(
   return `export * from ${JSON.stringify(relativePath)};\n${
     hasDefaultExport
       ? `export { _default as default } from ${JSON.stringify(
-          "./" + nodePath.basename(filename).replace(/\.d\.mts$/, ".default.js")
+          "./" + path.basename(filename).replace(/\.d\.mts$/, ".default.js")
         )};\n`
       : ""
   }${getDeclSourceMapComment(filename, relativePathWithExtension)}`;
@@ -518,4 +515,31 @@ export function parseImportConditionDefaultExportOption(
     'the "preconstruct.exports.importConditionDefaultExport" field must be set to "default" or "namespace" if it is present',
     name
   );
+}
+
+export async function fsOutputFile(
+  file: string,
+  data:
+    | string
+    | NodeJS.ArrayBufferView
+    | Iterable<string | NodeJS.ArrayBufferView>
+    | AsyncIterable<string | NodeJS.ArrayBufferView>
+): Promise<void> {
+  await fs.mkdir(path.dirname(file), { recursive: true });
+  await fs.writeFile(file, data);
+}
+
+export async function fsEnsureSymlink(
+  srcPath: string,
+  distPath: string,
+  type?: string
+) {
+  let stats;
+  try {
+    stats = await fs.lstat(distPath);
+  } catch {}
+  if (!stats) {
+    await fs.mkdir(path.dirname(distPath), { recursive: true });
+    await fs.symlink(srcPath, distPath, type);
+  }
 }

@@ -30,19 +30,19 @@ test("reports correct result on valid package", async () => {
   expect(logMock.log.mock.calls).toMatchInlineSnapshot(`
     [
       [
-        "🎁 info valid-package a valid entry point exists.",
+        "🎁 [36minfo[39m [36mvalid-package[39m a valid entry point exists.",
       ],
       [
-        "🎁 info valid-package main field is valid",
+        "🎁 [36minfo[39m [36mvalid-package[39m main field is valid",
       ],
       [
-        "🎁 info valid-package module field is valid",
+        "🎁 [36minfo[39m [36mvalid-package[39m module field is valid",
       ],
       [
-        "🎁 info valid-package umd:main field is valid",
+        "🎁 [36minfo[39m [36mvalid-package[39m umd:main field is valid",
       ],
       [
-        "🎁 success project is valid!",
+        "🎁 [32msuccess[39m project is valid!",
       ],
     ]
   `);
@@ -67,7 +67,7 @@ test("no main field", async () => {
     await validate(tmpPath);
   } catch (e) {
     expect(e).toMatchInlineSnapshot(
-      `[Error: main field was not found, expected \`"dist/no-main-field.cjs.js"\`]`
+      `[Error: main field [31mwas not found[39m, expected \`[32m"dist/no-main-field.cjs.js"[39m\`]`
     );
     return;
   }
@@ -82,13 +82,13 @@ test("no module", async () => {
   expect(logMock.log.mock.calls).toMatchInlineSnapshot(`
     [
       [
-        "🎁 info no-module a valid entry point exists.",
+        "🎁 [36minfo[39m [36mno-module[39m a valid entry point exists.",
       ],
       [
-        "🎁 info no-module main field is valid",
+        "🎁 [36minfo[39m [36mno-module[39m main field is valid",
       ],
       [
-        "🎁 success project is valid!",
+        "🎁 [32msuccess[39m project is valid!",
       ],
     ]
   `);
@@ -101,7 +101,7 @@ test("invalid browser", async () => {
     pkg.browser = "invalid.js";
   });
   await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
-    `[Error: browser field is invalid, found \`"invalid.js"\`, expected \`{"./dist/no-module.cjs.js":"./dist/no-module.browser.cjs.js"}\`]`
+    `[Error: browser field is invalid, found \`[31m"invalid.js"[39m\`, expected \`[32m{"./dist/no-module.cjs.js":"./dist/no-module.browser.cjs.js"}[39m\`]`
   );
 });
 
@@ -119,22 +119,22 @@ test("valid browser", async () => {
   expect(logMock.log.mock.calls).toMatchInlineSnapshot(`
     [
       [
-        "🎁 info valid-package a valid entry point exists.",
+        "🎁 [36minfo[39m [36mvalid-package[39m a valid entry point exists.",
       ],
       [
-        "🎁 info valid-package main field is valid",
+        "🎁 [36minfo[39m [36mvalid-package[39m main field is valid",
       ],
       [
-        "🎁 info valid-package module field is valid",
+        "🎁 [36minfo[39m [36mvalid-package[39m module field is valid",
       ],
       [
-        "🎁 info valid-package umd:main field is valid",
+        "🎁 [36minfo[39m [36mvalid-package[39m umd:main field is valid",
       ],
       [
-        "🎁 info valid-package browser field is valid",
+        "🎁 [36minfo[39m [36mvalid-package[39m browser field is valid",
       ],
       [
-        "🎁 success project is valid!",
+        "🎁 [32msuccess[39m project is valid!",
       ],
     ]
   `);
@@ -147,13 +147,13 @@ test("monorepo single package", async () => {
   expect(logMock.log.mock.calls).toMatchInlineSnapshot(`
     [
       [
-        "🎁 info @some-scope/package-two-single-package a valid entry point exists.",
+        "🎁 [36minfo[39m [36m@some-scope/package-two-single-package[39m a valid entry point exists.",
       ],
       [
-        "🎁 info @some-scope/package-two-single-package main field is valid",
+        "🎁 [36minfo[39m [36m@some-scope/package-two-single-package[39m main field is valid",
       ],
       [
-        "🎁 success project is valid!",
+        "🎁 [32msuccess[39m project is valid!",
       ],
     ]
   `);
@@ -363,7 +363,7 @@ test("monorepo umd with dep on other module incorrect peerDeps", async () => {
     await validate(tmpPath);
   } catch (err) {
     expect(err).toMatchInlineSnapshot(
-      `[Error: the package @some-scope-incorrect-peerdeps/package-four-umd-with-dep depends on @some-scope-incorrect-peerdeps/package-one-umd-with-dep which has a peerDependency on react but react is not specified in the dependencies or peerDependencies of @some-scope-incorrect-peerdeps/package-four-umd-with-dep. please add react to the dependencies or peerDependencies of @some-scope-incorrect-peerdeps/package-four-umd-with-dep]`
+      `[Error: the package [34m@some-scope-incorrect-peerdeps/package-four-umd-with-dep[39m depends on [34m@some-scope-incorrect-peerdeps/package-one-umd-with-dep[39m which has a peerDependency on [34mreact[39m but [34mreact[39m is not specified in the dependencies or peerDependencies of [34m@some-scope-incorrect-peerdeps/package-four-umd-with-dep[39m. please add [34mreact[39m to the dependencies or peerDependencies of [34m@some-scope-incorrect-peerdeps/package-four-umd-with-dep[39m]`
     );
     return;
   }
@@ -427,7 +427,7 @@ test("entrypoint not included in package", async () => {
     await validate(tmpPath);
   } catch (err) {
     expect(err).toMatchInlineSnapshot(
-      `[Error: the entrypoint multiply isn't included in the published files for this package, please add it to the files field in the package's package.json]`
+      `[Error: the entrypoint [36mmultiply[39m isn't included in the published files for this package, please add it to the files field in the package's package.json]`
     );
     return;
   }
@@ -588,7 +588,7 @@ test("non-existant entrypoint", async () => {
   });
 
   await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
-    `[Error: 🎁 pkg-a specifies a entrypoint "index.js" but the file does not exist, please create it or fix the config]`
+    `[Error: 🎁 [36mpkg-a[39m specifies a entrypoint "index.js" but the file does not exist, please create it or fix the config]`
   );
 });
 
@@ -605,7 +605,7 @@ test("negated entrypoint", async () => {
   });
 
   await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
-    `[Error: 🎁 pkg-a specifies a entrypoint "index.js" but it is negated in the same config so it should be removed or the config should be fixed]`
+    `[Error: 🎁 [36mpkg-a[39m specifies a entrypoint "index.js" but it is negated in the same config so it should be removed or the config should be fixed]`
   );
 });
 
@@ -619,21 +619,21 @@ test("old dist filenames", async () => {
   });
 
   await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
-    `[Error: main field is invalid, found \`"dist/pkg-a.cjs.js"\`, expected \`"dist/something-pkg-a.cjs.js"\`]`
+    `[Error: main field is invalid, found \`[31m"dist/pkg-a.cjs.js"[39m\`, expected \`[32m"dist/something-pkg-a.cjs.js"[39m\`]`
   );
   expect(logMock.log.mock.calls).toMatchInlineSnapshot(`
     [
       [
-        "🎁 info @something/pkg-a a valid entry point exists.",
+        "🎁 [36minfo[39m [36m@something/pkg-a[39m a valid entry point exists.",
       ],
       [
-        "🎁 info it looks like you're using the dist filenames of Preconstruct v1, the default dist filename strategy has changed in v2",
+        "🎁 [36minfo[39m it looks like you're using the dist filenames of Preconstruct v1, the default dist filename strategy has changed in v2",
       ],
       [
-        "🎁 info you can run preconstruct fix to use the new dist filenames",
+        "🎁 [36minfo[39m you can run [32mpreconstruct fix[39m to use the new dist filenames",
       ],
       [
-        "🎁 info if you want to keep the dist filename strategy of v1, add \`"distFilenameStrategy": "unscoped-package-name"\` to the Preconstruct config in your root package.json",
+        "🎁 [36minfo[39m if you want to keep the dist filename strategy of v1, add \`"distFilenameStrategy": "unscoped-package-name"\` to the Preconstruct config in your root package.json",
       ],
     ]
   `);
@@ -649,12 +649,12 @@ test("just wrong dist filenames doesn't report about the changed dist filename s
   });
 
   await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
-    `[Error: main field is invalid, found \`"dist/pkg-a-blah.cjs.js"\`, expected \`"dist/something-pkg-a.cjs.js"\`]`
+    `[Error: main field is invalid, found \`[31m"dist/pkg-a-blah.cjs.js"[39m\`, expected \`[32m"dist/something-pkg-a.cjs.js"[39m\`]`
   );
   expect(logMock.log.mock.calls).toMatchInlineSnapshot(`
     [
       [
-        "🎁 info @something/pkg-a a valid entry point exists.",
+        "🎁 [36minfo[39m [36m@something/pkg-a[39m a valid entry point exists.",
       ],
     ]
   `);
@@ -958,9 +958,9 @@ test("has browser field but no browser condition", async () => {
     "src/index.js": "",
   });
   await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(`
-          [Error: 🎁 pkg-a the exports field is configured and the browser field exists in this package but it is not specified in the preconstruct.exports.envConditions field
-          🎁 pkg-a browser field is invalid, found \`{"./dist/pkg-a.cjs.js":"./dist/pkg-a.browser.cjs.js","./dist/pkg-a.esm.js":"./dist/pkg-a.browser.esm.js"}\`, expected \`{"./dist/pkg-a.esm.js":"./dist/pkg-a.browser.esm.js"}\`]
-        `);
+    [Error: 🎁 [36mpkg-a[39m the exports field is configured and the browser field exists in this package but it is not specified in the preconstruct.exports.envConditions field
+    🎁 [36mpkg-a[39m browser field is invalid, found \`[31m{"./dist/pkg-a.cjs.js":"./dist/pkg-a.browser.cjs.js","./dist/pkg-a.esm.js":"./dist/pkg-a.browser.esm.js"}[39m\`, expected \`[32m{"./dist/pkg-a.esm.js":"./dist/pkg-a.browser.esm.js"}[39m\`]
+  `);
 });
 
 test("has browser condition but no browser field", async () => {
@@ -995,7 +995,7 @@ test("preconstruct.exports: true no exports field", async () => {
     "src/index.js": "",
   });
   await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
-    `[Error: exports field was not found, expected \`{".":{"module":"./dist/pkg-a.esm.js","default":"./dist/pkg-a.cjs.js"},"./package.json":"./package.json"}\`]`
+    `[Error: exports field [31mwas not found[39m, expected \`[32m{".":{"module":"./dist/pkg-a.esm.js","default":"./dist/pkg-a.cjs.js"},"./package.json":"./package.json"}[39m\`]`
   );
 });
 

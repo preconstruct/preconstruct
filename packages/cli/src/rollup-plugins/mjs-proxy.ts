@@ -1,5 +1,4 @@
-import normalizePath from "normalize-path";
-import path from "path";
+import path from "node:path";
 import { Plugin } from "rollup";
 import { Package } from "../package";
 import {
@@ -20,7 +19,7 @@ export default function mjsProxyPlugin(pkg: Package): Plugin {
           file.type === "asset" ||
           !file.isEntry ||
           file.facadeModuleId == null ||
-          !entrypointSources.has(normalizePath(file.facadeModuleId))
+          !entrypointSources.has(path.posix.normalize(file.facadeModuleId))
         ) {
           continue;
         }

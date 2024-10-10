@@ -3,8 +3,8 @@ import resolve from "@rollup/plugin-node-resolve";
 import alias from "@rollup/plugin-alias";
 import cjs from "@rollup/plugin-commonjs";
 import replace from "@rollup/plugin-replace";
-import chalk from "chalk";
-import path from "path";
+import pc from "picocolors";
+import path from "node:path";
 import builtInModules from "builtin-modules";
 import { Package } from "../package";
 import { Entrypoint } from "../entrypoint";
@@ -20,7 +20,6 @@ import terser from "../rollup-plugins/terser";
 import { getBaseDistName } from "../utils";
 import { EXTENSIONS } from "../constants";
 import { inlineProcessEnvNodeEnv } from "../rollup-plugins/inline-process-env-node-env";
-import normalizePath from "normalize-path";
 import { serverComponentsPlugin } from "../rollup-plugins/server-components";
 import { resolveErrorsPlugin } from "../rollup-plugins/resolve";
 import { Project } from "../project";
@@ -103,7 +102,7 @@ export let getRollupConfig = (
     onwarn: (warning) => {
       if (typeof warning === "string") {
         warnings.add(
-          `An unhandled Rollup error occurred: ${chalk.red(
+          `An unhandled Rollup error occurred: ${pc.red(
             // @ts-ignore
             warning.toString()
           )}`
@@ -122,7 +121,7 @@ export let getRollupConfig = (
             return;
           }
           warnings.add(
-            `"${normalizePath(
+            `"${path.posix.normalize(
               path.relative(pkg.directory, warning.loc!.file!)
             )}" used \`this\` keyword at the top level of an ES module. You can read more about this at ${warning.url!} and fix this issue that has happened here:\n\n${warning.frame!}\n`
           );
@@ -130,9 +129,7 @@ export let getRollupConfig = (
         }
         default: {
           warnings.add(
-            `An unhandled Rollup error occurred: ${chalk.red(
-              warning.toString()
-            )}`
+            `An unhandled Rollup error occurred: ${pc.red(warning.toString())}`
           );
         }
       }

@@ -1015,7 +1015,7 @@ test("type dep missing", async () => {
     }),
   });
   await expect(build(dir)).rejects.toMatchInlineSnapshot(
-    `[Error: 🎁 a dependency "something" used by types for src/index.ts is not declared in dependencies or peerDependencies]`
+    `[Error: 🎁 [36ma[39m dependency "something" used by types for src/index.ts is not declared in dependencies or peerDependencies]`
   );
 });
 
@@ -1068,7 +1068,7 @@ test("@types/ dep missing", async () => {
     }),
   });
   await expect(build(dir)).rejects.toMatchInlineSnapshot(
-    `[Error: 🎁 a dependency "@types/something" used by types for src/index.ts is not declared in dependencies or peerDependencies]`
+    `[Error: 🎁 [36ma[39m dependency "@types/something" used by types for src/index.ts is not declared in dependencies or peerDependencies]`
   );
 });
 

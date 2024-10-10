@@ -388,7 +388,7 @@ test("package resolvable but not in deps", async () => {
     await build(tmpPath);
   } catch (err) {
     expect(err.message).toMatchInlineSnapshot(
-      `"🎁 package-resolvable-but-not-in-deps "react" is imported by "src/index.js" but the package is not specified in dependencies or peerDependencies"`
+      `"🎁 [36mpackage-resolvable-but-not-in-deps[39m "react" is imported by "src/index.js" but the package is not specified in dependencies or peerDependencies"`
     );
     return;
   }
@@ -503,7 +503,7 @@ test("module imported outside package directory", async () => {
     await build(tmpPath);
   } catch (err) {
     expect(err.message).toMatchInlineSnapshot(
-      `"🎁 @imports-outside-pkg-dir/pkg-a all relative imports in a package should only import modules inside of their package directory but "src/index.js" is importing "../../some-file""`
+      `"🎁 [36m@imports-outside-pkg-dir/pkg-a[39m all relative imports in a package should only import modules inside of their package directory but "src/index.js" is importing "../../some-file""`
     );
     return;
   }
@@ -620,10 +620,10 @@ test("batches build errors", async () => {
     error = err;
   }
   expect(error).toMatchInlineSnapshot(`
-    [Error: 🎁 @errors/package-one "something-2" is imported by "src/index.js" but the package is not specified in dependencies or peerDependencies
-    🎁 @errors/package-one "something" is imported by "src/index.js" but the package is not specified in dependencies or peerDependencies
-    🎁 @errors/package-two "something-2" is imported by "src/index.js" but the package is not specified in dependencies or peerDependencies
-    🎁 @errors/package-two "something" is imported by "src/index.js" but the package is not specified in dependencies or peerDependencies]
+    [Error: 🎁 [36m@errors/package-one[39m "something-2" is imported by "src/index.js" but the package is not specified in dependencies or peerDependencies
+    🎁 [36m@errors/package-one[39m "something" is imported by "src/index.js" but the package is not specified in dependencies or peerDependencies
+    🎁 [36m@errors/package-two[39m "something-2" is imported by "src/index.js" but the package is not specified in dependencies or peerDependencies
+    🎁 [36m@errors/package-two[39m "something" is imported by "src/index.js" but the package is not specified in dependencies or peerDependencies]
   `);
 });
 
@@ -750,11 +750,11 @@ test("fails for source files containing top-level this", async () => {
     await build(dir);
   } catch (err) {
     expect(err.message).toMatchInlineSnapshot(`
-      "🎁 pkg "src/index.js" used \`this\` keyword at the top level of an ES module. You can read more about this at https://rollupjs.org/guide/en/#error-this-is-undefined and fix this issue that has happened here:
-      🎁 pkg
-      🎁 pkg 1: export default this;
-      🎁 pkg                   ^
-      🎁 pkg"
+      "🎁 [36mpkg[39m "src/index.js" used \`this\` keyword at the top level of an ES module. You can read more about this at https://rollupjs.org/guide/en/#error-this-is-undefined and fix this issue that has happened here:
+      🎁 [36mpkg[39m
+      🎁 [36mpkg[39m 1: export default this;
+      🎁 [36mpkg[39m                   ^
+      🎁 [36mpkg[39m"
     `);
     return;
   }

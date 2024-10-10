@@ -1,5 +1,4 @@
-import normalizePath from "normalize-path";
-import path from "path";
+import path from "node:path";
 import {
   EmittedDeclarationOutput,
   getDeclarationsForFile,
@@ -23,7 +22,7 @@ function checkTypeImportDeclaredInDeps(
   pkg: Package,
   filename: () => string
 ) {
-  const split = normalizePath(resolved).split("/");
+  const split = path.posix.normalize(resolved).split("/");
   const lastNodeModulesIndex = split.lastIndexOf("node_modules");
   if (lastNodeModulesIndex === -1) return;
   let pkgNameOrScope = split[lastNodeModulesIndex + 1];
@@ -60,7 +59,7 @@ export function getDeclarationsWithImportedModuleSpecifiersReplacing(
   const projectDir = pkg.project.directory;
   const depQueue = new Set(resolvedEntrypointSources);
   const diagnosticsHost = getDiagnosticsHost(typescript, projectDir);
-  const normalizedPkgDirNodeModules = normalizePath(
+  const normalizedPkgDirNodeModules = path.posix.normalize(
     path.join(normalizedPkgDir, "node_modules")
   );
   const emitted: EmittedDeclarationOutput[] = [];
@@ -84,7 +83,7 @@ export function getDeclarationsWithImportedModuleSpecifiersReplacing(
                   ? filename
                   : filename.toLowerCase()
               );
-              return normalizePath(
+              return path.posix.normalize(
                 path.relative(
                   pkg.directory,
                   sourceFile ? sourceFile.fileName : filename
@@ -100,7 +99,7 @@ export function getDeclarationsWithImportedModuleSpecifiersReplacing(
       depQueue.add(resolvedModule.resolvedFileName);
 
       let forImport = replaceExt(
-        normalizePath(
+        path.posix.normalize(
           path.relative(path.dirname(filename), resolvedModule.resolvedFileName)
         )
       );

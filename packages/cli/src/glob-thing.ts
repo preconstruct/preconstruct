@@ -1,20 +1,19 @@
-import parseGlob from "parse-glob";
-import * as fs from "fs-extra";
-import path from "path";
-import normalizePath from "normalize-path";
+import picomatch from "picomatch";
+import fs from "node:fs/promises";
+import path from "node:path";
 
 export async function getUselessGlobsThatArentReallyGlobsForNewEntrypoints(
   globs: string[],
   files: string[],
   cwd: string
 ) {
-  let filesSet = new Set(files.map((x) => normalizePath(x)));
+  let filesSet = new Set(files.map((x) => path.posix.normalize(x)));
   return (
     await Promise.all(
       globs.map(async (glob) => {
-        let parsedGlobResult = parseGlob(glob);
-        if (!parsedGlobResult.is.glob) {
-          let filename = normalizePath(path.resolve(cwd, "src", glob));
+        let parsedGlobResult = picomatch.scan(glob);
+        if (!(parsedGlobResult.isGlob || parsedGlobResult.negated)) {
+          let filename = path.posix.normalize(path.resolve(cwd, "src", glob));
           if (filesSet.has(filename)) return;
           try {
             await fs.stat(filename);

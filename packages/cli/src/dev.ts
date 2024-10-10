@@ -17,10 +17,10 @@ import {
   getDistFilenameForConditions,
   getBaseDistName,
   getDistFilenameForConditionsWithTypeModule,
+  fsOutputFile,
 } from "./utils";
-import * as fs from "fs-extra";
-import path from "path";
-import normalizePath from "normalize-path";
+import fs from "node:fs/promises";
+import path from "node:path";
 import { Entrypoint } from "./entrypoint";
 import { validateProject } from "./validate";
 
@@ -102,14 +102,14 @@ export async function writeDevTSFiles(
   );
 
   const baseDtsFilename = path.basename(dtsReexportFilename);
-  const relativePathWithExtension = normalizePath(
+  const relativePathWithExtension = path.posix.normalize(
     path.relative(path.dirname(dtsReexportFilename), entrypoint.source)
   );
 
   const pathToImport = replaceTsExtensionWithJs(relativePathWithExtension);
 
   let promises: Promise<unknown>[] = [
-    fs.outputFile(
+    fsOutputFile(
       dtsReexportFilename,
       dtsTemplate(
         baseDtsFilename,
@@ -131,7 +131,7 @@ export async function writeDevTSFiles(
     const baseDmtsFilename = path.basename(dmtsReexportFilename);
 
     promises.push(
-      fs.outputFile(
+      fsOutputFile(
         dmtsReexportFilename,
         dmtsTemplate(
           baseDmtsFilename,
@@ -143,7 +143,7 @@ export async function writeDevTSFiles(
     );
     if (hasDefaultExport) {
       promises.push(
-        fs.outputFile(
+        fsOutputFile(
           getDtsDefaultForMtsFilepath(dmtsReexportFilename),
           dtsDefaultForDmtsTemplate(pathToImport)
         )
@@ -175,7 +175,9 @@ async function writeDevFlowFile(entrypoint: Entrypoint) {
     cjsDistPath + ".flow",
     flowTemplate(
       false,
-      normalizePath(path.relative(path.dirname(cjsDistPath), entrypoint.source))
+      path.posix.normalize(
+        path.relative(path.dirname(cjsDistPath), entrypoint.source)
+      )
     )
   );
 }
@@ -189,8 +191,8 @@ export default async function dev(projectDir: string) {
     project.packages.map(async (pkg) => {
       const exportsFieldConfig = pkg.exportsFieldConfig();
       let distDirectory = path.join(pkg.directory, "dist");
-      await fs.remove(distDirectory);
-      await fs.ensureDir(distDirectory);
+      await fs.rm(distDirectory, { force: true, recursive: true });
+      await fs.mkdir(distDirectory, { recursive: true });
 
       return Promise.all(
         pkg.entrypoints.map(async (entrypoint) => {
@@ -406,9 +408,9 @@ async function cleanEntrypoint(entrypoint: Entrypoint) {
   if (entrypoint.package.name === entrypoint.name) return;
   let distDirectory = path.join(entrypoint.directory, "dist");
 
-  await fs.remove(distDirectory);
+  await fs.rm(distDirectory, { recursive: true, force: true });
   if (!entrypoint.package.project.experimentalFlags.distInRoot) {
-    await fs.ensureDir(distDirectory);
+    await fs.mkdir(distDirectory, { recursive: true });
   }
 }
 
@@ -420,7 +422,7 @@ function commonjsRequireHookTemplate(entrypoint: Entrypoint) {
     ).directory,
     "dist"
   );
-  let entrypointPath = normalizePath(
+  let entrypointPath = path.posix.normalize(
     path.relative(distDirectory, entrypoint.source)
   );
   return `"use strict";
@@ -434,18 +436,20 @@ function commonjsRequireHookTemplate(entrypoint: Entrypoint) {
 
 // this bit of code imports the require hook and registers it
 let unregister = require(${JSON.stringify(
-    normalizePath(
+    path.posix.normalize(
       path.relative(
         distDirectory,
         path.dirname(require.resolve("@preconstruct/hook"))
       )
     )
   )}).___internalHook(typeof __dirname === 'undefined' ? undefined : __dirname, ${JSON.stringify(
-    normalizePath(
+    path.posix.normalize(
       path.relative(distDirectory, entrypoint.package.project.directory)
     )
   )}, ${JSON.stringify(
-    normalizePath(path.relative(distDirectory, entrypoint.package.directory))
+    path.posix.normalize(
+      path.relative(distDirectory, entrypoint.package.directory)
+    )
   )});
 
 // this re-exports the source file
