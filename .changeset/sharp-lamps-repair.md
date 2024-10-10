@@ -2,4 +2,4 @@
 "@preconstruct/cli": patch
 ---
 
-Fix `preconstruct dev` with the `typeModule` experimental flag outputting `.d.ts` files with extensionless imports that are invalid with `moduleResolution: "nodenext"` and `type: "module"`
+Fix outputting `.d.ts` files with extension-less imports that are invalid when using the experimental flag `typeModule` with `moduleResolution: "nodenext"` and `type: "module"` in `dev` and `build`
