@@ -1,7 +1,7 @@
 import { EOL } from "os";
 import resolveFrom from "resolve-from";
 import { FatalError } from "../../errors";
-import * as fs from "fs-extra";
+import fs from "node:fs/promises";
 import path from "path";
 import normalizePath from "normalize-path";
 import { getModuleSpecifier } from "./get-module-specifier";

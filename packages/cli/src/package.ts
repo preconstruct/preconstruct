@@ -1,6 +1,6 @@
 // based on https://github.com/jamiebuilds/std-pkg but reading fewer things, adding setters and reading the file
 import { glob } from "tinyglobby";
-import * as fs from "fs-extra";
+import fs from "node:fs/promises";
 import fsPromises from "fs/promises";
 import nodePath from "path";
 import { Item } from "./item";
@@ -19,6 +19,7 @@ import {
   DistFilenameStrategy,
   MinimalEntrypoint,
   parseImportConditionDefaultExportOption,
+  fsOutputFile,
 } from "./utils";
 import normalizePath from "normalize-path";
 import { parseImportsField } from "./imports";
@@ -92,7 +93,7 @@ function createEntrypoints(
               );
             }
           }
-          await fs.remove(filename);
+          await fs.rm(filename, { force: true });
           const contents = await fs.readdir(nodePath.dirname(filename));
           if (
             contents.length === 0 ||
@@ -134,7 +135,7 @@ function createEntrypoints(
           nodePath.dirname(filename),
           pkg.indent
         );
-        await fs.outputFile(filename, contents);
+        await fsOutputFile(filename, contents);
       }
       return new Entrypoint(filename, contents, pkg, sourceFile);
     })

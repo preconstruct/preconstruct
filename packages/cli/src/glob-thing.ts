@@ -1,5 +1,5 @@
 import picomatch from "picomatch";
-import * as fs from "fs-extra";
+import fs from "node:fs/promises";
 import path from "path";
 import normalizePath from "normalize-path";
 

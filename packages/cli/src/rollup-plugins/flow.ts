@@ -2,7 +2,7 @@ import path from "path";
 import { Plugin } from "rollup";
 import { flowTemplate } from "../utils";
 
-import * as fs from "fs-extra";
+import fs from "node:fs/promises";
 import normalizePath from "normalize-path";
 
 export default function flow(): Plugin {
