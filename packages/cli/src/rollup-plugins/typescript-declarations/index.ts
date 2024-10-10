@@ -187,10 +187,12 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
         // TODO: technically this is wrong because you could have a default type-only export
         // (though i doubt that is very common)
         const hasDefaultExport = file.exports.includes("default");
+        const sourceWithExtension = `${relativeToSource}.js`;
+
         const dtsFileSource = dtsTemplate(
           baseDtsFilename,
           hasDefaultExport,
-          relativeToSource,
+          sourceWithExtension,
           `${relativeToSource}.d.ts`
         );
         this.emitFile({
@@ -209,7 +211,6 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
             /\.d\.ts$/,
             ".d.mts"
           );
-          const sourceWithExtension = `${relativeToSource}.js`;
 
           this.emitFile({
             type: "asset",
