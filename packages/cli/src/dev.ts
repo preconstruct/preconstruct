@@ -20,8 +20,7 @@ import {
   fsOutputFile,
 } from "./utils";
 import fs from "node:fs/promises";
-import path from "path";
-import normalizePath from "normalize-path";
+import path from "node:path";
 import { Entrypoint } from "./entrypoint";
 import { validateProject } from "./validate";
 
@@ -103,7 +102,7 @@ export async function writeDevTSFiles(
   );
 
   const baseDtsFilename = path.basename(dtsReexportFilename);
-  const relativePathWithExtension = normalizePath(
+  const relativePathWithExtension = path.posix.normalize(
     path.relative(path.dirname(dtsReexportFilename), entrypoint.source)
   );
 
@@ -176,7 +175,9 @@ async function writeDevFlowFile(entrypoint: Entrypoint) {
     cjsDistPath + ".flow",
     flowTemplate(
       false,
-      normalizePath(path.relative(path.dirname(cjsDistPath), entrypoint.source))
+      path.posix.normalize(
+        path.relative(path.dirname(cjsDistPath), entrypoint.source)
+      )
     )
   );
 }
@@ -421,7 +422,7 @@ function commonjsRequireHookTemplate(entrypoint: Entrypoint) {
     ).directory,
     "dist"
   );
-  let entrypointPath = normalizePath(
+  let entrypointPath = path.posix.normalize(
     path.relative(distDirectory, entrypoint.source)
   );
   return `"use strict";
@@ -435,18 +436,20 @@ function commonjsRequireHookTemplate(entrypoint: Entrypoint) {
 
 // this bit of code imports the require hook and registers it
 let unregister = require(${JSON.stringify(
-    normalizePath(
+    path.posix.normalize(
       path.relative(
         distDirectory,
         path.dirname(require.resolve("@preconstruct/hook"))
       )
     )
   )}).___internalHook(typeof __dirname === 'undefined' ? undefined : __dirname, ${JSON.stringify(
-    normalizePath(
+    path.posix.normalize(
       path.relative(distDirectory, entrypoint.package.project.directory)
     )
   )}, ${JSON.stringify(
-    normalizePath(path.relative(distDirectory, entrypoint.package.directory))
+    path.posix.normalize(
+      path.relative(distDirectory, entrypoint.package.directory)
+    )
   )});
 
 // this re-exports the source file

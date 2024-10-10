@@ -1,4 +1,4 @@
-import path from "path";
+import path from "node:path";
 import { FatalError } from "../../errors";
 import { Plugin } from "rollup";
 import fs from "node:fs/promises";
@@ -9,7 +9,6 @@ import {
   getDtsDefaultForMtsFilepath,
   dtsDefaultForDmtsTemplate,
 } from "../../utils";
-import normalizePath from "normalize-path";
 import {
   getProgram,
   loadTypeScript,
@@ -60,7 +59,7 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
         typescript
       );
 
-      let normalizedDirname = normalizePath(pkg.directory);
+      let normalizedDirname = path.posix.normalize(pkg.directory);
 
       let moduleResolutionCache = typescript.createModuleResolutionCache(
         normalizedDirname,
@@ -94,7 +93,7 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
               "This is an internal error, please open an issue if you see this: ts could not resolve module"
             );
           }
-          return [normalizePath(x), resolvedModule.resolvedFileName];
+          return [path.posix.normalize(x), resolvedModule.resolvedFileName];
         })
       );
 
@@ -112,7 +111,7 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
       await Promise.all(
         [...declarations].map(async (output) => {
           srcFilenameToDtsFilenameMap.set(
-            normalizePath(output.filename),
+            path.posix.normalize(output.filename),
             output.types.name
           );
           this.emitFile({
@@ -122,7 +121,7 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
           });
 
           if (output.map) {
-            const sourceRoot = normalizePath(
+            const sourceRoot = path.posix.normalize(
               path.dirname(
                 path.relative(path.dirname(output.map.name), output.filename)
               )
@@ -152,7 +151,7 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
         const facadeModuleId = file.facadeModuleId;
 
         const typeScriptSource = entrypointSourceToTypeScriptSource.get(
-          normalizePath(facadeModuleId)
+          path.posix.normalize(facadeModuleId)
         );
 
         if (!typeScriptSource) {
@@ -161,7 +160,7 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
         }
 
         let dtsFilename = srcFilenameToDtsFilenameMap.get(
-          normalizePath(typeScriptSource)
+          path.posix.normalize(typeScriptSource)
         );
 
         if (!dtsFilename) {
@@ -173,7 +172,7 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
         }
 
         let mainFieldPath = file.fileName.replace(/(?:\.prod)?\.js$/, "");
-        let relativeToSource = normalizePath(
+        let relativeToSource = path.posix.normalize(
           path.relative(
             path.dirname(path.join(opts.dir!, file.fileName)),
             dtsFilename.replace(/\.d\.ts$/, "")

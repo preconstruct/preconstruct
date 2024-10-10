@@ -1,8 +1,7 @@
 import { Package } from "../package";
 import { FatalError } from "../errors";
 import { Plugin } from "rollup";
-import normalizePath from "normalize-path";
-import path from "path";
+import path from "node:path";
 
 const allowedExtensionRegex = /\.([tj]sx?|json)$/;
 
@@ -22,7 +21,7 @@ export function resolveErrorsPlugin(
           warnings.add(
             `"${source}" is imported ${
               importer
-                ? `by "${normalizePath(
+                ? `by "${path.posix.normalize(
                     path.relative(pkg.directory, importer!)
                   )}"`
                 : ""
@@ -45,7 +44,9 @@ export function resolveErrorsPlugin(
           warnings.add(
             `only .ts, .tsx, .js, .jsx, and .json files can be imported but "${source}" is imported in ${
               importer
-                ? `"${normalizePath(path.relative(pkg.directory, importer))}"`
+                ? `"${path.posix.normalize(
+                    path.relative(pkg.directory, importer)
+                  )}"`
                 : "a module"
             }`
           );
@@ -60,7 +61,9 @@ export function resolveErrorsPlugin(
       warnings.add(
         `all relative imports in a package should only import modules inside of their package directory but ${
           importer
-            ? `"${normalizePath(path.relative(pkg.directory, importer))}"`
+            ? `"${path.posix.normalize(
+                path.relative(pkg.directory, importer)
+              )}"`
             : "a module"
         } is importing "${source}"`
       );

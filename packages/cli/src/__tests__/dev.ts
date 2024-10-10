@@ -1,5 +1,5 @@
 import spawn from "spawndamnit";
-import path from "path";
+import path from "node:path";
 import fs from "node:fs/promises";
 import {
   getFiles,
@@ -11,7 +11,6 @@ import {
   typescriptFixture,
 } from "../../test-utils";
 import dev from "../dev";
-import normalizePath from "normalize-path";
 import escapeStringRegexp from "escape-string-regexp";
 import { fsEnsureSymlink } from "../utils";
 
@@ -114,7 +113,7 @@ test("all the build types", async () => {
         "utf-8"
       )
     ).replace(
-      normalizePath(
+      path.posix.normalize(
         path.relative(
           distPath,
           path.dirname(require.resolve("@preconstruct/hook"))
@@ -603,7 +602,7 @@ test("imports conditions", async () => {
     `,
   });
   await dev(dir);
-  const maybeRelativePathFromTestDirToPreconstructDir = normalizePath(
+  const maybeRelativePathFromTestDirToPreconstructDir = path.posix.normalize(
     path.relative(dir, repoRoot)
   );
   expect(

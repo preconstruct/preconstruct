@@ -2,8 +2,7 @@ import { EOL } from "os";
 import resolveFrom from "resolve-from";
 import { FatalError } from "../../errors";
 import fs from "node:fs/promises";
-import path from "path";
-import normalizePath from "normalize-path";
+import path from "node:path";
 import { getModuleSpecifier } from "./get-module-specifier";
 import MagicString from "magic-string";
 
@@ -126,8 +125,8 @@ export async function getProgram(dirname: string, pkgName: string, ts: TS) {
   // and if we keep it, we could run out of memory for large projects
   // if the tsconfig _isn't_ in the package directory though, it's probably fine to memoize it
   // since it should just be a root level tsconfig
-  return normalizePath(configFileName) ===
-    normalizePath(path.join(dirname, "tsconfig.json"))
+  return path.posix.normalize(configFileName) ===
+    path.posix.normalize(path.join(dirname, "tsconfig.json"))
     ? nonMemoizedGetProgram(ts, configFileName)
     : memoizedGetProgram(ts)(configFileName);
 }
@@ -178,7 +177,9 @@ export function getDeclarationsForFile(
       types: {
         name: filename.replace(
           normalizedPkgDir,
-          normalizePath(path.join(normalizedPkgDir, "dist", "declarations"))
+          path.posix.normalize(
+            path.join(normalizedPkgDir, "dist", "declarations")
+          )
         ),
         content,
       },
@@ -190,7 +191,9 @@ export function getDeclarationsForFile(
       types: {
         name: filename.replace(
           normalizedPkgDir,
-          normalizePath(path.join(normalizedPkgDir, "dist", "declarations"))
+          path.posix.normalize(
+            path.join(normalizedPkgDir, "dist", "declarations")
+          )
         ),
         content: sourceFile.text,
       },
@@ -207,7 +210,9 @@ export function getDeclarationsForFile(
         emitted.types = {
           name: name.replace(
             normalizedPkgDir,
-            normalizePath(path.join(normalizedPkgDir, "dist", "declarations"))
+            path.posix.normalize(
+              path.join(normalizedPkgDir, "dist", "declarations")
+            )
           ),
           content: text,
         };
@@ -215,7 +220,9 @@ export function getDeclarationsForFile(
         emitted.map = {
           name: name.replace(
             normalizedPkgDir,
-            normalizePath(path.join(normalizedPkgDir, "dist", "declarations"))
+            path.posix.normalize(
+              path.join(normalizedPkgDir, "dist", "declarations")
+            )
           ),
           content: text,
         };
@@ -261,7 +268,7 @@ export function getDeclarationsForFile(
 
   if (!emitted.types || diagnostics.length) {
     throw new FatalError(
-      `Generating TypeScript declarations for ${normalizePath(
+      `Generating TypeScript declarations for ${path.posix.normalize(
         path.relative(projectDir, filename)
       )} failed:\n${typescript.formatDiagnosticsWithColorAndContext(
         diagnostics,

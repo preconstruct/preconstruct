@@ -1,4 +1,4 @@
-import path from "path";
+import path from "node:path";
 import fs from "node:fs/promises";
 import fastGlob from "fast-glob";
 import fixturez from "fixturez";
@@ -28,7 +28,6 @@ afterEach(() => {
 
 import init from "../src/init";
 import { confirms } from "../src/messages";
-import normalizePath from "normalize-path";
 import { fsOutputFile } from "../src/utils";
 
 let mockedConfirms = confirms as jest.Mocked<typeof confirms>;
@@ -153,7 +152,7 @@ export async function snapshotDistFiles(tmpPath: string) {
   await Promise.all(
     distFiles.map(async (x) => {
       expect(await readNormalizedFile(path.join(distPath, x))).toMatchSnapshot(
-        normalizePath(x)
+        path.posix.normalize(x)
       );
     })
   );
@@ -216,7 +215,7 @@ export async function snapshotDirectory(
           content = JSON.parse(content);
         }
         expect(content).toMatchSnapshot(
-          normalizePath(transformPath(x, content))
+          path.posix.normalize(transformPath(x, content))
         );
       })
   );
@@ -440,7 +439,7 @@ export async function getFiles(
           if (link !== undefined) {
             return [
               filename,
-              `⎯ symlink to ${normalizePath(
+              `⎯ symlink to ${path.posix.normalize(
                 path.relative(
                   dir,
                   path.resolve(path.dirname(path.join(dir, filename)), link)

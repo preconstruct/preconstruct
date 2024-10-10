@@ -1,7 +1,6 @@
 import { Plugin, SourceMapInput } from "rollup";
 import MagicString from "magic-string";
-import normalizePath from "normalize-path";
-import path from "path";
+import path from "node:path";
 import { getModuleDirectives } from "./directives";
 
 export function serverComponentsPlugin({
@@ -76,7 +75,7 @@ export function serverComponentsPlugin({
       magicString.replace(
         /__USE_CLIENT_IMPORT__(\w+?)__USE_CLIENT_IMPORT__\/\w+/g,
         (_, referenceId) => {
-          const relative = normalizePath(
+          const relative = path.posix.normalize(
             path.relative(
               path.dirname(chunk.fileName),
               this.getFileName(referenceId)
