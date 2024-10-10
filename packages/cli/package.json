@@ -65,7 +65,7 @@
     "quick-lru": "^5.1.1",
     "resolve-from": "^5.0.0",
     "rollup": "^2.79.1",
-    "semver": "^7.3.4",
+    "semver": "^6.3.1",
     "terser": "^5.16.8",
     "tinyglobby": "^0.2.9",
     "v8-compile-cache": "^2.1.1",
