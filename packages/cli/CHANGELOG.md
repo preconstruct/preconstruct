@@ -1,5 +1,11 @@
 # preconstruct
 
+## 2.8.9
+
+### Patch Changes
+
+- [#604](https://github.com/preconstruct/preconstruct/pull/604) [`79b6d1c`](https://github.com/preconstruct/preconstruct/commit/79b6d1cc75151c35fea48095034dc2c7b36b77e6) Thanks [@emmatown](https://github.com/emmatown)! - Fix outputting `.d.ts` files with extension-less imports that are invalid when using the experimental flag `typeModule` with `moduleResolution: "nodenext"` and `type: "module"` in `dev` and `build`
+
 ## 2.8.8
 
 ### Patch Changes
