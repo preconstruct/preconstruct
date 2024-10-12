@@ -189,7 +189,7 @@ export class Package extends Item<{
     let contents = await fs.readFile(filePath, "utf-8");
     let pkg = new Package(filePath, contents, project._jsonDataByPath);
     pkg.project = project;
-    let entrypoints = await glob(pkg.configEntrypoints, {
+    let entrypoints = await glob(pkg.configEntrypoints.map(normalizePath), {
       cwd: path.join(pkg.directory, "src"),
       expandDirectories: false,
       onlyFiles: true,
@@ -210,12 +210,15 @@ export class Package extends Item<{
       }),
     ];
     if (!entrypoints.length) {
-      let oldEntrypoints = await glob(pkg.configEntrypoints, {
-        cwd: pkg.directory,
-        expandDirectories: false,
-        onlyDirectories: true,
-        absolute: true,
-      });
+      let oldEntrypoints = await glob(
+        pkg.configEntrypoints.map(normalizePath),
+        {
+          cwd: pkg.directory,
+          expandDirectories: false,
+          onlyDirectories: true,
+          absolute: true,
+        }
+      );
       if (oldEntrypoints.length) {
         throw new FatalError(
           "this package has no entrypoints but it does have some using v1's entrypoints config, please see the the changelog for how to upgrade",

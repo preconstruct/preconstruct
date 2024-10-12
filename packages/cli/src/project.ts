@@ -6,7 +6,11 @@ import { Item } from "./item";
 import { Package } from "./package";
 import { validateIncludedFiles } from "./validate-included-files";
 import { FatalError } from "./errors";
-import { JSONValue, parseImportConditionDefaultExportOption } from "./utils";
+import {
+  JSONValue,
+  parseImportConditionDefaultExportOption,
+  normalizePath,
+} from "./utils";
 
 const allSettled = (promises: Promise<any>[]) =>
   Promise.all(
@@ -123,7 +127,7 @@ export class Project extends Item<{
       await this.save();
     }
 
-    let filenames = await glob(this.configPackages, {
+    let filenames = await glob(this.configPackages.map(normalizePath), {
       cwd: this.directory,
       onlyDirectories: true,
       expandDirectories: false,
