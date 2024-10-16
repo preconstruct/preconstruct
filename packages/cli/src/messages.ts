@@ -2,7 +2,14 @@ import { PKG_JSON_CONFIG_FIELD } from "./constants";
 import { createPromptConfirmLoader } from "./prompt";
 import chalk from "chalk";
 
-type Field = "main" | "module" | "browser" | "umd:main" | "exports";
+type Field =
+  | "main"
+  | "module"
+  | "browser"
+  | "umd:main"
+  | "exports"
+  | "types"
+  | "typings";
 
 export let errors = {
   noSource: (source: string) =>
