@@ -62,6 +62,30 @@ export function serverComponentsPlugin({
         },
       };
     },
+    generateBundle(options, bundle) {
+      for (const chunk of Object.values(bundle)) {
+        if (chunk.type === "chunk") {
+          let magicString = new MagicString(chunk.code);
+          magicString.replace(
+            /__USE_CLIENT_IMPORT__(\w+?)__USE_CLIENT_IMPORT__\/\w+/g,
+            (_, referenceId) => {
+              const relative = normalizePath(
+                path.relative(
+                  path.dirname(chunk.fileName),
+                  this.getFileName(referenceId)
+                )
+              );
+              return relative.startsWith("../") ? relative : `./${relative}`;
+            }
+          );
+          const stringified = magicString.toString();
+          if (stringified === chunk.code) {
+            continue;
+          }
+          chunk.code = stringified;
+        }
+      }
+    },
     renderChunk(code, chunk) {
       const magicString = new MagicString(code);
       if (chunk.facadeModuleId !== null) {
@@ -72,19 +96,6 @@ export function serverComponentsPlugin({
           magicString.prepend(`'${directive}';\n`);
         }
       }
-
-      magicString.replace(
-        /__USE_CLIENT_IMPORT__(\w+?)__USE_CLIENT_IMPORT__\/\w+/g,
-        (_, referenceId) => {
-          const relative = normalizePath(
-            path.relative(
-              path.dirname(chunk.fileName),
-              this.getFileName(referenceId)
-            )
-          );
-          return relative.startsWith("../") ? relative : `./${relative}`;
-        }
-      );
       const stringified = magicString.toString();
       if (stringified === code) {
         return null;
