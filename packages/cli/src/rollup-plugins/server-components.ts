@@ -38,6 +38,9 @@ export function serverComponentsPlugin({
       }
       return resolved;
     },
+    shouldTransformCachedModule(cached) {
+      return cached.meta.directivePreservedFile !== undefined;
+    },
     transform(code, id) {
       if (id.startsWith("\0")) return null;
       const directives = getModuleDirectives(code);
