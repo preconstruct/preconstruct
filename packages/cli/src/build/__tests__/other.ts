@@ -1304,7 +1304,27 @@ test("no hoisting client only imports", async () => {
     export { a, b };
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    import * as client from './client-some-hash.esm.js';
+    import * as client$1 from './client-some-hash.esm.js';
+
+    function _mergeNamespaces(n, m) {
+    	m.forEach(function (e) {
+    		e && typeof e !== 'string' && !Array.isArray(e) && Object.keys(e).forEach(function (k) {
+    			if (k !== 'default' && !(k in n)) {
+    				var d = Object.getOwnPropertyDescriptor(e, k);
+    				Object.defineProperty(n, k, d.get ? d : {
+    					enumerable: true,
+    					get: function () { return e[k]; }
+    				});
+    			}
+    		});
+    	});
+    	return Object.freeze(n);
+    }
+
+    var client = /*#__PURE__*/_mergeNamespaces({
+    	__proto__: null
+    }, [client$1]);
+
     export { client as x };
 
   `);
@@ -1407,10 +1427,29 @@ test("import use client self", async () => {
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     export { client } from './ui-some-hash.esm.js';
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/ui-this-is-not-the-real-hash-caf79d0376c465220743255e5be1da2d.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/ui-this-is-not-the-real-hash-82b5377830ffd545c19e687af30e4618.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use client';
     import 'client-only';
-    import * as self from './ui-some-hash.esm.js';
+    import * as ui from './ui-some-hash.esm.js';
+
+    function _mergeNamespaces(n, m) {
+      m.forEach(function (e) {
+        e && typeof e !== 'string' && !Array.isArray(e) && Object.keys(e).forEach(function (k) {
+          if (k !== 'default' && !(k in n)) {
+            var d = Object.getOwnPropertyDescriptor(e, k);
+            Object.defineProperty(n, k, d.get ? d : {
+              enumerable: true,
+              get: function () { return e[k]; }
+            });
+          }
+        });
+      });
+      return Object.freeze(n);
+    }
+
+    var self = /*#__PURE__*/_mergeNamespaces({
+      __proto__: null
+    }, [ui]);
 
     function client() {
       console.log("a", self);
@@ -1445,7 +1484,26 @@ test("import use client self as entrypoint", async () => {
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use client';
     import 'client-only';
-    import * as self from './pkg.esm.js';
+    import * as index from './pkg.esm.js';
+
+    function _mergeNamespaces(n, m) {
+      m.forEach(function (e) {
+        e && typeof e !== 'string' && !Array.isArray(e) && Object.keys(e).forEach(function (k) {
+          if (k !== 'default' && !(k in n)) {
+            var d = Object.getOwnPropertyDescriptor(e, k);
+            Object.defineProperty(n, k, d.get ? d : {
+              enumerable: true,
+              get: function () { return e[k]; }
+            });
+          }
+        });
+      });
+      return Object.freeze(n);
+    }
+
+    var self = /*#__PURE__*/_mergeNamespaces({
+      __proto__: null
+    }, [index]);
 
     function client() {
       console.log("a", self);
