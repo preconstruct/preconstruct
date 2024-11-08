@@ -1,5 +1,11 @@
 # preconstruct
 
+## 0.0.0-test-20241108011831
+
+### Patch Changes
+
+- [#612](https://github.com/preconstruct/preconstruct/pull/612) [`741707c`](https://github.com/preconstruct/preconstruct/commit/741707caa420e2ac5f781f893bb57ca9c10c7851) Thanks [@emmatown](https://github.com/emmatown)! - Fix `preconstruct watch` when using `use client`/`use server` directives
+
 ## 2.8.9
 
 ### Patch Changes
