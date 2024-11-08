@@ -5,7 +5,7 @@ import {
   hasDtsFile,
   writeDevTSFiles,
 } from "../dev";
-import * as fs from "fs-extra";
+import fs from "node:fs/promises";
 import path from "path";
 
 export function getDevPath(cjsPath: string) {
@@ -20,11 +20,17 @@ export async function cleanProjectBeforeBuild(project: Project) {
   await Promise.all(
     project.packages.map(async (pkg) => {
       await Promise.all([
-        fs.remove(path.join(pkg.directory, "dist")),
+        fs.rm(path.join(pkg.directory, "dist"), {
+          recursive: true,
+          force: true,
+        }),
         ...pkg.entrypoints
           .filter((entrypoint) => entrypoint.name !== pkg.name)
-          .map((entrypoint) => {
-            return fs.remove(path.join(entrypoint.directory, "dist"));
+          .map(async (entrypoint) => {
+            await fs.rm(path.join(entrypoint.directory, "dist"), {
+              recursive: true,
+              force: true,
+            });
           }),
       ]);
       const isTypeModule = pkg.isTypeModule();

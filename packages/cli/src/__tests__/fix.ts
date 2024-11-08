@@ -13,7 +13,7 @@ import {
   ts,
 } from "../../test-utils";
 import { promptInput as _promptInput } from "../prompt";
-import fs from "fs-extra";
+import fs from "node:fs/promises";
 
 const f = fixturez(__dirname);
 
