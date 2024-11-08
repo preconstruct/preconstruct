@@ -59,7 +59,7 @@ export function serverComponentsPlugin({
           `__USE_CLIENT_IMPORT__/${name}`;
         return `export * from ${JSON.stringify(importPath)};${
           hasDefaultExport
-            ? `\nexport { default } from ${JSON.stringify(importPath)};"`
+            ? `\nexport { default } from ${JSON.stringify(importPath)};`
             : ""
         }`;
       }
