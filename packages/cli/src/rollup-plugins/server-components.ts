@@ -4,6 +4,8 @@ import normalizePath from "normalize-path";
 import path from "path";
 import { getModuleDirectives } from "./directives";
 
+const internalModulePrefix = "\0preserve boundary:";
+
 export function serverComponentsPlugin({
   sourceMap,
 }: {
@@ -12,6 +14,9 @@ export function serverComponentsPlugin({
   return {
     name: "server-components",
     async resolveId(source, importer, opts) {
+      if (source.startsWith("__USE_CLIENT_IMPORT__")) {
+        return { id: source, external: true };
+      }
       const resolved = await this.resolve(source, importer, {
         ...opts,
         skipSelf: true,
@@ -21,22 +26,44 @@ export function serverComponentsPlugin({
       }
       const loaded = await this.load(resolved);
       if (
-        typeof loaded.meta.directivePreservedFile?.referenceId === "string" &&
+        typeof loaded.meta.directivePreservedFile === "string" &&
         importer !== undefined
       ) {
-        // this name is appended for Rollup naming chunks/variables in the output
-        const name = path
-          .basename(resolved.id)
-          .replace(/\.[tj]sx?$/, "")
-          .replace(/[^\w]/g, "_");
-        const id = `__USE_CLIENT_IMPORT__${loaded.meta.directivePreservedFile.referenceId}__USE_CLIENT_IMPORT__/${name}`;
-
         return {
-          id,
-          external: true,
+          id:
+            internalModulePrefix +
+            (loaded.hasDefaultExport ? "1" : "0") +
+            resolved.id,
         };
       }
       return resolved;
+    },
+    load(id) {
+      if (id.startsWith(internalModulePrefix)) {
+        const hasDefaultExport = id[internalModulePrefix.length] === "1";
+        const innerId = id.slice(internalModulePrefix.length + 1);
+        const referenceId = this.emitFile({
+          type: "chunk",
+          id: innerId,
+          preserveSignature: "strict",
+        });
+
+        // this name is appended for Rollup naming chunks/variables in the output
+        const name = path
+          .basename(innerId)
+          .replace(/\.[tj]sx?$/, "")
+          .replace(/[^\w]/g, "_");
+        const importPath =
+          "__USE_CLIENT_IMPORT__" +
+          referenceId +
+          `__USE_CLIENT_IMPORT__/${name}`;
+        return `export * from ${JSON.stringify(importPath)};${
+          hasDefaultExport
+            ? `\nexport { default } from ${JSON.stringify(importPath)};`
+            : ""
+        }`;
+      }
+      return null;
     },
     transform(code, id) {
       if (id.startsWith("\0")) return null;
@@ -46,11 +73,6 @@ export function serverComponentsPlugin({
       );
       if (!directive) return null;
       const magicString = new MagicString(code);
-      const referenceId = this.emitFile({
-        type: "chunk",
-        id,
-        preserveSignature: "allow-extension",
-      });
       magicString.remove(directive.start, directive.end);
       return {
         code: magicString.toString(),
@@ -58,7 +80,7 @@ export function serverComponentsPlugin({
           ? (magicString.generateMap({ hires: true }) as SourceMapInput)
           : undefined,
         meta: {
-          directivePreservedFile: { referenceId, directive: directive.value },
+          directivePreservedFile: directive.value,
         },
       };
     },
@@ -66,9 +88,8 @@ export function serverComponentsPlugin({
       const magicString = new MagicString(code);
       if (chunk.facadeModuleId !== null) {
         const moduleInfo = this.getModuleInfo(chunk.facadeModuleId);
-        if (moduleInfo?.meta.directivePreservedFile) {
-          const directive: "use client" | "use server" =
-            moduleInfo?.meta.directivePreservedFile.directive;
+        const directive = moduleInfo?.meta.directivePreservedFile;
+        if (directive) {
           magicString.prepend(`'${directive}';\n`);
         }
       }

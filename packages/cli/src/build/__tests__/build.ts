@@ -1942,6 +1942,85 @@ test("importConditionDefaultExport: default with use client", async () => {
   `);
 });
 
+test("default from use client module", async () => {
+  let dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "pkg-a",
+      main: "dist/pkg-a.cjs.js",
+      module: "dist/pkg-a.esm.js",
+      exports: {
+        ".": {
+          types: "./dist/pkg-a.cjs.js",
+          module: "./dist/pkg-a.esm.js",
+          default: "./dist/pkg-a.cjs.js",
+        },
+        "./package.json": "./package.json",
+      },
+      preconstruct: {
+        exports: true,
+        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+          importsConditions: true,
+        },
+      },
+    }),
+    "src/index.js": js`
+      export { default as Something } from "./client";
+      export default "a";
+    `,
+    "src/client.js": js`
+      "use client";
+      export default function Something() {}
+    `,
+  });
+  await build(dir);
+
+  expect(await getFiles(dir, ["dist/**"], stripHashes("client")))
+    .toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/client-this-is-not-the-real-hash-11db0c44c91085685398711059cda133.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use client';
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    function Something() {}
+
+    exports["default"] = Something;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/client-this-is-not-the-real-hash-31a4278303438daf0cbcc4f2d568e97a.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use client';
+    function Something() {}
+
+    export { Something as default };
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg-a.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    var client = require('./client-some-hash.cjs.js');
+
+    function _interopDefault (e) { return e && e.__esModule ? e : { 'default': e }; }
+
+    var client__default = /*#__PURE__*/_interopDefault(client);
+
+    var index = "a";
+
+    Object.defineProperty(exports, 'Something', {
+    	enumerable: true,
+    	get: function () { return client__default["default"]; }
+    });
+    exports["default"] = index;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg-a.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export { default as Something } from './client-some-hash.esm.js';
+
+    var index = "a";
+
+    export { index as default };
+
+  `);
+});
+
 test("correct default export using mjs and dmts proxies with moduleResolution: bundler", async () => {
   let dir = await testdir({
     "package.json": JSON.stringify({
