@@ -1,7 +1,6 @@
 import spawn from "spawndamnit";
 import path from "path";
-import * as fs from "fs-extra";
-import * as realFs from "fs";
+import fs from "node:fs/promises";
 import {
   getFiles,
   js,
@@ -10,6 +9,7 @@ import {
   testdir,
   ts,
   typescriptFixture,
+  fsEnsureSymlink,
 } from "../../test-utils";
 import dev from "../dev";
 import normalizePath from "normalize-path";
@@ -292,7 +292,7 @@ test("typescript", async () => {
 });
 
 test("exports field with worker condition", async () => {
-  let tmpPath = realFs.realpathSync.native(
+  let tmpPath = await fs.realpath(
     await testdir({
       "package.json": JSON.stringify({
         name: "@something/blah",
@@ -471,7 +471,7 @@ test("with default", async () => {
       },
     }),
   });
-  await fs.ensureSymlink(
+  await fsEnsureSymlink(
     path.join(dir, "packages/pkg-a"),
     path.join(dir, "node_modules/pkg-a")
   );

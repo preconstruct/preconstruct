@@ -1,7 +1,6 @@
 import build from "../";
 import fixturez from "fixturez";
 import path from "path";
-import fs from "fs-extra";
 import {
   initBasic,
   getPkg,
@@ -15,6 +14,7 @@ import {
   getFiles,
   ts,
   stripHashes,
+  fsEnsureSymlink,
 } from "../../../test-utils";
 import { doPromptInput as _doPromptInput } from "../../prompt";
 import { confirms as _confirms } from "../../messages";
@@ -820,7 +820,7 @@ test("typescript with nodenext module resolution", async () => {
     `,
     ...tsSetupFiles,
   });
-  await fs.ensureSymlink(
+  await fsEnsureSymlink(
     path.join(dir, "packages/pkg-a"),
     path.join(dir, "node_modules/pkg-a")
   );
@@ -1028,7 +1028,7 @@ test("correct default export using mjs and dmts proxies", async () => {
     `,
     ...tsSetupFiles,
   });
-  await fs.ensureSymlink(
+  await fsEnsureSymlink(
     path.join(dir, "packages/pkg-a"),
     path.join(dir, "node_modules/pkg-a")
   );
@@ -1195,11 +1195,11 @@ test("importing a package via dynamic import from another package provides the r
     `,
     ...tsSetupFiles,
   });
-  await fs.ensureSymlink(
+  await fsEnsureSymlink(
     path.join(dir, "packages/pkg-a"),
     path.join(dir, "node_modules/pkg-a")
   );
-  await fs.ensureSymlink(
+  await fsEnsureSymlink(
     path.join(dir, "packages/pkg-b"),
     path.join(dir, "node_modules/pkg-b")
   );
@@ -1325,11 +1325,11 @@ test("importing another package via dynamic import and exporting the namespace p
     `,
     ...tsSetupFiles,
   });
-  await fs.ensureSymlink(
+  await fsEnsureSymlink(
     path.join(dir, "packages/pkg-a"),
     path.join(dir, "node_modules/pkg-a")
   );
-  await fs.ensureSymlink(
+  await fsEnsureSymlink(
     path.join(dir, "packages/pkg-b"),
     path.join(dir, "node_modules/pkg-b")
   );
@@ -1408,11 +1408,11 @@ test("importing another package via dynamic import and exporting something that 
     `,
     ...tsSetupFiles,
   });
-  await fs.ensureSymlink(
+  await fsEnsureSymlink(
     path.join(dir, "packages/pkg-a"),
     path.join(dir, "node_modules/pkg-a")
   );
-  await fs.ensureSymlink(
+  await fsEnsureSymlink(
     path.join(dir, "packages/pkg-b"),
     path.join(dir, "node_modules/pkg-b")
   );
@@ -1516,7 +1516,7 @@ test("no __esModule when reexporting namespace with mjs proxy", async () => {
       },
     }),
   });
-  await fs.ensureSymlink(
+  await fsEnsureSymlink(
     path.join(dir, "packages/pkg-a"),
     path.join(dir, "node_modules/pkg-a")
   );
@@ -1652,7 +1652,7 @@ test("export * from external", async () => {
     `,
     ...tsSetupFiles,
   });
-  await fs.ensureSymlink(
+  await fsEnsureSymlink(
     path.join(dir, "packages/pkg-a"),
     path.join(dir, "node_modules/pkg-a")
   );
@@ -1780,7 +1780,7 @@ test("type only export imported in .mts", async () => {
     `,
     ...tsSetupFiles,
   });
-  await fs.ensureSymlink(
+  await fsEnsureSymlink(
     path.join(dir, "packages/pkg-a"),
     path.join(dir, "node_modules/pkg-a")
   );
@@ -2139,7 +2139,7 @@ test("correct default export using mjs and dmts proxies with moduleResolution: b
       },
     }),
   });
-  await fs.ensureSymlink(
+  await fsEnsureSymlink(
     path.join(dir, "packages/pkg-a"),
     path.join(dir, "node_modules/pkg-a")
   );
@@ -2282,7 +2282,7 @@ test("module with no runtime exports but with init-time side-effects with import
       require("pkg-a");
     `,
   });
-  await fs.ensureSymlink(
+  await fsEnsureSymlink(
     path.join(dir, "packages/pkg-a"),
     path.join(dir, "node_modules/pkg-a")
   );
@@ -2519,7 +2519,7 @@ test("using type from a package with .d.ts at entrypoint in another package", as
     `,
     ...tsSetupFiles,
   });
-  await fs.ensureSymlink(
+  await fsEnsureSymlink(
     path.join(dir, "packages/pkg-a"),
     path.join(dir, "node_modules/pkg-a")
   );
@@ -2604,7 +2604,7 @@ test("using type from a package with .d.ts at entrypoint in another package with
     `,
     ...tsSetupFiles,
   });
-  await fs.ensureSymlink(
+  await fsEnsureSymlink(
     path.join(dir, "packages/pkg-a"),
     path.join(dir, "node_modules/pkg-a")
   );
