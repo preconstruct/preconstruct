@@ -44,7 +44,13 @@ async function fixPackage(pkg: Package): Promise<() => Promise<boolean>> {
     }
   }
 
-  if (!pkg.isTypeModule()) {
+  if (pkg.isTypeModule()) {
+    keys(fields).forEach((field) => {
+      if (fields[field]) {
+        delete (pkg.json as any)[field];
+      }
+    });
+  } else {
     keys(fields)
       .filter((x) => fields[x])
       .forEach((field) => {

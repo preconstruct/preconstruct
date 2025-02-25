@@ -57,6 +57,14 @@ export function validatePackage(pkg: Package) {
   }
 
   if (pkg.isTypeModule()) {
+    keys(fields).forEach((field) => {
+      if (fields[field]) {
+        throw new FixableError(
+          `"type": "module" packages should not use the "${field}" field.`,
+          pkg.name
+        );
+      }
+    });
     return;
   }
 
