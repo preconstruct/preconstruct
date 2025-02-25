@@ -1,5 +1,11 @@
 # preconstruct
 
+## 2.8.11
+
+### Patch Changes
+
+- [#615](https://github.com/preconstruct/preconstruct/pull/615) [`e3e7067`](https://github.com/preconstruct/preconstruct/commit/e3e7067434232c29dd4a8e60295e5ea7e83aa90e) Thanks [@emmatown](https://github.com/emmatown)! - `preconstruct fix`/`preconstruct validate` will now enforce that the `main`/`module`/`browser`/`umd:main` fields are not present when using the experimental `typeModule` flag and a package has `"type": "module"`.
+
 ## 2.8.10
 
 ### Patch Changes
