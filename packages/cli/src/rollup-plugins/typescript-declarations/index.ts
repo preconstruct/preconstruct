@@ -58,7 +58,7 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
         pkg.directory,
         pkg.name,
         typescript,
-        pkg.typeScriptConfigName
+        pkg.typescriptConfigFilename
       );
 
       let normalizedDirname = normalizePath(pkg.directory);

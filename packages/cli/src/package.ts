@@ -157,7 +157,7 @@ export class Package extends Item<{
       envConditions?: EnvCondition[];
     };
     typescript?: {
-      configName?: string
+      tsConfigFilename?: string
     }
     entrypoints?: JSONValue;
   };
@@ -169,8 +169,8 @@ export class Package extends Item<{
   project!: Project;
   entrypoints!: Array<Entrypoint>;
 
-  get typeScriptConfigName(): string | undefined {
-    return this.json.preconstruct?.typescript?.configName
+  get typescriptConfigFilename(): string | undefined {
+    return this.json.preconstruct?.typescript?.tsConfigFilename
   }
 
   get configEntrypoints(): Array<string> {
