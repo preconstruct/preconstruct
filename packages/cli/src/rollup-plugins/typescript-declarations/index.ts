@@ -57,7 +57,8 @@ export default function typescriptDeclarations(pkg: Package): Plugin {
       const { program, options } = await getProgram(
         pkg.directory,
         pkg.name,
-        typescript
+        typescript,
+        pkg.typeScriptConfigName
       );
 
       let normalizedDirname = normalizePath(pkg.directory);

@@ -113,8 +113,8 @@ let memoizedGetProgram = weakMemoize((typescript: TS) =>
   })
 );
 
-export async function getProgram(dirname: string, pkgName: string, ts: TS) {
-  let configFileName = ts.findConfigFile(dirname, ts.sys.fileExists);
+export async function getProgram(dirname: string, pkgName: string, ts: TS, configName?: string) {
+  let configFileName = ts.findConfigFile(dirname, ts.sys.fileExists, configName);
   if (!configFileName) {
     throw new FatalError(
       "an entrypoint source file ends with the .ts or tsx extension but no TypeScript config exists, please create one.",

@@ -156,6 +156,9 @@ export class Package extends Item<{
       extra?: Record<string, JSONValue>;
       envConditions?: EnvCondition[];
     };
+    typescript?: {
+      configName?: string
+    }
     entrypoints?: JSONValue;
   };
   exports?: Record<string, ExportsConditions | string>;
@@ -165,6 +168,11 @@ export class Package extends Item<{
 }> {
   project!: Project;
   entrypoints!: Array<Entrypoint>;
+
+  get typeScriptConfigName(): string | undefined {
+    return this.json.preconstruct?.typescript?.configName
+  }
+
   get configEntrypoints(): Array<string> {
     if (this.json.preconstruct.entrypoints === undefined) {
       return ["index.{js,jsx,ts,tsx}"];
@@ -372,6 +380,7 @@ export class Package extends Item<{
     }
     return "full";
   }
+
   _parsedImportsGroups:
     | Map<string[], [string[], ...string[][]]>
     | false
