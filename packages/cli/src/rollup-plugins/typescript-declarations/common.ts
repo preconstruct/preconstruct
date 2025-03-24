@@ -89,7 +89,7 @@ async function nonMemoizedGetProgram(typescript: TS, configFileName: string) {
     configFileName,
     configFileContents
   );
-  
+
   let thing = typescript.parseJsonConfigFileContent(
     result.config,
     typescript.sys,
@@ -98,7 +98,11 @@ async function nonMemoizedGetProgram(typescript: TS, configFileName: string) {
     configFileName
   );
   if (thing.errors.length > 0) {
-    throw new Error(`Error while retrieving TypeScript program: \n ${thing.errors.map((error) => error.messageText).join('\n')}`)
+    throw new Error(
+      `Error while retrieving TypeScript program: \n ${thing.errors
+        .map((error) => error.messageText)
+        .join("\n")}`
+    );
   }
 
   thing.options.outDir = undefined;
