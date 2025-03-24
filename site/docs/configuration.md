@@ -334,7 +334,7 @@ To use `"type": "module"`, you need to enable the experimental flags and the exp
 
 `String`
 
-`tsconfig` allows you to specify a custom TypeScript configuration filename. Preconstruct will search for this file instead of the default `tsconfig.json`.
+`tsconfig` allows you to specify a custom TypeScript configuration filename nor path. Preconstruct will search for this file instead of the default `tsconfig.json`.
 
 This is useful when you need different TypeScript configurations, as for example for development and building.
 
@@ -356,6 +356,16 @@ This is useful when you need different TypeScript configurations, as for example
 {
   "preconstruct": {
     "tsconfig": ["tsconfig.build.json"]
+  }
+}
+```
+
+or
+
+```json
+{
+  "preconstruct": {
+    "tsconfig": ["folder/tsconfig.build.json"]
   }
 }
 ```
