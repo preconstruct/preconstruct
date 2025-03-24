@@ -1307,9 +1307,7 @@ test("typescript with custom tsconfig filename in standalone package", async () 
         typescript: "^3.8.3",
       },
       preconstruct: {
-        typescript: {
-          tsConfigFilename: "tsconfig.build.json",
-        },
+        tsconfig: "tsconfig.build.json",
       },
     }),
     ".babelrc": JSON.stringify({
@@ -1352,9 +1350,7 @@ test("typescript with invalid custom tsconfig filename in standalone package", a
         typescript: "^3.8.3",
       },
       preconstruct: {
-        typescript: {
-          tsConfigFilename: "tsconfig.invalid.json",
-        },
+        tsconfig: "tsconfig.invalid.json",
       },
     }),
     ".babelrc": JSON.stringify({
@@ -1422,9 +1418,7 @@ test("typescript with custom tsconfig filename in monorepo package", async () =>
       main: "dist/pkg-a.cjs.js",
       module: "dist/pkg-a.esm.js",
       preconstruct: {
-        typescript: {
-          tsConfigFilename: "tsconfig.build.json",
-        },
+        tsconfig: "tsconfig.build.json",
       },
     }),
     "packages/pkg-a/tsconfig.build.json": JSON.stringify({
@@ -1474,9 +1468,7 @@ test("typescript with custom invalid tsconfig filename in monorepo package", asy
       main: "dist/pkg-a.cjs.js",
       module: "dist/pkg-a.esm.js",
       preconstruct: {
-        typescript: {
-          tsConfigFilename: "tsconfig.invalid.json",
-        },
+        tsconfig: "tsconfig.invalid.json",
       },
     }),
     "packages/pkg-a/tsconfig.json": JSON.stringify({
