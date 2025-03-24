@@ -1307,7 +1307,6 @@ test("typescript with custom tsconfig filename in standalone package", async () 
         typescript: "^3.8.3",
       },
       preconstruct: {
-        entrypoints: ["index.ts"],
         typescript: {
           tsConfigFilename: "tsconfig.build.json",
         },
@@ -1353,7 +1352,6 @@ test("typescript with invalid custom tsconfig filename in standalone package", a
         typescript: "^3.8.3",
       },
       preconstruct: {
-        entrypoints: ["index.ts"],
         typescript: {
           tsConfigFilename: "tsconfig.invalid.json",
         },
@@ -1425,7 +1423,6 @@ test("typescript with custom tsconfig filename in monorepo package", async () =>
       module: "dist/pkg-a.esm.js",
       preconstruct: {
         typescript: {
-          entrypoints: ["index.ts"],
           tsConfigFilename: "tsconfig.build.json",
         },
       },
@@ -1478,7 +1475,6 @@ test("typescript with custom invalid tsconfig filename in monorepo package", asy
       module: "dist/pkg-a.esm.js",
       preconstruct: {
         typescript: {
-          entrypoints: ["index.ts"],
           tsConfigFilename: "tsconfig.invalid.json",
         },
       },
