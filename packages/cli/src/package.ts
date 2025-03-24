@@ -22,6 +22,7 @@ import {
 } from "./utils";
 import normalizePath from "normalize-path";
 import { parseImportsField } from "./imports";
+import { CONFIGURATION_DEFAULT_TSCONFIG } from "./constants";
 
 function getFieldsUsedInEntrypoints(
   descriptors: { contents: string | undefined; filename: string }[]
@@ -167,8 +168,8 @@ export class Package extends Item<{
   project!: Project;
   entrypoints!: Array<Entrypoint>;
 
-  get configTsconfig(): string | undefined {
-    return this.json.preconstruct?.tsconfig;
+  get configTsconfig(): string {
+    return this.json.preconstruct?.tsconfig ?? CONFIGURATION_DEFAULT_TSCONFIG;
   }
 
   get configEntrypoints(): Array<string> {

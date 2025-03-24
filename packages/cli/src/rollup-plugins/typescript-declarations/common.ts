@@ -6,6 +6,7 @@ import path from "path";
 import normalizePath from "normalize-path";
 import { getModuleSpecifier } from "./get-module-specifier";
 import MagicString from "magic-string";
+import { CONFIGURATION_DEFAULT_TSCONFIG } from "../../constants";
 
 export type DeclarationFile = {
   name: string;
@@ -88,7 +89,7 @@ async function nonMemoizedGetProgram(typescript: TS, configFileName: string) {
     configFileName,
     configFileContents
   );
-
+  
   let thing = typescript.parseJsonConfigFileContent(
     result.config,
     typescript.sys,
@@ -96,6 +97,9 @@ async function nonMemoizedGetProgram(typescript: TS, configFileName: string) {
     undefined,
     configFileName
   );
+  if (thing.errors.length > 0) {
+    throw new Error(`Error while retrieving TypeScript program: \n ${thing.errors.map((error) => error.messageText).join('\n')}`)
+  }
 
   thing.options.outDir = undefined;
   thing.options.declarationDir = undefined;
@@ -113,30 +117,56 @@ let memoizedGetProgram = weakMemoize((typescript: TS) =>
   })
 );
 
-export async function getProgram(
+function retrieveConfigFilenameOrThrow(
   dirname: string,
-  pkgName: string,
   ts: TS,
-  configName?: string
-) {
-  let configFileName = ts.findConfigFile(
+  configName: string,
+  pkgName: string
+): string {
+  if (configName !== CONFIGURATION_DEFAULT_TSCONFIG) {
+    const customConfigFilename = path.resolve(dirname, configName);
+    if (!ts.sys.fileExists(customConfigFilename)) {
+      throw new FatalError(
+        `the custom TypeScript config file ${configName} does not exist.`,
+        pkgName
+      );
+    }
+    return customConfigFilename;
+  }
+
+  const configFileName = ts.findConfigFile(
     dirname,
     ts.sys.fileExists,
     configName
   );
-  if (!configFileName) {
+  if (configFileName === undefined) {
     throw new FatalError(
       "an entrypoint source file ends with the .ts or tsx extension but no TypeScript config exists, please create one.",
       pkgName
     );
   }
+  return configFileName;
+}
+
+export async function getProgram(
+  dirname: string,
+  pkgName: string,
+  ts: TS,
+  configName: string
+) {
+  let configFileName = retrieveConfigFilenameOrThrow(
+    dirname,
+    ts,
+    configName,
+    pkgName
+  );
   // if the tsconfig is inside the package directory, let's not memoize getting the ts service
   // since it'll only ever be used once
   // and if we keep it, we could run out of memory for large projects
   // if the tsconfig _isn't_ in the package directory though, it's probably fine to memoize it
   // since it should just be a root level tsconfig
   return normalizePath(configFileName) ===
-    normalizePath(path.join(dirname, "tsconfig.json"))
+    normalizePath(path.join(dirname, configName))
     ? nonMemoizedGetProgram(ts, configFileName)
     : memoizedGetProgram(ts)(configFileName);
 }
