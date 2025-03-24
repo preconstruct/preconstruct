@@ -330,6 +330,36 @@ To use `"type": "module"`, you need to enable the experimental flags and the exp
 }
 ```
 
+### `tsconfig` {#tsconfig-config}
+
+`String`
+
+`tsconfig` allows you to specify a custom TypeScript configuration filename. Preconstruct will search for this file instead of the default `tsconfig.json`.
+
+This is useful when you need different TypeScript configurations, as for example for development and building.
+
+#### Default {#tsconfig-default}
+
+> Note: this is the default value, if it's what you want, you don't need to specify it.
+
+```json
+{
+  "preconstruct": {
+    "tsconfig": "tsconfig.json"
+  }
+}
+```
+
+#### Example {#tsconfig-example}
+
+```json
+{
+  "preconstruct": {
+    "tsconfig": ["tsconfig.build.json"]
+  }
+}
+```
+
 ## Entrypoints {#entrypoints}
 
 Entrypoints are the lowest level configuration point and describe a set of bundles for a particular entrypoint. They are configured by the `package.json` in the folder of the entrypoint. We also have a guide on [adding a second entrypoint](/guides/adding-a-second-entrypoint)
