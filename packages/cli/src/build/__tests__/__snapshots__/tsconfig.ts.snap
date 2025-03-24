@@ -1,0 +1,154 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`should build a monorepo package with custom tsconfig located in a relative folder: declarations/src/index.d.ts 1`] = `
+"export declare const thing = "monorepo-custom-config";
+"
+`;
+
+exports[`should build a monorepo package with custom tsconfig located in a relative folder: pkg-a.cjs.d.ts 1`] = `
+"export * from "./declarations/src/index.js";
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicGtnLWEuY2pzLmQudHMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuL2RlY2xhcmF0aW9ucy9zcmMvaW5kZXguZC50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSJ9
+"
+`;
+
+exports[`should build a monorepo package with custom tsconfig located in a relative folder: pkg-a.cjs.dev.js 1`] = `
+"'use strict';
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+const thing = "monorepo-custom-config";
+
+exports.thing = thing;
+"
+`;
+
+exports[`should build a monorepo package with custom tsconfig located in a relative folder: pkg-a.cjs.js 1`] = `
+"'use strict';
+
+if (process.env.NODE_ENV === "production") {
+  module.exports = require("./pkg-a.cjs.prod.js");
+} else {
+  module.exports = require("./pkg-a.cjs.dev.js");
+}
+"
+`;
+
+exports[`should build a monorepo package with custom tsconfig located in a relative folder: pkg-a.cjs.prod.js 1`] = `
+"'use strict';
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+const thing = "monorepo-custom-config";
+
+exports.thing = thing;
+"
+`;
+
+exports[`should build a monorepo package with custom tsconfig located in a relative folder: pkg-a.esm.js 1`] = `
+"const thing = "monorepo-custom-config";
+
+export { thing };
+"
+`;
+
+exports[`should build with custom tsconfig filename in monorepo package: declarations/src/index.d.ts 1`] = `
+"export declare const thing = "monorepo-custom-config";
+"
+`;
+
+exports[`should build with custom tsconfig filename in monorepo package: pkg-a.cjs.d.ts 1`] = `
+"export * from "./declarations/src/index.js";
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicGtnLWEuY2pzLmQudHMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuL2RlY2xhcmF0aW9ucy9zcmMvaW5kZXguZC50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSJ9
+"
+`;
+
+exports[`should build with custom tsconfig filename in monorepo package: pkg-a.cjs.dev.js 1`] = `
+"'use strict';
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+const thing = "monorepo-custom-config";
+
+exports.thing = thing;
+"
+`;
+
+exports[`should build with custom tsconfig filename in monorepo package: pkg-a.cjs.js 1`] = `
+"'use strict';
+
+if (process.env.NODE_ENV === "production") {
+  module.exports = require("./pkg-a.cjs.prod.js");
+} else {
+  module.exports = require("./pkg-a.cjs.dev.js");
+}
+"
+`;
+
+exports[`should build with custom tsconfig filename in monorepo package: pkg-a.cjs.prod.js 1`] = `
+"'use strict';
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+const thing = "monorepo-custom-config";
+
+exports.thing = thing;
+"
+`;
+
+exports[`should build with custom tsconfig filename in monorepo package: pkg-a.esm.js 1`] = `
+"const thing = "monorepo-custom-config";
+
+export { thing };
+"
+`;
+
+exports[`should build with custom tsconfig filename in standalone package: declarations/src/index.d.ts 1`] = `
+"export declare const thing: "custom-config";
+"
+`;
+
+exports[`should build with custom tsconfig filename in standalone package: typescript-custom-config.cjs.d.ts 1`] = `
+"export * from "./declarations/src/index.js";
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoidHlwZXNjcmlwdC1jdXN0b20tY29uZmlnLmNqcy5kLnRzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi9kZWNsYXJhdGlvbnMvc3JjL2luZGV4LmQudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUEifQ==
+"
+`;
+
+exports[`should build with custom tsconfig filename in standalone package: typescript-custom-config.cjs.dev.js 1`] = `
+"'use strict';
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+const thing = "custom-config";
+
+exports.thing = thing;
+"
+`;
+
+exports[`should build with custom tsconfig filename in standalone package: typescript-custom-config.cjs.js 1`] = `
+"'use strict';
+
+if (process.env.NODE_ENV === "production") {
+  module.exports = require("./typescript-custom-config.cjs.prod.js");
+} else {
+  module.exports = require("./typescript-custom-config.cjs.dev.js");
+}
+"
+`;
+
+exports[`should build with custom tsconfig filename in standalone package: typescript-custom-config.cjs.prod.js 1`] = `
+"'use strict';
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+const thing = "custom-config";
+
+exports.thing = thing;
+"
+`;
+
+exports[`should build with custom tsconfig filename in standalone package: typescript-custom-config.esm.js 1`] = `
+"const thing = "custom-config";
+
+export { thing };
+"
+`;
