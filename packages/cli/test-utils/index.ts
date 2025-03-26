@@ -1,6 +1,5 @@
 import path from "path";
-import realFs from "fs";
-import * as fs from "fs-extra";
+import fs from "node:fs/promises";
 import fastGlob from "fast-glob";
 import fixturez from "fixturez";
 import spawn from "spawndamnit";
@@ -33,6 +32,7 @@ afterEach(() => {
 import init from "../src/init";
 import { confirms } from "../src/messages";
 import normalizePath from "normalize-path";
+import { fsOutputFile } from "../src/utils";
 
 let mockedConfirms = confirms as jest.Mocked<typeof confirms>;
 
@@ -106,7 +106,7 @@ export let createPackageCheckTestCreator = (
         things.map(async (entrypointPath) => {
           let content = entrypoints[entrypointPath];
           let filepath = path.join(tmpPath, entrypointPath, "package.json");
-          await fs.ensureFile(filepath);
+          await fs.mkdir(path.dirname(filepath), { recursive: true });
           await fs.writeFile(filepath, JSON.stringify(content, null, 2));
         })
       );
@@ -346,16 +346,16 @@ async function getSymlinkType(targetPath: string): Promise<"dir" | "file"> {
 }
 
 export async function testdir(dir: Fixture) {
-  const temp = realFs.realpathSync.native(f.temp());
+  const temp = await fs.realpath(f.temp());
   await Promise.all(
     Object.keys(dir).map(async (filename) => {
       const output = dir[filename];
       const fullPath = path.join(temp, filename);
       if (typeof output === "string") {
-        await fs.outputFile(fullPath, output);
+        await fsOutputFile(fullPath, output);
       } else {
         const dir = path.dirname(fullPath);
-        await fs.ensureDir(dir);
+        await fs.mkdir(dir, { recursive: true });
         const targetPath = path.resolve(temp, output.path);
         const symlinkType = await getSymlinkType(targetPath);
         await fs.symlink(targetPath, fullPath, symlinkType);
@@ -480,3 +480,22 @@ export const basicPkgJson = (options?: {
     dependencies: options?.dependencies,
   });
 };
+
+/**
+ * Naive implementation of fs-extra.ensureSymlink.
+ * Should be good enough for tests.
+ */
+export async function fsEnsureSymlink(
+  srcPath: string,
+  distPath: string,
+  type?: string
+) {
+  let stats;
+  try {
+    stats = await fs.lstat(distPath);
+  } catch {}
+  if (!stats || !stats.isSymbolicLink()) {
+    await fs.mkdir(path.dirname(distPath), { recursive: true });
+    await fs.symlink(srcPath, distPath, type);
+  }
+}

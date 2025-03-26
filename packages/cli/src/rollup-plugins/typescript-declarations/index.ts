@@ -1,7 +1,7 @@
 import path from "path";
 import { FatalError } from "../../errors";
 import { Plugin } from "rollup";
-import fs from "fs-extra";
+import fs from "node:fs/promises";
 import { Package } from "../../package";
 import {
   dmtsTemplate,

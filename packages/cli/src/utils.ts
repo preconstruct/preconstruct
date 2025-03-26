@@ -8,6 +8,7 @@ import {
 import * as nodePath from "path";
 import { FatalError } from "./errors";
 import { createExportsField } from "./imports";
+import fs from "node:fs/promises";
 
 let fields = [
   "version",
@@ -518,4 +519,16 @@ export function parseImportConditionDefaultExportOption(
     'the "preconstruct.exports.importConditionDefaultExport" field must be set to "default" or "namespace" if it is present',
     name
   );
+}
+
+export async function fsOutputFile(
+  file: string,
+  data:
+    | string
+    | NodeJS.ArrayBufferView
+    | Iterable<string | NodeJS.ArrayBufferView>
+    | AsyncIterable<string | NodeJS.ArrayBufferView>
+): Promise<void> {
+  await fs.mkdir(nodePath.dirname(file), { recursive: true });
+  await fs.writeFile(file, data);
 }
