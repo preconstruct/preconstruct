@@ -38,7 +38,6 @@
     "@types/node": "^18.11.9",
     "@types/normalize-path": "^3.0.0",
     "@types/npm-packlist": "^1.1.1",
-    "@types/parse-glob": "^3.0.29",
     "@types/parse-json": "^4.0.0",
     "@types/source-map-support": "^0.5.0",
     "@types/terser": "^3.12.0",
