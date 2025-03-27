@@ -1,5 +1,11 @@
 # preconstruct
 
+## 2.8.12
+
+### Patch Changes
+
+- [#618](https://github.com/preconstruct/preconstruct/pull/618) [`4620b09`](https://github.com/preconstruct/preconstruct/commit/4620b099a26e946c0c4955f874be844e75088589) Thanks [@prastoin](https://github.com/prastoin)! - Introduced custom TypeScript configuration filename within preconstruct package.json configuration
+
 ## 2.8.11
 
 ### Patch Changes
