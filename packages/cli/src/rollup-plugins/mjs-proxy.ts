@@ -25,12 +25,21 @@ export default function mjsProxyPlugin(pkg: Package): Plugin {
           continue;
         }
 
+        const moduleInfo = this.getModuleInfo(file.facadeModuleId);
+        let directive: "use client" | "use server" | undefined =
+          moduleInfo?.meta.directivePreservedFile?.directive;
+
         let mjsPath = file.fileName.replace(/(?:\.prod)?\.js$/, ".mjs");
         const cjsRelativePath = `./${path.basename(mjsPath, ".mjs")}.js`;
         this.emitFile({
           type: "asset",
           fileName: mjsPath,
-          source: mjsTemplate(file.exports, cjsRelativePath, mjsPath),
+          source: mjsTemplate(
+            file.exports,
+            cjsRelativePath,
+            mjsPath,
+            directive
+          ),
         });
         if (file.exports.includes("default")) {
           this.emitFile({
