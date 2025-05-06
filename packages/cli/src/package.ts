@@ -1,7 +1,6 @@
 // based on https://github.com/jamiebuilds/std-pkg but reading fewer things, adding setters and reading the file
 import fastGlob from "fast-glob";
-import * as fs from "fs-extra";
-import fsPromises from "fs/promises";
+import fs from "node:fs/promises";
 import nodePath from "path";
 import { Item } from "./item";
 import { BatchError, FatalError } from "./errors";
@@ -19,6 +18,7 @@ import {
   DistFilenameStrategy,
   MinimalEntrypoint,
   parseImportConditionDefaultExportOption,
+  fsOutputFile,
 } from "./utils";
 import normalizePath from "normalize-path";
 import { parseImportsField } from "./imports";
@@ -93,14 +93,15 @@ function createEntrypoints(
               );
             }
           }
-          await fs.remove(filename);
+          await fs.rm(filename, { recursive: true, force: true });
           const contents = await fs.readdir(nodePath.dirname(filename));
           if (
             contents.length === 0 ||
             (contents.length === 1 && contents[0] === "dist")
           ) {
-            await fsPromises.rm(nodePath.dirname(filename), {
+            await fs.rm(nodePath.dirname(filename), {
               recursive: true,
+              force: true,
             });
           }
         }
@@ -135,7 +136,7 @@ function createEntrypoints(
           nodePath.dirname(filename),
           pkg.indent
         );
-        await fs.outputFile(filename, contents);
+        await fsOutputFile(filename, contents);
       }
       return new Entrypoint(filename, contents, pkg, sourceFile);
     })
