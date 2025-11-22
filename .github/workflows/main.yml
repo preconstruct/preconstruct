@@ -60,3 +60,13 @@ jobs:
 
       - name: Run Knip
         run: yarn lint:knip
+  build_site:
+    name: Build Site
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+
+      - uses: ./.github/actions/setup-deps
+
+      - name: Build Site
+        run: yarn build:site
