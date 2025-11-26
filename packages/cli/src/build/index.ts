@@ -3,7 +3,6 @@ import { Project } from "../project";
 import path from "path";
 import { rollup, OutputAsset, OutputChunk, OutputOptions } from "rollup";
 import * as logger from "../logger";
-import * as fs from "fs-extra";
 import {
   FatalError,
   UnexpectedBuildError,
@@ -14,6 +13,7 @@ import { getRollupConfigs } from "./config";
 import { createWorker, destroyWorker } from "../worker-client";
 import { validateProject } from "../validate";
 import { cleanProjectBeforeBuild } from "./utils";
+import { fsOutputFile } from "../utils";
 
 // https://github.com/rollup/rollup/blob/28ffcf4c4a2ab4323091f63944b2a609b7bcd701/src/utils/sourceMappingURL.ts
 // this looks ridiculous, but it prevents sourcemap tooling from mistaking
@@ -42,7 +42,7 @@ function writeOutputFile(
         url = outputFile.map.toUrl();
       } else {
         url = `${path.basename(outputFile.fileName)}.map`;
-        writeSourceMapPromise = fs.outputFile(
+        writeSourceMapPromise = fsOutputFile(
           `${fileName}.map`,
           outputFile.map.toString()
         );
@@ -53,7 +53,7 @@ function writeOutputFile(
     }
   }
 
-  return Promise.all([fs.outputFile(fileName, source), writeSourceMapPromise]);
+  return Promise.all([fsOutputFile(fileName, source), writeSourceMapPromise]);
 }
 
 async function buildPackage(pkg: Package) {

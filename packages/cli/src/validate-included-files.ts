@@ -1,9 +1,10 @@
 import path from "path";
 import chalk from "chalk";
-import * as fs from "fs-extra";
+import fs from "node:fs/promises";
 import packlist from "npm-packlist";
 import { Package } from "./package";
 import { FatalError } from "./errors";
+import { fsOutputFile } from "./utils";
 
 export async function validateIncludedFiles(pkg: Package) {
   try {
@@ -24,11 +25,11 @@ export async function validateIncludedFiles(pkg: Package) {
             "dist",
             "preconstruct-test-file"
           );
-          return fs.outputFile(filename, "test content");
+          return fsOutputFile(filename, "test content");
         })
         .concat(
           hasNoEntrypointAtRootOfPackage
-            ? fs.outputFile(rootDistDirectoryTestFilepath, "test content")
+            ? fsOutputFile(rootDistDirectoryTestFilepath, "test content")
             : []
         )
     );
@@ -85,8 +86,9 @@ export async function validateIncludedFiles(pkg: Package) {
   } finally {
     await Promise.all(
       pkg.entrypoints.map((entrypoint) =>
-        fs.remove(
-          path.join(entrypoint.directory, "dist", "preconstruct-test-file")
+        fs.rm(
+          path.join(entrypoint.directory, "dist", "preconstruct-test-file"),
+          { recursive: true, force: true }
         )
       )
     );

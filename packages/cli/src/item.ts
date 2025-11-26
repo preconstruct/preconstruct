@@ -1,4 +1,4 @@
-import * as fs from "fs-extra";
+import fs from "node:fs/promises";
 import nodePath from "path";
 import detectIndent from "detect-indent";
 import parseJson from "parse-json";

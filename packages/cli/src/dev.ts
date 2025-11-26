@@ -17,8 +17,9 @@ import {
   getDistFilenameForConditions,
   getBaseDistName,
   getDistFilenameForConditionsWithTypeModule,
+  fsOutputFile,
 } from "./utils";
-import * as fs from "fs-extra";
+import fs from "node:fs/promises";
 import path from "path";
 import normalizePath from "normalize-path";
 import { Entrypoint } from "./entrypoint";
@@ -109,7 +110,7 @@ export async function writeDevTSFiles(
   const pathToImport = replaceTsExtensionWithJs(relativePathWithExtension);
 
   let promises: Promise<unknown>[] = [
-    fs.outputFile(
+    fsOutputFile(
       dtsReexportFilename,
       dtsTemplate(
         baseDtsFilename,
@@ -131,7 +132,7 @@ export async function writeDevTSFiles(
     const baseDmtsFilename = path.basename(dmtsReexportFilename);
 
     promises.push(
-      fs.outputFile(
+      fsOutputFile(
         dmtsReexportFilename,
         dmtsTemplate(
           baseDmtsFilename,
@@ -143,7 +144,7 @@ export async function writeDevTSFiles(
     );
     if (hasDefaultExport) {
       promises.push(
-        fs.outputFile(
+        fsOutputFile(
           getDtsDefaultForMtsFilepath(dmtsReexportFilename),
           dtsDefaultForDmtsTemplate(pathToImport)
         )
@@ -189,8 +190,8 @@ export default async function dev(projectDir: string) {
     project.packages.map(async (pkg) => {
       const exportsFieldConfig = pkg.exportsFieldConfig();
       let distDirectory = path.join(pkg.directory, "dist");
-      await fs.remove(distDirectory);
-      await fs.ensureDir(distDirectory);
+      await fs.rm(distDirectory, { recursive: true, force: true });
+      await fs.mkdir(distDirectory, { recursive: true });
 
       return Promise.all(
         pkg.entrypoints.map(async (entrypoint) => {
@@ -406,9 +407,9 @@ async function cleanEntrypoint(entrypoint: Entrypoint) {
   if (entrypoint.package.name === entrypoint.name) return;
   let distDirectory = path.join(entrypoint.directory, "dist");
 
-  await fs.remove(distDirectory);
+  await fs.rm(distDirectory, { recursive: true, force: true });
   if (!entrypoint.package.project.experimentalFlags.distInRoot) {
-    await fs.ensureDir(distDirectory);
+    await fs.mkdir(distDirectory, { recursive: true });
   }
 }
 

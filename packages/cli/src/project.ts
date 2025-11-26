@@ -1,7 +1,7 @@
 import nodePath from "path";
 import { promptInput } from "./prompt";
 import fastGlob from "fast-glob";
-import * as fs from "fs-extra";
+import fs from "node:fs/promises";
 import { Item } from "./item";
 import { Package } from "./package";
 import { validateIncludedFiles } from "./validate-included-files";
@@ -80,7 +80,7 @@ export class Project extends Item<{
     _directory: string,
     isFix: boolean = false
   ): Promise<Project> {
-    const directory = await (fs.realpath as any).native(_directory);
+    const directory = await fs.realpath(_directory);
     let filePath = nodePath.join(directory, "package.json");
     let contents = await fs.readFile(filePath, "utf-8");
     let project = new Project(filePath, contents, new Map());
