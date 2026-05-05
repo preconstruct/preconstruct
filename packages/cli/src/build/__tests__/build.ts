@@ -484,8 +484,9 @@ test("monorepo umd with dep on multi-entrypoint module subpath", async () => {
 
   await build(tmpPath);
 
-  expect(await getFiles(path.join(tmpPath, "packages", "pkg-a"), ["dist/*umd*"]))
-    .toMatchInlineSnapshot(`
+  expect(
+    await getFiles(path.join(tmpPath, "packages", "pkg-a"), ["dist/*umd*"])
+  ).toMatchInlineSnapshot(`
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg-a.umd.min.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     !function(e,t){"object"==typeof exports&&"undefined"!=typeof module?module.exports=t():"function"==typeof define&&define.amd?define(t):(e="undefined"!=typeof globalThis?globalThis:e||self).pkgA=t()}(this,(function(){"use strict";return"right entrypoint"}));
     //# sourceMappingURL=pkg-a.umd.min.js.map
