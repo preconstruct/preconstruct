@@ -347,19 +347,31 @@ async function getSymlinkType(targetPath: string): Promise<"dir" | "file"> {
 
 export async function testdir(dir: Fixture) {
   const temp = realFs.realpathSync.native(f.temp());
+  const fileEntries: Array<[string, string]> = [];
+  const symlinkEntries: Array<[string, { kind: "symlink"; path: string }]> = [];
+
+  for (const [filename, output] of Object.entries(dir)) {
+    if (typeof output === "string") {
+      fileEntries.push([filename, output]);
+    } else {
+      symlinkEntries.push([filename, output]);
+    }
+  }
+
   await Promise.all(
-    Object.keys(dir).map(async (filename) => {
-      const output = dir[filename];
+    fileEntries.map(async ([filename, output]) => {
+      await fs.outputFile(path.join(temp, filename), output);
+    })
+  );
+
+  await Promise.all(
+    symlinkEntries.map(async ([filename, output]) => {
       const fullPath = path.join(temp, filename);
-      if (typeof output === "string") {
-        await fs.outputFile(fullPath, output);
-      } else {
-        const dir = path.dirname(fullPath);
-        await fs.ensureDir(dir);
-        const targetPath = path.resolve(temp, output.path);
-        const symlinkType = await getSymlinkType(targetPath);
-        await fs.symlink(targetPath, fullPath, symlinkType);
-      }
+      const dir = path.dirname(fullPath);
+      await fs.ensureDir(dir);
+      const targetPath = path.resolve(temp, output.path);
+      const symlinkType = await getSymlinkType(targetPath);
+      await fs.symlink(targetPath, fullPath, symlinkType);
     })
   );
   return temp;

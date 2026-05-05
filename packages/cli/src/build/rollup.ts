@@ -228,16 +228,24 @@ export let getRollupConfig = (
 
 function getAliases(
   project: Project
-): {
-  [key: string]: string;
-} {
-  let aliases: { [key: string]: string } = {};
+): Array<{ find: RegExp; replacement: string }> {
+  let aliases: Array<{ find: RegExp; replacement: string }> = [];
   project.packages.forEach((pkg) => {
+    // pkg.entrypoints are already expanded from the configured entrypoint globs
+    // and sorted in Package.create() for deterministic package.json#exports
+    // emission, so we preserve that same stable order here.
     pkg.entrypoints.forEach((entrypoint) => {
-      aliases[entrypoint.name] = entrypoint.source;
+      aliases.push({
+        find: new RegExp(`^${escapeForRegex(entrypoint.name)}$`),
+        replacement: entrypoint.source,
+      });
     });
   });
   return aliases;
+}
+
+function escapeForRegex(value: string) {
+  return value.replace(/[|\\{}()[\]^$+*?.-]/g, "\\$&");
 }
 
 const cjsDynamicImportPlugin: Plugin = {

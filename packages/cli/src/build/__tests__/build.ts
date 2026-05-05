@@ -428,6 +428,73 @@ test("monorepo umd with dep on other module", async () => {
   `);
 });
 
+test("monorepo umd with dep on multi-entrypoint module subpath", async () => {
+  let tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "monorepo-umd-subpath-alias",
+      main: "index.js",
+      workspaces: ["packages/*"],
+
+      preconstruct: {
+        packages: ["packages/*"],
+      },
+    }),
+    "packages/pkg-a/package.json": JSON.stringify({
+      name: "pkg-a",
+      main: "dist/pkg-a.cjs.js",
+      "umd:main": "dist/pkg-a.umd.min.js",
+
+      preconstruct: {
+        umdName: "pkgA",
+      },
+
+      dependencies: {
+        "pkg-b": "1.0.0",
+      },
+    }),
+    "packages/pkg-a/src/index.js": js`
+      import thing from "pkg-b/stuff";
+
+      export default thing;
+    `,
+    "packages/pkg-b/package.json": JSON.stringify({
+      name: "pkg-b",
+      main: "dist/pkg-b.cjs.js",
+      module: "dist/pkg-b.esm.js",
+
+      preconstruct: {
+        entrypoints: ["index.js", "stuff.js"],
+      },
+    }),
+    "packages/pkg-b/stuff/package.json": JSON.stringify({
+      main: "dist/pkg-b-stuff.cjs.js",
+      module: "dist/pkg-b-stuff.esm.js",
+    }),
+    "packages/pkg-b/src/index.js": js`
+      export default "wrong entrypoint";
+    `,
+    "packages/pkg-b/src/stuff.js": js`
+      export default "right entrypoint";
+    `,
+    "node_modules/pkg-b": {
+      kind: "symlink",
+      path: "packages/pkg-b",
+    },
+  });
+
+  await build(tmpPath);
+
+  expect(await getFiles(path.join(tmpPath, "packages", "pkg-a"), ["dist/*umd*"]))
+    .toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg-a.umd.min.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    !function(e,t){"object"==typeof exports&&"undefined"!=typeof module?module.exports=t():"function"==typeof define&&define.amd?define(t):(e="undefined"!=typeof globalThis?globalThis:e||self).pkgA=t()}(this,(function(){"use strict";return"right entrypoint"}));
+    //# sourceMappingURL=pkg-a.umd.min.js.map
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg-a.umd.min.js.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {"version":3,"file":"pkg-a.umd.min.js","sources":["../../pkg-b/src/stuff.js"],"sourcesContent":["export default \\"right entrypoint\\";"],"names":[],"mappings":"2OAAe"}
+  `);
+});
+
 test("monorepo single package", async () => {
   let tmpPath = f.copy("monorepo-single-package");
   await initBasic(tmpPath);
