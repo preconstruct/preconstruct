@@ -1,5 +1,11 @@
 # preconstruct
 
+## 2.8.13
+
+### Patch Changes
+
+- [#624](https://github.com/preconstruct/preconstruct/pull/624) [`cbca745`](https://github.com/preconstruct/preconstruct/commit/cbca7459625f3fc16655d423b43325626059422b) Thanks [@Andarist](https://github.com/Andarist)! - Fix UMD alias resolution for multi-entrypoint package subpaths
+
 ## 2.8.12
 
 ### Patch Changes
