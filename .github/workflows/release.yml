@@ -1,26 +1,54 @@
-name: Release
+name: Publish
 
 on:
   push:
     branches:
       - main
+      - next
+
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+
+permissions: {} # each job should define its own permission explicitly
 
 jobs:
-  release:
-    name: Release
+  version:
+    name: Version
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+    outputs:
+      hasChangesets: ${{ steps.changesets.outputs.hasChangesets }}
+    permissions:
+      contents: write # to create release (changesets/action)
+      issues: write # to post issue comments (changesets/action)
+      pull-requests: write # to create pull request (changesets/action)
     steps:
-      - name: Checkout Repo
-        uses: actions/checkout@main
-        with:
-          fetch-depth: 0
-
+      - uses: actions/checkout@v4
       - uses: ./.github/actions/setup-deps
 
-      - name: "Create Pull Request or Publish to npm"
-        uses: changesets/action@v1
+      - name: Create or update release pull request
+        id: changesets
+        # https://github.com/changesets/action
+        uses: changesets/action@6a0a831ff30acef54f2c6aa1cbbc1096b066edaf # v1
         with:
-          publish: yarn release --otp=1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          version: yarn version-packages
+
+  publish:
+    name: Publish
+    if: needs.version.outputs.hasChangesets == 'false'
+    needs: version
+    runs-on: ubuntu-latest
+    environment: npm
+    timeout-minutes: 20
+    permissions:
+      contents: write # to create release (changesets/action)
+      id-token: write # to use OpenID Connect token for trusted publishing (changesets/action)
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-deps
+
+      - name: Publish to npm
+        # https://github.com/changesets/action
+        uses: changesets/action@6a0a831ff30acef54f2c6aa1cbbc1096b066edaf # v1
+        with:
+          # this expects you to have a script called release which does a build for your packages and calls changeset publish
+          publish: yarn release
