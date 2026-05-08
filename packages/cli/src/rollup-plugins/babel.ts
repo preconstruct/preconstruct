@@ -93,11 +93,12 @@ let rollupPluginBabel = ({
           }
           return `${babelHelpersModuleStart}${helper}`;
         };
-  const maybeResolveBabelHelper = async (
+  const resolveBabelHelper = async (
     pluginContext: PluginContext,
-    source: string,
+    helper: string,
     parent: string | undefined
   ) => {
+    const source = resolveIdForBabelHelper(helper);
     if (source.startsWith(babelHelpersModuleStart)) {
       return source;
     }
@@ -111,17 +112,13 @@ let rollupPluginBabel = ({
       const currentIsBabelHelper = id.startsWith(babelHelpersModuleStart);
       if (!currentIsBabelHelper) {
         if (parent && parent.startsWith(babelHelpersModuleStart)) {
-          return maybeResolveBabelHelper(
-            this,
-            resolveIdForBabelHelper(id),
-            parent
-          );
+          return resolveBabelHelper(this, id, parent);
         }
         return null;
       }
-      return maybeResolveBabelHelper(
+      return resolveBabelHelper(
         this,
-        resolveIdForBabelHelper(id.slice(babelHelpersModuleStart.length)),
+        id.slice(babelHelpersModuleStart.length),
         parent
       );
     },
