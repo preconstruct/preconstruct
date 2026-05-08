@@ -2,4 +2,4 @@
 "@preconstruct/cli": patch
 ---
 
-Fix UMD resolution for mixed inline and @babel/runtime Babel helpers
+Fix UMD resolution for mixed inline and `@babel/runtime` Babel helpers
