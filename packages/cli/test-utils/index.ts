@@ -412,6 +412,22 @@ async function readNormalizedFile(filePath: string): Promise<string> {
   content = content.replace(/\r\n/g, "\n");
   if (/(?<!(\.d\.[mc]?ts))\.map$/.test(filePath)) {
     const sourceMap = JSON.parse(content);
+    const normalizedRepoRoot = normalizePath(repoRoot);
+    sourceMap.sources = sourceMap.sources.map((source: string) => {
+      const normalizedSource = normalizePath(source);
+      const resolvedSource = normalizePath(
+        path.resolve(path.dirname(filePath), source)
+      );
+
+      if (
+        resolvedSource === normalizedRepoRoot ||
+        resolvedSource.startsWith(`${normalizedRepoRoot}/`)
+      ) {
+        return resolvedSource.replace(normalizedRepoRoot, "<REPO_ROOT>");
+      }
+
+      return normalizedSource;
+    });
     sourceMap.sourcesContent = sourceMap.sourcesContent.map((source: string) =>
       source.replace(/\r\n/g, "\n")
     );

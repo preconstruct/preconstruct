@@ -496,6 +496,38 @@ test("monorepo umd with dep on multi-entrypoint module subpath", async () => {
   `);
 });
 
+test("umd bundles babel helpers split between inline and @babel/runtime", async () => {
+  let dir = await testdir({
+    "package.json": basicPkgJson({
+      umdName: "pkg",
+      dependencies: {
+        "@babel/runtime": "7.1.5",
+      },
+    }),
+    "node_modules/@babel/runtime": {
+      kind: "symlink",
+      path: path.join(repoNodeModules, "@babel/runtime"),
+    },
+    "babel.config.json": JSON.stringify({
+      plugins: [require.resolve("@babel/plugin-transform-object-rest-spread")],
+    }),
+    "src/index.js": js`
+      export default { ...thing };
+    `,
+  });
+
+  await build(dir);
+
+  expect(await getFiles(dir, ["dist/*umd*"])).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.umd.min.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    !function(e,t){"object"==typeof exports&&"undefined"!=typeof module?module.exports=t():"function"==typeof define&&define.amd?define(t):(e="undefined"!=typeof globalThis?globalThis:e||self).pkg=t()}(this,(function(){"use strict";function e(t){return e="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(e){return typeof e}:function(e){return e&&"function"==typeof Symbol&&e.constructor===Symbol&&e!==Symbol.prototype?"symbol":typeof e},e(t)}function t(t){var r=function(t,r){if("object"!==e(t)||null===t)return t;var n=t[Symbol.toPrimitive];if(void 0!==n){var o=n.call(t,r||"default");if("object"!==e(o))return o;throw new TypeError("@@toPrimitive must return a primitive value.")}return("string"===r?String:Number)(t)}(t,"string");return"symbol"===e(r)?r:String(r)}function r(e,t){var r=Object.keys(e);if(Object.getOwnPropertySymbols){var n=Object.getOwnPropertySymbols(e);t&&(n=n.filter((function(t){return Object.getOwnPropertyDescriptor(e,t).enumerable}))),r.push.apply(r,n)}return r}var n=function(e){for(var n=1;n<arguments.length;n++){var o=null!=arguments[n]?arguments[n]:{};n%2?r(Object(o),!0).forEach((function(r){var n,i,u;n=e,i=r,u=o[r],(i=t(i))in n?Object.defineProperty(n,i,{value:u,enumerable:!0,configurable:!0,writable:!0}):n[i]=u})):Object.getOwnPropertyDescriptors?Object.defineProperties(e,Object.getOwnPropertyDescriptors(o)):r(Object(o)).forEach((function(t){Object.defineProperty(e,t,Object.getOwnPropertyDescriptor(o,t))}))}return e}({},thing);return n}));
+    //# sourceMappingURL=pkg.umd.min.js.map
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.umd.min.js.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {"version":3,"file":"pkg.umd.min.js","sources":["<REPO_ROOT>/node_modules/@babel/runtime/helpers/esm/typeof.js","<REPO_ROOT>/node_modules/@babel/runtime/helpers/esm/toPropertyKey.js","<REPO_ROOT>/node_modules/@babel/runtime/helpers/esm/toPrimitive.js","../src/index.js","<REPO_ROOT>/node_modules/@babel/runtime/helpers/esm/defineProperty.js"],"sourcesContent":["export default function _typeof(obj) {\\n  \\"@babel/helpers - typeof\\";\\n\\n  return _typeof = \\"function\\" == typeof Symbol && \\"symbol\\" == typeof Symbol.iterator ? function (obj) {\\n    return typeof obj;\\n  } : function (obj) {\\n    return obj && \\"function\\" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? \\"symbol\\" : typeof obj;\\n  }, _typeof(obj);\\n}","import _typeof from \\"./typeof.js\\";\\nimport toPrimitive from \\"./toPrimitive.js\\";\\nexport default function _toPropertyKey(arg) {\\n  var key = toPrimitive(arg, \\"string\\");\\n  return _typeof(key) === \\"symbol\\" ? key : String(key);\\n}","import _typeof from \\"./typeof.js\\";\\nexport default function _toPrimitive(input, hint) {\\n  if (_typeof(input) !== \\"object\\" || input === null) return input;\\n  var prim = input[Symbol.toPrimitive];\\n  if (prim !== undefined) {\\n    var res = prim.call(input, hint || \\"default\\");\\n    if (_typeof(res) !== \\"object\\") return res;\\n    throw new TypeError(\\"@@toPrimitive must return a primitive value.\\");\\n  }\\n  return (hint === \\"string\\" ? String : Number)(input);\\n}","export default { ...thing };","import toPropertyKey from \\"./toPropertyKey.js\\";\\nexport default function _defineProperty(obj, key, value) {\\n  key = toPropertyKey(key);\\n  if (key in obj) {\\n    Object.defineProperty(obj, key, {\\n      value: value,\\n      enumerable: true,\\n      configurable: true,\\n      writable: true\\n    });\\n  } else {\\n    obj[key] = value;\\n  }\\n  return obj;\\n}"],"names":["_typeof","obj","Symbol","iterator","constructor","prototype","_toPropertyKey","arg","key","input","hint","prim","toPrimitive","undefined","res","call","TypeError","String","Number","index","value","toPropertyKey","Object","defineProperty","enumerable","configurable","writable","_objectSpread","thing"],"mappings":"oOAAe,SAASA,EAAQC,GAG9B,OAAOD,EAAU,mBAAqBE,QAAU,iBAAmBA,OAAOC,SAAW,SAAUF,GAC7F,cAAcA,CACf,EAAG,SAAUA,GACZ,OAAOA,GAAO,mBAAqBC,QAAUD,EAAIG,cAAgBF,QAAUD,IAAQC,OAAOG,UAAY,gBAAkBJ,CAC5H,EAAKD,EAAQC,EACb,CCNe,SAASK,EAAeC,GACrC,IAAIC,ECFS,SAAsBC,EAAOC,GAC1C,GAAuB,WAAnBV,EAAQS,IAAiC,OAAVA,EAAgB,OAAOA,EAC1D,IAAIE,EAAOF,EAAMP,OAAOU,aACxB,QAAaC,IAATF,EAAoB,CACtB,IAAIG,EAAMH,EAAKI,KAAKN,EAAOC,GAAQ,WACnC,GAAqB,WAAjBV,EAAQc,GAAmB,OAAOA,EACtC,MAAM,IAAIE,UAAU,+CACrB,CACD,OAAiB,WAATN,EAAoBO,OAASC,QAAQT,EAC/C,CDPYG,CAAYL,EAAK,UAC3B,MAAwB,WAAjBP,EAAQQ,GAAoBA,EAAMS,OAAOT,EAClD,+NELA,IAAAW,oICCe,IAAyBlB,EAAKO,EAAKY,EAAVnB,IAAKO,IAAKY,QAChDZ,EAAMa,EAAcb,MACTP,EACTqB,OAAOC,eAAetB,EAAKO,EAAK,CAC9BY,MAAOA,EACPI,YAAY,EACZC,cAAc,EACdC,UAAU,IAGZzB,EAAIO,GAAOY,mNDXfO,IAAoBC"}
+  `);
+});
+
 test("monorepo single package", async () => {
   let tmpPath = f.copy("monorepo-single-package");
   await initBasic(tmpPath);

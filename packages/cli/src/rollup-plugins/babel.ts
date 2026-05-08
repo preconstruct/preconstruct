@@ -1,5 +1,5 @@
 import { getWorker } from "../worker-client";
-import { AcornNode, Plugin } from "rollup";
+import { AcornNode, Plugin, PluginContext } from "rollup";
 import QuickLRU from "quick-lru";
 import resolveFrom from "resolve-from";
 import semver from "semver";
@@ -93,17 +93,34 @@ let rollupPluginBabel = ({
           }
           return `${babelHelpersModuleStart}${helper}`;
         };
+  const resolveBabelHelper = async (
+    pluginContext: PluginContext,
+    helper: string,
+    parent: string | undefined
+  ) => {
+    const source = resolveIdForBabelHelper(helper);
+    if (source.startsWith(babelHelpersModuleStart)) {
+      return source;
+    }
+    return pluginContext.resolve(source, parent, {
+      skipSelf: true,
+    });
+  };
   return {
     name: "babel",
     resolveId(id, parent) {
       const currentIsBabelHelper = id.startsWith(babelHelpersModuleStart);
       if (!currentIsBabelHelper) {
         if (parent && parent.startsWith(babelHelpersModuleStart)) {
-          return resolveIdForBabelHelper(id);
+          return resolveBabelHelper(this, id, parent);
         }
         return null;
       }
-      return resolveIdForBabelHelper(id.slice(babelHelpersModuleStart.length));
+      return resolveBabelHelper(
+        this,
+        id.slice(babelHelpersModuleStart.length),
+        parent
+      );
     },
 
     load(id) {
