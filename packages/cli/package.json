@@ -63,8 +63,8 @@
     "normalize-path": "^3.0.0",
     "npm-packlist": "^2.1.2",
     "p-limit": "^3.0.2",
-    "parse-glob": "^3.0.4",
     "parse-json": "^5.1.0",
+    "picomatch": "^4.0.2",
     "quick-lru": "^5.1.1",
     "resolve-from": "^5.0.0",
     "rollup": "^2.79.1",
@@ -81,6 +81,7 @@
   },
   "devDependencies": {
     "@types/estree": "*",
+    "@types/picomatch": "^3.0.1",
     "escape-string-regexp": "^4.0.0",
     "spawndamnit": "^2.0.0",
     "strip-ansi": "^6.0.0"
