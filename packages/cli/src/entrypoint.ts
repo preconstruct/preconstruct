@@ -9,6 +9,8 @@ export class Entrypoint extends Item<{
   module?: JSONValue;
   "umd:main"?: JSONValue;
   browser?: JSONValue;
+  types?: JSONValue;
+  typings?: JSONValue;
   exports?: Record<string, ExportsConditions | string>;
   preconstruct: {
     source?: JSONValue;

@@ -338,7 +338,7 @@ export class Package extends Item<{
     return pkg;
   }
 
-  setFieldOnEntrypoints(field: "main" | "browser" | "module" | "umd:main") {
+  setFieldOnEntrypoints(field: keyof typeof validFieldsForEntrypoint) {
     this.entrypoints.forEach((entrypoint) => {
       entrypoint.json = setFieldInOrder(
         entrypoint.json,
