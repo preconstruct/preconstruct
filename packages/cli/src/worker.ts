@@ -55,9 +55,3 @@ export async function transformBabel(
       return { code: res!.code!, map: res!.map };
     });
 }
-
-export function transformTerser(code: string, optionsString: string) {
-  const { minify } = require("terser") as typeof import("terser");
-  const options = JSON.parse(optionsString);
-  return minify(code, options) as Promise<{ code: string; map: any }>;
-}

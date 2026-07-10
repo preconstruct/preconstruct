@@ -1,86 +1,5 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`flow > flow.cjs.js 1`] = `
-"Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
-//#region src/a.js
-var a_default = "wow";
-//#endregion
-//#region src/index.js
-function doSomething(arg) {
-	return "something" + arg;
-}
-//#endregion
-exports.doSomething = doSomething;
-exports.something = a_default;
-"
-`;
-
-exports[`flow > flow.cjs.js.flow 1`] = `
-"// @flow
-export * from "../src/index.js";
-"
-`;
-
-exports[`flow > flow.esm.js 1`] = `
-"//#region src/a.js
-var a_default = "wow";
-//#endregion
-//#region src/index.js
-function doSomething(arg) {
-	return "something" + arg;
-}
-//#endregion
-export { doSomething, a_default as something };
-"
-`;
-
-exports[`flow > flow.esm.js.flow 1`] = `
-"// @flow
-export * from "../src/index.js";
-"
-`;
-
-exports[`flow > flow-export-default.cjs.js 1`] = `
-"Object.defineProperties(exports, {
-	__esModule: { value: true },
-	[Symbol.toStringTag]: { value: "Module" }
-});
-//#region src/index.js
-function doSomething(arg) {
-	return "something" + arg;
-}
-var src_default = "wow";
-//#endregion
-exports.default = src_default;
-exports.doSomething = doSomething;
-"
-`;
-
-exports[`flow > flow-export-default.cjs.js.flow 1`] = `
-"// @flow
-export * from "../src/index.js";
-export { default } from "../src/index.js";
-"
-`;
-
-exports[`flow > flow-export-default.esm.js 1`] = `
-"//#region src/index.js
-function doSomething(arg) {
-	return "something" + arg;
-}
-var src_default = "wow";
-//#endregion
-export { src_default as default, doSomething };
-"
-`;
-
-exports[`flow > flow-export-default.esm.js.flow 1`] = `
-"// @flow
-export * from "../src/index.js";
-export { default } from "../src/index.js";
-"
-`;
-
 exports[`monorepo > some-scope-package-one.cjs.js 1`] = `
 "Object.defineProperties(exports, {
 	__esModule: { value: true },
@@ -148,17 +67,12 @@ require("@some-scope/package-one-umd-with-dep");
 `;
 
 exports[`monorepo umd with dep on other module > some-scope-package-four-umd-with-dep.umd.min.js 1`] = `
-"(function(e, n) {
-	"object" == typeof exports && "undefined" != typeof module ? n(require("react")) : "function" == typeof define && define.amd ? define(["react"], n) : n((e = "undefined" != typeof globalThis ? globalThis : e || self).React);
-})(this, (function(e) {
-	(0, e.createElement)("div", null);
-}));
-
+"(function(e,t){typeof exports==\`object\`&&typeof module<\`u\`?t(require("react")):typeof define==\`function\`&&define.amd?define([\`react\`],t):(e=typeof globalThis<\`u\`?globalThis:e||self,t(e.React))})(this,function(e){(0,e.createElement)(\`div\`,null)});
 //# sourceMappingURL=some-scope-package-four-umd-with-dep.umd.min.js.map//# sourceMappingURL=some-scope-package-four-umd-with-dep.umd.min.js.map
 "
 `;
 
-exports[`monorepo umd with dep on other module > some-scope-package-four-umd-with-dep.umd.min.js.map 1`] = `"{"version":3,"file":"some-scope-package-four-umd-with-dep.umd.min.js","names":["createElement"],"sources":["../../package-one/src/index.js"],"sourcesContent":["import { createElement } from \\"react\\";\\n\\ncreateElement(\\"div\\", null);"],"mappings":";;;EAEAA,GAAAA,EAAAA,cAAAA,CAAc,OAAO,IAAA;AAAA,EAAA"}"`;
+exports[`monorepo umd with dep on other module > some-scope-package-four-umd-with-dep.umd.min.js.map 1`] = `"{"version":3,"file":"some-scope-package-four-umd-with-dep.umd.min.js","names":["createElement"],"sources":["../../package-one/src/index.js"],"sourcesContent":["import { createElement } from \\"react\\";\\n\\ncreateElement(\\"div\\", null);"],"mappings":"qNAEAA,EAAAA,EAAAA,cAAAA,CAAc,MAAO,IAAI"}"`;
 
 exports[`monorepo umd with dep on other module > some-scope-package-one-umd-with-dep.cjs.js 1`] = `
 "Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
@@ -169,17 +83,12 @@ exports[`monorepo umd with dep on other module > some-scope-package-one-umd-with
 `;
 
 exports[`monorepo umd with dep on other module > some-scope-package-one-umd-with-dep.umd.min.js 1`] = `
-"(function(e, n) {
-	"object" == typeof exports && "undefined" != typeof module ? n(require("react")) : "function" == typeof define && define.amd ? define(["react"], n) : n((e = "undefined" != typeof globalThis ? globalThis : e || self).React);
-})(this, (function(e) {
-	(0, e.createElement)("div", null);
-}));
-
+"(function(e,t){typeof exports==\`object\`&&typeof module<\`u\`?t(require("react")):typeof define==\`function\`&&define.amd?define([\`react\`],t):(e=typeof globalThis<\`u\`?globalThis:e||self,t(e.React))})(this,function(e){(0,e.createElement)(\`div\`,null)});
 //# sourceMappingURL=some-scope-package-one-umd-with-dep.umd.min.js.map//# sourceMappingURL=some-scope-package-one-umd-with-dep.umd.min.js.map
 "
 `;
 
-exports[`monorepo umd with dep on other module > some-scope-package-one-umd-with-dep.umd.min.js.map 1`] = `"{"version":3,"file":"some-scope-package-one-umd-with-dep.umd.min.js","names":["createElement"],"sources":["../src/index.js"],"sourcesContent":["import { createElement } from \\"react\\";\\n\\ncreateElement(\\"div\\", null);"],"mappings":";;;EAEAA,GAAAA,EAAAA,cAAAA,CAAc,OAAO,IAAA;AAAA,EAAA"}"`;
+exports[`monorepo umd with dep on other module > some-scope-package-one-umd-with-dep.umd.min.js.map 1`] = `"{"version":3,"file":"some-scope-package-one-umd-with-dep.umd.min.js","names":["createElement"],"sources":["../src/index.js"],"sourcesContent":["import { createElement } from \\"react\\";\\n\\ncreateElement(\\"div\\", null);"],"mappings":"qNAEAA,EAAAA,EAAAA,cAAAA,CAAc,MAAO,IAAI"}"`;
 
 exports[`monorepo umd with dep on other module > some-scope-package-three-umd-with-dep.cjs.js 1`] = `
 "Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
@@ -187,12 +96,7 @@ require("@some-scope/package-one-umd-with-dep");
 "
 `;
 
-exports[`monorepo umd with dep on other module > some-scope-package-three-umd-with-dep.umd.min.js 1`] = `
-"(function(e, o) {
-	"object" == typeof exports && "undefined" != typeof module ? require("@some-scope/package-one-umd-with-dep") : "function" == typeof define && define.amd ? define(["@some-scope/package-one-umd-with-dep"], o) : (e = "undefined" != typeof globalThis ? globalThis : e || self).packageOne;
-})(this, (function(e) {}));
-"
-`;
+exports[`monorepo umd with dep on other module > some-scope-package-three-umd-with-dep.umd.min.js 1`] = `"(function(e,t){typeof exports==\`object\`&&typeof module<\`u\`?t(require("@some-scope/package-one-umd-with-dep")):typeof define==\`function\`&&define.amd?define([\`@some-scope/package-one-umd-with-dep\`],t):(e=typeof globalThis<\`u\`?globalThis:e||self,t(e.packageOne))})(this,function(e){});"`;
 
 exports[`monorepo umd with dep on other module > some-scope-package-two-umd-with-dep.cjs.js 1`] = `
 "Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
@@ -203,17 +107,12 @@ exports[`monorepo umd with dep on other module > some-scope-package-two-umd-with
 `;
 
 exports[`monorepo umd with dep on other module > some-scope-package-two-umd-with-dep.umd.min.js 1`] = `
-"(function(e, n) {
-	"object" == typeof exports && "undefined" != typeof module ? n(require("react")) : "function" == typeof define && define.amd ? define(["react"], n) : n((e = "undefined" != typeof globalThis ? globalThis : e || self).React);
-})(this, (function(e) {
-	(0, e.createElement)("h1", null);
-}));
-
+"(function(e,t){typeof exports==\`object\`&&typeof module<\`u\`?t(require("react")):typeof define==\`function\`&&define.amd?define([\`react\`],t):(e=typeof globalThis<\`u\`?globalThis:e||self,t(e.React))})(this,function(e){(0,e.createElement)(\`h1\`,null)});
 //# sourceMappingURL=some-scope-package-two-umd-with-dep.umd.min.js.map//# sourceMappingURL=some-scope-package-two-umd-with-dep.umd.min.js.map
 "
 `;
 
-exports[`monorepo umd with dep on other module > some-scope-package-two-umd-with-dep.umd.min.js.map 1`] = `"{"version":3,"file":"some-scope-package-two-umd-with-dep.umd.min.js","names":["createElement"],"sources":["../src/index.js"],"sourcesContent":["import { createElement } from \\"react\\";\\n\\ncreateElement(\\"h1\\", null);"],"mappings":";;;EAEAA,GAAAA,EAAAA,cAAAA,CAAc,MAAM,IAAA;AAAA,EAAA"}"`;
+exports[`monorepo umd with dep on other module > some-scope-package-two-umd-with-dep.umd.min.js.map 1`] = `"{"version":3,"file":"some-scope-package-two-umd-with-dep.umd.min.js","names":["createElement"],"sources":["../src/index.js"],"sourcesContent":["import { createElement } from \\"react\\";\\n\\ncreateElement(\\"h1\\", null);"],"mappings":"qNAEAA,EAAAA,EAAAA,cAAAA,CAAc,KAAM,IAAI"}"`;
 
 exports[`no module > no-module.cjs.js 1`] = `
 "Object.defineProperties(exports, {
@@ -248,14 +147,9 @@ exports[`umd with dep on other module > umd-with-dep.cjs.js 1`] = `
 `;
 
 exports[`umd with dep on other module > umd-with-dep.umd.min.js 1`] = `
-"(function(e, n) {
-	"object" == typeof exports && "undefined" != typeof module ? n(require("react")) : "function" == typeof define && define.amd ? define(["react"], n) : n((e = "undefined" != typeof globalThis ? globalThis : e || self).React);
-})(this, (function(e) {
-	(0, e.createElement)("div", null);
-}));
-
+"(function(e,t){typeof exports==\`object\`&&typeof module<\`u\`?t(require("react")):typeof define==\`function\`&&define.amd?define([\`react\`],t):(e=typeof globalThis<\`u\`?globalThis:e||self,t(e.React))})(this,function(e){(0,e.createElement)(\`div\`,null)});
 //# sourceMappingURL=umd-with-dep.umd.min.js.map//# sourceMappingURL=umd-with-dep.umd.min.js.map
 "
 `;
 
-exports[`umd with dep on other module > umd-with-dep.umd.min.js.map 1`] = `"{"version":3,"file":"umd-with-dep.umd.min.js","names":["createElement"],"sources":["../src/index.js"],"sourcesContent":["import { createElement } from \\"react\\";\\n\\ncreateElement(\\"div\\", null);"],"mappings":";;;EAEAA,GAAAA,EAAAA,cAAAA,CAAc,OAAO,IAAA;AAAA,EAAA"}"`;
+exports[`umd with dep on other module > umd-with-dep.umd.min.js.map 1`] = `"{"version":3,"file":"umd-with-dep.umd.min.js","names":["createElement"],"sources":["../src/index.js"],"sourcesContent":["import { createElement } from \\"react\\";\\n\\ncreateElement(\\"div\\", null);"],"mappings":"qNAEAA,EAAAA,EAAAA,cAAAA,CAAc,MAAO,IAAI"}"`;

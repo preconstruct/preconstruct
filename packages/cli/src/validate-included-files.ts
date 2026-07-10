@@ -42,7 +42,7 @@ export async function validateIncludedFiles(pkg: Package) {
     let result = new Set(packedFilesArr.map((p) => path.normalize(p)));
 
     // check that we're including the package.json and main file
-    // TODO: add Flow and TS check and if they're ignored, don't write them
+    // TODO: add a TypeScript check and, if declarations are ignored, don't write them
     let messages: string[] = [];
     pkg.entrypoints.forEach((entrypoint) => {
       if (pkg.isTypeModule() && entrypoint.name !== pkg.name) return;

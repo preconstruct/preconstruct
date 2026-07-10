@@ -212,65 +212,6 @@ test("source maps work", async () => {
   );
 });
 
-test("flow", async () => {
-  let tmpPath = await testdir({
-    "package.json": JSON.stringify({
-      name: "flow-dev",
-      main: "dist/flow-dev.cjs.js",
-      module: "dist/flow-dev.esm.js",
-      preconstruct: {
-        entrypoints: ["index.js", "a.js", "b.js"],
-      },
-    }),
-
-    "a/package.json": JSON.stringify({
-      main: "dist/flow-dev-a.cjs.js",
-      module: "dist/flow-dev-a.esm.js",
-    }),
-
-    "b/package.json": JSON.stringify({
-      main: "dist/flow-dev-b.cjs.js",
-      module: "dist/flow-dev-b.esm.js",
-    }),
-
-    "src/index.js": js`
-      // @flow
-
-      export let something = true;
-    `,
-
-    "src/a.js": js`
-      // @flow
-
-      export default "something";
-    `,
-
-    "src/b.js": js`
-      // @flow
-
-      let something = true;
-
-      export { something as default };
-    `,
-  });
-
-  await dev(tmpPath);
-
-  expect(await getFiles(tmpPath, ["**/*.flow"])).toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ a/dist/flow-dev-a.cjs.js.flow ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    // @flow
-    export * from "../../src/a.js";
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ b/dist/flow-dev-b.cjs.js.flow ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    // @flow
-    export * from "../../src/b.js";
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/flow-dev.cjs.js.flow ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    // @flow
-    export * from "../src/index.js";
-  `);
-});
-
 test("typescript", async () => {
   let tmpPath = await testdir(typescriptFixture);
 
@@ -290,37 +231,6 @@ test("typescript", async () => {
     `);
 });
 
-test("flow and .d.ts", async () => {
-  let tmpPath = await testdir({
-    "package.json": JSON.stringify({
-      name: "pkg",
-      main: "dist/pkg.cjs.js",
-      module: "dist/pkg.esm.js",
-    }),
-    "src/index.js": js`
-      // @flow
-
-      export const x = "hello";
-    `,
-    "src/index.d.ts": ts`
-      export const x: string;
-    `,
-  });
-  await dev(tmpPath);
-  const files = await getFiles(tmpPath, ["dist/**", "!dist/pkg.cjs.js"]);
-  expect(files).toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    export * from "../src/index.js";
-    //# sourceMa${""}ppingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicGtnLmNqcy5kLnRzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi4vc3JjL2luZGV4LmpzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBIn0=
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.js.flow ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    // @flow
-    export * from "../src/index.js";
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    ⎯ symlink to src/index.js
-  `);
-});
 test(".d.ts file with default export", async () => {
   let dir = await testdir({
     node_modules: { kind: "symlink", path: repoNodeModules },

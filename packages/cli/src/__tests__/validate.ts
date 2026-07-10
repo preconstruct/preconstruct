@@ -59,8 +59,6 @@ test("no main field", async () => {
     }),
 
     "src/index.js": js`
-      // @flow
-
       export default "something";
     `,
   });

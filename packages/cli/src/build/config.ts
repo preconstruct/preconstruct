@@ -260,6 +260,7 @@ function umdBuilds(
         outputs: [
           {
             format: "umd" as const,
+            minify: true,
             sourcemap: true,
             entryFileNames: `[name].${getDistExtension("umd")}`,
             name: entrypoint.json.preconstruct.umdName as string,

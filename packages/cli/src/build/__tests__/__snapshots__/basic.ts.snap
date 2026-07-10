@@ -21,17 +21,12 @@ export { src_default as default };
 `;
 
 exports[`basic > valid-package.umd.min.js 1`] = `
-"(function(e, n) {
-	"object" == typeof exports && "undefined" != typeof module ? module.exports = n() : "function" == typeof define && define.amd ? define([], n) : (e = "undefined" != typeof globalThis ? globalThis : e || self).validPackage = n();
-})(this, (function() {
-	return "something";
-}));
-
+"(function(e,t){typeof exports==\`object\`&&typeof module<\`u\`?module.exports=t():typeof define==\`function\`&&define.amd?define([],t):(e=typeof globalThis<\`u\`?globalThis:e||self,e.validPackage=t())})(this,function(){return\`something\`});
 //# sourceMappingURL=valid-package.umd.min.js.map//# sourceMappingURL=valid-package.umd.min.js.map
 "
 `;
 
-exports[`basic > valid-package.umd.min.js.map 1`] = `"{"version":3,"file":"valid-package.umd.min.js","names":[],"sources":["../src/index.js"],"sourcesContent":["export default \\"something\\";\\n"],"mappings":";;;QAAe;AAAA,EAAA"}"`;
+exports[`basic > valid-package.umd.min.js.map 1`] = `"{"version":3,"file":"valid-package.umd.min.js","names":[],"sources":["../src/index.js"],"sourcesContent":["export default \\"something\\";\\n"],"mappings":""}"`;
 
 exports[`typescript thing > declarations/src/index.d.ts 1`] = `
 "export declare const thing: "wow";

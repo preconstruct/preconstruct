@@ -88,67 +88,6 @@ test("clears dist folder", async () => {
   `);
 });
 
-test("flow", async () => {
-  let tmpPath = await testdir({
-    "package.json": JSON.stringify({
-      name: "flow",
-      main: "dist/flow.cjs.js",
-      module: "dist/flow.esm.js",
-    }),
-    "babel.config.json": JSON.stringify({
-      presets: [require.resolve("@babel/preset-flow")],
-    }),
-
-    "src/a.js": js`
-      export default "wow";
-    `,
-
-    "src/index.js": js`
-      // @flow
-
-      export function doSomething(arg: string): string {
-        return "something" + arg;
-      }
-
-      export { default as something } from "./a";
-    `,
-  });
-
-  await install(tmpPath);
-
-  await build(tmpPath);
-
-  await snapshotDistFiles(tmpPath);
-});
-
-test("flow", async () => {
-  let tmpPath = await testdir({
-    "package.json": JSON.stringify({
-      name: "flow-export-default",
-      main: "dist/flow-export-default.cjs.js",
-      module: "dist/flow-export-default.esm.js",
-    }),
-    "babel.config.json": JSON.stringify({
-      presets: [require.resolve("@babel/preset-flow")],
-    }),
-    "src/index.js": js`
-      // @flow
-
-      export function doSomething(arg: string): string {
-        return "something" + arg;
-      }
-
-      export default "wow";
-    `,
-  });
-
-  await install(tmpPath);
-
-  await build(tmpPath);
-
-  await snapshotDistFiles(tmpPath);
-});
-
 test("preserves process.env.NODE_ENV checks", async () => {
   let tmpPath = await testdir({
     "package.json": JSON.stringify({
@@ -487,16 +426,11 @@ test("monorepo umd with dep on multi-entrypoint module subpath", async () => {
     await getFiles(path.join(tmpPath, "packages", "pkg-a"), ["dist/*umd*"])
   ).toMatchInlineSnapshot(`
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg-a.umd.min.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    (function(e, n) {
-    	"object" == typeof exports && "undefined" != typeof module ? module.exports = n() : "function" == typeof define && define.amd ? define([], n) : (e = "undefined" != typeof globalThis ? globalThis : e || self).pkgA = n();
-    })(this, (function() {
-    	return "right entrypoint";
-    }));
-
+    (function(e,t){typeof exports==\`object\`&&typeof module<\`u\`?module.exports=t():typeof define==\`function\`&&define.amd?define([],t):(e=typeof globalThis<\`u\`?globalThis:e||self,e.pkgA=t())})(this,function(){return\`right entrypoint\`});
     //# sourceMa${""}ppingURL=pkg-a.umd.min.js.map//# sourceMa${""}ppingURL=pkg-a.umd.min.js.map
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg-a.umd.min.js.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    {"version":3,"file":"pkg-a.umd.min.js","names":["thing"],"sources":["../../pkg-b/src/stuff.js","../src/index.js"],"sourcesContent":["export default \\"right entrypoint\\";","import thing from \\"pkg-b/stuff\\";\\n\\nexport default thing;"],"mappings":";;;QAAe;AAAA,EAAA"}
+    {"version":3,"file":"pkg-a.umd.min.js","names":["thing"],"sources":["../../pkg-b/src/stuff.js","../src/index.js"],"sourcesContent":["export default \\"right entrypoint\\";","import thing from \\"pkg-b/stuff\\";\\n\\nexport default thing;"],"mappings":""}
   `);
 });
 
@@ -598,16 +532,11 @@ test("respect browser alias field in dependencies when bundling UMD", async () =
 
   expect(await getFiles(dir, ["dist/*umd*"])).toMatchInlineSnapshot(`
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.umd.min.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    (function(e, i) {
-    	"object" == typeof exports && "undefined" != typeof module ? module.exports = i() : "function" == typeof define && define.amd ? define([], i) : (e = "undefined" != typeof globalThis ? globalThis : e || self).importingPkgWithBrowserAliasField = i();
-    })(this, (function() {
-    	return "And the target is: browser";
-    }));
-
+    (function(e,t){typeof exports==\`object\`&&typeof module<\`u\`?module.exports=t():typeof define==\`function\`&&define.amd?define([],t):(e=typeof globalThis<\`u\`?globalThis:e||self,e.importingPkgWithBrowserAliasField=t())})(this,function(){return\`And the target is: browser\`});
     //# sourceMa${""}ppingURL=pkg.umd.min.js.map//# sourceMa${""}ppingURL=pkg.umd.min.js.map
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.umd.min.js.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    {"version":3,"file":"pkg.umd.min.js","names":["target"],"sources":["../node_modules/with-browser-alias-field/lib/browser-file.js","../src/index.js"],"sourcesContent":["export default \\"browser\\";","import target from \\"with-browser-alias-field\\";\\n\\nexport default \\"And the target is: \\" + target;"],"x_google_ignoreList":[0],"mappings":";;;QCEe;AAAA,EAAA"}
+    {"version":3,"file":"pkg.umd.min.js","names":["target"],"sources":["../node_modules/with-browser-alias-field/lib/browser-file.js","../src/index.js"],"sourcesContent":["export default \\"browser\\";","import target from \\"with-browser-alias-field\\";\\n\\nexport default \\"And the target is: \\" + target;"],"x_google_ignoreList":[0],"mappings":""}
   `);
 });
 
@@ -1342,7 +1271,7 @@ test("importing another package via dynamic import and exporting the namespace p
     🎁 pkg-b     at retryableBuild (/Users/emma/projects/preconstruct/packages/cli/src/build/index.ts:102:5)
     🎁 pkg-b     at /Users/emma/projects/preconstruct/packages/cli/src/build/index.ts:140:11
     🎁 pkg-b     at Module.build (/Users/emma/projects/preconstruct/packages/cli/src/build/index.ts:137:5)
-    🎁 pkg-b     at /Users/emma/projects/preconstruct/packages/cli/src/build/__tests__/build.ts:1322:17
+    🎁 pkg-b     at /Users/emma/projects/preconstruct/packages/cli/src/build/__tests__/build.ts:1251:17
     🎁 pkg-b     at file:///Users/emma/projects/preconstruct/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20 {
     🎁 pkg-b   errors: [Getter/Setter]
     🎁 pkg-b }"

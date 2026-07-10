@@ -72,12 +72,7 @@ exports.default = src_default;
 `;
 
 exports[`should lazily get globals > dist/umd-unused-peer-dep.umd.min.js 1`] = `
-"(function(e, n) {
-	"object" == typeof exports && "undefined" != typeof module ? module.exports = n() : "function" == typeof define && define.amd ? define([], n) : (e = "undefined" != typeof globalThis ? globalThis : e || self).validPackage = n();
-})(this, (function() {
-	return "something";
-}));
-
+"(function(e,t){typeof exports==\`object\`&&typeof module<\`u\`?module.exports=t():typeof define==\`function\`&&define.amd?define([],t):(e=typeof globalThis<\`u\`?globalThis:e||self,e.validPackage=t())})(this,function(){return\`something\`});
 //# sourceMappingURL=umd-unused-peer-dep.umd.min.js.map//# sourceMappingURL=umd-unused-peer-dep.umd.min.js.map
 "
 `;

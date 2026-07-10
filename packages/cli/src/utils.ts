@@ -371,14 +371,6 @@ export const validFieldsForEntrypoint = {
   },
 };
 
-export function flowTemplate(hasDefaultExport: boolean, relativePath: string) {
-  const escapedPath = JSON.stringify(relativePath);
-  return `// @flow
-export * from ${escapedPath};${
-    hasDefaultExport ? `\nexport { default } from ${escapedPath};` : ""
-  }\n`;
-}
-
 function esmReexportTemplate(hasDefaultExport: boolean, relativePath: string) {
   const escapedPath = JSON.stringify(relativePath);
   return `export * from ${escapedPath};${

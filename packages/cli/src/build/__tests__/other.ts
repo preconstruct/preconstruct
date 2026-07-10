@@ -349,7 +349,7 @@ test("package resolvable but not in deps", async () => {
       🎁 package-resolvable-but-not-in-deps
       🎁 package-resolvable-but-not-in-deps [plugin throw-warnings]
       🎁 package-resolvable-but-not-in-deps Error: 🎁 package-resolvable-but-not-in-deps "react" is imported by "src/index.js" but the package is not specified in dependencies or peerDependencies
-      🎁 package-resolvable-but-not-in-deps     at PluginContextImpl.buildEnd (/Users/emma/projects/preconstruct/packages/cli/src/build/rollup.ts:144:19)
+      🎁 package-resolvable-but-not-in-deps     at PluginContextImpl.buildEnd (/Users/emma/projects/preconstruct/packages/cli/src/build/rollup.ts:159:19)
       🎁 package-resolvable-but-not-in-deps     at plugin (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/bindingify-input-options-XPJLJOD0.mjs:1406:18)
       🎁 package-resolvable-but-not-in-deps     at plugin.<computed> (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/bindingify-input-options-XPJLJOD0.mjs:1959:18)
       🎁 package-resolvable-but-not-in-deps     at aggregateBindingErrorsIntoJsError (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/error-BHRSI0R7.mjs:48:18)
@@ -411,19 +411,10 @@ test("package with exports resolvable", async () => {
       "dist/package-exports-resolvable-but-not-in-deps.umd.min.js",
     ])
   ).toMatchInlineSnapshot(`
-    		⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/package-exports-resolvable-but-not-in-deps.umd.min.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    		(function(e, o) {
-    			"object" == typeof exports && "undefined" != typeof module ? module.exports = o() : "function" == typeof define && define.amd ? define([], o) : (e = "undefined" != typeof globalThis ? globalThis : e || self).packageExportsResolvableButNotInDeps = o();
-    		})(this, (function() {
-    			return function(e) {
-    				return function(e) {
-    					console.log(e);
-    				}(e);
-    			};
-    		}));
-
-    		//# sourceMa${""}ppingURL=package-exports-resolvable-but-not-in-deps.umd.min.js.map//# sourceMa${""}ppingURL=package-exports-resolvable-but-not-in-deps.umd.min.js.map
-    	`);
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/package-exports-resolvable-but-not-in-deps.umd.min.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    (function(e,t){typeof exports==\`object\`&&typeof module<\`u\`?module.exports=t():typeof define==\`function\`&&define.amd?define([],t):(e=typeof globalThis<\`u\`?globalThis:e||self,e.packageExportsResolvableButNotInDeps=t())})(this,function(){function e(e){console.log(e)}function t(t){return e(t)}return t});
+    //# sourceMa${""}ppingURL=package-exports-resolvable-but-not-in-deps.umd.min.js.map//# sourceMa${""}ppingURL=package-exports-resolvable-but-not-in-deps.umd.min.js.map
+  `);
 });
 
 test("entrypoint outside package directory", async () => {
@@ -492,7 +483,7 @@ test("module imported outside package directory", async () => {
       🎁 @imports-outside-pkg-dir/pkg-a
       🎁 @imports-outside-pkg-dir/pkg-a [plugin throw-warnings]
       🎁 @imports-outside-pkg-dir/pkg-a Error: 🎁 @imports-outside-pkg-dir/pkg-a all relative imports in a package should only import modules inside of their package directory but "src/index.js" is importing "../../some-file"
-      🎁 @imports-outside-pkg-dir/pkg-a     at PluginContextImpl.buildEnd (/Users/emma/projects/preconstruct/packages/cli/src/build/rollup.ts:144:19)
+      🎁 @imports-outside-pkg-dir/pkg-a     at PluginContextImpl.buildEnd (/Users/emma/projects/preconstruct/packages/cli/src/build/rollup.ts:159:19)
       🎁 @imports-outside-pkg-dir/pkg-a     at plugin (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/bindingify-input-options-XPJLJOD0.mjs:1406:18)
       🎁 @imports-outside-pkg-dir/pkg-a     at plugin.<computed> (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/bindingify-input-options-XPJLJOD0.mjs:1959:18)
       🎁 @imports-outside-pkg-dir/pkg-a     at aggregateBindingErrorsIntoJsError (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/error-BHRSI0R7.mjs:48:18)
@@ -503,7 +494,7 @@ test("module imported outside package directory", async () => {
       🎁 @imports-outside-pkg-dir/pkg-a     at retryableBuild (/Users/emma/projects/preconstruct/packages/cli/src/build/index.ts:102:5)
       🎁 @imports-outside-pkg-dir/pkg-a     at /Users/emma/projects/preconstruct/packages/cli/src/build/index.ts:140:11
       🎁 @imports-outside-pkg-dir/pkg-a     at Module.build (/Users/emma/projects/preconstruct/packages/cli/src/build/index.ts:137:5)
-      🎁 @imports-outside-pkg-dir/pkg-a     at /Users/emma/projects/preconstruct/packages/cli/src/build/__tests__/other.ts:487:5
+      🎁 @imports-outside-pkg-dir/pkg-a     at /Users/emma/projects/preconstruct/packages/cli/src/build/__tests__/other.ts:478:5
       🎁 @imports-outside-pkg-dir/pkg-a     at file:///Users/emma/projects/preconstruct/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20 {
       🎁 @imports-outside-pkg-dir/pkg-a   errors: [Getter/Setter]
       🎁 @imports-outside-pkg-dir/pkg-a }"
@@ -627,9 +618,9 @@ test("batches build errors", async () => {
     [Error: 🎁 @errors/package-one Error: Build failed with 1 error:
     🎁 @errors/package-one
     🎁 @errors/package-one [plugin throw-warnings]
-    🎁 @errors/package-one Error: 🎁 @errors/package-one "something-2" is imported by "src/index.js" but the package is not specified in dependencies or peerDependencies
-    🎁 @errors/package-one 🎁 @errors/package-one "something" is imported by "src/index.js" but the package is not specified in dependencies or peerDependencies
-    🎁 @errors/package-one     at PluginContextImpl.buildEnd (/Users/emma/projects/preconstruct/packages/cli/src/build/rollup.ts:144:19)
+    🎁 @errors/package-one Error: 🎁 @errors/package-one "something" is imported by "src/index.js" but the package is not specified in dependencies or peerDependencies
+    🎁 @errors/package-one 🎁 @errors/package-one "something-2" is imported by "src/index.js" but the package is not specified in dependencies or peerDependencies
+    🎁 @errors/package-one     at PluginContextImpl.buildEnd (/Users/emma/projects/preconstruct/packages/cli/src/build/rollup.ts:159:19)
     🎁 @errors/package-one     at plugin (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/bindingify-input-options-XPJLJOD0.mjs:1406:18)
     🎁 @errors/package-one     at plugin.<computed> (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/bindingify-input-options-XPJLJOD0.mjs:1959:18)
     🎁 @errors/package-one     at aggregateBindingErrorsIntoJsError (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/error-BHRSI0R7.mjs:48:18)
@@ -640,16 +631,16 @@ test("batches build errors", async () => {
     🎁 @errors/package-one     at retryableBuild (/Users/emma/projects/preconstruct/packages/cli/src/build/index.ts:102:5)
     🎁 @errors/package-one     at /Users/emma/projects/preconstruct/packages/cli/src/build/index.ts:140:11
     🎁 @errors/package-one     at Module.build (/Users/emma/projects/preconstruct/packages/cli/src/build/index.ts:137:5)
-    🎁 @errors/package-one     at /Users/emma/projects/preconstruct/packages/cli/src/build/__tests__/other.ts:621:5
+    🎁 @errors/package-one     at /Users/emma/projects/preconstruct/packages/cli/src/build/__tests__/other.ts:612:5
     🎁 @errors/package-one     at file:///Users/emma/projects/preconstruct/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20 {
     🎁 @errors/package-one   errors: [Getter/Setter]
     🎁 @errors/package-one }
     🎁 @errors/package-two Error: Build failed with 1 error:
     🎁 @errors/package-two
     🎁 @errors/package-two [plugin throw-warnings]
-    🎁 @errors/package-two Error: 🎁 @errors/package-two "something-2" is imported by "src/index.js" but the package is not specified in dependencies or peerDependencies
-    🎁 @errors/package-two 🎁 @errors/package-two "something" is imported by "src/index.js" but the package is not specified in dependencies or peerDependencies
-    🎁 @errors/package-two     at PluginContextImpl.buildEnd (/Users/emma/projects/preconstruct/packages/cli/src/build/rollup.ts:144:19)
+    🎁 @errors/package-two Error: 🎁 @errors/package-two "something" is imported by "src/index.js" but the package is not specified in dependencies or peerDependencies
+    🎁 @errors/package-two 🎁 @errors/package-two "something-2" is imported by "src/index.js" but the package is not specified in dependencies or peerDependencies
+    🎁 @errors/package-two     at PluginContextImpl.buildEnd (/Users/emma/projects/preconstruct/packages/cli/src/build/rollup.ts:159:19)
     🎁 @errors/package-two     at plugin (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/bindingify-input-options-XPJLJOD0.mjs:1406:18)
     🎁 @errors/package-two     at plugin.<computed> (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/bindingify-input-options-XPJLJOD0.mjs:1959:18)
     🎁 @errors/package-two     at aggregateBindingErrorsIntoJsError (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/error-BHRSI0R7.mjs:48:18)
@@ -660,7 +651,7 @@ test("batches build errors", async () => {
     🎁 @errors/package-two     at retryableBuild (/Users/emma/projects/preconstruct/packages/cli/src/build/index.ts:102:5)
     🎁 @errors/package-two     at /Users/emma/projects/preconstruct/packages/cli/src/build/index.ts:140:11
     🎁 @errors/package-two     at Module.build (/Users/emma/projects/preconstruct/packages/cli/src/build/index.ts:137:5)
-    🎁 @errors/package-two     at /Users/emma/projects/preconstruct/packages/cli/src/build/__tests__/other.ts:621:5
+    🎁 @errors/package-two     at /Users/emma/projects/preconstruct/packages/cli/src/build/__tests__/other.ts:612:5
     🎁 @errors/package-two     at file:///Users/emma/projects/preconstruct/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20 {
     🎁 @errors/package-two   errors: [Getter/Setter]
     🎁 @errors/package-two }]
@@ -770,64 +761,12 @@ test("builds umd with a dependency containing top-level this in ESM", async () =
     });
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.umd.min.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    (function(e, n) {
-    	"object" == typeof exports && "undefined" != typeof module ? module.exports = n() : "function" == typeof define && define.amd ? define([], n) : (e = "undefined" != typeof globalThis ? globalThis : e || self).pkg = n();
-    })(this, (function() {
-    	var e = function() {
-    		return e = Object.assign || function(e) {
-    			for (var n, t = 1, o = arguments.length; t < o; t++) for (var f in n = arguments[t]) Object.prototype.hasOwnProperty.call(n, f) && (e[f] = n[f]);
-    			return e;
-    		}, e.apply(this, arguments);
-    	};
-    	return e({}, { bar: 42 });
-    }));
-
+    (function(e,t){typeof exports==\`object\`&&typeof module<\`u\`?module.exports=t():typeof define==\`function\`&&define.amd?define([],t):(e=typeof globalThis<\`u\`?globalThis:e||self,e.pkg=t())})(this,function(){var e=function(){return e=Object.assign||function(e){for(var t,n=1,r=arguments.length;n<r;n++)for(var i in t=arguments[n],t)Object.prototype.hasOwnProperty.call(t,i)&&(e[i]=t[i]);return e},e.apply(this,arguments)};return e({},{bar:42})});
     //# sourceMa${""}ppingURL=pkg.umd.min.js.map//# sourceMa${""}ppingURL=pkg.umd.min.js.map
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.umd.min.js.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    {"version":3,"file":"pkg.umd.min.js","names":[],"sources":["../node_modules/with-top-level-this-in-esm/index.js"],"sourcesContent":["// output transpiled by TS with inlined tslib helper\\nvar __assign =\\n  (this && this.__assign) ||\\n  function () {\\n    __assign =\\n      Object.assign ||\\n      function (t) {\\n        for (var s, i = 1, n = arguments.length; i < n; i++) {\\n          s = arguments[i];\\n          for (var p in s)\\n            if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];\\n        }\\n        return t;\\n      };\\n    return __assign.apply(this, arguments);\\n  };\\nvar foo = { bar: 42 };\\nexport default __assign({}, foo);"],"x_google_ignoreList":[0],"mappings":";;;CACA,IAAI,IAEF,WAAA;EAWE,OAVA,IACE,OAAO,UACP,SAAU,GAAA;GACR,KAAK,IAAI,GAAG,IAAI,GAAG,IAAI,UAAU,QAAQ,IAAI,GAAG,KAE9C,KAAK,IAAI,KADT,IAAI,UAAU,IAER,OAAO,UAAU,eAAe,KAAK,GAAG,CAAA,MAAI,EAAE,KAAK,EAAE;GAE7D,OAAO;EACT,GACK,EAAS,MAAM,MAAM,SAAA;CAC9B;CAAA,OAEa,EAAS,CAAC,GADf,EAAE,KAAK,GAAA,CAAA;AAAA,EAAA"}
+    {"version":3,"file":"pkg.umd.min.js","names":[],"sources":["../node_modules/with-top-level-this-in-esm/index.js"],"sourcesContent":["// output transpiled by TS with inlined tslib helper\\nvar __assign =\\n  (this && this.__assign) ||\\n  function () {\\n    __assign =\\n      Object.assign ||\\n      function (t) {\\n        for (var s, i = 1, n = arguments.length; i < n; i++) {\\n          s = arguments[i];\\n          for (var p in s)\\n            if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];\\n        }\\n        return t;\\n      };\\n    return __assign.apply(this, arguments);\\n  };\\nvar foo = { bar: 42 };\\nexport default __assign({}, foo);"],"x_google_ignoreList":[0],"mappings":"0MACA,IAAI,EAEF,UAAY,CAWV,MAVA,GACE,OAAO,QACP,SAAU,EAAG,CACX,IAAK,IAAI,EAAG,EAAI,EAAG,EAAI,UAAU,OAAQ,EAAI,EAAG,IAE9C,IAAK,IAAI,IADT,GAAI,UAAU,GACA,EACR,OAAO,UAAU,eAAe,KAAK,EAAG,CAAC,IAAG,EAAE,GAAK,EAAE,IAE7D,OAAO,CACT,EACK,EAAS,MAAM,KAAM,SAAS,CACvC,SAEa,EAAS,CAAC,EAAG,CADhB,IAAK,EACW"}
   `);
-});
-
-test("fails for source files containing top-level this", async () => {
-  let dir = await testdir({
-    "package.json": basicPkgJson(),
-    "src/index.js": js`
-      export default this;
-    `,
-  });
-
-  try {
-    await build(dir);
-  } catch (err) {
-    expect(err.message).toMatchInlineSnapshot(`
-      "🎁 pkg Error: Build failed with 1 error:
-      🎁 pkg
-      🎁 pkg [plugin throw-warnings]
-      🎁 pkg Error: 🎁 pkg "src/index.js" used \`this\` keyword at the top level of an ES module. You can read more about this at https://rollupjs.org/guide/en/#error-this-is-undefined and fix this issue that has happened here:
-      🎁 pkg 🎁 pkg
-      🎁 pkg 🎁 pkg > 1 | export default this;
-      🎁 pkg 🎁 pkg     |                ^
-      🎁 pkg 🎁 pkg
-      🎁 pkg     at PluginContextImpl.buildEnd (/Users/emma/projects/preconstruct/packages/cli/src/build/rollup.ts:144:19)
-      🎁 pkg     at plugin (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/bindingify-input-options-XPJLJOD0.mjs:1406:18)
-      🎁 pkg     at plugin.<computed> (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/bindingify-input-options-XPJLJOD0.mjs:1959:18)
-      🎁 pkg     at aggregateBindingErrorsIntoJsError (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/error-BHRSI0R7.mjs:48:18)
-      🎁 pkg     at unwrapBindingResult (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/error-BHRSI0R7.mjs:18:128)
-      🎁 pkg     at RolldownBuild.#build (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/rolldown-build-CtPvmZgJ.mjs:3276:34)
-      🎁 pkg     at /Users/emma/projects/preconstruct/packages/cli/src/build/index.ts:73:29
-      🎁 pkg     at buildPackage (/Users/emma/projects/preconstruct/packages/cli/src/build/index.ts:63:17)
-      🎁 pkg     at retryableBuild (/Users/emma/projects/preconstruct/packages/cli/src/build/index.ts:102:5)
-      🎁 pkg     at /Users/emma/projects/preconstruct/packages/cli/src/build/index.ts:140:11
-      🎁 pkg     at Module.build (/Users/emma/projects/preconstruct/packages/cli/src/build/index.ts:137:5)
-      🎁 pkg     at /Users/emma/projects/preconstruct/packages/cli/src/build/__tests__/other.ts:801:5
-      🎁 pkg     at file:///Users/emma/projects/preconstruct/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20 {
-      🎁 pkg   errors: [Getter/Setter]
-      🎁 pkg }"
-    `);
-    return;
-  }
-  expect(true).toBe(false);
 });
 
 test(".d.ts", async () => {

@@ -840,17 +840,11 @@ test("UMD with dep that uses process.env.NODE_ENV", async () => {
     exports.default = src_default;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.umd.min.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    (function(e, o) {
-    	"object" == typeof exports && "undefined" != typeof module ? module.exports = o() : "function" == typeof define && define.amd ? define([], o) : (e = "undefined" != typeof globalThis ? globalThis : e || self).test = o();
-    })(this, (function() {
-    	console.log("development");
-    	return "something";
-    }));
-
+    (function(e,t){typeof exports==\`object\`&&typeof module<\`u\`?module.exports=t():typeof define==\`function\`&&define.amd?define([],t):(e=typeof globalThis<\`u\`?globalThis:e||self,e.test=t())})(this,function(){return console.log(\`development\`),\`something\`});
     //# sourceMa${""}ppingURL=scope-test.umd.min.js.map//# sourceMa${""}ppingURL=scope-test.umd.min.js.map
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.umd.min.js.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    {"version":3,"file":"scope-test.umd.min.js","names":["x","console","log"],"sources":["../node_modules/somewhere/index.js","../src/index.js"],"sourcesContent":["export let x = process.env.NODE_ENV;","import { x } from \\"somewhere\\";\\nconsole.log(x);\\nexport default \\"something\\";"],"x_google_ignoreList":[0],"mappings":";;;CCCAC,QAAQC,IDDG,aAAA;CAAA,OCEI;AAAA,EAAA"}
+    {"version":3,"file":"scope-test.umd.min.js","names":["x","console","log"],"sources":["../node_modules/somewhere/index.js","../src/index.js"],"sourcesContent":["export let x = process.env.NODE_ENV;","import { x } from \\"somewhere\\";\\nconsole.log(x);\\nexport default \\"something\\";"],"x_google_ignoreList":[0],"mappings":"kNCCAC,QAAQC,IAAIF,aAAC"}
   `);
 });
 
@@ -889,18 +883,11 @@ test("UMD build with process.env.NODE_ENV and typeof document", async () => {
     exports.default = thing;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.umd.min.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    (function(e, o) {
-    	"object" == typeof exports && "undefined" != typeof module ? module.exports = o() : "function" == typeof define && define.amd ? define([], o) : (e = "undefined" != typeof globalThis ? globalThis : e || self).x = o();
-    })(this, (function() {
-    	return () => {
-    		console.log("development");
-    	};
-    }));
-
+    (function(e,t){typeof exports==\`object\`&&typeof module<\`u\`?module.exports=t():typeof define==\`function\`&&define.amd?define([],t):(e=typeof globalThis<\`u\`?globalThis:e||self,e.x=t())})(this,function(){return()=>{console.log(\`development\`)}});
     //# sourceMa${""}ppingURL=scope-test.umd.min.js.map//# sourceMa${""}ppingURL=scope-test.umd.min.js.map
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.umd.min.js.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    {"version":3,"file":"scope-test.umd.min.js","names":["x","document","thing","console","log","process","env","NODE_ENV"],"sources":["../src/index.js"],"sourcesContent":["let x = typeof document;\\n\\nconst thing = () => {\\n  console.log(process.env.NODE_ENV);\\n};\\n\\nexport default thing;"],"mappings":";;;cAEME;EACJC,QAAQC,IAAAA,aAAAA;CAAwB;AAAA,EAAA"}
+    {"version":3,"file":"scope-test.umd.min.js","names":["x","document","thing","console","log","process","env","NODE_ENV"],"sources":["../src/index.js"],"sourcesContent":["let x = typeof document;\\n\\nconst thing = () => {\\n  console.log(process.env.NODE_ENV);\\n};\\n\\nexport default thing;"],"mappings":"kNAEoB,CAClBG,QAAQC,IAAAA,aAAwB,CAClC"}
   `);
 });
 
@@ -977,7 +964,7 @@ test("typescript declaration emit with unreferencable types emits diagnostic", a
     🎁 @scope/test     at retryableBuild (/Users/emma/projects/preconstruct/packages/cli/src/build/index.ts:102:5)
     🎁 @scope/test     at /Users/emma/projects/preconstruct/packages/cli/src/build/index.ts:140:11
     🎁 @scope/test     at Module.build (/Users/emma/projects/preconstruct/packages/cli/src/build/index.ts:137:5)
-    🎁 @scope/test     at /Users/emma/projects/preconstruct/packages/cli/src/build/__tests__/basic.ts:949:17
+    🎁 @scope/test     at /Users/emma/projects/preconstruct/packages/cli/src/build/__tests__/basic.ts:936:17
     🎁 @scope/test     at file:///Users/emma/projects/preconstruct/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20 {
     🎁 @scope/test   errors: [Getter/Setter]
     🎁 @scope/test }"
@@ -1148,7 +1135,7 @@ test("importing css fails with a nice error", async () => {
     🎁 @scope/test
     🎁 @scope/test [plugin throw-warnings]
     🎁 @scope/test Error: 🎁 @scope/test only .ts, .tsx, .js, .jsx, and .json files can be imported but "./blah.css" is imported in "src/index.js"
-    🎁 @scope/test     at PluginContextImpl.buildEnd (/Users/emma/projects/preconstruct/packages/cli/src/build/rollup.ts:144:19)
+    🎁 @scope/test     at PluginContextImpl.buildEnd (/Users/emma/projects/preconstruct/packages/cli/src/build/rollup.ts:159:19)
     🎁 @scope/test     at plugin (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/bindingify-input-options-XPJLJOD0.mjs:1406:18)
     🎁 @scope/test     at plugin.<computed> (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/bindingify-input-options-XPJLJOD0.mjs:1959:18)
     🎁 @scope/test     at aggregateBindingErrorsIntoJsError (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/error-BHRSI0R7.mjs:48:18)
@@ -1159,7 +1146,7 @@ test("importing css fails with a nice error", async () => {
     🎁 @scope/test     at retryableBuild (/Users/emma/projects/preconstruct/packages/cli/src/build/index.ts:102:5)
     🎁 @scope/test     at /Users/emma/projects/preconstruct/packages/cli/src/build/index.ts:140:11
     🎁 @scope/test     at Module.build (/Users/emma/projects/preconstruct/packages/cli/src/build/index.ts:137:5)
-    🎁 @scope/test     at /Users/emma/projects/preconstruct/packages/cli/src/build/__tests__/basic.ts:1145:3
+    🎁 @scope/test     at /Users/emma/projects/preconstruct/packages/cli/src/build/__tests__/basic.ts:1132:3
     🎁 @scope/test     at file:///Users/emma/projects/preconstruct/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20 {
     🎁 @scope/test   errors: [Getter/Setter]
     🎁 @scope/test }]

@@ -3,7 +3,6 @@ import { Project } from "./project";
 import { success, info } from "./logger";
 import {
   dtsTemplate,
-  flowTemplate,
   validFieldsForEntrypoint,
   getExportsImportUnwrappingDefaultOutputPath,
   dmtsTemplate,
@@ -153,32 +152,6 @@ export async function writeDevTSFiles(
   await Promise.all(promises);
 }
 
-async function writeDevFlowFile(entrypoint: Entrypoint) {
-  // so...
-  // you might have noticed that this passes
-  // hasExportDefault=false
-  // and be thinking that default exports
-  // but flow seems to be
-  // then you might ask, if re-exporting the default
-  // export isn't necessary, why do it for actual builds?
-  // the reason is is that if preconstruct dev breaks because
-  // of a new version of flow that changes this, that's mostly okay
-  // because preconstruct dev can be fixed, a consumer can upgrade it
-  // and then everything is fine but if a production build is broken
-  // a consumer would have to do a new release and that's not ideal
-  let cjsDistPath = path.join(
-    entrypoint.directory,
-    validFieldsForEntrypoint.main(entrypoint)
-  );
-  await fs.writeFile(
-    cjsDistPath + ".flow",
-    flowTemplate(
-      false,
-      normalizePath(path.relative(path.dirname(cjsDistPath), entrypoint.source))
-    )
-  );
-}
-
 export default async function dev(projectDir: string) {
   let project = await Project.create(projectDir);
   validateProject(project);
@@ -205,11 +178,6 @@ export default async function dev(projectDir: string) {
           };
           await cleanEntrypoint(entrypoint);
           let entrypointPromises: Promise<unknown>[] = [
-            (async () => {
-              if ((await contentsPromise).includes("@flow")) {
-                await writeDevFlowFile(entrypoint);
-              }
-            })(),
             (async () => {
               if (
                 tsExtensionPattern.test(entrypoint.source) ||
