@@ -58,9 +58,6 @@ test("imports conditions", async () => {
         exports: {
           importConditionDefaultExport: "default",
         },
-        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
-          importsConditions: true,
-        },
       },
       imports: {
         "#is-development": {
@@ -300,9 +297,6 @@ describe("imports conditions runtime check with importConditionDefaultExport: de
           exports: {
             importConditionDefaultExport: "default",
           },
-          ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
-            importsConditions: true,
-          },
         },
         imports: {
           "#is-development": {
@@ -406,9 +400,6 @@ test("import with #something inside import type type arguments", async () => {
       preconstruct: {
         exports: {
           importConditionDefaultExport: "default",
-        },
-        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
-          importsConditions: true,
         },
       },
       imports: {

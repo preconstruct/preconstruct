@@ -202,7 +202,12 @@ export async function snapshotDirectory(
   } = {}
 ) {
   let paths = await fastGlob(
-    [`**/${files === "js" ? "*.js" : "*"}`, "!node_modules/**", "!yarn.lock"],
+    [
+      `**/${files === "js" ? "*.js" : "*"}`,
+      "!node_modules/**",
+      "!yarn.lock",
+      "!yarn-error.log",
+    ],
     {
       cwd: tmpPath,
     }
@@ -375,6 +380,24 @@ export async function testdir(dir: Fixture) {
     })
   );
   return temp;
+}
+
+export function testdirWithLegacyPreconstructDefaults(dir: Fixture) {
+  const rootPackageJson = dir["package.json"];
+  if (typeof rootPackageJson !== "string") {
+    throw new Error("a root package.json is required");
+  }
+  const parsed = JSON.parse(rootPackageJson);
+  parsed.preconstruct = {
+    exports: false,
+    imports: false,
+    dynamicImportInCjs: false,
+    ...parsed.preconstruct,
+  };
+  return testdir({
+    ...dir,
+    "package.json": JSON.stringify(parsed),
+  });
 }
 
 expect.addSnapshotSerializer({

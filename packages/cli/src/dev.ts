@@ -91,10 +91,8 @@ export async function writeDevTSFiles(
   hasDefaultExport: boolean
 ) {
   const dtsReexportFilename = path.join(
-    (entrypoint.package.project.experimentalFlags.distInRoot
-      ? entrypoint.package
-      : entrypoint
-    ).directory,
+    (entrypoint.package.usesRootDist() ? entrypoint.package : entrypoint)
+      .directory,
     "dist",
     getBaseDistName(entrypoint) +
       (entrypoint.package.isTypeModule() ? "" : ".cjs") +
@@ -247,7 +245,7 @@ export default async function dev(projectDir: string) {
           const cjsTemplate = commonjsRequireHookTemplate(entrypoint);
           if (exportsFieldConfig?.conditions.kind === "imports") {
             for (const conditions of exportsFieldConfig.conditions.groups.keys()) {
-              const distRoot = project.experimentalFlags.distInRoot
+              const distRoot = pkg.usesRootDist()
                 ? pkg.directory
                 : entrypoint.directory;
               entrypointPromises.push(
@@ -407,17 +405,15 @@ async function cleanEntrypoint(entrypoint: Entrypoint) {
   let distDirectory = path.join(entrypoint.directory, "dist");
 
   await fs.remove(distDirectory);
-  if (!entrypoint.package.project.experimentalFlags.distInRoot) {
+  if (!entrypoint.package.usesRootDist()) {
     await fs.ensureDir(distDirectory);
   }
 }
 
 function commonjsRequireHookTemplate(entrypoint: Entrypoint) {
   const distDirectory = path.join(
-    (entrypoint.package.project.experimentalFlags.distInRoot
-      ? entrypoint.package
-      : entrypoint
-    ).directory,
+    (entrypoint.package.usesRootDist() ? entrypoint.package : entrypoint)
+      .directory,
     "dist"
   );
   let entrypointPath = normalizePath(

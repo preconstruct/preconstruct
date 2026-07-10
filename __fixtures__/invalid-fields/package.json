@@ -4,5 +4,10 @@
   "main": "dist/index.js",
   "license": "MIT",
   "private": true,
+  "preconstruct": {
+    "exports": false,
+    "imports": false,
+    "dynamicImportInCjs": false
+  },
   "module": "dist/index.mjs"
 }

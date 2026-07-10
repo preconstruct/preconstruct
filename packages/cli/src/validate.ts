@@ -130,14 +130,14 @@ export const FORMER_FLAGS_THAT_ARE_ENABLED_NOW = new Set<string>([
   "newProcessEnvNodeEnvReplacementStrategyAndSkipTerserOnCJSProdBuild",
   "exports",
   "onlyEmitUsedTypeScriptDeclarations",
+  "importsConditions",
+  "distInRoot",
+  "keepDynamicImportAsDynamicImportInCommonJS",
+  "typeModule",
 ]);
 
 export const EXPERIMENTAL_FLAGS = new Set([
   "logCompiledFiles",
-  "keepDynamicImportAsDynamicImportInCommonJS",
-  "importsConditions",
-  "distInRoot",
-  "typeModule",
   "checkTypeDependencies",
 ]);
 

@@ -100,6 +100,88 @@ Projects map 1:1 with a version control repository. They specify global configur
 }
 ```
 
+### `imports` {#project-imports}
+
+`boolean`
+
+When enabled, Preconstruct uses each package's [`imports`](https://nodejs.org/api/packages.html#imports) field to determine the conditions it should build and include in the generated `exports` field. This allows a package to use private `#` imports internally and publish builds in which those imports resolve differently for conditions such as `browser`, `worker`, or `development`.
+
+This is a project-level option: configure it in the root `package.json`, not in the `preconstruct` config of an individual workspace package. Each workspace package still defines its own top-level `imports` field though.
+
+The `exports` feature must be enabled for packages using this option. `preconstruct.exports.envConditions` cannot be used at the same time because the package's `imports` field becomes the source of build conditions.
+
+Preconstruct supports `imports` entries with:
+
+- keys beginning with `#`;
+- string targets; and
+- nested condition objects.
+
+Every entry should provide a `default` target so that every generated condition set resolves. Array and `null` targets are not supported. The `import`, `require`, `module`, `types`, and versioned `types@` conditions are reserved for Preconstruct's generated output and cannot be used as source conditions.
+
+#### Default {#project-imports-default}
+
+`true`. It is always enabled for a package with `"type": "module"`, even when the project sets it to `false`.
+
+#### Example {#project-imports-example}
+
+```json
+{
+  "name": "my-package",
+  "imports": {
+    "#runtime": {
+      "browser": "./src/runtime.browser.js",
+      "default": "./src/runtime.node.js"
+    }
+  }
+}
+```
+
+Code inside the package can then import `#runtime`. Preconstruct generates a browser build using `runtime.browser.js` and a default build using `runtime.node.js`, and writes the corresponding conditions to the generated `exports` field.
+
+### `dynamicImportInCjs` {#dynamic-import-in-cjs}
+
+`boolean`
+
+When enabled, dynamic `import()` expressions are preserved in CommonJS output instead of being converted as part of the CommonJS build. This allows a CommonJS bundle to load an ESM-only dependency asynchronously:
+
+```js
+export async function loadDependency() {
+  return import("an-esm-only-dependency");
+}
+```
+
+This option only affects CommonJS output. Static imports and ESM builds are unchanged.
+
+#### Default {#dynamic-import-in-cjs-default}
+
+`true`.
+
+#### Opting out {#dynamic-import-in-cjs-example}
+
+```json
+{
+  "preconstruct": {
+    "dynamicImportInCjs": false
+  }
+}
+```
+
+### Migrating experimental flags {#migrating-experimental-flags}
+
+These entries in `___experimentalFlags_WILL_CHANGE_IN_PATCH` are no longer needed because their behavior is now the default:
+
+| Experimental flag | Migration |
+| --- | --- |
+| `exports` | Remove it |
+| `importsConditions` | Remove it |
+| `distInRoot` | Remove it; root-level dist output is only used by `"type": "module"` packages |
+| `keepDynamicImportAsDynamicImportInCommonJS` | Remove it |
+| `typeModule` | Remove it; `"type": "module"` is recognized automatically |
+
+Run `preconstruct fix` to remove the old flags. It removes the experimental object when it becomes empty and does not add redundant stable options. The stable `exports`, `imports`, and `dynamicImportInCjs` defaults can be disabled with explicit project-level `false` values.
+
+The `logCompiledFiles` and `checkTypeDependencies` flags remain experimental and are not removed.
+
 ## Packages {#packages}
 
 Packages map 1:1 with npm packages. Along with specifying the `entrypoints` option described below, packages are also responsible for specifying dependencies which is necessary for bundling UMD bundles and ensuring that packages will have all of their required dependencies when installed through npm.
@@ -142,7 +224,7 @@ Packages map 1:1 with npm packages. Along with specifying the `entrypoints` opti
   };
 ```
 
-The `exports` config allows you to opt-in to generating an `exports` field.
+The `exports` config controls whether Preconstruct generates an `exports` field. Generation is enabled by default; set `preconstruct.exports` to `false` to opt out.
 
 Using the `exports` field enables a couple of things:
 
@@ -150,18 +232,26 @@ Using the `exports` field enables a couple of things:
 - Disallowing importing modules that aren't specified in the `exports` field
 - More specific builds for certain environments
 
-> Note that Preconstruct's support for the `exports` field does not currently include generating ESM compatible with Node.js. While ESM builds are generated, they are targeting bundlers, not Node.js or browsers directly so they use the `module` condition, not the `import` condition.
+> For packages that are not marked with `"type": "module"`, Preconstruct's ESM builds target bundlers and use the `module` condition. Packages marked with `"type": "module"` instead produce Node.js-compatible ESM output.
 
 Note that adding an `exports` field can arguably be a breaking change, you may want to use the `extra` option to add more exports so that imports that worked previously still work or only add the `exports` field in a major version.
 
-The `exports` field feature can be enabled at the project or package level like this. The `envConditions` and `extra` options can only be configured at the package level. The `importConditionDefaultExport` option can be configured at the project or package level.
+The `exports` field feature can be configured at the project or package level. The `envConditions` and `extra` options can only be configured at the package level. The `importConditionDefaultExport` option can be configured at the project or package level.
 
-```diff
+When the project-level [`imports`](#project-imports) option is enabled, conditions come from each package's top-level `imports` field and `envConditions` is not supported. Because `imports` defaults to `true`, projects using the legacy `envConditions` option must set it to `false`.
+
+#### Default {#exports-default}
+
+`true`.
+
+#### Opting out {#exports-opt-out}
+
+```json
 {
   "name": "@sample/package",
   "version": "1.0.0",
   "preconstruct": {
-+   "exports": true
+    "exports": false
   }
 }
 ```
@@ -182,6 +272,7 @@ Builds
   "name": "@sample/package",
   "version": "1.0.0",
   "preconstruct": {
+    "imports": false,
     "exports": {
       "envConditions": ["browser", "worker"]
     }
@@ -291,24 +382,19 @@ Currently, this defaults to `"namespace"`, this will change to `"default"` in th
 }
 ```
 
-### `type` (experimental) {#type}
+### `type` {#type}
 
 ```ts
 "module" | "commonjs";
 ```
 
-> If you're just thinking "I want to write code with the native ECMAScript import and export syntax and have my code work for most people", you likely should not use this feature. This feature allows you to build packages that import Node.js ESM only dependencies and therefore only support being imported from ESM in newer versions of Node.js and some bundlers.
+Setting `type` to `"module"` makes Preconstruct publish Node.js-compatible ECMAScript modules rather than CommonJS output.
 
-The `type` config being set to `"module"` allows you to generate ECMAScript modules(ESM) compatible with Node.js' implementation of ESM (Node.js ESM), most modern bundlers, etc.
+Modern Node.js versions can load synchronous ES modules with `require()`. A CommonJS consumer can therefore require a Preconstruct package with `"type": "module"` when the package and its dependency graph do not use top-level `await`. `require()` returns the module namespace object.
 
-You should likely only use this feature if you fit into one these categories:
+If the module graph contains top-level `await`, Node.js throws `ERR_REQUIRE_ASYNC_MODULE`; the consumer must use `import()` instead. Older Node.js versions that do not support `require(esm)` also need `import()`. See Node.js' [`require(esm)` documentation](https://nodejs.org/api/modules.html#loading-ecmascript-modules-using-require) for its version history and interoperability details.
 
-- You're interested in the state of modules in the JS ecosystem
-- You want to publish a package that statically imports a Node.js ESM only dependency
-
-Node.js' implementation of ESM does not allow importing an ESM module from a CommonJS module synchronously. This means a given package only shipping Node.js ESM means that all of the packages that depend on it either need to use a dynamic `import()` call (which is asynchronous) to import it or only provide Node.js ESM and therefore enforce the same constraints on consumers.
-
-Preconstruct's support for Node.js ESM is currently an experiment to see how Preconstruct would work if it followed Node.js' behaviour for ESM. Note this behaviour means the resulting package will not support tools that do not support newer features like the `exports` field.
+Packages using this mode still require consumers and tools that understand the `exports` field and Node.js ESM semantics.
 
 - The [`exports` field feature](#exports) must also be enabled.
 - There are no entrypoint `package.json`s, the entrypoints are only specified in the `exports` field
@@ -316,17 +402,16 @@ Preconstruct's support for Node.js ESM is currently an experiment to see how Pre
 - No `main`, `module`, `browser` or `umd:main` fields are used
 - The default export of a CommonJS dependency(even if it provides ESM intended for bundlers) will be the whole exports object, not `exports.default` if `exports.__esModule` is set and otherwise the whole exports object which is the default behaviour in Preconstruct.
 
-To use `"type": "module"`, you need to enable the experimental flags and the exports field feature.
+Setting `"type": "module"` guarantees imports-based conditions and places the output for every entrypoint in the package's root `dist` directory. `exports` and `imports` already default to `true`, so no additional Preconstruct configuration is normally required.
+
+This inference is package-specific in a monorepo. An explicit project-level `imports: false` does not disable imports-based conditions for a module package. Non-module packages always place each non-root entrypoint's output in that entrypoint's own `dist` directory.
+
+`dynamicImportInCjs` is independent and has no effect on a module package because that package does not produce CommonJS output.
 
 ```json
-"type": "module",
-"preconstruct": {
-  "exports": true,
-  "___experimentalFlags_WILL_CHANGE_IN_PATCH": {
-    "typeModule": true,
-    "distInRoot": true,
-    "importsConditions": true
-  },
+{
+  "name": "my-esm-package",
+  "type": "module"
 }
 ```
 

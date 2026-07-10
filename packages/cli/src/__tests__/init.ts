@@ -214,6 +214,11 @@ test("invalid fields", async () => {
       "main": "dist/invalid-fields.cjs.js",
       "module": "dist/invalid-fields.esm.js",
       "name": "invalid-fields",
+      "preconstruct": {
+        "dynamicImportInCjs": false,
+        "exports": false,
+        "imports": false,
+      },
       "private": true,
       "version": "1.0.0",
     }
@@ -242,6 +247,9 @@ test("fix browser", async () => {
       "module": "dist/valid-package.esm.js",
       "name": "valid-package",
       "preconstruct": {
+        "dynamicImportInCjs": false,
+        "exports": false,
+        "imports": false,
         "umdName": "validPackage",
       },
       "private": true,
@@ -362,7 +370,7 @@ test("three entrypoints, no main, add main and fix browser", async () => {
     {
       "main": "dist/something-one.cjs.js",
       "browser": {
-        "./dist/something-one.cjs.js": "./dist/something-one.browser.cjs.js"
+        "./dist/something-one.esm.js": "./dist/something-one.browser.esm.js"
       }
     }
 
@@ -377,7 +385,7 @@ test("three entrypoints, no main, add main and fix browser", async () => {
         ]
       },
       "browser": {
-        "./dist/something.cjs.js": "./dist/something.browser.cjs.js"
+        "./dist/something.esm.js": "./dist/something.browser.esm.js"
       },
       "main": "dist/something.cjs.js"
     }
@@ -386,7 +394,7 @@ test("three entrypoints, no main, add main and fix browser", async () => {
     {
       "main": "dist/something-two.cjs.js",
       "browser": {
-        "./dist/something-two.cjs.js": "./dist/something-two.browser.cjs.js"
+        "./dist/something-two.esm.js": "./dist/something-two.browser.esm.js"
       }
     }
 

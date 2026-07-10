@@ -54,6 +54,7 @@ test("no main field", async () => {
       name: "no-main-field",
       license: "MIT",
       private: true,
+      preconstruct: { exports: false },
     }),
 
     "src/index.js": js`
@@ -167,6 +168,8 @@ test("one-entrypoint-with-browser-field-one-without", async () => {
       module: "dist/one-entrypoint-with-browser-field-one-without.esm.js",
 
       preconstruct: {
+        exports: false,
+        imports: false,
         entrypoints: ["index.js", "multiply.js"],
       },
     }),
@@ -213,6 +216,8 @@ test("create package.json for an entrypoint", async () => {
       module: "dist/entrypoint-pkg-json-missing.esm.js",
 
       preconstruct: {
+        exports: false,
+        imports: false,
         entrypoints: ["index.js", "other.js"],
       },
     }),
@@ -247,6 +252,8 @@ test("monorepo umd with dep on other module incorrect peerDeps", async () => {
       workspaces: ["packages/*"],
 
       preconstruct: {
+        exports: false,
+        imports: false,
         packages: ["packages/*"],
 
         globals: {
@@ -540,6 +547,7 @@ test("unexpected experimental flag", async () => {
       name: "pkg-a",
       main: "dist/pkg-a.cjs.js",
       preconstruct: {
+        exports: false,
         ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
           thisDoesNotExist: true,
         },
@@ -561,6 +569,7 @@ test("unexpected former experimental flag", async () => {
       name: "pkg-a",
       main: "dist/pkg-a.cjs.js",
       preconstruct: {
+        exports: false,
         ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
           newEntrypoints: true,
         },
@@ -573,6 +582,28 @@ test("unexpected former experimental flag", async () => {
 
   await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
     `[Error: The behaviour from the experimental flag "newEntrypoints" is the current behaviour now, the flag should be removed]`
+  );
+});
+
+test("stabilised experimental flag", async () => {
+  let tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "pkg-a",
+      main: "dist/pkg-a.cjs.js",
+      preconstruct: {
+        exports: false,
+        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+          importsConditions: true,
+        },
+      },
+    }),
+    "src/index.js": js`
+      export let x = true;
+    `,
+  });
+
+  await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
+    `[Error: The behaviour from the experimental flag "importsConditions" is the current behaviour now, the flag should be removed]`
   );
 });
 
@@ -614,6 +645,7 @@ test("old dist filenames", async () => {
     "package.json": JSON.stringify({
       name: "@something/pkg-a",
       main: "dist/pkg-a.cjs.js",
+      preconstruct: { exports: false },
     }),
     "src/index.js": "",
   });
@@ -644,6 +676,7 @@ test("just wrong dist filenames doesn't report about the changed dist filename s
     "package.json": JSON.stringify({
       name: "@something/pkg-a",
       main: "dist/pkg-a-blah.cjs.js",
+      preconstruct: { exports: false },
     }),
     "src/index.js": "",
   });
@@ -661,7 +694,7 @@ test("just wrong dist filenames doesn't report about the changed dist filename s
 });
 
 describe("exports field config", () => {
-  const exportsFieldConfigTestDir = (config: JSONValue) => {
+  const exportsFieldConfigTestDir = (config: JSONValue | undefined) => {
     return testdir({
       "package.json": JSON.stringify({
         name: "pkg-a",
@@ -675,6 +708,7 @@ describe("exports field config", () => {
           "./package.json": "./package.json",
         },
         preconstruct: {
+          imports: false,
           exports: config,
         },
       }),
@@ -755,6 +789,7 @@ describe("exports field config", () => {
       { extra: {}, importConditionDefaultExport: "namespace" },
       { importConditionDefaultExport: "namespace" },
       true,
+      undefined,
     ];
     for (const config of configsEquivalentToTrue) {
       test(`${JSON.stringify(config)}`, async () => {
@@ -764,7 +799,7 @@ describe("exports field config", () => {
     }
   });
   describe("false", () => {
-    const configsEquivalentToFalse = [false, undefined];
+    const configsEquivalentToFalse = [false];
     for (const config of configsEquivalentToFalse) {
       test(`${JSON.stringify(config)}`, async () => {
         const tmpPath = await testdir({
@@ -797,6 +832,7 @@ describe("exports field config", () => {
           "./package.json": "./package.json",
         },
         preconstruct: {
+          imports: false,
           exports: {
             importConditionDefaultExport: "default",
           },
@@ -814,6 +850,7 @@ describe("project level exports field config", () => {
       "package.json": JSON.stringify({
         name: "repo",
         preconstruct: {
+          imports: false,
           exports: config,
           packages: ["packages/*"],
         },
@@ -900,6 +937,7 @@ describe("project level exports field config", () => {
       "package.json": JSON.stringify({
         name: "repo",
         preconstruct: {
+          imports: false,
           exports: {
             importConditionDefaultExport: "default",
           },
@@ -931,6 +969,7 @@ test("no module field with exports field", async () => {
       name: "pkg-a",
       main: "dist/pkg-a.cjs.js",
       preconstruct: {
+        imports: false,
         exports: true,
       },
     }),
@@ -952,6 +991,7 @@ test("has browser field but no browser condition", async () => {
         "./dist/pkg-a.esm.js": "./dist/pkg-a.browser.esm.js",
       },
       preconstruct: {
+        imports: false,
         exports: true,
       },
     }),
@@ -970,6 +1010,7 @@ test("has browser condition but no browser field", async () => {
       main: "dist/pkg-a.cjs.js",
       module: "dist/pkg-a.esm.js",
       preconstruct: {
+        imports: false,
         exports: {
           envConditions: ["browser"],
         },
@@ -989,6 +1030,7 @@ test("preconstruct.exports: true no exports field", async () => {
       main: "dist/pkg-a.cjs.js",
       module: "dist/pkg-a.esm.js",
       preconstruct: {
+        imports: false,
         exports: true,
       },
     }),
@@ -1006,6 +1048,7 @@ test("experimental exports flag is removed", async () => {
         name: "repo",
         preconstruct: {
           packages: ["packages/*"],
+          imports: false,
           exports: true,
           ___experimentalFlags_WILL_CHANGE_IN_PATCH: { exports: true },
         },
@@ -1045,11 +1088,6 @@ test("type: module removes package.json", async () => {
       preconstruct: {
         exports: true,
         entrypoints: ["index.ts", "multiply.ts"],
-        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
-          importsConditions: true,
-          distInRoot: true,
-          typeModule: true,
-        },
       },
     }),
     "multiply/package.json": JSON.stringify({
@@ -1075,7 +1113,7 @@ test("type: module removes package.json", async () => {
 
   expect(await getFiles(dir, ["**/package.json"])).toMatchInlineSnapshot(`
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    {"name":"multiple-entrypoints","type":"module","exports":{".":"./dist/multiple-entrypoints.js","./multiply":"./dist/multiple-entrypoints-multiply.js","./package.json":"./package.json"},"preconstruct":{"exports":true,"entrypoints":["index.ts","multiply.ts"],"___experimentalFlags_WILL_CHANGE_IN_PATCH":{"importsConditions":true,"distInRoot":true,"typeModule":true}}}
+    {"name":"multiple-entrypoints","type":"module","exports":{".":"./dist/multiple-entrypoints.js","./multiply":"./dist/multiple-entrypoints-multiply.js","./package.json":"./package.json"},"preconstruct":{"exports":true,"entrypoints":["index.ts","multiply.ts"]}}
   `);
 });
 
@@ -1097,11 +1135,6 @@ test("type: module errors on main/module/browser/umd:main fields in package.json
         preconstruct: {
           exports: true,
           entrypoints: ["index.ts", "multiply.ts"],
-          ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
-            importsConditions: true,
-            distInRoot: true,
-            typeModule: true,
-          },
         },
       },
       null,

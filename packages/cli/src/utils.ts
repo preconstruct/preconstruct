@@ -284,7 +284,7 @@ export function getBaseDistFilename(
 }
 
 function getDistFilename(entrypoint: MinimalEntrypoint, target: BuildTarget) {
-  if (entrypoint.package.project.experimentalFlags.distInRoot) {
+  if (entrypoint.package.usesRootDist()) {
     if (entrypoint.package.name === entrypoint.name) {
       return `dist/${getBaseDistFilename(entrypoint, target)}`;
     }
@@ -299,7 +299,7 @@ function getDistFilename(entrypoint: MinimalEntrypoint, target: BuildTarget) {
 }
 
 function getExportsFieldEntrypointOutputPrefix(entrypoint: Entrypoint) {
-  if (entrypoint.package.project.experimentalFlags.distInRoot) return "./";
+  if (entrypoint.package.usesRootDist()) return "./";
   return `.${entrypoint.afterPackageName}/`;
 }
 

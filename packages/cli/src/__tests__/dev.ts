@@ -7,7 +7,8 @@ import {
   js,
   repoNodeModules,
   repoRoot,
-  testdir,
+  testdir as testdirWithNextMajorDefaults,
+  testdirWithLegacyPreconstructDefaults as testdir,
   ts,
   typescriptFixture,
 } from "../../test-utils";
@@ -532,15 +533,12 @@ test("with default", async () => {
 });
 
 test("imports conditions", async () => {
-  const dir = await testdir({
+  const dir = await testdirWithNextMajorDefaults({
     "package.json": JSON.stringify({
       name: "@scope/pkg",
       preconstruct: {
         exports: {
           importConditionDefaultExport: "default",
-        },
-        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
-          importsConditions: true,
         },
       },
       imports: {
@@ -688,8 +686,8 @@ test("dev command entrypoint", async () => {
   expect(code).toBe(0);
 });
 
-test("multiple entrypoints", async () => {
-  let dir = await testdir({
+test("multiple entrypoints with default imports and exports", async () => {
+  let dir = await testdirWithNextMajorDefaults({
     "package.json": JSON.stringify({
       name: "multiple-entrypoints",
       main: "dist/multiple-entrypoints.cjs.js",
@@ -706,12 +704,12 @@ test("multiple entrypoints", async () => {
         },
         "./multiply": {
           types: {
-            import: "./dist/multiple-entrypoints-multiply.cjs.mjs",
-            default: "./dist/multiple-entrypoints-multiply.cjs.js",
+            import: "./multiply/dist/multiple-entrypoints-multiply.cjs.mjs",
+            default: "./multiply/dist/multiple-entrypoints-multiply.cjs.js",
           },
-          module: "./dist/multiple-entrypoints-multiply.esm.js",
-          import: "./dist/multiple-entrypoints-multiply.cjs.mjs",
-          default: "./dist/multiple-entrypoints-multiply.cjs.js",
+          module: "./multiply/dist/multiple-entrypoints-multiply.esm.js",
+          import: "./multiply/dist/multiple-entrypoints-multiply.cjs.mjs",
+          default: "./multiply/dist/multiple-entrypoints-multiply.cjs.js",
         },
         "./package.json": "./package.json",
       },
@@ -719,34 +717,28 @@ test("multiple entrypoints", async () => {
         exports: {
           importConditionDefaultExport: "default",
         },
-        entrypoints: ["index.ts", "multiply.ts"],
-        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
-          importsConditions: true,
-          distInRoot: true,
-        },
+        entrypoints: ["index.js", "multiply.js"],
       },
     }),
     "multiply/package.json": JSON.stringify({
-      main: "../dist/multiple-entrypoints-multiply.cjs.js",
-      module: "../dist/multiple-entrypoints-multiply.esm.js",
+      main: "dist/multiple-entrypoints-multiply.cjs.js",
+      module: "dist/multiple-entrypoints-multiply.esm.js",
     }),
-    "src/index.ts": js`
+    "src/index.js": js`
       export let sum = (a, b) => a + b;
-      export default "a";
     `,
-    "src/multiply.ts": js`
+    "src/multiply.js": js`
       export let multiply = (a, b) => a * b;
     `,
     "something.js": js`
-      const { multiply } = require("multiple-entrypoints/multiply");
-      console.log(multiply(2, 2) + "");
+      console.log(require("multiple-entrypoints/multiply").multiply(2, 2));
     `,
   });
 
   await dev(dir);
 
   let { code, stdout, stderr } = await spawn("node", [
-    path.join(dir, "something"),
+    path.join(dir, "something.js"),
   ]);
   expect(stderr.toString()).toBe("");
   expect(stdout.toString().split("\n")).toEqual(["4", ""]);
@@ -766,11 +758,6 @@ test("type: module", async () => {
       preconstruct: {
         exports: true,
         entrypoints: ["index.ts", "multiply.ts"],
-        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
-          importsConditions: true,
-          distInRoot: true,
-          typeModule: true,
-        },
       },
     }),
     "src/index.ts": js`
@@ -812,11 +799,6 @@ test("type: module running", async () => {
       preconstruct: {
         exports: true,
         entrypoints: ["index.js", "multiply.js"],
-        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
-          importsConditions: true,
-          distInRoot: true,
-          typeModule: true,
-        },
       },
     }),
     "src/index.js": js`

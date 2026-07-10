@@ -2,7 +2,7 @@ import build from "../";
 import {
   snapshotDirectory,
   install,
-  testdir,
+  testdirWithLegacyPreconstructDefaults as testdir,
   js,
   getDist,
   basicPkgJson,

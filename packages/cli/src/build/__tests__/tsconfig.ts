@@ -2,7 +2,7 @@ import path from "path";
 import build from "..";
 import {
   snapshotDirectory,
-  testdir,
+  testdirWithLegacyPreconstructDefaults as testdir,
   ts,
   repoNodeModules,
 } from "../../../test-utils";

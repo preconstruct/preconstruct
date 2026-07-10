@@ -1,13 +1,14 @@
 import build from "../";
 import path from "path";
+import spawn from "spawndamnit";
 import {
   snapshotDirectory,
   stripHashes,
-  testdir,
+  testdir as testdirWithNextMajorDefaults,
+  testdirWithLegacyPreconstructDefaults as testdir,
   js,
   getFiles,
 } from "../../../test-utils";
-import spawn from "spawndamnit";
 
 jest.setTimeout(10000);
 
@@ -85,6 +86,86 @@ test("multiple entrypoints", async () => {
     export { multiply };
 
   `);
+});
+
+test("multiple entrypoints with default imports and exports", async () => {
+  let dir = await testdirWithNextMajorDefaults({
+    "package.json": JSON.stringify({
+      name: "multiple-entrypoints",
+      main: "dist/multiple-entrypoints.cjs.js",
+      module: "dist/multiple-entrypoints.esm.js",
+      exports: {
+        ".": {
+          types: "./dist/multiple-entrypoints.cjs.js",
+          module: "./dist/multiple-entrypoints.esm.js",
+          default: "./dist/multiple-entrypoints.cjs.js",
+        },
+        "./multiply": {
+          types: "./multiply/dist/multiple-entrypoints-multiply.cjs.js",
+          module: "./multiply/dist/multiple-entrypoints-multiply.esm.js",
+          default: "./multiply/dist/multiple-entrypoints-multiply.cjs.js",
+        },
+        "./package.json": "./package.json",
+      },
+      preconstruct: {
+        exports: true,
+        entrypoints: ["index.js", "multiply.js"],
+      },
+    }),
+    "multiply/package.json": JSON.stringify({
+      main: "dist/multiple-entrypoints-multiply.cjs.js",
+      module: "dist/multiple-entrypoints-multiply.esm.js",
+    }),
+    "src/index.js": js`
+      export let sum = (a, b) => a + b;
+    `,
+    "src/multiply.js": js`
+      export let multiply = (a, b) => a * b;
+    `,
+    "runtime-blah.js": js`
+      console.log(require("multiple-entrypoints/multiply").multiply(2, 2));
+    `,
+  });
+
+  await build(dir);
+
+  expect(await getFiles(dir, ["**/dist/**"])).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/multiple-entrypoints.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    let sum = (a, b) => a + b;
+
+    exports.sum = sum;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/multiple-entrypoints.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    let sum = (a, b) => a + b;
+
+    export { sum };
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ multiply/dist/multiple-entrypoints-multiply.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    let multiply = (a, b) => a * b;
+
+    exports.multiply = multiply;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ multiply/dist/multiple-entrypoints-multiply.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    let multiply = (a, b) => a * b;
+
+    export { multiply };
+
+  `);
+
+  let { code, stdout, stderr } = await spawn("node", [
+    path.join(dir, "runtime-blah.js"),
+  ]);
+  expect(stderr.toString()).toBe("");
+  expect(stdout.toString().split("\n")).toEqual(["4", ""]);
+  expect(code).toBe(0);
 });
 
 test("two entrypoints, one module, one not", async () => {
@@ -196,90 +277,4 @@ test("two entrypoints where one requires the other entrypoint", async () => {
   let { multiply } = require(path.join(tmpPath, "multiply"));
 
   expect(multiply(2, 3)).toBe(6);
-});
-
-test("multiple entrypoints", async () => {
-  let dir = await testdir({
-    "package.json": JSON.stringify({
-      name: "multiple-entrypoints",
-      main: "dist/multiple-entrypoints.cjs.js",
-      module: "dist/multiple-entrypoints.esm.js",
-      exports: {
-        ".": {
-          types: "./dist/multiple-entrypoints.cjs.js",
-          module: "./dist/multiple-entrypoints.esm.js",
-          default: "./dist/multiple-entrypoints.cjs.js",
-        },
-        "./multiply": {
-          types: "./dist/multiple-entrypoints-multiply.cjs.js",
-          module: "./dist/multiple-entrypoints-multiply.esm.js",
-          default: "./dist/multiple-entrypoints-multiply.cjs.js",
-        },
-        "./package.json": "./package.json",
-      },
-      preconstruct: {
-        exports: true,
-        entrypoints: ["index.js", "multiply.js"],
-        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
-          importsConditions: true,
-          distInRoot: true,
-        },
-      },
-    }),
-    "multiply/package.json": JSON.stringify({
-      main: "../dist/multiple-entrypoints-multiply.cjs.js",
-      module: "../dist/multiple-entrypoints-multiply.esm.js",
-    }),
-    "src/index.js": js`
-      export let sum = (a, b) => a + b;
-    `,
-    "src/multiply.js": js`
-      export let multiply = (a, b) => a * b;
-    `,
-    "runtime-blah.js": js`
-      const { multiply } = require("multiple-entrypoints/multiply");
-      console.log(multiply(2, 2) + "");
-    `,
-  });
-
-  await build(dir);
-
-  expect(await getFiles(dir, ["**/dist/**"])).toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/multiple-entrypoints-multiply.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    Object.defineProperty(exports, '__esModule', { value: true });
-
-    let multiply = (a, b) => a * b;
-
-    exports.multiply = multiply;
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/multiple-entrypoints-multiply.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    let multiply = (a, b) => a * b;
-
-    export { multiply };
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/multiple-entrypoints.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    Object.defineProperty(exports, '__esModule', { value: true });
-
-    let sum = (a, b) => a + b;
-
-    exports.sum = sum;
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/multiple-entrypoints.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    let sum = (a, b) => a + b;
-
-    export { sum };
-
-  `);
-  let node = await spawn("node", ["runtime-blah.js"], { cwd: dir });
-
-  expect(node.stdout.toString("utf8")).toMatchInlineSnapshot(`
-    "4
-    "
-  `);
-  expect(node.stderr.toString("utf8")).toMatchInlineSnapshot(`""`);
-  expect(node.code).toBe(0);
 });

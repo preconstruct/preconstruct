@@ -88,7 +88,7 @@ function createEntrypoints(
             );
             if (!shouldDeleteEntrypointPkgJson) {
               throw new FatalError(
-                "this package has an entrypoint package.json but the typeModule feature is enabled, please remove the package.json",
+                'this package has an entrypoint package.json but "type": "module" is enabled, please remove the package.json',
                 pkg.name
               );
             }
@@ -349,9 +349,15 @@ export class Package extends Item<{
   }
 
   isTypeModule() {
-    return (
-      this.project.experimentalFlags.typeModule && this.json.type === "module"
-    );
+    return this.json.type === "module";
+  }
+
+  usesImports() {
+    return this.isTypeModule() || this.project.imports;
+  }
+
+  usesRootDist() {
+    return this.isTypeModule();
   }
 
   get name(): string {
@@ -386,7 +392,7 @@ export class Package extends Item<{
     | undefined;
   exportsFieldConfig(): CanonicalExportsFieldConfig | undefined {
     if (this._parsedImportsGroups === undefined) {
-      if (this.project.experimentalFlags.importsConditions) {
+      if (this.usesImports()) {
         this._parsedImportsGroups = parseImportsField(this.json.imports);
       } else {
         this._parsedImportsGroups = false;
@@ -394,7 +400,8 @@ export class Package extends Item<{
     }
     return parseExportsFieldConfig(
       this.json.preconstruct.exports,
-      this.project.directory !== this.directory
+      this.project.directory !== this.directory ||
+        this.json.preconstruct.exports === undefined
         ? this.project.exportsFieldConfig()
         : undefined,
       this.name,

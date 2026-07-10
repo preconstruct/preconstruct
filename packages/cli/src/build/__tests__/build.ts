@@ -7,7 +7,8 @@ import {
   getPkg,
   snapshotDistFiles,
   install,
-  testdir,
+  testdir as testdirWithNextMajorDefaults,
+  testdirWithLegacyPreconstructDefaults as testdir,
   js,
   getDist,
   repoNodeModules,
@@ -234,9 +235,12 @@ test("umd with dep on other module", async () => {
         "react": "^16.6.3",
       },
       "preconstruct": {
+        "dynamicImportInCjs": false,
+        "exports": false,
         "globals": {
           "react": "React",
         },
+        "imports": false,
         "umdName": "umdWithDep",
       },
       "umd:main": "dist/umd-with-dep.umd.min.js",
@@ -414,9 +418,12 @@ test("monorepo umd with dep on other module", async () => {
       "main": "index.js",
       "name": "monorepo-umd-with-dep",
       "preconstruct": {
+        "dynamicImportInCjs": false,
+        "exports": false,
         "globals": {
           "react": "React",
         },
+        "imports": false,
         "packages": [
           "packages/*",
         ],
@@ -621,19 +628,15 @@ test("respect browser alias field in dependencies when bundling UMD", async () =
   `);
 });
 
-test("keepDynamicImportAsDynamicImportInCommonJS experimental flag", async () => {
-  let dir = await testdir({
+test("dynamicImportInCjs", async () => {
+  let dir = await testdirWithNextMajorDefaults({
     "package.json": JSON.stringify({
       name: "test",
       main: "dist/test.cjs.js",
       dependencies: {
         "some-dep": "*",
       },
-      preconstruct: {
-        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
-          keepDynamicImportAsDynamicImportInCommonJS: true,
-        },
-      },
+      preconstruct: { exports: false },
     }),
     "src/index.js": js`
       import "some-dep";
@@ -673,11 +676,7 @@ test("using @babel/plugin-transform-runtime with useESModules: true", async () =
       dependencies: {
         "@babel/runtime": "*",
       },
-      preconstruct: {
-        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
-          keepDynamicImportAsDynamicImportInCommonJS: true,
-        },
-      },
+      preconstruct: {},
     }),
     "babel.config.json": JSON.stringify({
       presets: [require.resolve("@babel/preset-env")],
@@ -2011,7 +2010,7 @@ test("importConditionDefaultExport: default with use client", async () => {
 });
 
 test("default from use client module", async () => {
-  let dir = await testdir({
+  let dir = await testdirWithNextMajorDefaults({
     "package.json": JSON.stringify({
       name: "pkg-a",
       main: "dist/pkg-a.cjs.js",
@@ -2026,9 +2025,6 @@ test("default from use client module", async () => {
       },
       preconstruct: {
         exports: true,
-        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
-          importsConditions: true,
-        },
       },
     }),
     "src/index.js": js`
@@ -2388,11 +2384,6 @@ test("type: module", async () => {
       preconstruct: {
         exports: true,
         entrypoints: ["index.ts", "multiply.ts"],
-        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
-          importsConditions: true,
-          distInRoot: true,
-          typeModule: true,
-        },
       },
     }),
     "src/index.ts": js`
@@ -2467,11 +2458,6 @@ test("type: module with conditions", async () => {
       preconstruct: {
         exports: true,
         entrypoints: ["index.ts", "multiply.ts"],
-        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
-          importsConditions: true,
-          distInRoot: true,
-          typeModule: true,
-        },
       },
       imports: {
         "#something": {

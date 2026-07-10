@@ -1,7 +1,8 @@
 import path from "path";
 import build from "..";
 import {
-  testdir,
+  testdir as testdirWithNextMajorDefaults,
+  testdirWithLegacyPreconstructDefaults as testdir,
   typescriptFixture,
   getDist,
   getFiles,
@@ -237,16 +238,13 @@ test("onlyEmitUsedTypeScriptDeclarations with import x = require('')", async () 
   `);
 });
 
-test("replaces ts extensions in module specifiers within generated declarations with importsConditions", async () => {
-  let dir = await testdir({
+test("replaces ts extensions in module specifiers within generated declarations with imports", async () => {
+  let dir = await testdirWithNextMajorDefaults({
     "package.json": JSON.stringify({
       name: "@explicit-ts-extensions/repo",
       preconstruct: {
         packages: ["packages/pkg-a"],
         exports: {},
-        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
-          importsConditions: true,
-        },
       },
     }),
     "packages/pkg-a/package.json": JSON.stringify({

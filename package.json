@@ -68,9 +68,6 @@
     ],
     "exports": {
       "importConditionDefaultExport": "default"
-    },
-    "___experimentalFlags_WILL_CHANGE_IN_PATCH": {
-      "importsConditions": true
     }
   }
 }

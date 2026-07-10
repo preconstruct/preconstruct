@@ -1,5 +1,10 @@
 import build from "../";
-import { testdir, getDist, ts, repoNodeModules } from "../../../test-utils";
+import {
+  testdirWithLegacyPreconstructDefaults as testdir,
+  getDist,
+  ts,
+  repoNodeModules,
+} from "../../../test-utils";
 
 test("monorepo with root src dir and typescript package", async () => {
   let tmpPath = await testdir({

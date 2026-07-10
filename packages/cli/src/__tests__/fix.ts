@@ -62,6 +62,14 @@ test("set main and module field", async () => {
 
   expect(pkg).toMatchInlineSnapshot(`
     {
+      "exports": {
+        ".": {
+          "default": "./dist/basic-package.cjs.js",
+          "module": "./dist/basic-package.esm.js",
+          "types": "./dist/basic-package.cjs.js",
+        },
+        "./package.json": "./package.json",
+      },
       "license": "MIT",
       "main": "dist/basic-package.cjs.js",
       "module": "dist/basic-package.esm.js",
@@ -79,6 +87,7 @@ test("set exports field when opt-in", async () => {
       main: "index.js",
       module: "dist/package-exports.esm.js",
       preconstruct: {
+        imports: false,
         exports: {
           envConditions: ["worker", "browser"],
         },
@@ -110,6 +119,7 @@ test("set exports field when opt-in", async () => {
         "./package.json": "./package.json"
       },
       "preconstruct": {
+        "imports": false,
         "exports": {
           "envConditions": [
             "worker",
@@ -129,6 +139,7 @@ test("set exports field when opt-in", async () => {
       main: "index.js",
       module: "dist/package-exports.esm.js",
       preconstruct: {
+        imports: false,
         exports: {
           envConditions: ["worker", "browser"],
         },
@@ -160,6 +171,7 @@ test("set exports field when opt-in", async () => {
         "./package.json": "./package.json"
       },
       "preconstruct": {
+        "imports": false,
         "exports": {
           "envConditions": [
             "worker",
@@ -195,6 +207,7 @@ test("set exports field when opt-in with no env conditions", async () => {
       "module": "dist/package-exports.esm.js",
       "exports": {
         ".": {
+          "types": "./dist/package-exports.cjs.js",
           "module": "./dist/package-exports.esm.js",
           "default": "./dist/package-exports.cjs.js"
         },
@@ -216,6 +229,7 @@ test("set exports field with multiple entrypoints", async () => {
       module: "dist/package-exports.esm.js",
       preconstruct: {
         entrypoints: ["index.js", "other.js", "deep/something.js"],
+        imports: false,
         exports: {
           envConditions: ["worker", "browser"],
         },
@@ -290,6 +304,7 @@ test("set exports field with multiple entrypoints", async () => {
           "other.js",
           "deep/something.js"
         ],
+        "imports": false,
         "exports": {
           "envConditions": [
             "worker",
@@ -310,6 +325,7 @@ test("set exports field without root entrypoint", async () => {
           name: "@blah/something",
           preconstruct: {
             entrypoints: ["other.js"],
+            imports: false,
             exports: {
               envConditions: ["worker", "browser"],
             },
@@ -341,6 +357,7 @@ test("set exports field without root entrypoint", async () => {
         "entrypoints": [
           "other.js"
         ],
+        "imports": false,
         "exports": {
           "envConditions": [
             "worker",
@@ -379,6 +396,14 @@ test("new dist filenames", async () => {
 
   expect(pkg).toMatchInlineSnapshot(`
     {
+      "exports": {
+        ".": {
+          "default": "./dist/scope-something.cjs.js",
+          "module": "./dist/scope-something.esm.js",
+          "types": "./dist/scope-something.cjs.js",
+        },
+        "./package.json": "./package.json",
+      },
       "license": "MIT",
       "main": "dist/scope-something.cjs.js",
       "module": "dist/scope-something.esm.js",
@@ -407,6 +432,14 @@ test("new dist filenames only-unscoped-package-name strategy", async () => {
 
   expect(pkg).toMatchInlineSnapshot(`
     {
+      "exports": {
+        ".": {
+          "default": "./dist/something.cjs.js",
+          "module": "./dist/something.esm.js",
+          "types": "./dist/something.cjs.js",
+        },
+        "./package.json": "./package.json",
+      },
       "license": "MIT",
       "main": "dist/something.cjs.js",
       "module": "dist/something.esm.js",
@@ -486,6 +519,11 @@ test("invalid fields", async () => {
       "main": "dist/invalid-fields.cjs.js",
       "module": "dist/invalid-fields.esm.js",
       "name": "invalid-fields",
+      "preconstruct": {
+        "dynamicImportInCjs": false,
+        "exports": false,
+        "imports": false,
+      },
       "private": true,
       "version": "1.0.0",
     }
@@ -512,6 +550,9 @@ test("fix browser", async () => {
       "module": "dist/valid-package.esm.js",
       "name": "valid-package",
       "preconstruct": {
+        "dynamicImportInCjs": false,
+        "exports": false,
+        "imports": false,
         "umdName": "validPackage",
       },
       "private": true,
@@ -555,7 +596,16 @@ testFix(
     expect(contents).toMatchInlineSnapshot(`
       {
         "": {
+          "exports": {
+            ".": {
+              "default": "./dist/something.cjs.js",
+              "module": "./dist/something.esm.js",
+              "types": "./dist/something.cjs.js",
+            },
+            "./package.json": "./package.json",
+          },
           "main": "dist/something.cjs.js",
+          "module": "dist/something.esm.js",
           "name": "something",
           "preconstruct": {
             "umdName": "somethingUmdName",
@@ -617,10 +667,13 @@ test("create entrypoint", async () => {
       "module": "dist/valid-package.esm.js",
       "name": "valid-package",
       "preconstruct": {
+        "dynamicImportInCjs": false,
         "entrypoints": [
           "index.js",
           "another.js",
         ],
+        "exports": false,
+        "imports": false,
         "umdName": "validPackage",
       },
       "private": true,
@@ -656,10 +709,13 @@ test("create entrypoint no umd/no prompts", async () => {
       "module": "dist/valid-package.esm.js",
       "name": "valid-package",
       "preconstruct": {
+        "dynamicImportInCjs": false,
         "entrypoints": [
           "index.js",
           "another.js",
         ],
+        "exports": false,
+        "imports": false,
         "umdName": "validPackage",
       },
       "private": true,
@@ -709,7 +765,54 @@ test("unexpected former experimental flag is removed", async () => {
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     {
       "name": "pkg-a",
-      "main": "dist/pkg-a.cjs.js"
+      "main": "dist/pkg-a.cjs.js",
+      "module": "dist/pkg-a.esm.js",
+      "exports": {
+        ".": {
+          "types": "./dist/pkg-a.cjs.js",
+          "module": "./dist/pkg-a.esm.js",
+          "default": "./dist/pkg-a.cjs.js"
+        },
+        "./package.json": "./package.json"
+      }
+    }
+
+  `);
+});
+
+test("stabilised experimental flags are removed", async () => {
+  let tmpPath = await testdir({
+    "package.json": JSON.stringify({
+      name: "pkg-a",
+      main: "dist/pkg-a.cjs.js",
+      preconstruct: {
+        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
+          importsConditions: true,
+          distInRoot: true,
+          keepDynamicImportAsDynamicImportInCommonJS: true,
+          typeModule: true,
+        },
+      },
+    }),
+    "src/index.js": js`
+      export let x = true;
+    `,
+  });
+  await fix(tmpPath);
+  expect(await getFiles(tmpPath, ["package.json"])).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {
+      "name": "pkg-a",
+      "main": "dist/pkg-a.cjs.js",
+      "module": "dist/pkg-a.esm.js",
+      "exports": {
+        ".": {
+          "types": "./dist/pkg-a.cjs.js",
+          "module": "./dist/pkg-a.esm.js",
+          "default": "./dist/pkg-a.cjs.js"
+        },
+        "./package.json": "./package.json"
+      }
     }
 
   `);
@@ -735,6 +838,7 @@ test("no module field with exports field", async () => {
       "module": "dist/pkg-a.esm.js",
       "exports": {
         ".": {
+          "types": "./dist/pkg-a.cjs.js",
           "module": "./dist/pkg-a.esm.js",
           "default": "./dist/pkg-a.cjs.js"
         },
@@ -759,6 +863,7 @@ test("has browser field but no browser condition", async () => {
         "./dist/pkg-a.esm.js": "./dist/pkg-a.browser.esm.js",
       },
       preconstruct: {
+        imports: false,
         exports: true,
       },
     }),
@@ -785,6 +890,7 @@ test("has browser field but no browser condition", async () => {
         "./package.json": "./package.json"
       },
       "preconstruct": {
+        "imports": false,
         "exports": {
           "envConditions": [
             "browser"
@@ -803,6 +909,7 @@ test("has browser condition but no browser field", async () => {
       main: "dist/pkg-a.cjs.js",
       module: "dist/pkg-a.esm.js",
       preconstruct: {
+        imports: false,
         exports: {
           envConditions: ["browser"],
         },
@@ -832,6 +939,7 @@ test("has browser condition but no browser field", async () => {
         "./package.json": "./package.json"
       },
       "preconstruct": {
+        "imports": false,
         "exports": {
           "envConditions": [
             "browser"
@@ -864,6 +972,7 @@ test("preconstruct.exports: true no exports field", async () => {
       "module": "dist/pkg-a.esm.js",
       "exports": {
         ".": {
+          "types": "./dist/pkg-a.cjs.js",
           "module": "./dist/pkg-a.esm.js",
           "default": "./dist/pkg-a.cjs.js"
         },
@@ -911,6 +1020,7 @@ test("project level exports field config", async () => {
       "module": "dist/pkg-a.esm.js",
       "exports": {
         ".": {
+          "types": "./dist/pkg-a.cjs.js",
           "module": "./dist/pkg-a.esm.js",
           "default": "./dist/pkg-a.cjs.js"
         },
@@ -960,6 +1070,7 @@ test("experimental exports flag is removed", async () => {
       "module": "dist/pkg-a.esm.js",
       "exports": {
         ".": {
+          "types": "./dist/pkg-a.cjs.js",
           "module": "./dist/pkg-a.esm.js",
           "default": "./dist/pkg-a.cjs.js"
         },
@@ -1006,10 +1117,7 @@ test("import conditions fix", async () => {
     {
       "name": "@scope/pkg",
       "preconstruct": {
-        "exports": true,
-        "___experimentalFlags_WILL_CHANGE_IN_PATCH": {
-          "importsConditions": true
-        }
+        "exports": true
       },
       "imports": {
         "#is-development": {
@@ -1101,9 +1209,6 @@ test("import conditions fix with importConditionDefaultExport: default", async (
       "preconstruct": {
         "exports": {
           "importConditionDefaultExport": "default"
-        },
-        "___experimentalFlags_WILL_CHANGE_IN_PATCH": {
-          "importsConditions": true
         }
       },
       "imports": {
@@ -1231,11 +1336,6 @@ test("type: module removes package.json", async () => {
       preconstruct: {
         exports: true,
         entrypoints: ["index.ts", "multiply.ts"],
-        ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
-          importsConditions: true,
-          distInRoot: true,
-          typeModule: true,
-        },
       },
     }),
     "multiply/package.json": JSON.stringify({
@@ -1259,7 +1359,7 @@ test("type: module removes package.json", async () => {
 
   expect(await getFiles(dir, ["**/package.json"])).toMatchInlineSnapshot(`
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    {"name":"multiple-entrypoints","type":"module","exports":{".":"./dist/multiple-entrypoints.js","./multiply":"./dist/multiple-entrypoints-multiply.js","./package.json":"./package.json"},"preconstruct":{"exports":true,"entrypoints":["index.ts","multiply.ts"],"___experimentalFlags_WILL_CHANGE_IN_PATCH":{"importsConditions":true,"distInRoot":true,"typeModule":true}}}
+    {"name":"multiple-entrypoints","type":"module","exports":{".":"./dist/multiple-entrypoints.js","./multiply":"./dist/multiple-entrypoints-multiply.js","./package.json":"./package.json"},"preconstruct":{"exports":true,"entrypoints":["index.ts","multiply.ts"]}}
   `);
 });
 
@@ -1281,11 +1381,6 @@ test("type: module removes main/module/browser/umd:main fields in package.json",
         preconstruct: {
           exports: true,
           entrypoints: ["index.ts", "multiply.ts"],
-          ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
-            importsConditions: true,
-            distInRoot: true,
-            typeModule: true,
-          },
         },
       },
       null,
@@ -1325,12 +1420,7 @@ test("type: module removes main/module/browser/umd:main fields in package.json",
         "entrypoints": [
           "index.ts",
           "multiply.ts"
-        ],
-        "___experimentalFlags_WILL_CHANGE_IN_PATCH": {
-          "importsConditions": true,
-          "distInRoot": true,
-          "typeModule": true
-        }
+        ]
       }
     }
 

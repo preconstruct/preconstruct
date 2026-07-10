@@ -26,6 +26,8 @@ export class Project extends Item<{
     packages?: JSONValue;
     distFilenameStrategy?: JSONValue;
     exports?: JSONValue;
+    imports?: JSONValue;
+    dynamicImportInCjs?: JSONValue;
     ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
       logCompiledFiles?: JSONValue;
       keepDynamicImportAsDynamicImportInCommonJS?: JSONValue;
@@ -39,26 +41,16 @@ export class Project extends Item<{
   get experimentalFlags() {
     let config =
       this.json.preconstruct.___experimentalFlags_WILL_CHANGE_IN_PATCH || {};
-    if (config.distInRoot && !config.importsConditions) {
-      throw new FatalError(
-        "distInRoot is not supported without importsConditions",
-        this.name
-      );
-    }
-    if (config.typeModule && !config.distInRoot) {
-      throw new FatalError(
-        "typeModule is not supported without distInRoot",
-        this.name
-      );
-    }
     return {
       logCompiledFiles: !!config.logCompiledFiles,
-      keepDynamicImportAsDynamicImportInCommonJS: !!config.keepDynamicImportAsDynamicImportInCommonJS,
-      importsConditions: !!config.importsConditions,
-      distInRoot: !!config.distInRoot,
-      typeModule: !!config.typeModule,
       checkTypeDependencies: !!config.checkTypeDependencies,
     };
+  }
+  get imports() {
+    return this.json.preconstruct.imports !== false;
+  }
+  get dynamicImportInCjs() {
+    return this.json.preconstruct.dynamicImportInCjs !== false;
   }
   get configPackages(): Array<string> {
     if (this.json.preconstruct.packages === undefined) {
@@ -163,11 +155,11 @@ export class Project extends Item<{
     | undefined
     | { importConditionDefaultExport: "namespace" | "default" } {
     const exportsFieldConfig = this.json.preconstruct.exports;
-    if (exportsFieldConfig === false || exportsFieldConfig === undefined) {
+    if (exportsFieldConfig === false) {
       return undefined;
     }
     let importConditionDefaultExport: "namespace" | "default" = "namespace";
-    if (exportsFieldConfig === true) {
+    if (exportsFieldConfig === true || exportsFieldConfig === undefined) {
       return { importConditionDefaultExport };
     }
     if (

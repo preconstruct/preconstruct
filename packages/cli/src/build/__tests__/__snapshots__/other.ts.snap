@@ -72,6 +72,11 @@ exports[`browser no module: package.json 1`] = `
   },
   "main": "dist/browser-no-module.cjs.js",
   "name": "browser-no-module",
+  "preconstruct": {
+    "dynamicImportInCjs": false,
+    "exports": false,
+    "imports": false,
+  },
 }
 `;
 
@@ -297,6 +302,11 @@ exports[`using external @babel/runtime helpers: package.json 1`] = `
   "main": "dist/external-babel-runtime.cjs.js",
   "module": "dist/external-babel-runtime.esm.js",
   "name": "external-babel-runtime",
+  "preconstruct": {
+    "dynamicImportInCjs": false,
+    "exports": false,
+    "imports": false,
+  },
 }
 `;
 

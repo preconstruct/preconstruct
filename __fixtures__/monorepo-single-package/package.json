@@ -5,6 +5,9 @@
   "license": "MIT",
   "private": true,
   "preconstruct": {
+    "exports": false,
+    "imports": false,
+    "dynamicImportInCjs": false,
     "packages": [
       "packages/package-two"
     ]

@@ -4,7 +4,7 @@ import fixturez from "fixturez";
 import {
   snapshotDistFiles,
   snapshotDirectory,
-  testdir,
+  testdirWithLegacyPreconstructDefaults as testdir,
   getDist,
   tsx,
   ts,

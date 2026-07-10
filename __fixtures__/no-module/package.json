@@ -3,5 +3,10 @@
   "version": "1.0.0",
   "main": "dist/no-module.cjs.js",
   "license": "MIT",
-  "private": true
+  "private": true,
+  "preconstruct": {
+    "exports": false,
+    "imports": false,
+    "dynamicImportInCjs": false
+  }
 }

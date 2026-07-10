@@ -79,9 +79,9 @@ export let getRollupConfig = (
   }
 
   let input: Record<string, string> = {};
-  const { distInRoot } = pkg.project.experimentalFlags;
+  const usesRootDist = pkg.usesRootDist();
   for (const entrypoint of entrypoints) {
-    if (distInRoot) {
+    if (usesRootDist) {
       input[`dist/${getBaseDistName(entrypoint)}`] = entrypoint.source;
       continue;
     }
@@ -218,8 +218,7 @@ export let getRollupConfig = (
           },
           preventAssignment: true,
         }),
-      pkg.project.experimentalFlags
-        .keepDynamicImportAsDynamicImportInCommonJS && cjsDynamicImportPlugin,
+      pkg.project.dynamicImportInCjs && cjsDynamicImportPlugin,
     ].filter((x): x is Plugin => !!x),
   };
 
