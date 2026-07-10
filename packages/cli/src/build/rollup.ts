@@ -7,12 +7,11 @@ import path from "path";
 import builtInModules from "builtin-modules";
 import { Package } from "../package";
 import { Entrypoint } from "../entrypoint";
-import { RollupOptions, Plugin } from "rollup";
+import type { RolldownOptions, Plugin } from "rolldown";
 import { FatalError, BatchError } from "../errors";
 import rewriteBabelRuntimeHelpers from "../rollup-plugins/rewrite-babel-runtime-helpers";
 import typescriptDeclarations from "../rollup-plugins/typescript-declarations";
 import mjsProxy from "../rollup-plugins/mjs-proxy";
-import json from "@rollup/plugin-json";
 import babel from "../rollup-plugins/babel";
 import terser from "../rollup-plugins/terser";
 import { getBaseDistName } from "../utils";
@@ -22,6 +21,7 @@ import { serverComponentsPlugin } from "../rollup-plugins/server-components";
 import { resolveErrorsPlugin } from "../rollup-plugins/resolve";
 import { Project } from "../project";
 import flow from "../rollup-plugins/flow";
+import { codeFrameColumns } from "@babel/code-frame";
 
 type ExternalPredicate = (source: string) => boolean;
 
@@ -50,7 +50,7 @@ export let getRollupConfig = (
         conditions: string[];
       },
   reportTransformedFile: (filename: string) => void
-): RollupOptions => {
+): RolldownOptions => {
   let external = [];
   if (pkg.json.peerDependencies) {
     external.push(...Object.keys(pkg.json.peerDependencies));
@@ -91,7 +91,12 @@ export let getRollupConfig = (
   const isDefaultConditionsBuild =
     options.kind === "conditions" && options.conditions.length === 0;
 
-  const config: RollupOptions = {
+  const config: RolldownOptions = {
+    cwd: pkg.directory,
+    checks: {
+      pluginTimings: false,
+      preferBuiltinFeature: false,
+    },
     input,
     external: wrapExternalPredicate(makeExternalPredicate(external)),
     onwarn: (warning) => {
@@ -142,6 +147,35 @@ export let getRollupConfig = (
           }
         },
       } as Plugin,
+      {
+        name: "top-level-this",
+        transform(code, id) {
+          if (
+            id.startsWith("\0") ||
+            !id.startsWith(pkg.directory) ||
+            id.includes(`${path.sep}node_modules${path.sep}`) ||
+            code.includes("@flow") ||
+            !/\.jsx?$/.test(id)
+          )
+            return null;
+          const ast = this.parse(code);
+          const thisExpression = findTopLevelThis(ast);
+          if (thisExpression === undefined) return null;
+          const before = code.slice(0, thisExpression.start);
+          const line = before.split("\n").length;
+          const column = thisExpression.start - before.lastIndexOf("\n");
+          warnings.add(
+            `"${normalizePath(
+              path.relative(pkg.directory, id)
+            )}" used \`this\` keyword at the top level of an ES module. You can read more about this at https://rollupjs.org/guide/en/#error-this-is-undefined and fix this issue that has happened here:\n\n${codeFrameColumns(
+              code,
+              { start: { line, column } },
+              { linesAbove: 0, linesBelow: 0 }
+            )}\n`
+          );
+          return null;
+        },
+      } as Plugin,
       (options.kind === "node" || isDefaultConditionsBuild) && flow(),
       resolveErrorsPlugin(pkg, warnings, options.kind === "umd"),
       (options.kind === "node" || isDefaultConditionsBuild) &&
@@ -149,7 +183,10 @@ export let getRollupConfig = (
       (options.kind === "node" || options.kind === "conditions") &&
         pkg.exportsFieldConfig()?.importConditionDefaultExport === "default" &&
         mjsProxy(pkg),
-      serverComponentsPlugin({ sourceMap: options.kind === "umd" }),
+      serverComponentsPlugin({
+        sourceMap: options.kind === "umd",
+        root: pkg.directory,
+      }),
       babel({
         cwd: pkg.project.directory,
         reportTransformedFile,
@@ -172,9 +209,6 @@ export let getRollupConfig = (
         }),
 
       rewriteBabelRuntimeHelpers(),
-      json({
-        namedExports: false,
-      }),
       options.kind === "umd" &&
         alias({
           entries: getAliases(pkg.project),
@@ -192,7 +226,6 @@ export let getRollupConfig = (
           sourceMap: true,
           compress: true,
         }),
-      pkg.project.dynamicImportInCjs && cjsDynamicImportPlugin,
     ].filter((x): x is Plugin => !!x),
   };
 
@@ -221,13 +254,20 @@ function escapeForRegex(value: string) {
   return value.replace(/[|\\{}()[\]^$+*?.-]/g, "\\$&");
 }
 
-const cjsDynamicImportPlugin: Plugin = {
-  name: "cjs render dynamic import",
-  renderDynamicImport({ format }) {
-    if (format !== "cjs") return;
-    return {
-      left: "import(",
-      right: ")",
-    };
-  },
-};
+function findTopLevelThis(value: unknown): { start: number } | undefined {
+  if (value === null || typeof value !== "object") return;
+  const node = value as { type?: string; start?: number };
+  if (node.type === "ThisExpression" && node.start !== undefined) {
+    return { start: node.start };
+  }
+  if (
+    node.type === "FunctionDeclaration" ||
+    node.type === "FunctionExpression"
+  ) {
+    return;
+  }
+  for (const child of Object.values(value)) {
+    const found = findTopLevelThis(child);
+    if (found !== undefined) return found;
+  }
+}

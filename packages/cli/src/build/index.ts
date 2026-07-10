@@ -1,7 +1,8 @@
 import { Package } from "../package";
 import { Project } from "../project";
 import path from "path";
-import { rollup, OutputAsset, OutputChunk, OutputOptions } from "rollup";
+import type { OutputAsset, OutputChunk, OutputOptions } from "rolldown";
+import { rolldown } from "rolldown";
 import * as logger from "../logger";
 import * as fs from "fs-extra";
 import {
@@ -10,7 +11,7 @@ import {
   ScopelessError,
   BatchError,
 } from "../errors";
-import { getRollupConfigs } from "./config";
+import { getRollupConfigs, prepareUmdGlobals } from "./config";
 import { createWorker, destroyWorker } from "../worker-client";
 import { validateProject } from "../validate";
 import { cleanProjectBeforeBuild } from "./utils";
@@ -57,19 +58,28 @@ function writeOutputFile(
 }
 
 async function buildPackage(pkg: Package) {
+  await prepareUmdGlobals(pkg);
   let configs = getRollupConfigs(pkg);
-
   let outputs = await Promise.all(
     configs.map(async ({ config, outputs }) => {
-      let bundle = await rollup(config);
-      return Promise.all(
-        outputs.map(async (outputConfig) => {
-          return {
-            output: (await bundle.generate(outputConfig)).output,
-            outputConfig,
+      let bundle = await rolldown(config);
+      try {
+        const generatedOutputs = [];
+        for (const outputConfig of outputs) {
+          const resolvedOutputConfig = {
+            ...outputConfig,
+            dynamicImportInCjs: pkg.project.dynamicImportInCjs,
           };
-        })
-      );
+          const generated = await bundle.generate(resolvedOutputConfig);
+          generatedOutputs.push({
+            output: generated.output,
+            outputConfig: resolvedOutputConfig,
+          });
+        }
+        return generatedOutputs;
+      } finally {
+        await bundle.close();
+      }
     })
   );
   await Promise.all(
@@ -113,7 +123,7 @@ async function retryableBuild(pkg: Package) {
 export default async function build(directory: string) {
   // do more stuff with checking whether the repo is using yarn workspaces or bolt
   try {
-    createWorker();
+    await createWorker();
     let project = await Project.create(directory);
 
     validateProject(project);

@@ -1,5 +1,8 @@
 import { EOL } from "os";
 import resolveFrom from "resolve-from";
+import { createRequire } from "module";
+
+const require = createRequire(import.meta.url);
 import { FatalError } from "../../errors";
 import * as fs from "fs-extra";
 import path from "path";

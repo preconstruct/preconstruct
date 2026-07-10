@@ -10,15 +10,16 @@ import {
   testdir,
   getFiles,
 } from "../../test-utils";
+import type { Mocked } from "vitest";
 
 const f = fixturez(__dirname);
 
-jest.mock("../prompt");
+vi.mock("../prompt");
 
-let confirms = _confirms as jest.Mocked<typeof _confirms>;
+let confirms = _confirms as Mocked<typeof _confirms>;
 
 afterEach(() => {
-  jest.resetAllMocks();
+  vi.resetAllMocks();
 });
 
 test("no entrypoint", async () => {

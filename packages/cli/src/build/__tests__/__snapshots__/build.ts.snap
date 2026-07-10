@@ -1,243 +1,261 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`flow: flow.cjs.js 1`] = `
-"'use strict';
-
-Object.defineProperty(exports, '__esModule', { value: true });
-
-var a = "wow";
-
+exports[`flow > flow.cjs.js 1`] = `
+"Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+//#region src/a.js
+var a_default = "wow";
+//#endregion
+//#region src/index.js
 function doSomething(arg) {
-  return "something" + arg;
+	return "something" + arg;
 }
-
+//#endregion
 exports.doSomething = doSomething;
-exports.something = a;
+exports.something = a_default;
 "
 `;
 
-exports[`flow: flow.cjs.js.flow 1`] = `
+exports[`flow > flow.cjs.js.flow 1`] = `
 "// @flow
 export * from "../src/index.js";
 "
 `;
 
-exports[`flow: flow.esm.js 1`] = `
-"var a = "wow";
-
+exports[`flow > flow.esm.js 1`] = `
+"//#region src/a.js
+var a_default = "wow";
+//#endregion
+//#region src/index.js
 function doSomething(arg) {
-  return "something" + arg;
+	return "something" + arg;
 }
-
-export { doSomething, a as something };
+//#endregion
+export { doSomething, a_default as something };
 "
 `;
 
-exports[`flow: flow.esm.js.flow 1`] = `
+exports[`flow > flow.esm.js.flow 1`] = `
 "// @flow
 export * from "../src/index.js";
 "
 `;
 
-exports[`flow: flow-export-default.cjs.js 1`] = `
-"'use strict';
-
-Object.defineProperty(exports, '__esModule', { value: true });
-
+exports[`flow > flow-export-default.cjs.js 1`] = `
+"Object.defineProperties(exports, {
+	__esModule: { value: true },
+	[Symbol.toStringTag]: { value: "Module" }
+});
+//#region src/index.js
 function doSomething(arg) {
-  return "something" + arg;
+	return "something" + arg;
 }
-var index = "wow";
-
-exports["default"] = index;
+var src_default = "wow";
+//#endregion
+exports.default = src_default;
 exports.doSomething = doSomething;
 "
 `;
 
-exports[`flow: flow-export-default.cjs.js.flow 1`] = `
+exports[`flow > flow-export-default.cjs.js.flow 1`] = `
 "// @flow
 export * from "../src/index.js";
 export { default } from "../src/index.js";
 "
 `;
 
-exports[`flow: flow-export-default.esm.js 1`] = `
-"function doSomething(arg) {
-  return "something" + arg;
+exports[`flow > flow-export-default.esm.js 1`] = `
+"//#region src/index.js
+function doSomething(arg) {
+	return "something" + arg;
 }
-var index = "wow";
-
-export { index as default, doSomething };
+var src_default = "wow";
+//#endregion
+export { src_default as default, doSomething };
 "
 `;
 
-exports[`flow: flow-export-default.esm.js.flow 1`] = `
+exports[`flow > flow-export-default.esm.js.flow 1`] = `
 "// @flow
 export * from "../src/index.js";
 export { default } from "../src/index.js";
 "
 `;
 
-exports[`monorepo single package: some-scope-package-two-single-package.cjs.js 1`] = `
-"'use strict';
-
-Object.defineProperty(exports, '__esModule', { value: true });
-
-var index = 2;
-
-exports["default"] = index;
+exports[`monorepo > some-scope-package-one.cjs.js 1`] = `
+"Object.defineProperties(exports, {
+	__esModule: { value: true },
+	[Symbol.toStringTag]: { value: "Module" }
+});
+//#region src/index.js
+var src_default = 1;
+//#endregion
+exports.default = src_default;
 "
 `;
 
-exports[`monorepo single package: some-scope-package-two-single-package.esm.js 1`] = `
-"var index = 2;
-
-export { index as default };
+exports[`monorepo > some-scope-package-one.esm.js 1`] = `
+"//#region src/index.js
+var src_default = 1;
+//#endregion
+export { src_default as default };
 "
 `;
 
-exports[`monorepo umd with dep on other module: some-scope-package-four-umd-with-dep.cjs.js 1`] = `
-"'use strict';
-
-require('@some-scope/package-one-umd-with-dep');
-
+exports[`monorepo > some-scope-package-two.cjs.js 1`] = `
+"Object.defineProperties(exports, {
+	__esModule: { value: true },
+	[Symbol.toStringTag]: { value: "Module" }
+});
+//#region src/index.js
+var src_default = 2;
+//#endregion
+exports.default = src_default;
 "
 `;
 
-exports[`monorepo umd with dep on other module: some-scope-package-four-umd-with-dep.umd.min.js 1`] = `
-"!function(e,t){"object"==typeof exports&&"undefined"!=typeof module?t(require("react")):"function"==typeof define&&define.amd?define(["react"],t):t((e="undefined"!=typeof globalThis?globalThis:e||self).React)}(this,(function(e){"use strict";e.createElement("div",null)}));
-//# sourceMappingURL=some-scope-package-four-umd-with-dep.umd.min.js.map
+exports[`monorepo > some-scope-package-two.esm.js 1`] = `
+"//#region src/index.js
+var src_default = 2;
+//#endregion
+export { src_default as default };
 "
 `;
 
-exports[`monorepo umd with dep on other module: some-scope-package-four-umd-with-dep.umd.min.js.map 1`] = `"{"version":3,"file":"some-scope-package-four-umd-with-dep.umd.min.js","sources":["../../package-one/src/index.js"],"sourcesContent":["import { createElement } from \\"react\\";\\n\\ncreateElement(\\"div\\", null);"],"names":["createElement"],"mappings":"iPAEAA,EAAAA,cAAc,MAAO"}"`;
-
-exports[`monorepo umd with dep on other module: some-scope-package-one-umd-with-dep.cjs.js 1`] = `
-"'use strict';
-
-var react = require('react');
-
-react.createElement("div", null);
+exports[`monorepo single package > some-scope-package-two-single-package.cjs.js 1`] = `
+"Object.defineProperties(exports, {
+	__esModule: { value: true },
+	[Symbol.toStringTag]: { value: "Module" }
+});
+//#region src/index.js
+var src_default = 2;
+//#endregion
+exports.default = src_default;
 "
 `;
 
-exports[`monorepo umd with dep on other module: some-scope-package-one-umd-with-dep.umd.min.js 1`] = `
-"!function(e,t){"object"==typeof exports&&"undefined"!=typeof module?t(require("react")):"function"==typeof define&&define.amd?define(["react"],t):t((e="undefined"!=typeof globalThis?globalThis:e||self).React)}(this,(function(e){"use strict";e.createElement("div",null)}));
-//# sourceMappingURL=some-scope-package-one-umd-with-dep.umd.min.js.map
+exports[`monorepo single package > some-scope-package-two-single-package.esm.js 1`] = `
+"//#region src/index.js
+var src_default = 2;
+//#endregion
+export { src_default as default };
 "
 `;
 
-exports[`monorepo umd with dep on other module: some-scope-package-one-umd-with-dep.umd.min.js.map 1`] = `"{"version":3,"file":"some-scope-package-one-umd-with-dep.umd.min.js","sources":["../src/index.js"],"sourcesContent":["import { createElement } from \\"react\\";\\n\\ncreateElement(\\"div\\", null);"],"names":["createElement"],"mappings":"iPAEAA,EAAAA,cAAc,MAAO"}"`;
-
-exports[`monorepo umd with dep on other module: some-scope-package-three-umd-with-dep.cjs.js 1`] = `
-"'use strict';
-
-require('@some-scope/package-one-umd-with-dep');
-
+exports[`monorepo umd with dep on other module > some-scope-package-four-umd-with-dep.cjs.js 1`] = `
+"Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+require("@some-scope/package-one-umd-with-dep");
 "
 `;
 
-exports[`monorepo umd with dep on other module: some-scope-package-three-umd-with-dep.umd.min.js 1`] = `
-"!function(e){"function"==typeof define&&define.amd?define(["@some-scope/package-one-umd-with-dep"],e):e()}((function(){}));
-//# sourceMappingURL=some-scope-package-three-umd-with-dep.umd.min.js.map
+exports[`monorepo umd with dep on other module > some-scope-package-four-umd-with-dep.umd.min.js 1`] = `
+"(function(e, n) {
+	"object" == typeof exports && "undefined" != typeof module ? n(require("react")) : "function" == typeof define && define.amd ? define(["react"], n) : n((e = "undefined" != typeof globalThis ? globalThis : e || self).React);
+})(this, (function(e) {
+	(0, e.createElement)("div", null);
+}));
+
+//# sourceMappingURL=some-scope-package-four-umd-with-dep.umd.min.js.map//# sourceMappingURL=some-scope-package-four-umd-with-dep.umd.min.js.map
 "
 `;
 
-exports[`monorepo umd with dep on other module: some-scope-package-three-umd-with-dep.umd.min.js.map 1`] = `"{"version":3,"file":"some-scope-package-three-umd-with-dep.umd.min.js","sources":[],"sourcesContent":[],"names":[],"mappings":""}"`;
+exports[`monorepo umd with dep on other module > some-scope-package-four-umd-with-dep.umd.min.js.map 1`] = `"{"version":3,"file":"some-scope-package-four-umd-with-dep.umd.min.js","names":["createElement"],"sources":["../../package-one/src/index.js"],"sourcesContent":["import { createElement } from \\"react\\";\\n\\ncreateElement(\\"div\\", null);"],"mappings":";;;EAEAA,GAAAA,EAAAA,cAAAA,CAAc,OAAO,IAAA;AAAA,EAAA"}"`;
 
-exports[`monorepo umd with dep on other module: some-scope-package-two-umd-with-dep.cjs.js 1`] = `
-"'use strict';
-
-var react = require('react');
-
-react.createElement("h1", null);
+exports[`monorepo umd with dep on other module > some-scope-package-one-umd-with-dep.cjs.js 1`] = `
+"Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+//#region src/index.js
+(0, require("react").createElement)("div", null);
+//#endregion
 "
 `;
 
-exports[`monorepo umd with dep on other module: some-scope-package-two-umd-with-dep.umd.min.js 1`] = `
-"!function(e,t){"object"==typeof exports&&"undefined"!=typeof module?t(require("react")):"function"==typeof define&&define.amd?define(["react"],t):t((e="undefined"!=typeof globalThis?globalThis:e||self).React)}(this,(function(e){"use strict";e.createElement("h1",null)}));
-//# sourceMappingURL=some-scope-package-two-umd-with-dep.umd.min.js.map
+exports[`monorepo umd with dep on other module > some-scope-package-one-umd-with-dep.umd.min.js 1`] = `
+"(function(e, n) {
+	"object" == typeof exports && "undefined" != typeof module ? n(require("react")) : "function" == typeof define && define.amd ? define(["react"], n) : n((e = "undefined" != typeof globalThis ? globalThis : e || self).React);
+})(this, (function(e) {
+	(0, e.createElement)("div", null);
+}));
+
+//# sourceMappingURL=some-scope-package-one-umd-with-dep.umd.min.js.map//# sourceMappingURL=some-scope-package-one-umd-with-dep.umd.min.js.map
 "
 `;
 
-exports[`monorepo umd with dep on other module: some-scope-package-two-umd-with-dep.umd.min.js.map 1`] = `"{"version":3,"file":"some-scope-package-two-umd-with-dep.umd.min.js","sources":["../src/index.js"],"sourcesContent":["import { createElement } from \\"react\\";\\n\\ncreateElement(\\"h1\\", null);"],"names":["createElement"],"mappings":"iPAEAA,EAAAA,cAAc,KAAM"}"`;
+exports[`monorepo umd with dep on other module > some-scope-package-one-umd-with-dep.umd.min.js.map 1`] = `"{"version":3,"file":"some-scope-package-one-umd-with-dep.umd.min.js","names":["createElement"],"sources":["../src/index.js"],"sourcesContent":["import { createElement } from \\"react\\";\\n\\ncreateElement(\\"div\\", null);"],"mappings":";;;EAEAA,GAAAA,EAAAA,cAAAA,CAAc,OAAO,IAAA;AAAA,EAAA"}"`;
 
-exports[`monorepo: some-scope-package-one.cjs.js 1`] = `
-"'use strict';
-
-Object.defineProperty(exports, '__esModule', { value: true });
-
-var index = 1;
-
-exports["default"] = index;
+exports[`monorepo umd with dep on other module > some-scope-package-three-umd-with-dep.cjs.js 1`] = `
+"Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+require("@some-scope/package-one-umd-with-dep");
 "
 `;
 
-exports[`monorepo: some-scope-package-one.esm.js 1`] = `
-"var index = 1;
-
-export { index as default };
+exports[`monorepo umd with dep on other module > some-scope-package-three-umd-with-dep.umd.min.js 1`] = `
+"(function(e, o) {
+	"object" == typeof exports && "undefined" != typeof module ? require("@some-scope/package-one-umd-with-dep") : "function" == typeof define && define.amd ? define(["@some-scope/package-one-umd-with-dep"], o) : (e = "undefined" != typeof globalThis ? globalThis : e || self).packageOne;
+})(this, (function(e) {}));
 "
 `;
 
-exports[`monorepo: some-scope-package-two.cjs.js 1`] = `
-"'use strict';
-
-Object.defineProperty(exports, '__esModule', { value: true });
-
-var index = 2;
-
-exports["default"] = index;
+exports[`monorepo umd with dep on other module > some-scope-package-two-umd-with-dep.cjs.js 1`] = `
+"Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+//#region src/index.js
+(0, require("react").createElement)("h1", null);
+//#endregion
 "
 `;
 
-exports[`monorepo: some-scope-package-two.esm.js 1`] = `
-"var index = 2;
+exports[`monorepo umd with dep on other module > some-scope-package-two-umd-with-dep.umd.min.js 1`] = `
+"(function(e, n) {
+	"object" == typeof exports && "undefined" != typeof module ? n(require("react")) : "function" == typeof define && define.amd ? define(["react"], n) : n((e = "undefined" != typeof globalThis ? globalThis : e || self).React);
+})(this, (function(e) {
+	(0, e.createElement)("h1", null);
+}));
 
-export { index as default };
+//# sourceMappingURL=some-scope-package-two-umd-with-dep.umd.min.js.map//# sourceMappingURL=some-scope-package-two-umd-with-dep.umd.min.js.map
 "
 `;
 
-exports[`no module: no-module.cjs.js 1`] = `
-"'use strict';
+exports[`monorepo umd with dep on other module > some-scope-package-two-umd-with-dep.umd.min.js.map 1`] = `"{"version":3,"file":"some-scope-package-two-umd-with-dep.umd.min.js","names":["createElement"],"sources":["../src/index.js"],"sourcesContent":["import { createElement } from \\"react\\";\\n\\ncreateElement(\\"h1\\", null);"],"mappings":";;;EAEAA,GAAAA,EAAAA,cAAAA,CAAc,MAAM,IAAA;AAAA,EAAA"}"`;
 
-Object.defineProperty(exports, '__esModule', { value: true });
-
-var index = "this does not have a module build";
-
-exports["default"] = index;
+exports[`no module > no-module.cjs.js 1`] = `
+"Object.defineProperties(exports, {
+	__esModule: { value: true },
+	[Symbol.toStringTag]: { value: "Module" }
+});
+//#region src/index.js
+var src_default = "this does not have a module build";
+//#endregion
+exports.default = src_default;
 "
 `;
 
-exports[`preserves process.env.NODE_ENV checks: prod-checks.cjs.js 1`] = `
-"'use strict';
-
-Object.defineProperty(exports, '__esModule', { value: true });
-
+exports[`preserves process.env.NODE_ENV checks > prod-checks.cjs.js 1`] = `
+"Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+//#region src/index.js
 function thing() {
-  if (process.env.NODE_ENV !== "production") {
-    return "not prod";
-  }
-  return "prod";
+	if (process.env.NODE_ENV !== "production") return "not prod";
+	return "prod";
 }
-
+//#endregion
 exports.thing = thing;
 "
 `;
 
-exports[`umd with dep on other module: umd-with-dep.cjs.js 1`] = `
-"'use strict';
-
-var react = require('react');
-
-react.createElement("div", null);
+exports[`umd with dep on other module > umd-with-dep.cjs.js 1`] = `
+"Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+//#region src/index.js
+(0, require("react").createElement)("div", null);
+//#endregion
 "
 `;
 
-exports[`umd with dep on other module: umd-with-dep.umd.min.js 1`] = `
-"!function(e,t){"object"==typeof exports&&"undefined"!=typeof module?t(require("react")):"function"==typeof define&&define.amd?define(["react"],t):t((e="undefined"!=typeof globalThis?globalThis:e||self).React)}(this,(function(e){"use strict";e.createElement("div",null)}));
-//# sourceMappingURL=umd-with-dep.umd.min.js.map
+exports[`umd with dep on other module > umd-with-dep.umd.min.js 1`] = `
+"(function(e, n) {
+	"object" == typeof exports && "undefined" != typeof module ? n(require("react")) : "function" == typeof define && define.amd ? define(["react"], n) : n((e = "undefined" != typeof globalThis ? globalThis : e || self).React);
+})(this, (function(e) {
+	(0, e.createElement)("div", null);
+}));
+
+//# sourceMappingURL=umd-with-dep.umd.min.js.map//# sourceMappingURL=umd-with-dep.umd.min.js.map
 "
 `;
 
-exports[`umd with dep on other module: umd-with-dep.umd.min.js.map 1`] = `"{"version":3,"file":"umd-with-dep.umd.min.js","sources":["../src/index.js"],"sourcesContent":["import { createElement } from \\"react\\";\\n\\ncreateElement(\\"div\\", null);"],"names":["createElement"],"mappings":"iPAEAA,EAAAA,cAAc,MAAO"}"`;
+exports[`umd with dep on other module > umd-with-dep.umd.min.js.map 1`] = `"{"version":3,"file":"umd-with-dep.umd.min.js","names":["createElement"],"sources":["../src/index.js"],"sourcesContent":["import { createElement } from \\"react\\";\\n\\ncreateElement(\\"div\\", null);"],"mappings":";;;EAEAA,GAAAA,EAAAA,cAAAA,CAAc,OAAO,IAAA;AAAA,EAAA"}"`;

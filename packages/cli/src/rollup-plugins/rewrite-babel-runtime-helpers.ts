@@ -1,4 +1,4 @@
-import { Plugin } from "rollup";
+import type { Plugin } from "rolldown";
 
 const pattern = /from (["'])@babel\/runtime(|-corejs[23])\/helpers\/(\w+)["']/g;
 const requireWithEsmPattern = /require\((["'])@babel\/runtime(|-corejs[23])\/helpers\/esm\/(\w+)["']\)/g;

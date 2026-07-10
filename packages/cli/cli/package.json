@@ -1,4 +1,0 @@
-{
-  "main": "dist/preconstruct-cli-cli.cjs.js",
-  "module": "dist/preconstruct-cli-cli.esm.js"
-}

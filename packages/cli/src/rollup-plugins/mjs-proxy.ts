@@ -1,6 +1,6 @@
 import normalizePath from "normalize-path";
 import path from "path";
-import { Plugin } from "rollup";
+import type { Plugin } from "rolldown";
 import { Package } from "../package";
 import {
   getJsDefaultForMjsFilepath,

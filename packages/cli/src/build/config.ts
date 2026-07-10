@@ -1,6 +1,6 @@
 import { Package } from "../package";
 import { getRollupConfig } from "./rollup";
-import { OutputOptions, RollupOptions } from "rollup";
+import type { OutputOptions, RolldownOptions } from "rolldown";
 import { PKG_JSON_CONFIG_FIELD } from "../constants";
 import { limit, doPromptInput } from "../prompt";
 import path from "path";
@@ -12,6 +12,11 @@ import {
   getDistExtensionForConditions,
   getDistExtensionForConditionsWithTypeModule,
 } from "../utils";
+import { createRequire } from "module";
+import fastGlob from "fast-glob";
+import * as fs from "fs-extra";
+
+const require = createRequire(import.meta.url);
 
 function getGlobal(project: Project, name: string) {
   if (
@@ -64,14 +69,40 @@ function getGlobal(project: Project, name: string) {
   }
 }
 
-const babelHelperId = /@babel\/runtime(|-corejs[23])\/helpers\//;
-
-const interop = (id: string | null): "auto" | "default" =>
-  id && babelHelperId.test(id) ? "default" : "auto";
+export async function prepareUmdGlobals(pkg: Package) {
+  if (pkg.entrypoints[0].json["umd:main"] === undefined) return;
+  const sourceFiles = await fastGlob("**/*.{js,jsx,ts,tsx}", {
+    cwd: pkg.directory,
+    absolute: true,
+    ignore: ["**/node_modules/**", "**/dist/**"],
+  });
+  const source = (
+    await Promise.all(sourceFiles.map((filename) => fs.readFile(filename, "utf8")))
+  ).join("\n");
+  for (const name of Object.keys(pkg.json.peerDependencies || {})) {
+    const escapedName = name.replace(/[|\\{}()[\]^$+*?.-]/g, "\\$&");
+    if (
+      !new RegExp(
+        `(?:from\\s*|import\\s*\\(|require\\s*\\()\\s*["']${escapedName}(?:/[^"']*)?["']`
+      ).test(source)
+    ) {
+      continue;
+    }
+    while (true) {
+      try {
+        getGlobal(pkg.project, name);
+        break;
+      } catch (err) {
+        if (!(err instanceof Promise)) throw err;
+        await err;
+      }
+    }
+  }
+}
 
 export function getRollupConfigs(pkg: Package) {
   let configs: Array<{
-    config: RollupOptions;
+    config: RolldownOptions;
     outputs: OutputOptions[];
   }> = umdBuilds(pkg);
 
@@ -123,7 +154,6 @@ export function getRollupConfigs(pkg: Package) {
             )}`,
             dir: pkg.directory,
             exports: "named" as const,
-            interop,
           },
           {
             format: "es" as const,
@@ -163,7 +193,6 @@ export function getRollupConfigs(pkg: Package) {
         chunkFileNames: `dist/[name]-[hash].${getDistExtension("cjs")}`,
         dir: pkg.directory,
         exports: "named" as const,
-        interop,
       },
       ...(hasModuleField
         ? [
@@ -197,7 +226,6 @@ export function getRollupConfigs(pkg: Package) {
           )}`,
           dir: pkg.directory,
           exports: "named" as const,
-          interop,
         },
         hasModuleField && {
           format: "es" as const,
@@ -219,7 +247,7 @@ export function getRollupConfigs(pkg: Package) {
 function umdBuilds(
   pkg: Package
 ): Array<{
-  config: RollupOptions;
+  config: RolldownOptions;
   outputs: OutputOptions[];
 }> {
   // umd builds are a bit special
@@ -236,7 +264,6 @@ function umdBuilds(
             entryFileNames: `[name].${getDistExtension("umd")}`,
             name: entrypoint.json.preconstruct.umdName as string,
             dir: pkg.directory,
-            interop,
             globals: (name: string) => {
               if (name === (entrypoint.json.preconstruct.umdName as string)) {
                 return name;

@@ -8,6 +8,7 @@ import outdent from "outdent";
 import crypto from "crypto";
 // import profiler from "v8-profiler-next";
 import chalk from "chalk";
+import { vi, type Mocked, type MockInstance } from "vitest";
 
 let f = fixturez(__dirname);
 
@@ -17,12 +18,12 @@ export const tsx = outdent;
 
 chalk.level = 0;
 
-console.error = jest.fn();
-console.log = jest.fn();
+console.error = vi.fn();
+console.log = vi.fn();
 
 export let logMock = {
-  log: (console.log as any) as jest.MockInstance<void, any>,
-  error: (console.error as any) as jest.MockInstance<void, any>,
+  log: console.log as unknown as MockInstance<(...args: any[]) => void>,
+  error: console.error as unknown as MockInstance<(...args: any[]) => void>,
 };
 
 afterEach(() => {
@@ -34,7 +35,7 @@ import init from "../src/init";
 import { confirms } from "../src/messages";
 import normalizePath from "normalize-path";
 
-let mockedConfirms = confirms as jest.Mocked<typeof confirms>;
+let mockedConfirms = confirms as Mocked<typeof confirms>;
 
 export async function initBasic(directory: string) {
   mockedConfirms.writeMainField.mockReturnValue(Promise.resolve(true));

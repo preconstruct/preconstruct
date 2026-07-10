@@ -14,19 +14,20 @@ import {
 } from "../../test-utils";
 import { promptInput as _promptInput } from "../prompt";
 import fs from "fs-extra";
+import type { Mocked, MockedFunction } from "vitest";
 
 const f = fixturez(__dirname);
 
-jest.mock("../prompt");
+vi.mock("../prompt");
 
-let confirms = _confirms as jest.Mocked<typeof _confirms>;
+let confirms = _confirms as Mocked<typeof _confirms>;
 
-let promptInput = _promptInput as jest.MockedFunction<typeof _promptInput>;
+let promptInput = _promptInput as MockedFunction<typeof _promptInput>;
 
 let testFix = createPackageCheckTestCreator(fix);
 
 afterEach(() => {
-  jest.resetAllMocks();
+  vi.resetAllMocks();
 });
 
 test("no entrypoint", async () => {

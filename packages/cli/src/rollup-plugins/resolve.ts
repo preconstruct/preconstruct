@@ -1,6 +1,6 @@
 import { Package } from "../package";
 import { FatalError } from "../errors";
-import { Plugin } from "rollup";
+import type { Plugin } from "rolldown";
 import normalizePath from "normalize-path";
 import path from "path";
 
@@ -14,6 +14,9 @@ export function resolveErrorsPlugin(
   return {
     name: "resolve-errors",
     async resolveId(source, importer) {
+      if (source.startsWith("\0")) {
+        return null;
+      }
       let resolved = await this.resolve(source, importer, {
         skipSelf: true,
       });

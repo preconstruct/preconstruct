@@ -23,7 +23,7 @@ jobs:
       - uses: ./.github/actions/setup-deps
 
       - name: Run Tests
-        run: yarn cross-env CI=true yarn jest --coverage --color
+        run: yarn cross-env CI=true yarn vitest run --coverage --color
 
       - name: Upload coverage to Codecov
         run: bash <(curl -s https://codecov.io/bash) -C $GITHUB_SHA -B ${GITHUB_REF#refs/heads/} -Z

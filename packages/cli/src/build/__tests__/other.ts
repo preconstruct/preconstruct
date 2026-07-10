@@ -13,13 +13,14 @@ import {
   stripHashes,
 } from "../../../test-utils";
 import { doPromptInput } from "../../prompt";
+import type { MockedFunction } from "vitest";
 
-jest.mock("../../prompt");
+vi.mock("../../prompt");
 
-jest.setTimeout(30000);
+vi.setConfig({ testTimeout: 30000 });
 
 afterEach(() => {
-  jest.resetAllMocks();
+  vi.resetAllMocks();
 });
 
 test("browser", async () => {
@@ -50,35 +51,28 @@ test("browser", async () => {
 
   await build(dir);
   expect(await getDist(dir)).toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/browser.browser.cjs.js, dist/browser.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
+          ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/browser.browser.cjs.js, dist/browser.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+          Object.defineProperties(exports, {
+          	__esModule: { value: true },
+          	[Symbol.toStringTag]: { value: "Module" }
+          });
+          //#region src/index.js
+          let thing = "wow";
+          if (typeof window !== "undefined") thing = "something";
+          thing += "other";
+          var src_default = thing;
+          //#endregion
+          exports.default = src_default;
 
-    Object.defineProperty(exports, '__esModule', { value: true });
-
-    let thing = "wow";
-    if (typeof window !== "undefined") {
-      thing = "something";
-    }
-    if (typeof document !== undefined) {
-      thing += "other";
-    }
-    var thing$1 = thing;
-
-    exports["default"] = thing$1;
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/browser.browser.esm.js, dist/browser.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    let thing = "wow";
-    if (typeof window !== "undefined") {
-      thing = "something";
-    }
-    if (typeof document !== undefined) {
-      thing += "other";
-    }
-    var thing$1 = thing;
-
-    export { thing$1 as default };
-
-  `);
+          ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/browser.browser.esm.js, dist/browser.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+          //#region src/index.js
+          let thing = "wow";
+          if (typeof window !== "undefined") thing = "something";
+          thing += "other";
+          var src_default = thing;
+          //#endregion
+          export { src_default as default };
+        `);
 });
 
 test("browser no module", async () => {
@@ -118,72 +112,80 @@ test("typescript", async () => {
   await build(dir);
 
   expect(await getDist(dir)).toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/another-thing.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    export type SomeType = string;
+        ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/another-thing.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+        export type SomeType = string;
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/index.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    import { SomeType } from "./another-thing.js";
-    export * from "./one-more-thing.js";
-    import * as path from "path";
-    export { path };
-    declare let thing: SomeType;
-    export default thing;
+        ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/index.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+        import { SomeType } from "./another-thing.js";
+        export * from "./one-more-thing.js";
+        import * as path from "path";
+        export { path };
+        declare let thing: SomeType;
+        export default thing;
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/one-more-thing.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    declare var obj: object;
+        ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/one-more-thing.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+        declare var obj: object;
 
-    export { obj };
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    export * from "./declarations/src/index.js";
-    export { default } from "./declarations/src/index.js";
-    //# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoidHlwZXNjcmlwdC5janMuZC50cyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4vZGVjbGFyYXRpb25zL3NyYy9pbmRleC5kLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBIn0=
+        export { obj };
+        ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+        export * from "./declarations/src/index.js";
+        export { default } from "./declarations/src/index.js";
+        //# sourceMa${""}ppingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoidHlwZXNjcmlwdC5janMuZC50cyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4vZGVjbGFyYXRpb25zL3NyYy9pbmRleC5kLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBIn0=
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
+        ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+        Object.defineProperties(exports, {
+        	__esModule: { value: true },
+        	[Symbol.toStringTag]: { value: "Module" }
+        });
+        //#region \\0rolldown/runtime.js
+        var __create = Object.create;
+        var __defProp = Object.defineProperty;
+        var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+        var __getOwnPropNames = Object.getOwnPropertyNames;
+        var __getProtoOf = Object.getPrototypeOf;
+        var __hasOwnProp = Object.prototype.hasOwnProperty;
+        var __copyProps = (to, from, except, desc) => {
+        	if (from && typeof from === "object" || typeof from === "function") for (var keys = __getOwnPropNames(from), i = 0, n = keys.length, key; i < n; i++) {
+        		key = keys[i];
+        		if (!__hasOwnProp.call(to, key) && key !== except) __defProp(to, key, {
+        			get: ((k) => from[k]).bind(null, key),
+        			enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable
+        		});
+        	}
+        	return to;
+        };
+        var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", {
+        	value: mod,
+        	enumerable: true
+        }) : target, mod));
+        //#endregion
+        let path = require("path");
+        path = __toESM(path);
+        //#region src/one-more-thing.js
+        let obj = {};
+        //#endregion
+        //#region src/index.ts
+        let thing = "something";
+        //#endregion
+        exports.default = thing;
+        exports.obj = obj;
+        Object.defineProperty(exports, "path", {
+        	enumerable: true,
+        	get: function() {
+        		return path;
+        	}
+        });
 
-    Object.defineProperty(exports, '__esModule', { value: true });
-
-    var path = require('path');
-
-    function _interopNamespace(e) {
-    	if (e && e.__esModule) return e;
-    	var n = Object.create(null);
-    	if (e) {
-    		Object.keys(e).forEach(function (k) {
-    			if (k !== 'default') {
-    				var d = Object.getOwnPropertyDescriptor(e, k);
-    				Object.defineProperty(n, k, d.get ? d : {
-    					enumerable: true,
-    					get: function () { return e[k]; }
-    				});
-    			}
-    		});
-    	}
-    	n["default"] = e;
-    	return Object.freeze(n);
-    }
-
-    var path__namespace = /*#__PURE__*/_interopNamespace(path);
-
-    let obj = {};
-
-    let thing = "something";
-
-    exports.path = path__namespace;
-    exports["default"] = thing;
-    exports.obj = obj;
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    import * as path from 'path';
-    export { path };
-
-    let obj = {};
-
-    let thing = "something";
-
-    export { thing as default, obj };
-
-  `);
+        ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+        import * as path from "path";
+        //#region src/one-more-thing.js
+        let obj = {};
+        //#endregion
+        //#region src/index.ts
+        let thing = "something";
+        //#endregion
+        export { thing as default, obj, path };
+      `);
 });
 
 test("typescript with forced dts emit", async () => {
@@ -342,7 +344,27 @@ test("package resolvable but not in deps", async () => {
     await build(tmpPath);
   } catch (err) {
     expect(err.message).toMatchInlineSnapshot(
-      `"🎁 package-resolvable-but-not-in-deps "react" is imported by "src/index.js" but the package is not specified in dependencies or peerDependencies"`
+      `
+      "🎁 package-resolvable-but-not-in-deps Error: Build failed with 1 error:
+      🎁 package-resolvable-but-not-in-deps
+      🎁 package-resolvable-but-not-in-deps [plugin throw-warnings]
+      🎁 package-resolvable-but-not-in-deps Error: 🎁 package-resolvable-but-not-in-deps "react" is imported by "src/index.js" but the package is not specified in dependencies or peerDependencies
+      🎁 package-resolvable-but-not-in-deps     at PluginContextImpl.buildEnd (/Users/emma/projects/preconstruct/packages/cli/src/build/rollup.ts:144:19)
+      🎁 package-resolvable-but-not-in-deps     at plugin (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/bindingify-input-options-XPJLJOD0.mjs:1406:18)
+      🎁 package-resolvable-but-not-in-deps     at plugin.<computed> (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/bindingify-input-options-XPJLJOD0.mjs:1959:18)
+      🎁 package-resolvable-but-not-in-deps     at aggregateBindingErrorsIntoJsError (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/error-BHRSI0R7.mjs:48:18)
+      🎁 package-resolvable-but-not-in-deps     at unwrapBindingResult (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/error-BHRSI0R7.mjs:18:128)
+      🎁 package-resolvable-but-not-in-deps     at RolldownBuild.#build (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/rolldown-build-CtPvmZgJ.mjs:3276:34)
+      🎁 package-resolvable-but-not-in-deps     at /Users/emma/projects/preconstruct/packages/cli/src/build/index.ts:73:29
+      🎁 package-resolvable-but-not-in-deps     at buildPackage (/Users/emma/projects/preconstruct/packages/cli/src/build/index.ts:63:17)
+      🎁 package-resolvable-but-not-in-deps     at retryableBuild (/Users/emma/projects/preconstruct/packages/cli/src/build/index.ts:102:5)
+      🎁 package-resolvable-but-not-in-deps     at /Users/emma/projects/preconstruct/packages/cli/src/build/index.ts:140:11
+      🎁 package-resolvable-but-not-in-deps     at Module.build (/Users/emma/projects/preconstruct/packages/cli/src/build/index.ts:137:5)
+      🎁 package-resolvable-but-not-in-deps     at /Users/emma/projects/preconstruct/packages/cli/src/build/__tests__/other.ts:344:5
+      🎁 package-resolvable-but-not-in-deps     at file:///Users/emma/projects/preconstruct/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20 {
+      🎁 package-resolvable-but-not-in-deps   errors: [Getter/Setter]
+      🎁 package-resolvable-but-not-in-deps }"
+    `
     );
     return;
   }
@@ -389,11 +411,19 @@ test("package with exports resolvable", async () => {
       "dist/package-exports-resolvable-but-not-in-deps.umd.min.js",
     ])
   ).toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/package-exports-resolvable-but-not-in-deps.umd.min.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    !function(e,o){"object"==typeof exports&&"undefined"!=typeof module?module.exports=o():"function"==typeof define&&define.amd?define(o):(e="undefined"!=typeof globalThis?globalThis:e||self).packageExportsResolvableButNotInDeps=o()}(this,(function(){"use strict";return function(e){return function(e){console.log(e)}(e)}}));
-    //# sourceMappingURL=package-exports-resolvable-but-not-in-deps.umd.min.js.map
+    		⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/package-exports-resolvable-but-not-in-deps.umd.min.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    		(function(e, o) {
+    			"object" == typeof exports && "undefined" != typeof module ? module.exports = o() : "function" == typeof define && define.amd ? define([], o) : (e = "undefined" != typeof globalThis ? globalThis : e || self).packageExportsResolvableButNotInDeps = o();
+    		})(this, (function() {
+    			return function(e) {
+    				return function(e) {
+    					console.log(e);
+    				}(e);
+    			};
+    		}));
 
-  `);
+    		//# sourceMa${""}ppingURL=package-exports-resolvable-but-not-in-deps.umd.min.js.map//# sourceMa${""}ppingURL=package-exports-resolvable-but-not-in-deps.umd.min.js.map
+    	`);
 });
 
 test("entrypoint outside package directory", async () => {
@@ -457,7 +487,27 @@ test("module imported outside package directory", async () => {
     await build(tmpPath);
   } catch (err) {
     expect(err.message).toMatchInlineSnapshot(
-      `"🎁 @imports-outside-pkg-dir/pkg-a all relative imports in a package should only import modules inside of their package directory but "src/index.js" is importing "../../some-file""`
+      `
+      "🎁 @imports-outside-pkg-dir/pkg-a Error: Build failed with 1 error:
+      🎁 @imports-outside-pkg-dir/pkg-a
+      🎁 @imports-outside-pkg-dir/pkg-a [plugin throw-warnings]
+      🎁 @imports-outside-pkg-dir/pkg-a Error: 🎁 @imports-outside-pkg-dir/pkg-a all relative imports in a package should only import modules inside of their package directory but "src/index.js" is importing "../../some-file"
+      🎁 @imports-outside-pkg-dir/pkg-a     at PluginContextImpl.buildEnd (/Users/emma/projects/preconstruct/packages/cli/src/build/rollup.ts:144:19)
+      🎁 @imports-outside-pkg-dir/pkg-a     at plugin (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/bindingify-input-options-XPJLJOD0.mjs:1406:18)
+      🎁 @imports-outside-pkg-dir/pkg-a     at plugin.<computed> (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/bindingify-input-options-XPJLJOD0.mjs:1959:18)
+      🎁 @imports-outside-pkg-dir/pkg-a     at aggregateBindingErrorsIntoJsError (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/error-BHRSI0R7.mjs:48:18)
+      🎁 @imports-outside-pkg-dir/pkg-a     at unwrapBindingResult (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/error-BHRSI0R7.mjs:18:128)
+      🎁 @imports-outside-pkg-dir/pkg-a     at RolldownBuild.#build (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/rolldown-build-CtPvmZgJ.mjs:3276:34)
+      🎁 @imports-outside-pkg-dir/pkg-a     at /Users/emma/projects/preconstruct/packages/cli/src/build/index.ts:73:29
+      🎁 @imports-outside-pkg-dir/pkg-a     at buildPackage (/Users/emma/projects/preconstruct/packages/cli/src/build/index.ts:63:17)
+      🎁 @imports-outside-pkg-dir/pkg-a     at retryableBuild (/Users/emma/projects/preconstruct/packages/cli/src/build/index.ts:102:5)
+      🎁 @imports-outside-pkg-dir/pkg-a     at /Users/emma/projects/preconstruct/packages/cli/src/build/index.ts:140:11
+      🎁 @imports-outside-pkg-dir/pkg-a     at Module.build (/Users/emma/projects/preconstruct/packages/cli/src/build/index.ts:137:5)
+      🎁 @imports-outside-pkg-dir/pkg-a     at /Users/emma/projects/preconstruct/packages/cli/src/build/__tests__/other.ts:487:5
+      🎁 @imports-outside-pkg-dir/pkg-a     at file:///Users/emma/projects/preconstruct/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20 {
+      🎁 @imports-outside-pkg-dir/pkg-a   errors: [Getter/Setter]
+      🎁 @imports-outside-pkg-dir/pkg-a }"
+    `
     );
     return;
   }
@@ -511,7 +561,7 @@ test("should lazily get globals", async () => {
     `,
   });
 
-  (doPromptInput as jest.MockedFunction<
+  (doPromptInput as MockedFunction<
     typeof doPromptInput
   >).mockImplementation((question, { name }, thing) => {
     console.log("called");
@@ -574,10 +624,46 @@ test("batches build errors", async () => {
     error = err;
   }
   expect(error).toMatchInlineSnapshot(`
-    [Error: 🎁 @errors/package-one "something-2" is imported by "src/index.js" but the package is not specified in dependencies or peerDependencies
-    🎁 @errors/package-one "something" is imported by "src/index.js" but the package is not specified in dependencies or peerDependencies
-    🎁 @errors/package-two "something-2" is imported by "src/index.js" but the package is not specified in dependencies or peerDependencies
-    🎁 @errors/package-two "something" is imported by "src/index.js" but the package is not specified in dependencies or peerDependencies]
+    [Error: 🎁 @errors/package-one Error: Build failed with 1 error:
+    🎁 @errors/package-one
+    🎁 @errors/package-one [plugin throw-warnings]
+    🎁 @errors/package-one Error: 🎁 @errors/package-one "something-2" is imported by "src/index.js" but the package is not specified in dependencies or peerDependencies
+    🎁 @errors/package-one 🎁 @errors/package-one "something" is imported by "src/index.js" but the package is not specified in dependencies or peerDependencies
+    🎁 @errors/package-one     at PluginContextImpl.buildEnd (/Users/emma/projects/preconstruct/packages/cli/src/build/rollup.ts:144:19)
+    🎁 @errors/package-one     at plugin (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/bindingify-input-options-XPJLJOD0.mjs:1406:18)
+    🎁 @errors/package-one     at plugin.<computed> (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/bindingify-input-options-XPJLJOD0.mjs:1959:18)
+    🎁 @errors/package-one     at aggregateBindingErrorsIntoJsError (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/error-BHRSI0R7.mjs:48:18)
+    🎁 @errors/package-one     at unwrapBindingResult (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/error-BHRSI0R7.mjs:18:128)
+    🎁 @errors/package-one     at RolldownBuild.#build (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/rolldown-build-CtPvmZgJ.mjs:3276:34)
+    🎁 @errors/package-one     at /Users/emma/projects/preconstruct/packages/cli/src/build/index.ts:73:29
+    🎁 @errors/package-one     at buildPackage (/Users/emma/projects/preconstruct/packages/cli/src/build/index.ts:63:17)
+    🎁 @errors/package-one     at retryableBuild (/Users/emma/projects/preconstruct/packages/cli/src/build/index.ts:102:5)
+    🎁 @errors/package-one     at /Users/emma/projects/preconstruct/packages/cli/src/build/index.ts:140:11
+    🎁 @errors/package-one     at Module.build (/Users/emma/projects/preconstruct/packages/cli/src/build/index.ts:137:5)
+    🎁 @errors/package-one     at /Users/emma/projects/preconstruct/packages/cli/src/build/__tests__/other.ts:621:5
+    🎁 @errors/package-one     at file:///Users/emma/projects/preconstruct/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20 {
+    🎁 @errors/package-one   errors: [Getter/Setter]
+    🎁 @errors/package-one }
+    🎁 @errors/package-two Error: Build failed with 1 error:
+    🎁 @errors/package-two
+    🎁 @errors/package-two [plugin throw-warnings]
+    🎁 @errors/package-two Error: 🎁 @errors/package-two "something-2" is imported by "src/index.js" but the package is not specified in dependencies or peerDependencies
+    🎁 @errors/package-two 🎁 @errors/package-two "something" is imported by "src/index.js" but the package is not specified in dependencies or peerDependencies
+    🎁 @errors/package-two     at PluginContextImpl.buildEnd (/Users/emma/projects/preconstruct/packages/cli/src/build/rollup.ts:144:19)
+    🎁 @errors/package-two     at plugin (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/bindingify-input-options-XPJLJOD0.mjs:1406:18)
+    🎁 @errors/package-two     at plugin.<computed> (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/bindingify-input-options-XPJLJOD0.mjs:1959:18)
+    🎁 @errors/package-two     at aggregateBindingErrorsIntoJsError (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/error-BHRSI0R7.mjs:48:18)
+    🎁 @errors/package-two     at unwrapBindingResult (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/error-BHRSI0R7.mjs:18:128)
+    🎁 @errors/package-two     at RolldownBuild.#build (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/rolldown-build-CtPvmZgJ.mjs:3276:34)
+    🎁 @errors/package-two     at /Users/emma/projects/preconstruct/packages/cli/src/build/index.ts:73:29
+    🎁 @errors/package-two     at buildPackage (/Users/emma/projects/preconstruct/packages/cli/src/build/index.ts:63:17)
+    🎁 @errors/package-two     at retryableBuild (/Users/emma/projects/preconstruct/packages/cli/src/build/index.ts:102:5)
+    🎁 @errors/package-two     at /Users/emma/projects/preconstruct/packages/cli/src/build/index.ts:140:11
+    🎁 @errors/package-two     at Module.build (/Users/emma/projects/preconstruct/packages/cli/src/build/index.ts:137:5)
+    🎁 @errors/package-two     at /Users/emma/projects/preconstruct/packages/cli/src/build/__tests__/other.ts:621:5
+    🎁 @errors/package-two     at file:///Users/emma/projects/preconstruct/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20 {
+    🎁 @errors/package-two   errors: [Getter/Setter]
+    🎁 @errors/package-two }]
   `);
 });
 
@@ -595,16 +681,16 @@ test("builds package using eval", async () => {
 
   expect(await getDist(dir)).toMatchInlineSnapshot(`
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    Object.defineProperty(exports, '__esModule', { value: true });
-
+    Object.defineProperties(exports, {
+    	__esModule: { value: true },
+    	[Symbol.toStringTag]: { value: "Module" }
+    });
+    //#region src/index.js
     function compute(arg) {
-      return eval(arg);
+    	return eval(arg);
     }
-
-    exports["default"] = compute;
-
+    //#endregion
+    exports.default = compute;
   `);
 });
 
@@ -648,29 +734,58 @@ test("builds umd with a dependency containing top-level this in ESM", async () =
 
   expect(await getDist(dir)).toMatchInlineSnapshot(`
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    Object.defineProperty(exports, '__esModule', { value: true });
-
-    var withTopLevelThisInEsm = require('with-top-level-this-in-esm');
-
-    function _interopDefault (e) { return e && e.__esModule ? e : { 'default': e }; }
-
-    var withTopLevelThisInEsm__default = /*#__PURE__*/_interopDefault(withTopLevelThisInEsm);
-
-
-
-    Object.defineProperty(exports, 'default', {
+    Object.defineProperties(exports, {
+    	__esModule: { value: true },
+    	[Symbol.toStringTag]: { value: "Module" }
+    });
+    //#region \\0rolldown/runtime.js
+    var __create = Object.create;
+    var __defProp = Object.defineProperty;
+    var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+    var __getOwnPropNames = Object.getOwnPropertyNames;
+    var __getProtoOf = Object.getPrototypeOf;
+    var __hasOwnProp = Object.prototype.hasOwnProperty;
+    var __copyProps = (to, from, except, desc) => {
+    	if (from && typeof from === "object" || typeof from === "function") for (var keys = __getOwnPropNames(from), i = 0, n = keys.length, key; i < n; i++) {
+    		key = keys[i];
+    		if (!__hasOwnProp.call(to, key) && key !== except) __defProp(to, key, {
+    			get: ((k) => from[k]).bind(null, key),
+    			enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable
+    		});
+    	}
+    	return to;
+    };
+    var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", {
+    	value: mod,
+    	enumerable: true
+    }) : target, mod));
+    //#endregion
+    let with_top_level_this_in_esm = require("with-top-level-this-in-esm");
+    with_top_level_this_in_esm = __toESM(with_top_level_this_in_esm);
+    Object.defineProperty(exports, "default", {
     	enumerable: true,
-    	get: function () { return withTopLevelThisInEsm__default["default"]; }
+    	get: function() {
+    		return with_top_level_this_in_esm.default;
+    	}
     });
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.umd.min.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    !function(e,t){"object"==typeof exports&&"undefined"!=typeof module?module.exports=t():"function"==typeof define&&define.amd?define(t):(e="undefined"!=typeof globalThis?globalThis:e||self).pkg=t()}(this,(function(){"use strict";var e=function(){return e=Object.assign||function(e){for(var t,n=1,o=arguments.length;n<o;n++)for(var r in t=arguments[n])Object.prototype.hasOwnProperty.call(t,r)&&(e[r]=t[r]);return e},e.apply(this,arguments)};return e({},{bar:42})}));
-    //# sourceMappingURL=pkg.umd.min.js.map
+    (function(e, n) {
+    	"object" == typeof exports && "undefined" != typeof module ? module.exports = n() : "function" == typeof define && define.amd ? define([], n) : (e = "undefined" != typeof globalThis ? globalThis : e || self).pkg = n();
+    })(this, (function() {
+    	var e = function() {
+    		return e = Object.assign || function(e) {
+    			for (var n, t = 1, o = arguments.length; t < o; t++) for (var f in n = arguments[t]) Object.prototype.hasOwnProperty.call(n, f) && (e[f] = n[f]);
+    			return e;
+    		}, e.apply(this, arguments);
+    	};
+    	return e({}, { bar: 42 });
+    }));
+
+    //# sourceMa${""}ppingURL=pkg.umd.min.js.map//# sourceMa${""}ppingURL=pkg.umd.min.js.map
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.umd.min.js.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    {"version":3,"file":"pkg.umd.min.js","sources":["../node_modules/with-top-level-this-in-esm/index.js"],"sourcesContent":["// output transpiled by TS with inlined tslib helper\\nvar __assign =\\n  (this && this.__assign) ||\\n  function () {\\n    __assign =\\n      Object.assign ||\\n      function (t) {\\n        for (var s, i = 1, n = arguments.length; i < n; i++) {\\n          s = arguments[i];\\n          for (var p in s)\\n            if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];\\n        }\\n        return t;\\n      };\\n    return __assign.apply(this, arguments);\\n  };\\nvar foo = { bar: 42 };\\nexport default __assign({}, foo);"],"names":["__assign","Object","assign","t","s","i","n","arguments","length","p","prototype","hasOwnProperty","call","apply","this","bar"],"mappings":"oOACA,IAAIA,EAEF,WAWE,OAVAA,EACEC,OAAOC,QACP,SAAUC,GACR,IAAK,IAAIC,EAAGC,EAAI,EAAGC,EAAIC,UAAUC,OAAQH,EAAIC,EAAGD,IAE9C,IAAK,IAAII,KADTL,EAAIG,UAAUF,GAERJ,OAAOS,UAAUC,eAAeC,KAAKR,EAAGK,KAAIN,EAAEM,GAAKL,EAAEK,IAE7D,OAAON,CACf,EACWH,EAASa,MAAMC,KAAMP,UAChC,SAEeP,EAAS,CAAE,EADhB,CAAEe,IAAK"}
+    {"version":3,"file":"pkg.umd.min.js","names":[],"sources":["../node_modules/with-top-level-this-in-esm/index.js"],"sourcesContent":["// output transpiled by TS with inlined tslib helper\\nvar __assign =\\n  (this && this.__assign) ||\\n  function () {\\n    __assign =\\n      Object.assign ||\\n      function (t) {\\n        for (var s, i = 1, n = arguments.length; i < n; i++) {\\n          s = arguments[i];\\n          for (var p in s)\\n            if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];\\n        }\\n        return t;\\n      };\\n    return __assign.apply(this, arguments);\\n  };\\nvar foo = { bar: 42 };\\nexport default __assign({}, foo);"],"x_google_ignoreList":[0],"mappings":";;;CACA,IAAI,IAEF,WAAA;EAWE,OAVA,IACE,OAAO,UACP,SAAU,GAAA;GACR,KAAK,IAAI,GAAG,IAAI,GAAG,IAAI,UAAU,QAAQ,IAAI,GAAG,KAE9C,KAAK,IAAI,KADT,IAAI,UAAU,IAER,OAAO,UAAU,eAAe,KAAK,GAAG,CAAA,MAAI,EAAE,KAAK,EAAE;GAE7D,OAAO;EACT,GACK,EAAS,MAAM,MAAM,SAAA;CAC9B;CAAA,OAEa,EAAS,CAAC,GADf,EAAE,KAAK,GAAA,CAAA;AAAA,EAAA"}
   `);
 });
 
@@ -686,11 +801,29 @@ test("fails for source files containing top-level this", async () => {
     await build(dir);
   } catch (err) {
     expect(err.message).toMatchInlineSnapshot(`
-      "🎁 pkg "src/index.js" used \`this\` keyword at the top level of an ES module. You can read more about this at https://rollupjs.org/guide/en/#error-this-is-undefined and fix this issue that has happened here:
+      "🎁 pkg Error: Build failed with 1 error:
       🎁 pkg
-      🎁 pkg 1: export default this;
-      🎁 pkg                   ^
-      🎁 pkg"
+      🎁 pkg [plugin throw-warnings]
+      🎁 pkg Error: 🎁 pkg "src/index.js" used \`this\` keyword at the top level of an ES module. You can read more about this at https://rollupjs.org/guide/en/#error-this-is-undefined and fix this issue that has happened here:
+      🎁 pkg 🎁 pkg
+      🎁 pkg 🎁 pkg > 1 | export default this;
+      🎁 pkg 🎁 pkg     |                ^
+      🎁 pkg 🎁 pkg
+      🎁 pkg     at PluginContextImpl.buildEnd (/Users/emma/projects/preconstruct/packages/cli/src/build/rollup.ts:144:19)
+      🎁 pkg     at plugin (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/bindingify-input-options-XPJLJOD0.mjs:1406:18)
+      🎁 pkg     at plugin.<computed> (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/bindingify-input-options-XPJLJOD0.mjs:1959:18)
+      🎁 pkg     at aggregateBindingErrorsIntoJsError (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/error-BHRSI0R7.mjs:48:18)
+      🎁 pkg     at unwrapBindingResult (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/error-BHRSI0R7.mjs:18:128)
+      🎁 pkg     at RolldownBuild.#build (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/rolldown-build-CtPvmZgJ.mjs:3276:34)
+      🎁 pkg     at /Users/emma/projects/preconstruct/packages/cli/src/build/index.ts:73:29
+      🎁 pkg     at buildPackage (/Users/emma/projects/preconstruct/packages/cli/src/build/index.ts:63:17)
+      🎁 pkg     at retryableBuild (/Users/emma/projects/preconstruct/packages/cli/src/build/index.ts:102:5)
+      🎁 pkg     at /Users/emma/projects/preconstruct/packages/cli/src/build/index.ts:140:11
+      🎁 pkg     at Module.build (/Users/emma/projects/preconstruct/packages/cli/src/build/index.ts:137:5)
+      🎁 pkg     at /Users/emma/projects/preconstruct/packages/cli/src/build/__tests__/other.ts:801:5
+      🎁 pkg     at file:///Users/emma/projects/preconstruct/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20 {
+      🎁 pkg   errors: [Getter/Setter]
+      🎁 pkg }"
     `);
     return;
   }
@@ -719,22 +852,20 @@ test(".d.ts", async () => {
     export const x: string;
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     export * from "./declarations/src/index.js";
-    //# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicGtnLmNqcy5kLnRzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi9kZWNsYXJhdGlvbnMvc3JjL2luZGV4LmQudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUEifQ==
+    //# sourceMa${""}ppingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicGtnLmNqcy5kLnRzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi9kZWNsYXJhdGlvbnMvc3JjL2luZGV4LmQudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUEifQ==
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    Object.defineProperty(exports, '__esModule', { value: true });
-
+    Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+    //#region src/index.js
     const x = "hello";
-
+    //#endregion
     exports.x = x;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    //#region src/index.js
     const x = "hello";
-
+    //#endregion
     export { x };
-
   `);
 });
 
@@ -757,42 +888,96 @@ test("simple use client", async () => {
   await build(dir);
   expect(await getFiles(dir, ["dist/**"], stripHashes("client")))
     .toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/client-this-is-not-the-real-hash-a11d1f492d9543facacf36a90317cec3.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use client';
-    'use strict';
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/client-this-is-not-the-real-hash-666cfcd2500cae30c5a50dab6c18a7e2.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      "use client";
+      //#region src/client.js
+      const A = "something";
+      console.log("client");
+      //#endregion
+      export { A };
 
-    Object.defineProperty(exports, '__esModule', { value: true });
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/client-this-is-not-the-real-hash-b11ab0fac70c8fbe4ae59421af73c245.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      "use client";
+      //#region src/client.js
+      const A = "something";
+      console.log("client");
+      //#endregion
+      exports.A = A;
 
-    const A = "something";
-    console.log("client");
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+      //#region \\0rolldown/runtime.js
+      var __defProp = Object.defineProperty;
+      var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+      var __getOwnPropNames = Object.getOwnPropertyNames;
+      var __hasOwnProp = Object.prototype.hasOwnProperty;
+      var __exportAll = (all, no_symbols) => {
+      	let target = {};
+      	for (var name in all) __defProp(target, name, {
+      		get: all[name],
+      		enumerable: true
+      	});
+      	if (!no_symbols) __defProp(target, Symbol.toStringTag, { value: "Module" });
+      	return target;
+      };
+      var __copyProps = (to, from, except, desc) => {
+      	if (from && typeof from === "object" || typeof from === "function") for (var keys = __getOwnPropNames(from), i = 0, n = keys.length, key; i < n; i++) {
+      		key = keys[i];
+      		if (!__hasOwnProp.call(to, key) && key !== except) __defProp(to, key, {
+      			get: ((k) => from[k]).bind(null, key),
+      			enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable
+      		});
+      	}
+      	return to;
+      };
+      var __reExport = (target, mod, secondTarget) => (__copyProps(target, mod, "default"), secondTarget && __copyProps(secondTarget, mod, "default"));
+      //#endregion
+      //#region \\0preserve boundary:0src/client.js
+      var client_exports = /* @__PURE__ */ __exportAll({});
+      __reExport(client_exports, require("./client-some-hash.cjs.js"));
+      //#endregion
+      Object.defineProperty(exports, "A", {
+      	enumerable: true,
+      	get: function() {
+      		return client_exports.A;
+      	}
+      });
 
-    exports.A = A;
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/client-this-is-not-the-real-hash-fd8b1fd76b9a9f92e7a34756ea9de1bb.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use client';
-    const A = "something";
-    console.log("client");
-
-    export { A };
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    Object.defineProperty(exports, '__esModule', { value: true });
-
-    var client = require('./client-some-hash.cjs.js');
-
-
-
-    Object.defineProperty(exports, 'A', {
-    	enumerable: true,
-    	get: function () { return client.A; }
-    });
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    export { A } from './client-some-hash.esm.js';
-
-  `);
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      //#region \\0rolldown/runtime.js
+      var __defProp = Object.defineProperty;
+      var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+      var __getOwnPropNames = Object.getOwnPropertyNames;
+      var __hasOwnProp = Object.prototype.hasOwnProperty;
+      var __exportAll = (all, no_symbols) => {
+      	let target = {};
+      	for (var name in all) __defProp(target, name, {
+      		get: all[name],
+      		enumerable: true
+      	});
+      	if (!no_symbols) __defProp(target, Symbol.toStringTag, { value: "Module" });
+      	return target;
+      };
+      var __copyProps = (to, from, except, desc) => {
+      	if (from && typeof from === "object" || typeof from === "function") for (var keys = __getOwnPropNames(from), i = 0, n = keys.length, key; i < n; i++) {
+      		key = keys[i];
+      		if (!__hasOwnProp.call(to, key) && key !== except) __defProp(to, key, {
+      			get: ((k) => from[k]).bind(null, key),
+      			enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable
+      		});
+      	}
+      	return to;
+      };
+      var __reExport = (target, mod, secondTarget) => (__copyProps(target, mod, "default"), secondTarget && __copyProps(secondTarget, mod, "default"));
+      //#endregion
+      //#region \\0preserve boundary:0src/client.js
+      var client_exports = /* @__PURE__ */ __exportAll({});
+      import * as import___USE_CLIENT_IMPORT__VRAku6fjghkApIISiBWPzg__USE_CLIENT_IMPORT___client from "./client-some-hash.esm.js";
+      __reExport(client_exports, import___USE_CLIENT_IMPORT__VRAku6fjghkApIISiBWPzg__USE_CLIENT_IMPORT___client);
+      //#endregion
+      var A = client_exports.A;
+      export { A };
+    `);
 });
 test("use client", async () => {
   const dir = await testdir({
@@ -827,72 +1012,135 @@ test("use client", async () => {
   await build(dir);
   expect(await getFiles(dir, ["dist/**"], stripHashes("client", "d")))
     .toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/client-this-is-not-the-real-hash-58cd7e7ea387bdad7ade6e69ad459a33.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use client';
-    'use strict';
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/client-this-is-not-the-real-hash-53f4b26e873a46577262c23cfb2b3286.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      "use client";
+      //#region src/client.js
+      const A = "something";
+      //#endregion
+      export { A };
 
-    Object.defineProperty(exports, '__esModule', { value: true });
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/client-this-is-not-the-real-hash-597c7d25a1f9a66672bdcea9b63eb4c0.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      "use client";
+      //#region src/client.js
+      const A = "something";
+      //#endregion
+      exports.A = A;
 
-    const A = "something";
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/d-this-is-not-the-real-hash-d79e706d60bd0b5c5ed881cf51f8a855.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      "use client";
+      //#region src/d.js
+      const D = "d";
+      //#endregion
+      export { D };
 
-    exports.A = A;
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/d-this-is-not-the-real-hash-e3e8fa0b8537554da8576ca07669438e.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      "use client";
+      //#region src/d.js
+      const D = "d";
+      //#endregion
+      exports.D = D;
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/client-this-is-not-the-real-hash-b139dd137c1582a38e35a32f7605ab74.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use client';
-    const A = "something";
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+      //#region \\0rolldown/runtime.js
+      var __defProp = Object.defineProperty;
+      var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+      var __getOwnPropNames = Object.getOwnPropertyNames;
+      var __hasOwnProp = Object.prototype.hasOwnProperty;
+      var __exportAll = (all, no_symbols) => {
+      	let target = {};
+      	for (var name in all) __defProp(target, name, {
+      		get: all[name],
+      		enumerable: true
+      	});
+      	if (!no_symbols) __defProp(target, Symbol.toStringTag, { value: "Module" });
+      	return target;
+      };
+      var __copyProps = (to, from, except, desc) => {
+      	if (from && typeof from === "object" || typeof from === "function") for (var keys = __getOwnPropNames(from), i = 0, n = keys.length, key; i < n; i++) {
+      		key = keys[i];
+      		if (!__hasOwnProp.call(to, key) && key !== except) __defProp(to, key, {
+      			get: ((k) => from[k]).bind(null, key),
+      			enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable
+      		});
+      	}
+      	return to;
+      };
+      var __reExport = (target, mod, secondTarget) => (__copyProps(target, mod, "default"), secondTarget && __copyProps(secondTarget, mod, "default"));
+      //#endregion
+      //#region \\0preserve boundary:0src/client.js
+      var client_exports = /* @__PURE__ */ __exportAll({});
+      __reExport(client_exports, require("./client-some-hash.cjs.js"));
+      //#endregion
+      //#region \\0preserve boundary:0src/d.js
+      var d_exports = /* @__PURE__ */ __exportAll({});
+      __reExport(d_exports, require("./d-some-hash.cjs.js"));
+      //#endregion
+      //#region src/c.js
+      function C() {
+      	return d_exports.D;
+      }
+      //#endregion
+      //#region src/b.js
+      const B = "b";
+      //#endregion
+      Object.defineProperty(exports, "A", {
+      	enumerable: true,
+      	get: function() {
+      		return client_exports.A;
+      	}
+      });
+      exports.B = B;
+      exports.C = C;
 
-    export { A };
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/d-this-is-not-the-real-hash-24ae31ff9082854e1c87c472a0860694.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use client';
-    'use strict';
-
-    Object.defineProperty(exports, '__esModule', { value: true });
-
-    const D = "d";
-
-    exports.D = D;
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/d-this-is-not-the-real-hash-edd08facffb57479ea67330357004b7f.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use client';
-    const D = "d";
-
-    export { D };
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    Object.defineProperty(exports, '__esModule', { value: true });
-
-    var client = require('./client-some-hash.cjs.js');
-    var d = require('./d-some-hash.cjs.js');
-
-    function C() {
-      return d.D;
-    }
-
-    const B = "b";
-
-    Object.defineProperty(exports, 'A', {
-      enumerable: true,
-      get: function () { return client.A; }
-    });
-    exports.B = B;
-    exports.C = C;
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    export { A } from './client-some-hash.esm.js';
-    import { D } from './d-some-hash.esm.js';
-
-    function C() {
-      return D;
-    }
-
-    const B = "b";
-
-    export { B, C };
-
-  `);
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      //#region \\0rolldown/runtime.js
+      var __defProp = Object.defineProperty;
+      var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+      var __getOwnPropNames = Object.getOwnPropertyNames;
+      var __hasOwnProp = Object.prototype.hasOwnProperty;
+      var __exportAll = (all, no_symbols) => {
+      	let target = {};
+      	for (var name in all) __defProp(target, name, {
+      		get: all[name],
+      		enumerable: true
+      	});
+      	if (!no_symbols) __defProp(target, Symbol.toStringTag, { value: "Module" });
+      	return target;
+      };
+      var __copyProps = (to, from, except, desc) => {
+      	if (from && typeof from === "object" || typeof from === "function") for (var keys = __getOwnPropNames(from), i = 0, n = keys.length, key; i < n; i++) {
+      		key = keys[i];
+      		if (!__hasOwnProp.call(to, key) && key !== except) __defProp(to, key, {
+      			get: ((k) => from[k]).bind(null, key),
+      			enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable
+      		});
+      	}
+      	return to;
+      };
+      var __reExport = (target, mod, secondTarget) => (__copyProps(target, mod, "default"), secondTarget && __copyProps(secondTarget, mod, "default"));
+      //#endregion
+      //#region \\0preserve boundary:0src/client.js
+      var client_exports = /* @__PURE__ */ __exportAll({});
+      import * as import___USE_CLIENT_IMPORT__VRAku6fjghkApIISiBWPzg__USE_CLIENT_IMPORT___client from "./client-some-hash.esm.js";
+      __reExport(client_exports, import___USE_CLIENT_IMPORT__VRAku6fjghkApIISiBWPzg__USE_CLIENT_IMPORT___client);
+      //#endregion
+      //#region \\0preserve boundary:0src/d.js
+      var d_exports = /* @__PURE__ */ __exportAll({});
+      import * as import___USE_CLIENT_IMPORT__WPGYjwIlzWVNM1bYhOc83w__USE_CLIENT_IMPORT___d from "./d-some-hash.esm.js";
+      __reExport(d_exports, import___USE_CLIENT_IMPORT__WPGYjwIlzWVNM1bYhOc83w__USE_CLIENT_IMPORT___d);
+      //#endregion
+      //#region src/c.js
+      function C() {
+      	return d_exports.D;
+      }
+      //#endregion
+      //#region src/b.js
+      const B = "b";
+      //#endregion
+      var A = client_exports.A;
+      export { A, B, C };
+    `);
 });
 
 test("use client as entrypoint", async () => {
@@ -910,21 +1158,19 @@ test("use client as entrypoint", async () => {
   await build(dir);
   expect(await getFiles(dir, ["dist/**"])).toMatchInlineSnapshot(`
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use client';
-    'use strict';
-
-    Object.defineProperty(exports, '__esModule', { value: true });
-
+    "use client";
+    Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+    //#region src/index.js
     const a = true;
-
+    //#endregion
     exports.a = a;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use client';
+    "use client";
+    //#region src/index.js
     const a = true;
-
+    //#endregion
     export { a };
-
   `);
 });
 
@@ -946,59 +1192,115 @@ test("use client with typescript", async () => {
   await build(dir);
   expect(await getFiles(dir, ["dist/**"], stripHashes("a")))
     .toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/a-this-is-not-the-real-hash-d912e49410d7ef28505c151217271ac8.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use client';
-    const A = 1;
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/a-this-is-not-the-real-hash-179af0311ae58f099ef74cec7cd90f58.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      "use client";
+      //#region src/a.ts
+      const A = 1;
+      //#endregion
+      exports.A = A;
 
-    export { A };
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/a-this-is-not-the-real-hash-49ed23373c96c124cb5dcff612b4c05c.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      "use client";
+      //#region src/a.ts
+      const A = 1;
+      //#endregion
+      export { A };
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/a-this-is-not-the-real-hash-f67b4ee51aa01653fbab25fa1bdfb30e.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use client';
-    'use strict';
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/a.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      export declare const A = 1;
 
-    Object.defineProperty(exports, '__esModule', { value: true });
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/b.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      export declare const B = 2;
 
-    const A = 1;
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/index.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      export { A } from "./a.js";
+      export { B } from "./b.js";
 
-    exports.A = A;
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      export * from "./declarations/src/index.js";
+      //# sourceMa${""}ppingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoidHlwZXNjcmlwdC5janMuZC50cyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4vZGVjbGFyYXRpb25zL3NyYy9pbmRleC5kLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBIn0=
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/a.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    export declare const A = 1;
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+      //#region \\0rolldown/runtime.js
+      var __defProp = Object.defineProperty;
+      var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+      var __getOwnPropNames = Object.getOwnPropertyNames;
+      var __hasOwnProp = Object.prototype.hasOwnProperty;
+      var __exportAll = (all, no_symbols) => {
+      	let target = {};
+      	for (var name in all) __defProp(target, name, {
+      		get: all[name],
+      		enumerable: true
+      	});
+      	if (!no_symbols) __defProp(target, Symbol.toStringTag, { value: "Module" });
+      	return target;
+      };
+      var __copyProps = (to, from, except, desc) => {
+      	if (from && typeof from === "object" || typeof from === "function") for (var keys = __getOwnPropNames(from), i = 0, n = keys.length, key; i < n; i++) {
+      		key = keys[i];
+      		if (!__hasOwnProp.call(to, key) && key !== except) __defProp(to, key, {
+      			get: ((k) => from[k]).bind(null, key),
+      			enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable
+      		});
+      	}
+      	return to;
+      };
+      var __reExport = (target, mod, secondTarget) => (__copyProps(target, mod, "default"), secondTarget && __copyProps(secondTarget, mod, "default"));
+      //#endregion
+      //#region \\0preserve boundary:0src/a.ts
+      var a_exports = /* @__PURE__ */ __exportAll({});
+      __reExport(a_exports, require("./a-some-hash.cjs.js"));
+      //#endregion
+      //#region src/b.ts
+      const B = 2;
+      //#endregion
+      Object.defineProperty(exports, "A", {
+      	enumerable: true,
+      	get: function() {
+      		return a_exports.A;
+      	}
+      });
+      exports.B = B;
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/b.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    export declare const B = 2;
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/index.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    export { A } from "./a.js";
-    export { B } from "./b.js";
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    export * from "./declarations/src/index.js";
-    //# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoidHlwZXNjcmlwdC5janMuZC50cyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4vZGVjbGFyYXRpb25zL3NyYy9pbmRleC5kLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBIn0=
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    Object.defineProperty(exports, '__esModule', { value: true });
-
-    var a = require('./a-some-hash.cjs.js');
-
-    const B = 2;
-
-    Object.defineProperty(exports, 'A', {
-    	enumerable: true,
-    	get: function () { return a.A; }
-    });
-    exports.B = B;
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    export { A } from './a-some-hash.esm.js';
-
-    const B = 2;
-
-    export { B };
-
-  `);
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      //#region \\0rolldown/runtime.js
+      var __defProp = Object.defineProperty;
+      var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+      var __getOwnPropNames = Object.getOwnPropertyNames;
+      var __hasOwnProp = Object.prototype.hasOwnProperty;
+      var __exportAll = (all, no_symbols) => {
+      	let target = {};
+      	for (var name in all) __defProp(target, name, {
+      		get: all[name],
+      		enumerable: true
+      	});
+      	if (!no_symbols) __defProp(target, Symbol.toStringTag, { value: "Module" });
+      	return target;
+      };
+      var __copyProps = (to, from, except, desc) => {
+      	if (from && typeof from === "object" || typeof from === "function") for (var keys = __getOwnPropNames(from), i = 0, n = keys.length, key; i < n; i++) {
+      		key = keys[i];
+      		if (!__hasOwnProp.call(to, key) && key !== except) __defProp(to, key, {
+      			get: ((k) => from[k]).bind(null, key),
+      			enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable
+      		});
+      	}
+      	return to;
+      };
+      var __reExport = (target, mod, secondTarget) => (__copyProps(target, mod, "default"), secondTarget && __copyProps(secondTarget, mod, "default"));
+      //#endregion
+      //#region \\0preserve boundary:0src/a.ts
+      var a_exports = /* @__PURE__ */ __exportAll({});
+      import * as import___USE_CLIENT_IMPORT__VRAku6fjghkApIISiBWPzg__USE_CLIENT_IMPORT___a from "./a-some-hash.esm.js";
+      __reExport(a_exports, import___USE_CLIENT_IMPORT__VRAku6fjghkApIISiBWPzg__USE_CLIENT_IMPORT___a);
+      //#endregion
+      //#region src/b.ts
+      const B = 2;
+      //#endregion
+      var A = a_exports.A;
+      export { A, B };
+    `);
 });
 test("use client as entrypoint with typescript", async () => {
   const dir = await testdir({
@@ -1044,36 +1346,75 @@ test("use client as entrypoint with typescript", async () => {
   await build(dir);
   expect(await getFiles(dir, ["{another/dist,dist}/**/*.{esm.js,d.ts}"]))
     .toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ another/dist/typescript-another.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    export * from "../../dist/declarations/src/another.js";
-    //# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoidHlwZXNjcmlwdC1hbm90aGVyLmNqcy5kLnRzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi4vLi4vZGlzdC9kZWNsYXJhdGlvbnMvc3JjL2Fub3RoZXIuZC50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSJ9
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ another/dist/typescript-another.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      export * from "../../dist/declarations/src/another.js";
+      //# sourceMa${""}ppingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoidHlwZXNjcmlwdC1hbm90aGVyLmNqcy5kLnRzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi4vLi4vZGlzdC9kZWNsYXJhdGlvbnMvc3JjL2Fub3RoZXIuZC50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSJ9
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ another/dist/typescript-another.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    import { A } from '../../dist/typescript.esm.js';
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ another/dist/typescript-another.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      //#region \\0rolldown/runtime.js
+      var __defProp = Object.defineProperty;
+      var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+      var __getOwnPropNames = Object.getOwnPropertyNames;
+      var __hasOwnProp = Object.prototype.hasOwnProperty;
+      var __exportAll = (all, no_symbols) => {
+      	let target = {};
+      	for (var name in all) __defProp(target, name, {
+      		get: all[name],
+      		enumerable: true
+      	});
+      	if (!no_symbols) __defProp(target, Symbol.toStringTag, { value: "Module" });
+      	return target;
+      };
+      var __copyProps = (to, from, except, desc) => {
+      	if (from && typeof from === "object" || typeof from === "function") for (var keys = __getOwnPropNames(from), i = 0, n = keys.length, key; i < n; i++) {
+      		key = keys[i];
+      		if (!__hasOwnProp.call(to, key) && key !== except) __defProp(to, key, {
+      			get: ((k) => from[k]).bind(null, key),
+      			enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable
+      		});
+      	}
+      	return to;
+      };
+      var __reExport = (target, mod, secondTarget) => (__copyProps(target, mod, "default"), secondTarget && __copyProps(secondTarget, mod, "default"));
+      //#endregion
+      //#region \\0preserve boundary:0src/index.ts
+      var _preserve_boundary_0src_exports = /* @__PURE__ */ __exportAll({});
+      import * as import___USE_CLIENT_IMPORT__VRAku6fjghkApIISiBWPzg__USE_CLIENT_IMPORT___index from "../../dist/src-Cba4ld0B.esm.js";
+      __reExport(_preserve_boundary_0src_exports, import___USE_CLIENT_IMPORT__VRAku6fjghkApIISiBWPzg__USE_CLIENT_IMPORT___index);
+      //#endregion
+      //#region src/another.ts
+      function something() {
+      	console.log(_preserve_boundary_0src_exports.A);
+      }
+      //#endregion
+      export { something };
 
-    function something() {
-      console.log(A);
-    }
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/another.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      export declare function something(): void;
 
-    export { something };
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/index.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      export declare const A = 1;
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/another.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    export declare function something(): void;
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/src-BGn3I3qN.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      export * from "./declarations/src/index.js";
+      //# sourceMa${""}ppingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoic3JjLUJHbjNJM3FOLmNqcy5kLnRzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi9kZWNsYXJhdGlvbnMvc3JjL2luZGV4LmQudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUEifQ==
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/index.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    export declare const A = 1;
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/src-Cba4ld0B.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      "use client";
+      import { A } from "./typescript.esm.js";
+      export { A };
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    export * from "./declarations/src/index.js";
-    //# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoidHlwZXNjcmlwdC5janMuZC50cyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4vZGVjbGFyYXRpb25zL3NyYy9pbmRleC5kLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBIn0=
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      export * from "./declarations/src/index.js";
+      //# sourceMa${""}ppingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoidHlwZXNjcmlwdC5janMuZC50cyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4vZGVjbGFyYXRpb25zL3NyYy9pbmRleC5kLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBIn0=
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use client';
-    const A = 1;
-
-    export { A };
-
-  `);
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      "use client";
+      //#region src/index.ts
+      const A = 1;
+      //#endregion
+      export { A };
+    `);
 });
 
 test("no hoisting client only imports", async () => {
@@ -1099,40 +1440,49 @@ test("no hoisting client only imports", async () => {
   await build(dir);
   expect(await getFiles(dir, ["dist/**.esm.js"], stripHashes("client")))
     .toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/client-this-is-not-the-real-hash-2d9a93e2d378420c96993764a8d2b439.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use client';
-    import 'client-only';
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/client-this-is-not-the-real-hash-33d4b50f82e3476a7ff85a4ddc95fbbe.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      "use client";
+      import "client-only";
+      //#region src/client.js
+      const a = 1;
+      const b = 1;
+      //#endregion
+      export { a, b };
 
-    const a = 1;
-    const b = 1;
-
-    export { a, b };
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    import * as client$1 from './client-some-hash.esm.js';
-
-    function _mergeNamespaces(n, m) {
-    	m.forEach(function (e) {
-    		e && typeof e !== 'string' && !Array.isArray(e) && Object.keys(e).forEach(function (k) {
-    			if (k !== 'default' && !(k in n)) {
-    				var d = Object.getOwnPropertyDescriptor(e, k);
-    				Object.defineProperty(n, k, d.get ? d : {
-    					enumerable: true,
-    					get: function () { return e[k]; }
-    				});
-    			}
-    		});
-    	});
-    	return Object.freeze(n);
-    }
-
-    var client = /*#__PURE__*/_mergeNamespaces({
-    	__proto__: null
-    }, [client$1]);
-
-    export { client as x };
-
-  `);
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      //#region \\0rolldown/runtime.js
+      var __defProp = Object.defineProperty;
+      var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+      var __getOwnPropNames = Object.getOwnPropertyNames;
+      var __hasOwnProp = Object.prototype.hasOwnProperty;
+      var __exportAll = (all, no_symbols) => {
+      	let target = {};
+      	for (var name in all) __defProp(target, name, {
+      		get: all[name],
+      		enumerable: true
+      	});
+      	if (!no_symbols) __defProp(target, Symbol.toStringTag, { value: "Module" });
+      	return target;
+      };
+      var __copyProps = (to, from, except, desc) => {
+      	if (from && typeof from === "object" || typeof from === "function") for (var keys = __getOwnPropNames(from), i = 0, n = keys.length, key; i < n; i++) {
+      		key = keys[i];
+      		if (!__hasOwnProp.call(to, key) && key !== except) __defProp(to, key, {
+      			get: ((k) => from[k]).bind(null, key),
+      			enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable
+      		});
+      	}
+      	return to;
+      };
+      var __reExport = (target, mod, secondTarget) => (__copyProps(target, mod, "default"), secondTarget && __copyProps(secondTarget, mod, "default"));
+      //#endregion
+      //#region \\0preserve boundary:0src/client.js
+      var client_exports = /* @__PURE__ */ __exportAll({});
+      import * as import___USE_CLIENT_IMPORT__VRAku6fjghkApIISiBWPzg__USE_CLIENT_IMPORT___client from "./client-some-hash.esm.js";
+      __reExport(client_exports, import___USE_CLIENT_IMPORT__VRAku6fjghkApIISiBWPzg__USE_CLIENT_IMPORT___client);
+      //#endregion
+      export { client_exports as x };
+    `);
 });
 test("cycle with use client", async () => {
   const dir = await testdir({
@@ -1175,33 +1525,63 @@ test("cycle with use client", async () => {
   await build(dir);
   expect(await getFiles(dir, ["dist/**.esm.js"], stripHashes("ui")))
     .toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    import { client } from './ui-some-hash.esm.js';
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      //#region \\0rolldown/runtime.js
+      var __defProp = Object.defineProperty;
+      var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+      var __getOwnPropNames = Object.getOwnPropertyNames;
+      var __hasOwnProp = Object.prototype.hasOwnProperty;
+      var __exportAll = (all, no_symbols) => {
+      	let target = {};
+      	for (var name in all) __defProp(target, name, {
+      		get: all[name],
+      		enumerable: true
+      	});
+      	if (!no_symbols) __defProp(target, Symbol.toStringTag, { value: "Module" });
+      	return target;
+      };
+      var __copyProps = (to, from, except, desc) => {
+      	if (from && typeof from === "object" || typeof from === "function") for (var keys = __getOwnPropNames(from), i = 0, n = keys.length, key; i < n; i++) {
+      		key = keys[i];
+      		if (!__hasOwnProp.call(to, key) && key !== except) __defProp(to, key, {
+      			get: ((k) => from[k]).bind(null, key),
+      			enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable
+      		});
+      	}
+      	return to;
+      };
+      var __reExport = (target, mod, secondTarget) => (__copyProps(target, mod, "default"), secondTarget && __copyProps(secondTarget, mod, "default"));
+      //#endregion
+      //#region \\0preserve boundary:0src/ui.js
+      var ui_exports = /* @__PURE__ */ __exportAll({});
+      import * as import___USE_CLIENT_IMPORT__VRAku6fjghkApIISiBWPzg__USE_CLIENT_IMPORT___ui from "./ui-some-hash.esm.js";
+      __reExport(ui_exports, import___USE_CLIENT_IMPORT__VRAku6fjghkApIISiBWPzg__USE_CLIENT_IMPORT___ui);
+      //#endregion
+      //#region src/other.js
+      function another() {
+      	return c;
+      }
+      //#endregion
+      //#region src/index.js
+      async function thing() {
+      	return a;
+      }
+      function other() {
+      	console.log(another, ui_exports.client);
+      }
+      //#endregion
+      export { other, thing };
 
-    function another() {
-      return c;
-    }
-
-    async function thing() {
-      return a;
-    }
-    function other() {
-      console.log(another, client);
-    }
-
-    export { other, thing };
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/ui-this-is-not-the-real-hash-bed1afce5b6c65dfe85deec7c0ef27d1.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use client';
-    import 'client-only';
-
-    function client() {
-      console.log("a");
-    }
-
-    export { client };
-
-  `);
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/ui-this-is-not-the-real-hash-6611fca7d3a0d82d22ac3bcbfe0ef9bc.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      "use client";
+      import "client-only";
+      //#region src/ui.js
+      function client() {
+      	console.log("a");
+      }
+      //#endregion
+      export { client };
+    `);
 });
 test("import use client self", async () => {
   const dir = await testdir({
@@ -1229,40 +1609,56 @@ test("import use client self", async () => {
   await build(dir);
   expect(await getFiles(dir, ["dist/**.esm.js"], stripHashes("ui")))
     .toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    export { client } from './ui-some-hash.esm.js';
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      import { t as ui_exports } from "./ui-some-hash.esm.js";
+      var client = ui_exports.client;
+      export { client };
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/ui-this-is-not-the-real-hash-82b5377830ffd545c19e687af30e4618.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use client';
-    import 'client-only';
-    import * as ui from './ui-some-hash.esm.js';
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/ui-this-is-not-the-real-hash-3fe2055c746e52371b225f73cd2525ec.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      "use client";
+      import { t as ui_exports } from "./ui-some-hash.esm.js";
+      import "client-only";
+      //#region src/ui.js
+      function client() {
+      	console.log("a", ui_exports);
+      }
+      //#endregion
+      export { client };
 
-    function _mergeNamespaces(n, m) {
-      m.forEach(function (e) {
-        e && typeof e !== 'string' && !Array.isArray(e) && Object.keys(e).forEach(function (k) {
-          if (k !== 'default' && !(k in n)) {
-            var d = Object.getOwnPropertyDescriptor(e, k);
-            Object.defineProperty(n, k, d.get ? d : {
-              enumerable: true,
-              get: function () { return e[k]; }
-            });
-          }
-        });
-      });
-      return Object.freeze(n);
-    }
-
-    var self = /*#__PURE__*/_mergeNamespaces({
-      __proto__: null
-    }, [ui]);
-
-    function client() {
-      console.log("a", self);
-    }
-
-    export { client };
-
-  `);
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/ui-this-is-not-the-real-hash-c70853ee8fcec8cdcb82a953e56cd5fd.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      //#region \\0rolldown/runtime.js
+      var __defProp = Object.defineProperty;
+      var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+      var __getOwnPropNames = Object.getOwnPropertyNames;
+      var __hasOwnProp = Object.prototype.hasOwnProperty;
+      var __exportAll = (all, no_symbols) => {
+      	let target = {};
+      	for (var name in all) __defProp(target, name, {
+      		get: all[name],
+      		enumerable: true
+      	});
+      	if (!no_symbols) __defProp(target, Symbol.toStringTag, { value: "Module" });
+      	return target;
+      };
+      var __copyProps = (to, from, except, desc) => {
+      	if (from && typeof from === "object" || typeof from === "function") for (var keys = __getOwnPropNames(from), i = 0, n = keys.length, key; i < n; i++) {
+      		key = keys[i];
+      		if (!__hasOwnProp.call(to, key) && key !== except) __defProp(to, key, {
+      			get: ((k) => from[k]).bind(null, key),
+      			enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable
+      		});
+      	}
+      	return to;
+      };
+      var __reExport = (target, mod, secondTarget) => (__copyProps(target, mod, "default"), secondTarget && __copyProps(secondTarget, mod, "default"));
+      //#endregion
+      //#region \\0preserve boundary:0src/ui.js
+      var ui_exports = /* @__PURE__ */ __exportAll({});
+      import * as import___USE_CLIENT_IMPORT__VRAku6fjghkApIISiBWPzg__USE_CLIENT_IMPORT___ui from "./ui-some-hash.esm.js";
+      __reExport(ui_exports, import___USE_CLIENT_IMPORT__VRAku6fjghkApIISiBWPzg__USE_CLIENT_IMPORT___ui);
+      //#endregion
+      export { ui_exports as t };
+    `);
 });
 test("import use client self as entrypoint", async () => {
   const dir = await testdir({
@@ -1287,35 +1683,50 @@ test("import use client self as entrypoint", async () => {
   await build(dir);
   expect(await getFiles(dir, ["dist/**.esm.js"])).toMatchInlineSnapshot(`
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use client';
-    import 'client-only';
-    import * as index from './pkg.esm.js';
-
-    function _mergeNamespaces(n, m) {
-      m.forEach(function (e) {
-        e && typeof e !== 'string' && !Array.isArray(e) && Object.keys(e).forEach(function (k) {
-          if (k !== 'default' && !(k in n)) {
-            var d = Object.getOwnPropertyDescriptor(e, k);
-            Object.defineProperty(n, k, d.get ? d : {
-              enumerable: true,
-              get: function () { return e[k]; }
-            });
-          }
-        });
-      });
-      return Object.freeze(n);
-    }
-
-    var self = /*#__PURE__*/_mergeNamespaces({
-      __proto__: null
-    }, [index]);
-
+    "use client";
+    import "client-only";
+    //#region \\0rolldown/runtime.js
+    var __defProp = Object.defineProperty;
+    var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+    var __getOwnPropNames = Object.getOwnPropertyNames;
+    var __hasOwnProp = Object.prototype.hasOwnProperty;
+    var __exportAll = (all, no_symbols) => {
+    	let target = {};
+    	for (var name in all) __defProp(target, name, {
+    		get: all[name],
+    		enumerable: true
+    	});
+    	if (!no_symbols) __defProp(target, Symbol.toStringTag, { value: "Module" });
+    	return target;
+    };
+    var __copyProps = (to, from, except, desc) => {
+    	if (from && typeof from === "object" || typeof from === "function") for (var keys = __getOwnPropNames(from), i = 0, n = keys.length, key; i < n; i++) {
+    		key = keys[i];
+    		if (!__hasOwnProp.call(to, key) && key !== except) __defProp(to, key, {
+    			get: ((k) => from[k]).bind(null, key),
+    			enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable
+    		});
+    	}
+    	return to;
+    };
+    var __reExport = (target, mod, secondTarget) => (__copyProps(target, mod, "default"), secondTarget && __copyProps(secondTarget, mod, "default"));
+    //#endregion
+    //#region \\0preserve boundary:0src/index.js
+    var _preserve_boundary_0src_exports = /* @__PURE__ */ __exportAll({});
+    import * as import___USE_CLIENT_IMPORT__VRAku6fjghkApIISiBWPzg__USE_CLIENT_IMPORT___index from "./src-DdIuPpet.esm.js";
+    __reExport(_preserve_boundary_0src_exports, import___USE_CLIENT_IMPORT__VRAku6fjghkApIISiBWPzg__USE_CLIENT_IMPORT___index);
+    //#endregion
+    //#region src/index.js
     function client() {
-      console.log("a", self);
+    	console.log("a", _preserve_boundary_0src_exports);
     }
-
+    //#endregion
     export { client };
 
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/src-DdIuPpet.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    "use client";
+    import { client } from "./pkg.esm.js";
+    export { client };
   `);
 });
 
@@ -1339,46 +1750,98 @@ test("simple use client with comment above directive", async () => {
   await build(dir);
   expect(await getFiles(dir, ["dist/**"], stripHashes("client")))
     .toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/client-this-is-not-the-real-hash-d42256f03593be08d8620d4b6456d377.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use client';
-    /** blah */
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/client-this-is-not-the-real-hash-25f391c9d4f1808130dee8a963673bd5.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      "use client";
+      //#region src/client.js
+      /** blah */
+      const A = "something";
+      console.log("client");
+      //#endregion
+      export { A };
 
-    const A = "something";
-    console.log("client");
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/client-this-is-not-the-real-hash-a70f94636f097aad9060cb4e2fc73daf.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      "use client";
+      //#region src/client.js
+      /** blah */
+      const A = "something";
+      console.log("client");
+      //#endregion
+      exports.A = A;
 
-    export { A };
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+      //#region \\0rolldown/runtime.js
+      var __defProp = Object.defineProperty;
+      var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+      var __getOwnPropNames = Object.getOwnPropertyNames;
+      var __hasOwnProp = Object.prototype.hasOwnProperty;
+      var __exportAll = (all, no_symbols) => {
+      	let target = {};
+      	for (var name in all) __defProp(target, name, {
+      		get: all[name],
+      		enumerable: true
+      	});
+      	if (!no_symbols) __defProp(target, Symbol.toStringTag, { value: "Module" });
+      	return target;
+      };
+      var __copyProps = (to, from, except, desc) => {
+      	if (from && typeof from === "object" || typeof from === "function") for (var keys = __getOwnPropNames(from), i = 0, n = keys.length, key; i < n; i++) {
+      		key = keys[i];
+      		if (!__hasOwnProp.call(to, key) && key !== except) __defProp(to, key, {
+      			get: ((k) => from[k]).bind(null, key),
+      			enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable
+      		});
+      	}
+      	return to;
+      };
+      var __reExport = (target, mod, secondTarget) => (__copyProps(target, mod, "default"), secondTarget && __copyProps(secondTarget, mod, "default"));
+      //#endregion
+      //#region \\0preserve boundary:0src/client.js
+      var client_exports = /* @__PURE__ */ __exportAll({});
+      __reExport(client_exports, require("./client-some-hash.cjs.js"));
+      //#endregion
+      Object.defineProperty(exports, "A", {
+      	enumerable: true,
+      	get: function() {
+      		return client_exports.A;
+      	}
+      });
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/client-this-is-not-the-real-hash-ef1aedc2ed504d143f108943a7d13c16.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use client';
-    'use strict';
-
-    Object.defineProperty(exports, '__esModule', { value: true });
-
-    /** blah */
-
-    const A = "something";
-    console.log("client");
-
-    exports.A = A;
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    Object.defineProperty(exports, '__esModule', { value: true });
-
-    var client = require('./client-some-hash.cjs.js');
-
-
-
-    Object.defineProperty(exports, 'A', {
-    	enumerable: true,
-    	get: function () { return client.A; }
-    });
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    export { A } from './client-some-hash.esm.js';
-
-  `);
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      //#region \\0rolldown/runtime.js
+      var __defProp = Object.defineProperty;
+      var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+      var __getOwnPropNames = Object.getOwnPropertyNames;
+      var __hasOwnProp = Object.prototype.hasOwnProperty;
+      var __exportAll = (all, no_symbols) => {
+      	let target = {};
+      	for (var name in all) __defProp(target, name, {
+      		get: all[name],
+      		enumerable: true
+      	});
+      	if (!no_symbols) __defProp(target, Symbol.toStringTag, { value: "Module" });
+      	return target;
+      };
+      var __copyProps = (to, from, except, desc) => {
+      	if (from && typeof from === "object" || typeof from === "function") for (var keys = __getOwnPropNames(from), i = 0, n = keys.length, key; i < n; i++) {
+      		key = keys[i];
+      		if (!__hasOwnProp.call(to, key) && key !== except) __defProp(to, key, {
+      			get: ((k) => from[k]).bind(null, key),
+      			enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable
+      		});
+      	}
+      	return to;
+      };
+      var __reExport = (target, mod, secondTarget) => (__copyProps(target, mod, "default"), secondTarget && __copyProps(secondTarget, mod, "default"));
+      //#endregion
+      //#region \\0preserve boundary:0src/client.js
+      var client_exports = /* @__PURE__ */ __exportAll({});
+      import * as import___USE_CLIENT_IMPORT__VRAku6fjghkApIISiBWPzg__USE_CLIENT_IMPORT___client from "./client-some-hash.esm.js";
+      __reExport(client_exports, import___USE_CLIENT_IMPORT__VRAku6fjghkApIISiBWPzg__USE_CLIENT_IMPORT___client);
+      //#endregion
+      var A = client_exports.A;
+      export { A };
+    `);
 });
 
 test("use server", async () => {
@@ -1399,38 +1862,92 @@ test("use server", async () => {
   await build(dir);
   expect(await getFiles(dir, ["dist/**"], stripHashes("server")))
     .toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+      //#region \\0rolldown/runtime.js
+      var __defProp = Object.defineProperty;
+      var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+      var __getOwnPropNames = Object.getOwnPropertyNames;
+      var __hasOwnProp = Object.prototype.hasOwnProperty;
+      var __exportAll = (all, no_symbols) => {
+      	let target = {};
+      	for (var name in all) __defProp(target, name, {
+      		get: all[name],
+      		enumerable: true
+      	});
+      	if (!no_symbols) __defProp(target, Symbol.toStringTag, { value: "Module" });
+      	return target;
+      };
+      var __copyProps = (to, from, except, desc) => {
+      	if (from && typeof from === "object" || typeof from === "function") for (var keys = __getOwnPropNames(from), i = 0, n = keys.length, key; i < n; i++) {
+      		key = keys[i];
+      		if (!__hasOwnProp.call(to, key) && key !== except) __defProp(to, key, {
+      			get: ((k) => from[k]).bind(null, key),
+      			enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable
+      		});
+      	}
+      	return to;
+      };
+      var __reExport = (target, mod, secondTarget) => (__copyProps(target, mod, "default"), secondTarget && __copyProps(secondTarget, mod, "default"));
+      //#endregion
+      //#region \\0preserve boundary:0src/server.js
+      var server_exports = /* @__PURE__ */ __exportAll({});
+      __reExport(server_exports, require("./server-some-hash.cjs.js"));
+      //#endregion
+      Object.defineProperty(exports, "doSomething", {
+      	enumerable: true,
+      	get: function() {
+      		return server_exports.doSomething;
+      	}
+      });
 
-    Object.defineProperty(exports, '__esModule', { value: true });
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      //#region \\0rolldown/runtime.js
+      var __defProp = Object.defineProperty;
+      var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+      var __getOwnPropNames = Object.getOwnPropertyNames;
+      var __hasOwnProp = Object.prototype.hasOwnProperty;
+      var __exportAll = (all, no_symbols) => {
+      	let target = {};
+      	for (var name in all) __defProp(target, name, {
+      		get: all[name],
+      		enumerable: true
+      	});
+      	if (!no_symbols) __defProp(target, Symbol.toStringTag, { value: "Module" });
+      	return target;
+      };
+      var __copyProps = (to, from, except, desc) => {
+      	if (from && typeof from === "object" || typeof from === "function") for (var keys = __getOwnPropNames(from), i = 0, n = keys.length, key; i < n; i++) {
+      		key = keys[i];
+      		if (!__hasOwnProp.call(to, key) && key !== except) __defProp(to, key, {
+      			get: ((k) => from[k]).bind(null, key),
+      			enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable
+      		});
+      	}
+      	return to;
+      };
+      var __reExport = (target, mod, secondTarget) => (__copyProps(target, mod, "default"), secondTarget && __copyProps(secondTarget, mod, "default"));
+      //#endregion
+      //#region \\0preserve boundary:0src/server.js
+      var server_exports = /* @__PURE__ */ __exportAll({});
+      import * as import___USE_CLIENT_IMPORT__VRAku6fjghkApIISiBWPzg__USE_CLIENT_IMPORT___server from "./server-some-hash.esm.js";
+      __reExport(server_exports, import___USE_CLIENT_IMPORT__VRAku6fjghkApIISiBWPzg__USE_CLIENT_IMPORT___server);
+      //#endregion
+      var doSomething = server_exports.doSomething;
+      export { doSomething };
 
-    var server = require('./server-some-hash.cjs.js');
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/server-this-is-not-the-real-hash-1514b4880a1eea3958d5a6a65519ad77.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      "use server";
+      //#region src/server.js
+      function doSomething() {}
+      //#endregion
+      export { doSomething };
 
-
-
-    Object.defineProperty(exports, 'doSomething', {
-    	enumerable: true,
-    	get: function () { return server.doSomething; }
-    });
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    export { doSomething } from './server-some-hash.esm.js';
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/server-this-is-not-the-real-hash-288a9f5076a34272a0270a4055aa266d.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use server';
-    function doSomething() {}
-
-    export { doSomething };
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/server-this-is-not-the-real-hash-f9ea3f80de7afbb1e4ac2175565ef521.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use server';
-    'use strict';
-
-    Object.defineProperty(exports, '__esModule', { value: true });
-
-    function doSomething() {}
-
-    exports.doSomething = doSomething;
-
-  `);
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/server-this-is-not-the-real-hash-1a680e81f5ab07c990d8db40c29b816e.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      "use server";
+      //#region src/server.js
+      function doSomething() {}
+      //#endregion
+      exports.doSomething = doSomething;
+    `);
 });

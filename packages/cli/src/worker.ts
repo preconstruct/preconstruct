@@ -1,6 +1,8 @@
-import { lazyRequire } from "lazy-require.macro";
+import { createRequire } from "module";
 // @ts-ignore
 import { addDefault } from "@babel/helper-module-imports";
+
+const require = createRequire(import.meta.url);
 
 function importHelperPlugin(babel: typeof import("@babel/core")) {
   return {
@@ -35,7 +37,7 @@ export async function transformBabel(
   cwd: string,
   filename: string
 ) {
-  const babel = lazyRequire<typeof import("@babel/core")>();
+  const babel = require("@babel/core") as typeof import("@babel/core");
 
   return babel
     .transformAsync(code, {
@@ -55,7 +57,7 @@ export async function transformBabel(
 }
 
 export function transformTerser(code: string, optionsString: string) {
-  const { minify } = lazyRequire<typeof import("terser")>();
+  const { minify } = require("terser") as typeof import("terser");
   const options = JSON.parse(optionsString);
   return minify(code, options) as Promise<{ code: string; map: any }>;
 }

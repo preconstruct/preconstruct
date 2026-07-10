@@ -1,5 +1,5 @@
 import path from "path";
-import { Plugin } from "rollup";
+import type { Plugin } from "rolldown";
 import { flowTemplate } from "../utils";
 
 import * as fs from "fs-extra";

@@ -16,9 +16,9 @@ import stripAnsi from "strip-ansi";
 
 const f = fixturez(__dirname);
 
-jest.setTimeout(6000000);
+vi.setConfig({ testTimeout: 6000000 });
 
-jest.mock("../../prompt");
+vi.mock("../../prompt");
 
 let unsafeRequire = require;
 
@@ -151,27 +151,25 @@ test("typescript declarationMap", async () => {
   await expect(getDist(dir)).resolves.toMatchInlineSnapshot(`
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/index.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     export declare const thing: "wow";
-    //# sourceMappingURL=index.d.ts.map
+    //# sourceMa${""}ppingURL=index.d.ts.map
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/index.d.ts.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     {"version":3,"file":"index.d.ts","sourceRoot":"../../../src","sources":["index.ts"],"names":[],"mappings":"AAAA,eAAO,MAAM,KAAK,OAAiB,CAAC"}
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript-declarationMap.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     export * from "./declarations/src/index.js";
-    //# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoidHlwZXNjcmlwdC1kZWNsYXJhdGlvbk1hcC5janMuZC50cyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4vZGVjbGFyYXRpb25zL3NyYy9pbmRleC5kLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBIn0=
+    //# sourceMa${""}ppingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoidHlwZXNjcmlwdC1kZWNsYXJhdGlvbk1hcC5janMuZC50cyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4vZGVjbGFyYXRpb25zL3NyYy9pbmRleC5kLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBIn0=
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript-declarationMap.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    Object.defineProperty(exports, '__esModule', { value: true });
-
+    Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+    //#region src/index.ts
     const thing = "wow";
-
+    //#endregion
     exports.thing = thing;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript-declarationMap.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    //#region src/index.ts
     const thing = "wow";
-
+    //#endregion
     export { thing };
-
   `);
 });
 
@@ -191,13 +189,12 @@ test("preserves process.env.NODE_ENV reads and assignments", async () => {
   await build(dir);
   expect(await getDist(dir)).toMatchInlineSnapshot(`
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
+    //#region src/index.js
     process.env.NODE_ENV = "development";
     something12.process.env.NODE_ENV = "development";
     console.log(process.env.NODE_ENV);
     console.log(something.process.env.NODE_ENV);
-
+    //#endregion
   `);
 });
 
@@ -215,55 +212,55 @@ test("does not duplicate babel helpers", async () => {
   });
   await build(dir);
   expect(await getDist(dir)).toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    Object.defineProperty(exports, '__esModule', { value: true });
-
-    function _toPrimitive(t, r) {
-      if ("object" != typeof t || !t) return t;
-      var e = t[Symbol.toPrimitive];
-      if (void 0 !== e) {
-        var i = e.call(t, r || "default");
-        if ("object" != typeof i) return i;
-        throw new TypeError("@@toPrimitive must return a primitive value.");
-      }
-      return ("string" === r ? String : Number)(t);
-    }
-
-    function _toPropertyKey(t) {
-      var i = _toPrimitive(t, "string");
-      return "symbol" == typeof i ? i : i + "";
-    }
-
-    function _defineProperties(e, r) {
-      for (var t = 0; t < r.length; t++) {
-        var o = r[t];
-        o.enumerable = o.enumerable || !1, o.configurable = !0, "value" in o && (o.writable = !0), Object.defineProperty(e, _toPropertyKey(o.key), o);
-      }
-    }
-    function _createClass(e, r, t) {
-      return r && _defineProperties(e.prototype, r), t && _defineProperties(e, t), Object.defineProperty(e, "prototype", {
-        writable: !1
-      }), e;
-    }
-
-    function _classCallCheck(a, n) {
-      if (!(a instanceof n)) throw new TypeError("Cannot call a class as a function");
-    }
-
-    var Other = /*#__PURE__*/_createClass(function Other() {
-      _classCallCheck(this, Other);
-    });
-
-    var Thing = /*#__PURE__*/_createClass(function Thing() {
-      _classCallCheck(this, Thing);
-    });
-
-    exports.Other = Other;
-    exports.Thing = Thing;
-
-  `);
+        ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+        Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+        //#region \\0rollupPluginBabelHelpers/toPrimitive
+        function _toPrimitive(t, r) {
+        	if ("object" != typeof t || !t) return t;
+        	var e = t[Symbol.toPrimitive];
+        	if (void 0 !== e) {
+        		var i = e.call(t, r || "default");
+        		if ("object" != typeof i) return i;
+        		throw new TypeError("@@toPrimitive must return a primitive value.");
+        	}
+        	return ("string" === r ? String : Number)(t);
+        }
+        //#endregion
+        //#region \\0rollupPluginBabelHelpers/toPropertyKey
+        function _toPropertyKey(t) {
+        	var i = _toPrimitive(t, "string");
+        	return "symbol" == typeof i ? i : i + "";
+        }
+        //#endregion
+        //#region \\0rollupPluginBabelHelpers/createClass
+        function _defineProperties(e, r) {
+        	for (var t = 0; t < r.length; t++) {
+        		var o = r[t];
+        		o.enumerable = o.enumerable || !1, o.configurable = !0, "value" in o && (o.writable = !0), Object.defineProperty(e, _toPropertyKey(o.key), o);
+        	}
+        }
+        function _createClass(e, r, t) {
+        	return r && _defineProperties(e.prototype, r), t && _defineProperties(e, t), Object.defineProperty(e, "prototype", { writable: !1 }), e;
+        }
+        //#endregion
+        //#region \\0rollupPluginBabelHelpers/classCallCheck
+        function _classCallCheck(a, n) {
+        	if (!(a instanceof n)) throw new TypeError("Cannot call a class as a function");
+        }
+        //#endregion
+        //#region src/other.js
+        var Other = /*#__PURE__*/ _createClass(function Other() {
+        	_classCallCheck(this, Other);
+        });
+        //#endregion
+        //#region src/index.js
+        var Thing = /*#__PURE__*/ _createClass(function Thing() {
+        	_classCallCheck(this, Thing);
+        });
+        //#endregion
+        exports.Other = Other;
+        exports.Thing = Thing;
+      `);
 });
 
 test("imports helpers from @babel/runtime without @babel/plugin-transform-runtime", async () => {
@@ -284,40 +281,62 @@ test("imports helpers from @babel/runtime without @babel/plugin-transform-runtim
   });
   await build(dir);
   expect(await getDist(dir)).toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
+        ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+        Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+        //#region \\0rolldown/runtime.js
+        var __create = Object.create;
+        var __defProp = Object.defineProperty;
+        var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+        var __getOwnPropNames = Object.getOwnPropertyNames;
+        var __getProtoOf = Object.getPrototypeOf;
+        var __hasOwnProp = Object.prototype.hasOwnProperty;
+        var __copyProps = (to, from, except, desc) => {
+        	if (from && typeof from === "object" || typeof from === "function") for (var keys = __getOwnPropNames(from), i = 0, n = keys.length, key; i < n; i++) {
+        		key = keys[i];
+        		if (!__hasOwnProp.call(to, key) && key !== except) __defProp(to, key, {
+        			get: ((k) => from[k]).bind(null, key),
+        			enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable
+        		});
+        	}
+        	return to;
+        };
+        var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", {
+        	value: mod,
+        	enumerable: true
+        }) : target, mod));
+        //#endregion
+        let _babel_runtime_helpers_createClass = require("@babel/runtime/helpers/createClass");
+        _babel_runtime_helpers_createClass = __toESM(_babel_runtime_helpers_createClass);
+        let _babel_runtime_helpers_classCallCheck = require("@babel/runtime/helpers/classCallCheck");
+        _babel_runtime_helpers_classCallCheck = __toESM(_babel_runtime_helpers_classCallCheck);
+        //#region src/other.js
+        var Other = /*#__PURE__*/ (0, _babel_runtime_helpers_createClass.default)(function Other() {
+        	(0, _babel_runtime_helpers_classCallCheck.default)(this, Other);
+        });
+        //#endregion
+        //#region src/index.js
+        var Thing = /*#__PURE__*/ (0, _babel_runtime_helpers_createClass.default)(function Thing() {
+        	(0, _babel_runtime_helpers_classCallCheck.default)(this, Thing);
+        });
+        //#endregion
+        exports.Other = Other;
+        exports.Thing = Thing;
 
-    Object.defineProperty(exports, '__esModule', { value: true });
-
-    var _createClass = require('@babel/runtime/helpers/createClass');
-    var _classCallCheck = require('@babel/runtime/helpers/classCallCheck');
-
-    var Other = /*#__PURE__*/_createClass(function Other() {
-      _classCallCheck(this, Other);
-    });
-
-    var Thing = /*#__PURE__*/_createClass(function Thing() {
-      _classCallCheck(this, Thing);
-    });
-
-    exports.Other = Other;
-    exports.Thing = Thing;
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    import _createClass from '@babel/runtime/helpers/esm/createClass';
-    import _classCallCheck from '@babel/runtime/helpers/esm/classCallCheck';
-
-    var Other = /*#__PURE__*/_createClass(function Other() {
-      _classCallCheck(this, Other);
-    });
-
-    var Thing = /*#__PURE__*/_createClass(function Thing() {
-      _classCallCheck(this, Thing);
-    });
-
-    export { Other, Thing };
-
-  `);
+        ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+        import _createClass from "@babel/runtime/helpers/esm/createClass";
+        import _classCallCheck from "@babel/runtime/helpers/esm/classCallCheck";
+        //#region src/other.js
+        var Other = /*#__PURE__*/ _createClass(function Other() {
+        	_classCallCheck(this, Other);
+        });
+        //#endregion
+        //#region src/index.js
+        var Thing = /*#__PURE__*/ _createClass(function Thing() {
+        	_classCallCheck(this, Thing);
+        });
+        //#endregion
+        export { Other, Thing };
+      `);
 });
 
 test("imports helpers from @babel/runtime-corejs2 without @babel/plugin-transform-runtime", async () => {
@@ -338,40 +357,62 @@ test("imports helpers from @babel/runtime-corejs2 without @babel/plugin-transfor
   });
   await build(dir);
   expect(await getDist(dir)).toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
+        		⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+        		Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+        		//#region \\0rolldown/runtime.js
+        		var __create = Object.create;
+        		var __defProp = Object.defineProperty;
+        		var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+        		var __getOwnPropNames = Object.getOwnPropertyNames;
+        		var __getProtoOf = Object.getPrototypeOf;
+        		var __hasOwnProp = Object.prototype.hasOwnProperty;
+        		var __copyProps = (to, from, except, desc) => {
+        			if (from && typeof from === "object" || typeof from === "function") for (var keys = __getOwnPropNames(from), i = 0, n = keys.length, key; i < n; i++) {
+        				key = keys[i];
+        				if (!__hasOwnProp.call(to, key) && key !== except) __defProp(to, key, {
+        					get: ((k) => from[k]).bind(null, key),
+        					enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable
+        				});
+        			}
+        			return to;
+        		};
+        		var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", {
+        			value: mod,
+        			enumerable: true
+        		}) : target, mod));
+        		//#endregion
+        		let _babel_runtime_corejs2_helpers_createClass = require("@babel/runtime-corejs2/helpers/createClass");
+        		_babel_runtime_corejs2_helpers_createClass = __toESM(_babel_runtime_corejs2_helpers_createClass);
+        		let _babel_runtime_corejs2_helpers_classCallCheck = require("@babel/runtime-corejs2/helpers/classCallCheck");
+        		_babel_runtime_corejs2_helpers_classCallCheck = __toESM(_babel_runtime_corejs2_helpers_classCallCheck);
+        		//#region src/other.js
+        		var Other = /*#__PURE__*/ (0, _babel_runtime_corejs2_helpers_createClass.default)(function Other() {
+        			(0, _babel_runtime_corejs2_helpers_classCallCheck.default)(this, Other);
+        		});
+        		//#endregion
+        		//#region src/index.js
+        		var Thing = /*#__PURE__*/ (0, _babel_runtime_corejs2_helpers_createClass.default)(function Thing() {
+        			(0, _babel_runtime_corejs2_helpers_classCallCheck.default)(this, Thing);
+        		});
+        		//#endregion
+        		exports.Other = Other;
+        		exports.Thing = Thing;
 
-    Object.defineProperty(exports, '__esModule', { value: true });
-
-    var _createClass = require('@babel/runtime-corejs2/helpers/createClass');
-    var _classCallCheck = require('@babel/runtime-corejs2/helpers/classCallCheck');
-
-    var Other = /*#__PURE__*/_createClass(function Other() {
-      _classCallCheck(this, Other);
-    });
-
-    var Thing = /*#__PURE__*/_createClass(function Thing() {
-      _classCallCheck(this, Thing);
-    });
-
-    exports.Other = Other;
-    exports.Thing = Thing;
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    import _createClass from '@babel/runtime-corejs2/helpers/esm/createClass';
-    import _classCallCheck from '@babel/runtime-corejs2/helpers/esm/classCallCheck';
-
-    var Other = /*#__PURE__*/_createClass(function Other() {
-      _classCallCheck(this, Other);
-    });
-
-    var Thing = /*#__PURE__*/_createClass(function Thing() {
-      _classCallCheck(this, Thing);
-    });
-
-    export { Other, Thing };
-
-  `);
+        		⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+        		import _createClass from "@babel/runtime-corejs2/helpers/esm/createClass";
+        		import _classCallCheck from "@babel/runtime-corejs2/helpers/esm/classCallCheck";
+        		//#region src/other.js
+        		var Other = /*#__PURE__*/ _createClass(function Other() {
+        			_classCallCheck(this, Other);
+        		});
+        		//#endregion
+        		//#region src/index.js
+        		var Thing = /*#__PURE__*/ _createClass(function Thing() {
+        			_classCallCheck(this, Thing);
+        		});
+        		//#endregion
+        		export { Other, Thing };
+        	`);
 });
 
 test("imports helpers from @babel/runtime-corejs3 without @babel/plugin-transform-runtime", async () => {
@@ -392,40 +433,62 @@ test("imports helpers from @babel/runtime-corejs3 without @babel/plugin-transfor
   });
   await build(dir);
   expect(await getDist(dir)).toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
+          		⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+          		Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+          		//#region \\0rolldown/runtime.js
+          		var __create = Object.create;
+          		var __defProp = Object.defineProperty;
+          		var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+          		var __getOwnPropNames = Object.getOwnPropertyNames;
+          		var __getProtoOf = Object.getPrototypeOf;
+          		var __hasOwnProp = Object.prototype.hasOwnProperty;
+          		var __copyProps = (to, from, except, desc) => {
+          			if (from && typeof from === "object" || typeof from === "function") for (var keys = __getOwnPropNames(from), i = 0, n = keys.length, key; i < n; i++) {
+          				key = keys[i];
+          				if (!__hasOwnProp.call(to, key) && key !== except) __defProp(to, key, {
+          					get: ((k) => from[k]).bind(null, key),
+          					enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable
+          				});
+          			}
+          			return to;
+          		};
+          		var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", {
+          			value: mod,
+          			enumerable: true
+          		}) : target, mod));
+          		//#endregion
+          		let _babel_runtime_corejs3_helpers_createClass = require("@babel/runtime-corejs3/helpers/createClass");
+          		_babel_runtime_corejs3_helpers_createClass = __toESM(_babel_runtime_corejs3_helpers_createClass);
+          		let _babel_runtime_corejs3_helpers_classCallCheck = require("@babel/runtime-corejs3/helpers/classCallCheck");
+          		_babel_runtime_corejs3_helpers_classCallCheck = __toESM(_babel_runtime_corejs3_helpers_classCallCheck);
+          		//#region src/other.js
+          		var Other = /*#__PURE__*/ (0, _babel_runtime_corejs3_helpers_createClass.default)(function Other() {
+          			(0, _babel_runtime_corejs3_helpers_classCallCheck.default)(this, Other);
+          		});
+          		//#endregion
+          		//#region src/index.js
+          		var Thing = /*#__PURE__*/ (0, _babel_runtime_corejs3_helpers_createClass.default)(function Thing() {
+          			(0, _babel_runtime_corejs3_helpers_classCallCheck.default)(this, Thing);
+          		});
+          		//#endregion
+          		exports.Other = Other;
+          		exports.Thing = Thing;
 
-    Object.defineProperty(exports, '__esModule', { value: true });
-
-    var _createClass = require('@babel/runtime-corejs3/helpers/createClass');
-    var _classCallCheck = require('@babel/runtime-corejs3/helpers/classCallCheck');
-
-    var Other = /*#__PURE__*/_createClass(function Other() {
-      _classCallCheck(this, Other);
-    });
-
-    var Thing = /*#__PURE__*/_createClass(function Thing() {
-      _classCallCheck(this, Thing);
-    });
-
-    exports.Other = Other;
-    exports.Thing = Thing;
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    import _createClass from '@babel/runtime-corejs3/helpers/esm/createClass';
-    import _classCallCheck from '@babel/runtime-corejs3/helpers/esm/classCallCheck';
-
-    var Other = /*#__PURE__*/_createClass(function Other() {
-      _classCallCheck(this, Other);
-    });
-
-    var Thing = /*#__PURE__*/_createClass(function Thing() {
-      _classCallCheck(this, Thing);
-    });
-
-    export { Other, Thing };
-
-  `);
+          		⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+          		import _createClass from "@babel/runtime-corejs3/helpers/esm/createClass";
+          		import _classCallCheck from "@babel/runtime-corejs3/helpers/esm/classCallCheck";
+          		//#region src/other.js
+          		var Other = /*#__PURE__*/ _createClass(function Other() {
+          			_classCallCheck(this, Other);
+          		});
+          		//#endregion
+          		//#region src/index.js
+          		var Thing = /*#__PURE__*/ _createClass(function Thing() {
+          			_classCallCheck(this, Thing);
+          		});
+          		//#endregion
+          		export { Other, Thing };
+          	`);
 });
 
 test("does not duplicate babel helpers when using @babel/plugin-transform-runtime but the helper isn't in the version of @babel/runtime that the user has specified", async () => {
@@ -446,97 +509,92 @@ test("does not duplicate babel helpers when using @babel/plugin-transform-runtim
   });
   await build(dir);
   expect(await getDist(dir)).toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    function _arrayLikeToArray(r, a) {
-      (null == a || a > r.length) && (a = r.length);
-      for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e];
-      return n;
-    }
-
-    function _unsupportedIterableToArray(r, a) {
-      if (r) {
-        if ("string" == typeof r) return _arrayLikeToArray(r, a);
-        var t = {}.toString.call(r).slice(8, -1);
-        return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0;
-      }
-    }
-
-    function _createForOfIteratorHelper(r, e) {
-      var t = "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"];
-      if (!t) {
-        if (Array.isArray(r) || (t = _unsupportedIterableToArray(r)) || e && r && "number" == typeof r.length) {
-          t && (r = t);
-          var n = 0,
-            F = function () {};
-          return {
-            s: F,
-            n: function () {
-              return n >= r.length ? {
-                done: !0
-              } : {
-                done: !1,
-                value: r[n++]
-              };
-            },
-            e: function (r) {
-              throw r;
-            },
-            f: F
-          };
-        }
-        throw new TypeError("Invalid attempt to iterate non-iterable instance.\\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
-      }
-      var o,
-        a = !0,
-        u = !1;
-      return {
-        s: function () {
-          t = t.call(r);
-        },
-        n: function () {
-          var r = t.next();
-          return a = r.done, r;
-        },
-        e: function (r) {
-          u = !0, o = r;
-        },
-        f: function () {
-          try {
-            a || null == t.return || t.return();
-          } finally {
-            if (u) throw o;
-          }
-        }
-      };
-    }
-
-    var _iterator$1 = _createForOfIteratorHelper(something),
-      _step$1;
-    try {
-      for (_iterator$1.s(); !(_step$1 = _iterator$1.n()).done;) {
-        var x$1 = _step$1.value;
-      }
-    } catch (err) {
-      _iterator$1.e(err);
-    } finally {
-      _iterator$1.f();
-    }
-
-    var _iterator = _createForOfIteratorHelper(something),
-      _step;
-    try {
-      for (_iterator.s(); !(_step = _iterator.n()).done;) {
-        var x = _step.value;
-      }
-    } catch (err) {
-      _iterator.e(err);
-    } finally {
-      _iterator.f();
-    }
-
-  `);
+        			⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+        			Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+        			//#region \\0rollupPluginBabelHelpers/arrayLikeToArray
+        			function _arrayLikeToArray(r, a) {
+        				(null == a || a > r.length) && (a = r.length);
+        				for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e];
+        				return n;
+        			}
+        			//#endregion
+        			//#region \\0rollupPluginBabelHelpers/unsupportedIterableToArray
+        			function _unsupportedIterableToArray(r, a) {
+        				if (r) {
+        					if ("string" == typeof r) return _arrayLikeToArray(r, a);
+        					var t = {}.toString.call(r).slice(8, -1);
+        					return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0;
+        				}
+        			}
+        			//#endregion
+        			//#region \\0rollupPluginBabelHelpers/createForOfIteratorHelper
+        			function _createForOfIteratorHelper(r, e) {
+        				var t = "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"];
+        				if (!t) {
+        					if (Array.isArray(r) || (t = _unsupportedIterableToArray(r)) || e && r && "number" == typeof r.length) {
+        						t && (r = t);
+        						var n = 0, F = function() {};
+        						return {
+        							s: F,
+        							n: function() {
+        								return n >= r.length ? { done: !0 } : {
+        									done: !1,
+        									value: r[n++]
+        								};
+        							},
+        							e: function(r) {
+        								throw r;
+        							},
+        							f: F
+        						};
+        					}
+        					throw new TypeError("Invalid attempt to iterate non-iterable instance.\\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+        				}
+        				var o, a = !0, u = !1;
+        				return {
+        					s: function() {
+        						t = t.call(r);
+        					},
+        					n: function() {
+        						var r = t.next();
+        						return a = r.done, r;
+        					},
+        					e: function(r) {
+        						u = !0, o = r;
+        					},
+        					f: function() {
+        						try {
+        							a || null == t.return || t.return();
+        						} finally {
+        							if (u) throw o;
+        						}
+        					}
+        				};
+        			}
+        			//#endregion
+        			//#region src/other.js
+        			var _iterator$1 = _createForOfIteratorHelper(something);
+        			var _step$1;
+        			try {
+        				for (_iterator$1.s(); !(_step$1 = _iterator$1.n()).done;) _step$1.value;
+        			} catch (err) {
+        				_iterator$1.e(err);
+        			} finally {
+        				_iterator$1.f();
+        			}
+        			//#endregion
+        			//#region src/index.js
+        			var _iterator = _createForOfIteratorHelper(something);
+        			var _step;
+        			try {
+        				for (_iterator.s(); !(_step = _iterator.n()).done;) _step.value;
+        			} catch (err) {
+        				_iterator.e(err);
+        			} finally {
+        				_iterator.f();
+        			}
+        			//#endregion
+        		`);
 });
 
 test("does not duplicate babel helpers when not using @babel/plugin-transform-runtime and the helper isn't in the version of @babel/runtime that the user has specified", async () => {
@@ -556,97 +614,92 @@ test("does not duplicate babel helpers when not using @babel/plugin-transform-ru
   });
   await build(dir);
   expect(await getDist(dir)).toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    function _arrayLikeToArray(r, a) {
-      (null == a || a > r.length) && (a = r.length);
-      for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e];
-      return n;
-    }
-
-    function _unsupportedIterableToArray(r, a) {
-      if (r) {
-        if ("string" == typeof r) return _arrayLikeToArray(r, a);
-        var t = {}.toString.call(r).slice(8, -1);
-        return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0;
-      }
-    }
-
-    function _createForOfIteratorHelper(r, e) {
-      var t = "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"];
-      if (!t) {
-        if (Array.isArray(r) || (t = _unsupportedIterableToArray(r)) || e && r && "number" == typeof r.length) {
-          t && (r = t);
-          var n = 0,
-            F = function () {};
-          return {
-            s: F,
-            n: function () {
-              return n >= r.length ? {
-                done: !0
-              } : {
-                done: !1,
-                value: r[n++]
-              };
-            },
-            e: function (r) {
-              throw r;
-            },
-            f: F
-          };
-        }
-        throw new TypeError("Invalid attempt to iterate non-iterable instance.\\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
-      }
-      var o,
-        a = !0,
-        u = !1;
-      return {
-        s: function () {
-          t = t.call(r);
-        },
-        n: function () {
-          var r = t.next();
-          return a = r.done, r;
-        },
-        e: function (r) {
-          u = !0, o = r;
-        },
-        f: function () {
-          try {
-            a || null == t.return || t.return();
-          } finally {
-            if (u) throw o;
-          }
-        }
-      };
-    }
-
-    var _iterator$1 = _createForOfIteratorHelper(something),
-      _step$1;
-    try {
-      for (_iterator$1.s(); !(_step$1 = _iterator$1.n()).done;) {
-        var x$1 = _step$1.value;
-      }
-    } catch (err) {
-      _iterator$1.e(err);
-    } finally {
-      _iterator$1.f();
-    }
-
-    var _iterator = _createForOfIteratorHelper(something),
-      _step;
-    try {
-      for (_iterator.s(); !(_step = _iterator.n()).done;) {
-        var x = _step.value;
-      }
-    } catch (err) {
-      _iterator.e(err);
-    } finally {
-      _iterator.f();
-    }
-
-  `);
+            ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+            Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+            //#region \\0rollupPluginBabelHelpers/arrayLikeToArray
+            function _arrayLikeToArray(r, a) {
+            	(null == a || a > r.length) && (a = r.length);
+            	for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e];
+            	return n;
+            }
+            //#endregion
+            //#region \\0rollupPluginBabelHelpers/unsupportedIterableToArray
+            function _unsupportedIterableToArray(r, a) {
+            	if (r) {
+            		if ("string" == typeof r) return _arrayLikeToArray(r, a);
+            		var t = {}.toString.call(r).slice(8, -1);
+            		return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0;
+            	}
+            }
+            //#endregion
+            //#region \\0rollupPluginBabelHelpers/createForOfIteratorHelper
+            function _createForOfIteratorHelper(r, e) {
+            	var t = "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"];
+            	if (!t) {
+            		if (Array.isArray(r) || (t = _unsupportedIterableToArray(r)) || e && r && "number" == typeof r.length) {
+            			t && (r = t);
+            			var n = 0, F = function() {};
+            			return {
+            				s: F,
+            				n: function() {
+            					return n >= r.length ? { done: !0 } : {
+            						done: !1,
+            						value: r[n++]
+            					};
+            				},
+            				e: function(r) {
+            					throw r;
+            				},
+            				f: F
+            			};
+            		}
+            		throw new TypeError("Invalid attempt to iterate non-iterable instance.\\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+            	}
+            	var o, a = !0, u = !1;
+            	return {
+            		s: function() {
+            			t = t.call(r);
+            		},
+            		n: function() {
+            			var r = t.next();
+            			return a = r.done, r;
+            		},
+            		e: function(r) {
+            			u = !0, o = r;
+            		},
+            		f: function() {
+            			try {
+            				a || null == t.return || t.return();
+            			} finally {
+            				if (u) throw o;
+            			}
+            		}
+            	};
+            }
+            //#endregion
+            //#region src/other.js
+            var _iterator$1 = _createForOfIteratorHelper(something);
+            var _step$1;
+            try {
+            	for (_iterator$1.s(); !(_step$1 = _iterator$1.n()).done;) _step$1.value;
+            } catch (err) {
+            	_iterator$1.e(err);
+            } finally {
+            	_iterator$1.f();
+            }
+            //#endregion
+            //#region src/index.js
+            var _iterator = _createForOfIteratorHelper(something);
+            var _step;
+            try {
+            	for (_iterator.s(); !(_step = _iterator.n()).done;) _step.value;
+            } catch (err) {
+            	_iterator.e(err);
+            } finally {
+            	_iterator.f();
+            }
+            //#endregion
+          `);
 });
 
 test("imports helpers for a helper only available in a newer version of @babel/runtime (without @babel/plugin-transfrom-runtime)", async () => {
@@ -667,34 +720,53 @@ test("imports helpers for a helper only available in a newer version of @babel/r
   await build(dir);
   expect(await getDist(dir)).toMatchInlineSnapshot(`
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    var _createForOfIteratorHelper = require('@babel/runtime/helpers/createForOfIteratorHelper');
-
-    var _iterator$1 = _createForOfIteratorHelper(something),
-      _step$1;
+    Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+    //#region \\0rolldown/runtime.js
+    var __create = Object.create;
+    var __defProp = Object.defineProperty;
+    var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+    var __getOwnPropNames = Object.getOwnPropertyNames;
+    var __getProtoOf = Object.getPrototypeOf;
+    var __hasOwnProp = Object.prototype.hasOwnProperty;
+    var __copyProps = (to, from, except, desc) => {
+    	if (from && typeof from === "object" || typeof from === "function") for (var keys = __getOwnPropNames(from), i = 0, n = keys.length, key; i < n; i++) {
+    		key = keys[i];
+    		if (!__hasOwnProp.call(to, key) && key !== except) __defProp(to, key, {
+    			get: ((k) => from[k]).bind(null, key),
+    			enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable
+    		});
+    	}
+    	return to;
+    };
+    var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", {
+    	value: mod,
+    	enumerable: true
+    }) : target, mod));
+    //#endregion
+    let _babel_runtime_helpers_createForOfIteratorHelper = require("@babel/runtime/helpers/createForOfIteratorHelper");
+    _babel_runtime_helpers_createForOfIteratorHelper = __toESM(_babel_runtime_helpers_createForOfIteratorHelper);
+    //#region src/other.js
+    var _iterator$1 = (0, _babel_runtime_helpers_createForOfIteratorHelper.default)(something);
+    var _step$1;
     try {
-      for (_iterator$1.s(); !(_step$1 = _iterator$1.n()).done;) {
-        var x$1 = _step$1.value;
-      }
+    	for (_iterator$1.s(); !(_step$1 = _iterator$1.n()).done;) _step$1.value;
     } catch (err) {
-      _iterator$1.e(err);
+    	_iterator$1.e(err);
     } finally {
-      _iterator$1.f();
+    	_iterator$1.f();
     }
-
-    var _iterator = _createForOfIteratorHelper(something),
-      _step;
+    //#endregion
+    //#region src/index.js
+    var _iterator = (0, _babel_runtime_helpers_createForOfIteratorHelper.default)(something);
+    var _step;
     try {
-      for (_iterator.s(); !(_step = _iterator.n()).done;) {
-        var x = _step.value;
-      }
+    	for (_iterator.s(); !(_step = _iterator.n()).done;) _step.value;
     } catch (err) {
-      _iterator.e(err);
+    	_iterator.e(err);
     } finally {
-      _iterator.f();
+    	_iterator.f();
     }
-
+    //#endregion
   `);
 });
 
@@ -712,19 +784,20 @@ test("new dist filenames", async () => {
   await build(dir);
   await expect(getDist(dir)).resolves.toMatchInlineSnapshot(`
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    Object.defineProperty(exports, '__esModule', { value: true });
-
-    var index = "something";
-
-    exports["default"] = index;
+    Object.defineProperties(exports, {
+    	__esModule: { value: true },
+    	[Symbol.toStringTag]: { value: "Module" }
+    });
+    //#region src/index.js
+    var src_default = "something";
+    //#endregion
+    exports.default = src_default;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    var index = "something";
-
-    export { index as default };
-
+    //#region src/index.js
+    var src_default = "something";
+    //#endregion
+    export { src_default as default };
   `);
 });
 
@@ -755,23 +828,29 @@ test("UMD with dep that uses process.env.NODE_ENV", async () => {
   await build(dir);
   await expect(getDist(dir)).resolves.toMatchInlineSnapshot(`
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    Object.defineProperty(exports, '__esModule', { value: true });
-
-    var somewhere = require('somewhere');
-
+    Object.defineProperties(exports, {
+    	__esModule: { value: true },
+    	[Symbol.toStringTag]: { value: "Module" }
+    });
+    let somewhere = require("somewhere");
+    //#region src/index.js
     console.log(somewhere.x);
-    var index = "something";
-
-    exports["default"] = index;
+    var src_default = "something";
+    //#endregion
+    exports.default = src_default;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.umd.min.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    !function(e,o){"object"==typeof exports&&"undefined"!=typeof module?module.exports=o():"function"==typeof define&&define.amd?define(o):(e="undefined"!=typeof globalThis?globalThis:e||self).test=o()}(this,(function(){"use strict";let e=process.env.NODE_ENV;console.log(e);return"something"}));
-    //# sourceMappingURL=scope-test.umd.min.js.map
+    (function(e, o) {
+    	"object" == typeof exports && "undefined" != typeof module ? module.exports = o() : "function" == typeof define && define.amd ? define([], o) : (e = "undefined" != typeof globalThis ? globalThis : e || self).test = o();
+    })(this, (function() {
+    	console.log("development");
+    	return "something";
+    }));
+
+    //# sourceMa${""}ppingURL=scope-test.umd.min.js.map//# sourceMa${""}ppingURL=scope-test.umd.min.js.map
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.umd.min.js.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    {"version":3,"file":"scope-test.umd.min.js","sources":["../node_modules/somewhere/index.js","../src/index.js"],"sourcesContent":["export let x = process.env.NODE_ENV;","import { x } from \\"somewhere\\";\\nconsole.log(x);\\nexport default \\"something\\";"],"names":["x","process","env","NODE_ENV","console","log"],"mappings":"qOAAO,IAAIA,EAAIC,QAAQC,IAAIC,SCC3BC,QAAQC,IAAIL,SACG"}
+    {"version":3,"file":"scope-test.umd.min.js","names":["x","console","log"],"sources":["../node_modules/somewhere/index.js","../src/index.js"],"sourcesContent":["export let x = process.env.NODE_ENV;","import { x } from \\"somewhere\\";\\nconsole.log(x);\\nexport default \\"something\\";"],"x_google_ignoreList":[0],"mappings":";;;CCCAC,QAAQC,IDDG,aAAA;CAAA,OCEI;AAAA,EAAA"}
   `);
 });
 
@@ -798,22 +877,30 @@ test("UMD build with process.env.NODE_ENV and typeof document", async () => {
   await build(dir);
   await expect(getDist(dir)).resolves.toMatchInlineSnapshot(`
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    Object.defineProperty(exports, '__esModule', { value: true });
-
+    Object.defineProperties(exports, {
+    	__esModule: { value: true },
+    	[Symbol.toStringTag]: { value: "Module" }
+    });
+    //#region src/index.js
     const thing = () => {
-      console.log(process.env.NODE_ENV);
+    	console.log(process.env.NODE_ENV);
     };
-
-    exports["default"] = thing;
+    //#endregion
+    exports.default = thing;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.umd.min.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    !function(e,o){"object"==typeof exports&&"undefined"!=typeof module?module.exports=o():"function"==typeof define&&define.amd?define(o):(e="undefined"!=typeof globalThis?globalThis:e||self).x=o()}(this,(function(){"use strict";return()=>{console.log(process.env.NODE_ENV)}}));
-    //# sourceMappingURL=scope-test.umd.min.js.map
+    (function(e, o) {
+    	"object" == typeof exports && "undefined" != typeof module ? module.exports = o() : "function" == typeof define && define.amd ? define([], o) : (e = "undefined" != typeof globalThis ? globalThis : e || self).x = o();
+    })(this, (function() {
+    	return () => {
+    		console.log("development");
+    	};
+    }));
+
+    //# sourceMa${""}ppingURL=scope-test.umd.min.js.map//# sourceMa${""}ppingURL=scope-test.umd.min.js.map
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.umd.min.js.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    {"version":3,"file":"scope-test.umd.min.js","sources":["../src/index.js"],"sourcesContent":["let x = typeof document;\\n\\nconst thing = () => {\\n  console.log(process.env.NODE_ENV);\\n};\\n\\nexport default thing;"],"names":["thing","console","log","process","env","NODE_ENV"],"mappings":"wOAEcA,KACZC,QAAQC,IAAIC,QAAQC,IAAIC,SAAS"}
+    {"version":3,"file":"scope-test.umd.min.js","names":["x","document","thing","console","log","process","env","NODE_ENV"],"sources":["../src/index.js"],"sourcesContent":["let x = typeof document;\\n\\nconst thing = () => {\\n  console.log(process.env.NODE_ENV);\\n};\\n\\nexport default thing;"],"mappings":";;;cAEME;EACJC,QAAQC,IAAAA,aAAAA;CAAwB;AAAA,EAAA"}
   `);
 });
 
@@ -869,12 +956,31 @@ test("typescript declaration emit with unreferencable types emits diagnostic", a
       )
     )
   ).toMatchInlineSnapshot(`
-    "🎁 Generating TypeScript declarations for src/index.ts failed:
-    🎁 src/index.ts:3:14 - error TS4023: Exported variable 'thing' has or is using name 'A' from external module "path-to-module-with-a" but cannot be named.
-    🎁
-    🎁 3 export const thing = x();
-    🎁                ~~~~~
-    🎁"
+    "🎁 @scope/test Error: Build failed with 1 error:
+    🎁 @scope/test
+    🎁 @scope/test [plugin typescript-declarations]
+    🎁 @scope/test Error: Generating TypeScript declarations for src/index.ts failed:
+    🎁 @scope/test src/index.ts:3:14 - error TS4023: Exported variable 'thing' has or is using name 'A' from external module "path-to-module-with-a" but cannot be named.
+    🎁 @scope/test
+    🎁 @scope/test 3 export const thing = x();
+    🎁 @scope/test                ~~~~~
+    🎁 @scope/test     at getDeclarationsForFile (/Users/emma/projects/preconstruct/packages/cli/src/rollup-plugins/typescript-declarations/common.ts:309:11)
+    🎁 @scope/test     at getDeclarationsWithImportedModuleSpecifiersReplacing (/Users/emma/projects/preconstruct/packages/cli/src/rollup-plugins/typescript-declarations/get-declarations-with-imported-module-specifiers-replacing.ts:112:20)
+    🎁 @scope/test     at PluginContextImpl.generateBundle (/Users/emma/projects/preconstruct/packages/cli/src/rollup-plugins/typescript-declarations/index.ts:102:28)
+    🎁 @scope/test     at plugin (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/bindingify-input-options-XPJLJOD0.mjs:1707:4)
+    🎁 @scope/test     at plugin.<computed> (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/bindingify-input-options-XPJLJOD0.mjs:1959:12)
+    🎁 @scope/test     at aggregateBindingErrorsIntoJsError (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/error-BHRSI0R7.mjs:48:18)
+    🎁 @scope/test     at unwrapBindingResult (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/error-BHRSI0R7.mjs:18:128)
+    🎁 @scope/test     at RolldownBuild.#build (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/rolldown-build-CtPvmZgJ.mjs:3276:34)
+    🎁 @scope/test     at /Users/emma/projects/preconstruct/packages/cli/src/build/index.ts:73:29
+    🎁 @scope/test     at buildPackage (/Users/emma/projects/preconstruct/packages/cli/src/build/index.ts:63:17)
+    🎁 @scope/test     at retryableBuild (/Users/emma/projects/preconstruct/packages/cli/src/build/index.ts:102:5)
+    🎁 @scope/test     at /Users/emma/projects/preconstruct/packages/cli/src/build/index.ts:140:11
+    🎁 @scope/test     at Module.build (/Users/emma/projects/preconstruct/packages/cli/src/build/index.ts:137:5)
+    🎁 @scope/test     at /Users/emma/projects/preconstruct/packages/cli/src/build/__tests__/basic.ts:949:17
+    🎁 @scope/test     at file:///Users/emma/projects/preconstruct/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20 {
+    🎁 @scope/test   errors: [Getter/Setter]
+    🎁 @scope/test }"
   `);
 });
 
@@ -925,22 +1031,18 @@ test("typescript declaration emit with json import", async () => {
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     export * from "./declarations/src/index.js";
-    //# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoic2NvcGUtdGVzdC5janMuZC50cyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4vZGVjbGFyYXRpb25zL3NyYy9pbmRleC5kLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBIn0=
+    //# sourceMa${""}ppingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoic2NvcGUtdGVzdC5janMuZC50cyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4vZGVjbGFyYXRpb25zL3NyYy9pbmRleC5kLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBIn0=
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    Object.defineProperty(exports, '__esModule', { value: true });
-
-    var x = {
+    Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+    //#endregion
+    //#region src/index.ts
+    const thing = {
     	thing: true,
     	other: ""
     };
-
-    const thing = x;
-
+    //#endregion
     exports.thing = thing;
-
   `);
 });
 
@@ -962,19 +1064,17 @@ test("bigint usage", async () => {
   await build(dir);
   expect(await getDist(dir)).toMatchInlineSnapshot(`
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    Object.defineProperty(exports, '__esModule', { value: true });
-
+    Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+    //#region src/index.js
     const thing = 5n;
-
+    //#endregion
     exports.thing = thing;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    //#region src/index.js
     const thing = 5n;
-
+    //#endregion
     export { thing };
-
   `);
 });
 
@@ -993,21 +1093,40 @@ test("node: is external", async () => {
   await build(dir);
   expect(await getDist(dir)).toMatchInlineSnapshot(`
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    var fs = require('node:fs');
-
-    function _interopDefault (e) { return e && e.__esModule ? e : { 'default': e }; }
-
-    var fs__default = /*#__PURE__*/_interopDefault(fs);
-
-    fs__default["default"].writeFileSync("test.txt", "test");
+    Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+    //#region \\0rolldown/runtime.js
+    var __create = Object.create;
+    var __defProp = Object.defineProperty;
+    var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+    var __getOwnPropNames = Object.getOwnPropertyNames;
+    var __getProtoOf = Object.getPrototypeOf;
+    var __hasOwnProp = Object.prototype.hasOwnProperty;
+    var __copyProps = (to, from, except, desc) => {
+    	if (from && typeof from === "object" || typeof from === "function") for (var keys = __getOwnPropNames(from), i = 0, n = keys.length, key; i < n; i++) {
+    		key = keys[i];
+    		if (!__hasOwnProp.call(to, key) && key !== except) __defProp(to, key, {
+    			get: ((k) => from[k]).bind(null, key),
+    			enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable
+    		});
+    	}
+    	return to;
+    };
+    var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", {
+    	value: mod,
+    	enumerable: true
+    }) : target, mod));
+    //#endregion
+    let node_fs = require("node:fs");
+    node_fs = __toESM(node_fs);
+    //#region src/index.js
+    node_fs.default.writeFileSync("test.txt", "test");
+    //#endregion
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    import fs from 'node:fs';
-
+    import fs from "node:fs";
+    //#region src/index.js
     fs.writeFileSync("test.txt", "test");
-
+    //#endregion
   `);
 });
 
@@ -1024,7 +1143,27 @@ test("importing css fails with a nice error", async () => {
     "src/blah.css": "",
   });
   await expect(build(dir)).rejects.toMatchInlineSnapshot(
-    `[Error: 🎁 @scope/test only .ts, .tsx, .js, .jsx, and .json files can be imported but "./blah.css" is imported in "src/index.js"]`
+    `
+    [Error: 🎁 @scope/test Error: Build failed with 1 error:
+    🎁 @scope/test
+    🎁 @scope/test [plugin throw-warnings]
+    🎁 @scope/test Error: 🎁 @scope/test only .ts, .tsx, .js, .jsx, and .json files can be imported but "./blah.css" is imported in "src/index.js"
+    🎁 @scope/test     at PluginContextImpl.buildEnd (/Users/emma/projects/preconstruct/packages/cli/src/build/rollup.ts:144:19)
+    🎁 @scope/test     at plugin (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/bindingify-input-options-XPJLJOD0.mjs:1406:18)
+    🎁 @scope/test     at plugin.<computed> (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/bindingify-input-options-XPJLJOD0.mjs:1959:18)
+    🎁 @scope/test     at aggregateBindingErrorsIntoJsError (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/error-BHRSI0R7.mjs:48:18)
+    🎁 @scope/test     at unwrapBindingResult (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/error-BHRSI0R7.mjs:18:128)
+    🎁 @scope/test     at RolldownBuild.#build (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/rolldown-build-CtPvmZgJ.mjs:3276:34)
+    🎁 @scope/test     at /Users/emma/projects/preconstruct/packages/cli/src/build/index.ts:73:29
+    🎁 @scope/test     at buildPackage (/Users/emma/projects/preconstruct/packages/cli/src/build/index.ts:63:17)
+    🎁 @scope/test     at retryableBuild (/Users/emma/projects/preconstruct/packages/cli/src/build/index.ts:102:5)
+    🎁 @scope/test     at /Users/emma/projects/preconstruct/packages/cli/src/build/index.ts:140:11
+    🎁 @scope/test     at Module.build (/Users/emma/projects/preconstruct/packages/cli/src/build/index.ts:137:5)
+    🎁 @scope/test     at /Users/emma/projects/preconstruct/packages/cli/src/build/__tests__/basic.ts:1145:3
+    🎁 @scope/test     at file:///Users/emma/projects/preconstruct/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20 {
+    🎁 @scope/test   errors: [Getter/Setter]
+    🎁 @scope/test }]
+  `
   );
 });
 
@@ -1068,22 +1207,23 @@ test(".d.ts file with default export", async () => {
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     export * from "./declarations/src/index.js";
     export { default } from "./declarations/src/index.js";
-    //# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoidHlwZXNjcmlwdC5janMuZC50cyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4vZGVjbGFyYXRpb25zL3NyYy9pbmRleC5kLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBIn0=
+    //# sourceMa${""}ppingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoidHlwZXNjcmlwdC5janMuZC50cyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4vZGVjbGFyYXRpb25zL3NyYy9pbmRleC5kLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBIn0=
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    Object.defineProperty(exports, '__esModule', { value: true });
-
+    Object.defineProperties(exports, {
+    	__esModule: { value: true },
+    	[Symbol.toStringTag]: { value: "Module" }
+    });
+    //#region src/index.js
     const a = true;
-
+    //#endregion
     exports.a = a;
-    exports["default"] = a;
+    exports.default = a;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    //#region src/index.js
     const a = true;
-
+    //#endregion
     export { a, a as default };
-
   `);
 });

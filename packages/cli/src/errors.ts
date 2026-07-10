@@ -26,7 +26,13 @@ export class ScopelessError extends Error {}
 
 export class UnexpectedBuildError extends FatalError {
   constructor(error: Error, pkgName: string) {
-    super(`${util.format("", error).trim()}`, pkgName);
+    super(
+      util
+        .format("", error)
+        .trim()
+        .replace(/\n\s+at async Promise\.all \(index \d+\)/g, ""),
+      pkgName
+    );
   }
 }
 

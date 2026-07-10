@@ -10,9 +10,9 @@ import {
   getFiles,
 } from "../../../test-utils";
 
-jest.setTimeout(10000);
+vi.setConfig({ testTimeout: 10000 });
 
-jest.mock("../../prompt");
+vi.mock("../../prompt");
 
 test("multiple entrypoints", async () => {
   let dir = await testdir({
@@ -40,33 +40,30 @@ test("multiple entrypoints", async () => {
 
   expect(await getFiles(dir, ["**/dist/**"])).toMatchInlineSnapshot(`
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/multiple-entrypoints.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    Object.defineProperty(exports, '__esModule', { value: true });
-
+    Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+    //#region src/index.js
     let sum = (a, b) => a + b;
-
+    //#endregion
     exports.sum = sum;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/multiple-entrypoints.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    //#region src/index.js
     let sum = (a, b) => a + b;
-
+    //#endregion
     export { sum };
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ multiply/dist/multiple-entrypoints-multiply.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    Object.defineProperty(exports, '__esModule', { value: true });
-
+    Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+    //#region src/multiply.js
     let multiply = (a, b) => a * b;
-
+    //#endregion
     exports.multiply = multiply;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ multiply/dist/multiple-entrypoints-multiply.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    //#region src/multiply.js
     let multiply = (a, b) => a * b;
-
+    //#endregion
     export { multiply };
-
   `);
 });
 
@@ -113,33 +110,30 @@ test("multiple entrypoints with default imports and exports", async () => {
 
   expect(await getFiles(dir, ["**/dist/**"])).toMatchInlineSnapshot(`
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/multiple-entrypoints.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    Object.defineProperty(exports, '__esModule', { value: true });
-
+    Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+    //#region src/index.js
     let sum = (a, b) => a + b;
-
+    //#endregion
     exports.sum = sum;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/multiple-entrypoints.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    //#region src/index.js
     let sum = (a, b) => a + b;
-
+    //#endregion
     export { sum };
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ multiply/dist/multiple-entrypoints-multiply.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    Object.defineProperty(exports, '__esModule', { value: true });
-
+    Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+    //#region src/multiply.js
     let multiply = (a, b) => a * b;
-
+    //#endregion
     exports.multiply = multiply;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ multiply/dist/multiple-entrypoints-multiply.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    //#region src/multiply.js
     let multiply = (a, b) => a * b;
-
+    //#endregion
     export { multiply };
-
   `);
 
   let { code, stdout, stderr } = await spawn("node", [

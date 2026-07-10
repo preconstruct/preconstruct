@@ -5,6 +5,9 @@ import { errors } from "./messages";
 import { Package } from "./package";
 import { isFieldValid } from "./validate";
 import { exportsField } from "./utils";
+import { createRequire } from "module";
+
+const require = createRequire(import.meta.url);
 
 let keys: <Obj>(obj: Obj) => (keyof Obj)[] = Object.keys;
 

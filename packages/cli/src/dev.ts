@@ -1,4 +1,4 @@
-import { lazyRequire } from "lazy-require.macro";
+import { createRequire } from "module";
 import { Project } from "./project";
 import { success, info } from "./logger";
 import {
@@ -22,6 +22,8 @@ import path from "path";
 import normalizePath from "normalize-path";
 import { Entrypoint } from "./entrypoint";
 import { validateProject } from "./validate";
+
+const require = createRequire(import.meta.url);
 
 let tsExtensionPattern = /\.tsx?$/;
 
@@ -55,7 +57,7 @@ export async function entrypointHasDefaultExport(
   ) {
     return false;
   }
-  const babel = lazyRequire<typeof import("@babel/core")>();
+  const babel = require("@babel/core") as typeof import("@babel/core");
   let ast = (await babel.parseAsync(content, {
     filename: entrypoint.source,
     sourceType: "module",

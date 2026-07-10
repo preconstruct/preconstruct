@@ -1,104 +1,96 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`two entrypoints where one requires the other entrypoint: dist/importing-another-entrypoint.cjs.js 1`] = `
-"'use strict';
-
-Object.defineProperty(exports, '__esModule', { value: true });
-
-let identity = x => x;
-
+exports[`two entrypoints where one requires the other entrypoint > dist/importing-another-entrypoint.cjs.js 1`] = `
+"Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+//#region src/index.js
+let identity = (x) => x;
+//#endregion
 exports.identity = identity;
 "
 `;
 
-exports[`two entrypoints where one requires the other entrypoint: multiply/dist/importing-another-entrypoint-multiply.cjs.js 1`] = `
-"'use strict';
-
-Object.defineProperty(exports, '__esModule', { value: true });
-
-var dist_importingAnotherEntrypoint = require('../../dist/importing-another-entrypoint.cjs.js');
-
-let multiply = (a, b) => dist_importingAnotherEntrypoint.identity(a * b);
-
+exports[`two entrypoints where one requires the other entrypoint > multiply/dist/importing-another-entrypoint-multiply.cjs.js 1`] = `
+"Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+const require_dist_importing_another_entrypoint = require("../../dist/importing-another-entrypoint.cjs.js");
+//#region src/multiply.js
+let multiply = (a, b) => require_dist_importing_another_entrypoint.identity(a * b);
+//#endregion
 exports.multiply = multiply;
 "
 `;
 
-exports[`two entrypoints where one requires the other entrypoint: src/index.js 1`] = `"export let identity = (x) => x;"`;
+exports[`two entrypoints where one requires the other entrypoint > src/index.js 1`] = `"export let identity = (x) => x;"`;
 
-exports[`two entrypoints where one requires the other entrypoint: src/multiply.js 1`] = `
+exports[`two entrypoints where one requires the other entrypoint > src/multiply.js 1`] = `
 "import { identity } from "./index";
 
 export let multiply = (a, b) => identity(a * b);"
 `;
 
-exports[`two entrypoints with a common dependency: dist/common-dependency-two-entrypoints.cjs.js 1`] = `
-"'use strict';
-
-Object.defineProperty(exports, '__esModule', { value: true });
-
-var identity = require('./identity-some-hash.cjs.js');
-
-let sum = (a, b) => identity.identity(a + b);
-
-exports.identity = identity.identity;
+exports[`two entrypoints with a common dependency > dist/common-dependency-two-entrypoints.cjs.js 1`] = `
+"Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+const require_identity = require("./identity-some-hash.cjs.js");
+//#region src/index.js
+let sum = (a, b) => require_identity.identity(a + b);
+//#endregion
+exports.identity = require_identity.identity;
 exports.sum = sum;
 "
 `;
 
-exports[`two entrypoints with a common dependency: dist/common-dependency-two-entrypoints.esm.js 1`] = `
-"import { i as identity } from './identity-some-hash.esm.js';
-export { i as identity } from './identity-some-hash.esm.js';
-
+exports[`two entrypoints with a common dependency > dist/common-dependency-two-entrypoints.esm.js 1`] = `
+"import { t as identity } from "./identity-some-hash.esm.js";
+//#region src/index.js
 let sum = (a, b) => identity(a + b);
-
-export { sum };
+//#endregion
+export { identity, sum };
 "
 `;
 
-exports[`two entrypoints with a common dependency: dist/identity-this-is-not-the-real-hash-09d8aa2cd41dd37e55ea1ca5c8546d35.esm.js 1`] = `
-"let identity = x => x;
-
-export { identity as i };
+exports[`two entrypoints with a common dependency > dist/identity-this-is-not-the-real-hash-4d59cd6baffd281a152a361b93e75f30.cjs.js 1`] = `
+"//#region src/identity.js
+let identity = (x) => x;
+//#endregion
+Object.defineProperty(exports, "identity", {
+	enumerable: true,
+	get: function() {
+		return identity;
+	}
+});
 "
 `;
 
-exports[`two entrypoints with a common dependency: dist/identity-this-is-not-the-real-hash-f57161fefd97e3101601d153708a46b8.cjs.js 1`] = `
-"'use strict';
-
-let identity = x => x;
-
-exports.identity = identity;
+exports[`two entrypoints with a common dependency > dist/identity-this-is-not-the-real-hash-c7e6b1ad22a7d3567b1e90c76944f556.esm.js 1`] = `
+"//#region src/identity.js
+let identity = (x) => x;
+//#endregion
+export { identity as t };
 "
 `;
 
-exports[`two entrypoints with a common dependency: multiply/dist/common-dependency-two-entrypoints-multiply.cjs.js 1`] = `
-"'use strict';
-
-Object.defineProperty(exports, '__esModule', { value: true });
-
-var identity = require('../../dist/identity-some-hash.cjs.js');
-
-let multiply = (a, b) => identity.identity(a * b);
-
-exports.identity = identity.identity;
+exports[`two entrypoints with a common dependency > multiply/dist/common-dependency-two-entrypoints-multiply.cjs.js 1`] = `
+"Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+const require_identity = require("../../dist/identity-some-hash.cjs.js");
+//#region src/multiply.js
+let multiply = (a, b) => require_identity.identity(a * b);
+//#endregion
+exports.identity = require_identity.identity;
 exports.multiply = multiply;
 "
 `;
 
-exports[`two entrypoints with a common dependency: multiply/dist/common-dependency-two-entrypoints-multiply.esm.js 1`] = `
-"import { i as identity } from '../../dist/identity-some-hash.esm.js';
-export { i as identity } from '../../dist/identity-some-hash.esm.js';
-
+exports[`two entrypoints with a common dependency > multiply/dist/common-dependency-two-entrypoints-multiply.esm.js 1`] = `
+"import { t as identity } from "../../dist/identity-some-hash.esm.js";
+//#region src/multiply.js
 let multiply = (a, b) => identity(a * b);
-
-export { multiply };
+//#endregion
+export { identity, multiply };
 "
 `;
 
-exports[`two entrypoints with a common dependency: src/identity.js 1`] = `"export let identity = (x) => x;"`;
+exports[`two entrypoints with a common dependency > src/identity.js 1`] = `"export let identity = (x) => x;"`;
 
-exports[`two entrypoints with a common dependency: src/index.js 1`] = `
+exports[`two entrypoints with a common dependency > src/index.js 1`] = `
 "import { identity } from "./identity";
 
 export let sum = (a, b) => identity(a + b);
@@ -106,7 +98,7 @@ export let sum = (a, b) => identity(a + b);
 export { identity };"
 `;
 
-exports[`two entrypoints with a common dependency: src/multiply.js 1`] = `
+exports[`two entrypoints with a common dependency > src/multiply.js 1`] = `
 "import { identity } from "./identity";
 
 export let multiply = (a, b) => identity(a * b);

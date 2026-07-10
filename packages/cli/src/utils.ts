@@ -471,7 +471,8 @@ function getDeclSourceMapComment(
   dtsFilename: string,
   relativePathWithExtension: string
 ) {
-  return `//# sourceMappingURL=data:application/json;charset=utf-8;base64,${Buffer.from(
+  let sourceMapComment = "//# sourceMa";
+  sourceMapComment += `ppingURL=data:application/json;charset=utf-8;base64,${Buffer.from(
     JSON.stringify({
       version: 3,
       file: dtsFilename,
@@ -481,6 +482,7 @@ function getDeclSourceMapComment(
       mappings: "AAAA",
     })
   ).toString("base64")}\n`;
+  return sourceMapComment;
 }
 
 export type JSONValue =

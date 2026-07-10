@@ -12,16 +12,17 @@ import {
 } from "../../test-utils";
 import { confirms as _confirms } from "../messages";
 import { JSONValue } from "../utils";
+import type { Mocked } from "vitest";
 
 const f = fixturez(__dirname);
 
-jest.mock("../prompt");
+vi.mock("../prompt");
 
 afterEach(() => {
-  jest.resetAllMocks();
+  vi.resetAllMocks();
 });
 
-let confirms = _confirms as jest.Mocked<typeof _confirms>;
+let confirms = _confirms as Mocked<typeof _confirms>;
 
 test("reports correct result on valid package", async () => {
   let tmpPath = f.find("valid-package");

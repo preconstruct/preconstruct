@@ -1,6 +1,6 @@
 import path from "path";
 import { FatalError } from "../../errors";
-import { Plugin } from "rollup";
+import type { Plugin } from "rolldown";
 import fs from "fs-extra";
 import { Package } from "../../package";
 import {

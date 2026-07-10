@@ -21,12 +21,13 @@ import { doPromptInput as _doPromptInput } from "../../prompt";
 import { confirms as _confirms } from "../../messages";
 import spawn from "spawndamnit";
 import stripAnsi from "strip-ansi";
+import type { MockedFunction } from "vitest";
 
 const f = fixturez(__dirname);
 
-jest.mock("../../prompt");
+vi.mock("../../prompt");
 
-let doPromptInput = _doPromptInput as jest.MockedFunction<
+let doPromptInput = _doPromptInput as MockedFunction<
   typeof _doPromptInput
 >;
 
@@ -76,14 +77,14 @@ test("clears dist folder", async () => {
 
   expect(await getDist(dir)).toMatchInlineSnapshot(`
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/already-has-things-in-dist.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    Object.defineProperty(exports, '__esModule', { value: true });
-
-    var index = "something";
-
-    exports["default"] = index;
-
+    Object.defineProperties(exports, {
+    	__esModule: { value: true },
+    	[Symbol.toStringTag]: { value: "Module" }
+    });
+    //#region src/index.js
+    var src_default = "something";
+    //#endregion
+    exports.default = src_default;
   `);
 });
 
@@ -173,7 +174,7 @@ test("preserves process.env.NODE_ENV checks", async () => {
 });
 
 // TODO: make it faster so this isn't required
-jest.setTimeout(20000);
+vi.setConfig({ testTimeout: 20000 });
 
 test("umd with dep on other module", async () => {
   let tmpPath = await testdir({
@@ -370,39 +371,39 @@ test("monorepo umd with dep on other module", async () => {
 
   expect(await getPkg(path.join(tmpPath, "packages", "package-one")))
     .toMatchInlineSnapshot(`
-    {
-      "devDependencies": {
-        "react": "^16.6.3",
-      },
-      "main": "dist/some-scope-package-one-umd-with-dep.cjs.js",
-      "name": "@some-scope/package-one-umd-with-dep",
-      "peerDependencies": {
-        "react": "^16.6.3",
-      },
-      "preconstruct": {
-        "umdName": "packageOne",
-      },
-      "umd:main": "dist/some-scope-package-one-umd-with-dep.umd.min.js",
-    }
-  `);
+      {
+        "devDependencies": {
+          "react": "^16.6.3",
+        },
+        "main": "dist/some-scope-package-one-umd-with-dep.cjs.js",
+        "name": "@some-scope/package-one-umd-with-dep",
+        "peerDependencies": {
+          "react": "^16.6.3",
+        },
+        "preconstruct": {
+          "umdName": "packageOne",
+        },
+        "umd:main": "dist/some-scope-package-one-umd-with-dep.umd.min.js",
+      }
+    `);
 
   expect(await getPkg(path.join(tmpPath, "packages", "package-two")))
     .toMatchInlineSnapshot(`
-    {
-      "devDependencies": {
-        "react": "^16.6.3",
-      },
-      "main": "dist/some-scope-package-two-umd-with-dep.cjs.js",
-      "name": "@some-scope/package-two-umd-with-dep",
-      "peerDependencies": {
-        "react": "^16.6.3",
-      },
-      "preconstruct": {
-        "umdName": "packageTwo",
-      },
-      "umd:main": "dist/some-scope-package-two-umd-with-dep.umd.min.js",
-    }
-  `);
+      {
+        "devDependencies": {
+          "react": "^16.6.3",
+        },
+        "main": "dist/some-scope-package-two-umd-with-dep.cjs.js",
+        "name": "@some-scope/package-two-umd-with-dep",
+        "peerDependencies": {
+          "react": "^16.6.3",
+        },
+        "preconstruct": {
+          "umdName": "packageTwo",
+        },
+        "umd:main": "dist/some-scope-package-two-umd-with-dep.umd.min.js",
+      }
+    `);
 
   expect(await getPkg(tmpPath)).toMatchInlineSnapshot(`
     {
@@ -486,11 +487,16 @@ test("monorepo umd with dep on multi-entrypoint module subpath", async () => {
     await getFiles(path.join(tmpPath, "packages", "pkg-a"), ["dist/*umd*"])
   ).toMatchInlineSnapshot(`
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg-a.umd.min.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    !function(e,t){"object"==typeof exports&&"undefined"!=typeof module?module.exports=t():"function"==typeof define&&define.amd?define(t):(e="undefined"!=typeof globalThis?globalThis:e||self).pkgA=t()}(this,(function(){"use strict";return"right entrypoint"}));
-    //# sourceMappingURL=pkg-a.umd.min.js.map
+    (function(e, n) {
+    	"object" == typeof exports && "undefined" != typeof module ? module.exports = n() : "function" == typeof define && define.amd ? define([], n) : (e = "undefined" != typeof globalThis ? globalThis : e || self).pkgA = n();
+    })(this, (function() {
+    	return "right entrypoint";
+    }));
+
+    //# sourceMa${""}ppingURL=pkg-a.umd.min.js.map//# sourceMa${""}ppingURL=pkg-a.umd.min.js.map
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg-a.umd.min.js.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    {"version":3,"file":"pkg-a.umd.min.js","sources":["../../pkg-b/src/stuff.js"],"sourcesContent":["export default \\"right entrypoint\\";"],"names":[],"mappings":"2OAAe"}
+    {"version":3,"file":"pkg-a.umd.min.js","names":["thing"],"sources":["../../pkg-b/src/stuff.js","../src/index.js"],"sourcesContent":["export default \\"right entrypoint\\";","import thing from \\"pkg-b/stuff\\";\\n\\nexport default thing;"],"mappings":";;;QAAe;AAAA,EAAA"}
   `);
 });
 
@@ -532,39 +538,29 @@ test("json", async () => {
 
   expect(await getDist(tmpPath)).toMatchInlineSnapshot(`
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/json-package.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    Object.defineProperty(exports, '__esModule', { value: true });
-
-    var changesetsSchema = {
+    Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+    //#endregion
+    //#region src/index.js
+    let schema = {
     	$schema: "http://json-schema.org/draft-07/schema#",
     	type: "object",
-    	properties: {
-    	},
-    	required: [
-    		"$schema"
-    	]
+    	properties: {},
+    	required: ["$schema"]
     };
-
-    let schema = changesetsSchema;
-
+    //#endregion
     exports.schema = schema;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/json-package.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    var changesetsSchema = {
+    //#endregion
+    //#region src/index.js
+    let schema = {
     	$schema: "http://json-schema.org/draft-07/schema#",
     	type: "object",
-    	properties: {
-    	},
-    	required: [
-    		"$schema"
-    	]
+    	properties: {},
+    	required: ["$schema"]
     };
-
-    let schema = changesetsSchema;
-
+    //#endregion
     export { schema };
-
   `);
 });
 
@@ -602,11 +598,16 @@ test("respect browser alias field in dependencies when bundling UMD", async () =
 
   expect(await getFiles(dir, ["dist/*umd*"])).toMatchInlineSnapshot(`
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.umd.min.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    !function(e,t){"object"==typeof exports&&"undefined"!=typeof module?module.exports=t():"function"==typeof define&&define.amd?define(t):(e="undefined"!=typeof globalThis?globalThis:e||self).importingPkgWithBrowserAliasField=t()}(this,(function(){"use strict";return"And the target is: browser"}));
-    //# sourceMappingURL=pkg.umd.min.js.map
+    (function(e, i) {
+    	"object" == typeof exports && "undefined" != typeof module ? module.exports = i() : "function" == typeof define && define.amd ? define([], i) : (e = "undefined" != typeof globalThis ? globalThis : e || self).importingPkgWithBrowserAliasField = i();
+    })(this, (function() {
+    	return "And the target is: browser";
+    }));
+
+    //# sourceMa${""}ppingURL=pkg.umd.min.js.map//# sourceMa${""}ppingURL=pkg.umd.min.js.map
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg.umd.min.js.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    {"version":3,"file":"pkg.umd.min.js","sources":["../src/index.js"],"sourcesContent":["import target from \\"with-browser-alias-field\\";\\n\\nexport default \\"And the target is: \\" + target;"],"names":[],"mappings":"wQAEe"}
+    {"version":3,"file":"pkg.umd.min.js","names":["target"],"sources":["../node_modules/with-browser-alias-field/lib/browser-file.js","../src/index.js"],"sourcesContent":["export default \\"browser\\";","import target from \\"with-browser-alias-field\\";\\n\\nexport default \\"And the target is: \\" + target;"],"x_google_ignoreList":[0],"mappings":";;;QCEe;AAAA,EAAA"}
   `);
 });
 
@@ -631,12 +632,11 @@ test("dynamicImportInCjs", async () => {
 
   expect(await getDist(dir)).toMatchInlineSnapshot(`
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    require('some-dep');
-
-    import('some-dep');
-
+    Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+    require("some-dep");
+    //#region src/index.js
+    import("some-dep");
+    //#endregion
   `);
 });
 
@@ -669,29 +669,49 @@ test("using @babel/plugin-transform-runtime with useESModules: true", async () =
 
   expect(await getDist(dir)).toMatchInlineSnapshot(`
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    Object.defineProperty(exports, '__esModule', { value: true });
-
-    var _createClass = require('@babel/runtime/helpers/createClass');
-    var _classCallCheck = require('@babel/runtime/helpers/classCallCheck');
-
-    var Thing = /*#__PURE__*/_createClass(function Thing() {
-      _classCallCheck(this, Thing);
+    Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+    //#region \\0rolldown/runtime.js
+    var __create = Object.create;
+    var __defProp = Object.defineProperty;
+    var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+    var __getOwnPropNames = Object.getOwnPropertyNames;
+    var __getProtoOf = Object.getPrototypeOf;
+    var __hasOwnProp = Object.prototype.hasOwnProperty;
+    var __copyProps = (to, from, except, desc) => {
+    	if (from && typeof from === "object" || typeof from === "function") for (var keys = __getOwnPropNames(from), i = 0, n = keys.length, key; i < n; i++) {
+    		key = keys[i];
+    		if (!__hasOwnProp.call(to, key) && key !== except) __defProp(to, key, {
+    			get: ((k) => from[k]).bind(null, key),
+    			enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable
+    		});
+    	}
+    	return to;
+    };
+    var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", {
+    	value: mod,
+    	enumerable: true
+    }) : target, mod));
+    //#endregion
+    let _babel_runtime_helpers_esm_createClass = require("@babel/runtime/helpers/createClass");
+    _babel_runtime_helpers_esm_createClass = __toESM(_babel_runtime_helpers_esm_createClass);
+    let _babel_runtime_helpers_esm_classCallCheck = require("@babel/runtime/helpers/classCallCheck");
+    _babel_runtime_helpers_esm_classCallCheck = __toESM(_babel_runtime_helpers_esm_classCallCheck);
+    //#region src/index.js
+    var Thing = /*#__PURE__*/ (0, _babel_runtime_helpers_esm_createClass.default)(function Thing() {
+    	(0, _babel_runtime_helpers_esm_classCallCheck.default)(this, Thing);
     });
-
+    //#endregion
     exports.Thing = Thing;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    import _createClass from '@babel/runtime/helpers/esm/createClass';
-    import _classCallCheck from '@babel/runtime/helpers/esm/classCallCheck';
-
-    var Thing = /*#__PURE__*/_createClass(function Thing() {
-      _classCallCheck(this, Thing);
+    import _createClass from "@babel/runtime/helpers/esm/createClass";
+    import _classCallCheck from "@babel/runtime/helpers/esm/classCallCheck";
+    //#region src/index.js
+    var Thing = /*#__PURE__*/ _createClass(function Thing() {
+    	_classCallCheck(this, Thing);
     });
-
+    //#endregion
     export { Thing };
-
   `);
 });
 
@@ -724,19 +744,17 @@ test("browser build preserves environment checks", async () => {
   await build(dir);
   expect(await getDist(dir)).toMatchInlineSnapshot(`
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/exports-test.browser.esm.js, dist/exports-test.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    //#region src/index.js
     const thing = typeof window;
-
+    //#endregion
     export { thing };
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/exports-test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    Object.defineProperty(exports, '__esModule', { value: true });
-
+    Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+    //#region src/index.js
     const thing = typeof window;
-
+    //#endregion
     exports.thing = thing;
-
   `);
 });
 
@@ -865,43 +883,40 @@ test("self import", async () => {
   await build(dir);
   expect(await getFiles(dir, ["dist/**", "other/dist/**"]))
     .toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/my-test-package.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/my-test-package.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+      //#region src/index.js
+      const a = 1;
+      //#endregion
+      exports.a = a;
 
-    Object.defineProperty(exports, '__esModule', { value: true });
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/my-test-package.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      //#region src/index.js
+      const a = 1;
+      //#endregion
+      export { a };
 
-    const a = 1;
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ other/dist/my-test-package-other.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+      let _my_test_package = require("@my-test/package");
+      //#region src/other.js
+      const b = a;
+      //#endregion
+      Object.defineProperty(exports, "a", {
+      	enumerable: true,
+      	get: function() {
+      		return _my_test_package.a;
+      	}
+      });
+      exports.b = b;
 
-    exports.a = a;
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/my-test-package.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    const a = 1;
-
-    export { a };
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ other/dist/my-test-package-other.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    Object.defineProperty(exports, '__esModule', { value: true });
-
-    var _package = require('@my-test/package');
-
-    const b = a;
-
-    Object.defineProperty(exports, 'a', {
-    	enumerable: true,
-    	get: function () { return _package.a; }
-    });
-    exports.b = b;
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ other/dist/my-test-package-other.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    export { a } from '@my-test/package';
-
-    const b = a;
-
-    export { b };
-
-  `);
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ other/dist/my-test-package-other.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      import { a as a$1 } from "@my-test/package";
+      //#region src/other.js
+      const b = a;
+      //#endregion
+      export { a$1 as a, b };
+    `);
 });
 
 test("correct default export using mjs and dmts proxies", async () => {
@@ -1034,12 +1049,12 @@ test("correct default export using mjs and dmts proxies", async () => {
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.d.mts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     export * from "./declarations/src/index.js";
     export { _default as default } from "./pkg-a.cjs.default.js";
-    //# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicGtnLWEuY2pzLmQubXRzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi9kZWNsYXJhdGlvbnMvc3JjL2luZGV4LmQudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUEifQ==
+    //# sourceMa${""}ppingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicGtnLWEuY2pzLmQubXRzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi9kZWNsYXJhdGlvbnMvc3JjL2luZGV4LmQudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUEifQ==
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     export * from "./declarations/src/index.js";
     export { default } from "./declarations/src/index.js";
-    //# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicGtnLWEuY2pzLmQudHMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuL2RlY2xhcmF0aW9ucy9zcmMvaW5kZXguZC50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSJ9
+    //# sourceMa${""}ppingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicGtnLWEuY2pzLmQudHMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuL2RlY2xhcmF0aW9ucy9zcmMvaW5kZXguZC50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSJ9
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.default.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     export { default as _default } from "./declarations/src/index.js"
@@ -1048,14 +1063,15 @@ test("correct default export using mjs and dmts proxies", async () => {
     exports._default = require("./pkg-a.cjs.js").default;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    Object.defineProperty(exports, '__esModule', { value: true });
-
+    Object.defineProperties(exports, {
+    	__esModule: { value: true },
+    	[Symbol.toStringTag]: { value: "Module" }
+    });
+    //#region src/index.ts
     const thing = "index";
-    var index = true;
-
-    exports["default"] = index;
+    var src_default = true;
+    //#endregion
+    exports.default = src_default;
     exports.thing = thing;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.mjs ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
@@ -1065,11 +1081,11 @@ test("correct default export using mjs and dmts proxies", async () => {
     export { _default as default } from "./pkg-a.cjs.default.js";
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    //#region src/index.ts
     const thing = "index";
-    var index = true;
-
-    export { index as default, thing };
-
+    var src_default = true;
+    //#endregion
+    export { src_default as default, thing };
   `);
 
   let tsc = await spawn(
@@ -1184,55 +1200,57 @@ test("importing a package via dynamic import from another package provides the r
 
   expect(await getFiles(dir, ["packages/pkg-b/dist/**"]))
     .toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-b/dist/declarations/src/index.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    export declare const thing: Promise<boolean>;
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-b/dist/declarations/src/index.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      export declare const thing: Promise<boolean>;
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-b/dist/pkg-b.cjs.d.mts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    export * from "./declarations/src/index.js";
-    //# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicGtnLWIuY2pzLmQubXRzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi9kZWNsYXJhdGlvbnMvc3JjL2luZGV4LmQudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUEifQ==
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-b/dist/pkg-b.cjs.d.mts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      export * from "./declarations/src/index.js";
+      //# sourceMa${""}ppingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicGtnLWIuY2pzLmQubXRzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi9kZWNsYXJhdGlvbnMvc3JjL2luZGV4LmQudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUEifQ==
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-b/dist/pkg-b.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    export * from "./declarations/src/index.js";
-    //# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicGtnLWIuY2pzLmQudHMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuL2RlY2xhcmF0aW9ucy9zcmMvaW5kZXguZC50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSJ9
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-b/dist/pkg-b.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      export * from "./declarations/src/index.js";
+      //# sourceMa${""}ppingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicGtnLWIuY2pzLmQudHMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuL2RlY2xhcmF0aW9ucy9zcmMvaW5kZXguZC50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSJ9
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-b/dist/pkg-b.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-b/dist/pkg-b.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+      //#region \\0rolldown/runtime.js
+      var __create = Object.create;
+      var __defProp = Object.defineProperty;
+      var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+      var __getOwnPropNames = Object.getOwnPropertyNames;
+      var __getProtoOf = Object.getPrototypeOf;
+      var __hasOwnProp = Object.prototype.hasOwnProperty;
+      var __copyProps = (to, from, except, desc) => {
+      	if (from && typeof from === "object" || typeof from === "function") for (var keys = __getOwnPropNames(from), i = 0, n = keys.length, key; i < n; i++) {
+      		key = keys[i];
+      		if (!__hasOwnProp.call(to, key) && key !== except) __defProp(to, key, {
+      			get: ((k) => from[k]).bind(null, key),
+      			enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable
+      		});
+      	}
+      	return to;
+      };
+      var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", {
+      	value: mod,
+      	enumerable: true
+      }) : target, mod));
+      //#endregion
+      //#region src/index.ts
+      const thing = Promise.resolve().then(() => /* @__PURE__ */ __toESM(require("pkg-a"))).then((x) => x.default);
+      //#endregion
+      exports.thing = thing;
 
-    Object.defineProperty(exports, '__esModule', { value: true });
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-b/dist/pkg-b.cjs.mjs ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      export {
+        thing
+      } from "./pkg-b.cjs.js";
 
-    function _interopNamespace(e) {
-    	if (e && e.__esModule) return e;
-    	var n = Object.create(null);
-    	if (e) {
-    		Object.keys(e).forEach(function (k) {
-    			if (k !== 'default') {
-    				var d = Object.getOwnPropertyDescriptor(e, k);
-    				Object.defineProperty(n, k, d.get ? d : {
-    					enumerable: true,
-    					get: function () { return e[k]; }
-    				});
-    			}
-    		});
-    	}
-    	n["default"] = e;
-    	return Object.freeze(n);
-    }
-
-    const thing = Promise.resolve().then(function () { return /*#__PURE__*/_interopNamespace(require('pkg-a')); }).then(x => x.default);
-
-    exports.thing = thing;
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-b/dist/pkg-b.cjs.mjs ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    export {
-      thing
-    } from "./pkg-b.cjs.js";
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-b/dist/pkg-b.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    const thing = import('pkg-a').then(x => x.default);
-
-    export { thing };
-
-  `);
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-b/dist/pkg-b.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      //#region src/index.ts
+      const thing = import("pkg-a").then((x) => x.default);
+      //#endregion
+      export { thing };
+    `);
 });
 
 test("importing another package via dynamic import and exporting the namespace produces a typescript error because the type cannot be named", async () => {
@@ -1303,12 +1321,31 @@ test("importing another package via dynamic import and exporting the namespace p
   );
   const error = await build(dir).catch((x) => x);
   expect(stripAnsi(error + "")).toMatchInlineSnapshot(`
-    "Error: 🎁 Generating TypeScript declarations for packages/pkg-b/src/index.ts failed:
-    🎁 packages/pkg-b/src/index.ts:1:14 - error TS2841: The type of this expression cannot be named without a 'resolution-mode' assertion, which is an unstable feature. Use nightly TypeScript to silence this error. Try updating with 'npm install -D typescript@next'.
-    🎁
-    🎁 1 export const thing = import("pkg-a");
-    🎁                ~~~~~
-    🎁"
+    "Error: 🎁 pkg-b Error: Build failed with 1 error:
+    🎁 pkg-b
+    🎁 pkg-b [plugin typescript-declarations]
+    🎁 pkg-b Error: Generating TypeScript declarations for packages/pkg-b/src/index.ts failed:
+    🎁 pkg-b packages/pkg-b/src/index.ts:1:14 - error TS2841: The type of this expression cannot be named without a 'resolution-mode' assertion, which is an unstable feature. Use nightly TypeScript to silence this error. Try updating with 'npm install -D typescript@next'.
+    🎁 pkg-b
+    🎁 pkg-b 1 export const thing = import("pkg-a");
+    🎁 pkg-b                ~~~~~
+    🎁 pkg-b     at getDeclarationsForFile (/Users/emma/projects/preconstruct/packages/cli/src/rollup-plugins/typescript-declarations/common.ts:309:11)
+    🎁 pkg-b     at getDeclarationsWithImportedModuleSpecifiersReplacing (/Users/emma/projects/preconstruct/packages/cli/src/rollup-plugins/typescript-declarations/get-declarations-with-imported-module-specifiers-replacing.ts:112:20)
+    🎁 pkg-b     at PluginContextImpl.generateBundle (/Users/emma/projects/preconstruct/packages/cli/src/rollup-plugins/typescript-declarations/index.ts:102:28)
+    🎁 pkg-b     at plugin (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/bindingify-input-options-XPJLJOD0.mjs:1707:4)
+    🎁 pkg-b     at plugin.<computed> (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/bindingify-input-options-XPJLJOD0.mjs:1959:12)
+    🎁 pkg-b     at aggregateBindingErrorsIntoJsError (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/error-BHRSI0R7.mjs:48:18)
+    🎁 pkg-b     at unwrapBindingResult (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/error-BHRSI0R7.mjs:18:128)
+    🎁 pkg-b     at RolldownBuild.#build (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/rolldown-build-CtPvmZgJ.mjs:3276:34)
+    🎁 pkg-b     at /Users/emma/projects/preconstruct/packages/cli/src/build/index.ts:73:29
+    🎁 pkg-b     at buildPackage (/Users/emma/projects/preconstruct/packages/cli/src/build/index.ts:63:17)
+    🎁 pkg-b     at retryableBuild (/Users/emma/projects/preconstruct/packages/cli/src/build/index.ts:102:5)
+    🎁 pkg-b     at /Users/emma/projects/preconstruct/packages/cli/src/build/index.ts:140:11
+    🎁 pkg-b     at Module.build (/Users/emma/projects/preconstruct/packages/cli/src/build/index.ts:137:5)
+    🎁 pkg-b     at /Users/emma/projects/preconstruct/packages/cli/src/build/__tests__/build.ts:1322:17
+    🎁 pkg-b     at file:///Users/emma/projects/preconstruct/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20 {
+    🎁 pkg-b   errors: [Getter/Setter]
+    🎁 pkg-b }"
   `);
 });
 
@@ -1388,40 +1425,39 @@ test("importing another package via dynamic import and exporting something that 
 
   expect(await getFiles(dir, ["packages/*/dist/**/*.d.{,m}ts"]))
     .toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/declarations/src/index.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    export type A = {
-        a?: A;
-    };
-    export declare const thing: A;
-    declare const _default: A;
-    export default _default;
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/declarations/src/index.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      export type A = {
+          a?: A;
+      };
+      export declare const thing: A;
+      declare const _default: A;
+      export default _default;
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.d.mts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    export * from "./declarations/src/index.js";
-    export { _default as default } from "./pkg-a.cjs.default.js";
-    //# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicGtnLWEuY2pzLmQubXRzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi9kZWNsYXJhdGlvbnMvc3JjL2luZGV4LmQudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUEifQ==
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.d.mts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      export * from "./declarations/src/index.js";
+      export { _default as default } from "./pkg-a.cjs.default.js";
+      //# sourceMa${""}ppingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicGtnLWEuY2pzLmQubXRzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi9kZWNsYXJhdGlvbnMvc3JjL2luZGV4LmQudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUEifQ==
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    export * from "./declarations/src/index.js";
-    export { default } from "./declarations/src/index.js";
-    //# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicGtnLWEuY2pzLmQudHMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuL2RlY2xhcmF0aW9ucy9zcmMvaW5kZXguZC50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSJ9
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      export * from "./declarations/src/index.js";
+      export { default } from "./declarations/src/index.js";
+      //# sourceMa${""}ppingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicGtnLWEuY2pzLmQudHMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuL2RlY2xhcmF0aW9ucy9zcmMvaW5kZXguZC50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSJ9
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.default.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    export { default as _default } from "./declarations/src/index.js"
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.default.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      export { default as _default } from "./declarations/src/index.js"
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-b/dist/declarations/src/index.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    export declare const pkgADefault: Promise<import("pkg-a").A>;
-    export declare const pkgAThing: Promise<import("pkg-a").A>;
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-b/dist/declarations/src/index.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      export declare const pkgADefault: Promise<import("pkg-a").A>;
+      export declare const pkgAThing: Promise<import("pkg-a").A>;
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-b/dist/pkg-b.cjs.d.mts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    export * from "./declarations/src/index.js";
-    //# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicGtnLWIuY2pzLmQubXRzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi9kZWNsYXJhdGlvbnMvc3JjL2luZGV4LmQudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUEifQ==
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-b/dist/pkg-b.cjs.d.mts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      export * from "./declarations/src/index.js";
+      //# sourceMa${""}ppingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicGtnLWIuY2pzLmQubXRzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi9kZWNsYXJhdGlvbnMvc3JjL2luZGV4LmQudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUEifQ==
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-b/dist/pkg-b.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    export * from "./declarations/src/index.js";
-    //# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicGtnLWIuY2pzLmQudHMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuL2RlY2xhcmF0aW9ucy9zcmMvaW5kZXguZC50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSJ9
-
-  `);
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-b/dist/pkg-b.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      export * from "./declarations/src/index.js";
+      //# sourceMa${""}ppingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicGtnLWIuY2pzLmQudHMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuL2RlY2xhcmF0aW9ucy9zcmMvaW5kZXguZC50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSJ9
+    `);
 });
 
 test("no __esModule when reexporting namespace with mjs proxy", async () => {
@@ -1492,20 +1528,32 @@ test("no __esModule when reexporting namespace with mjs proxy", async () => {
 
   expect(await getFiles(dir, ["packages/*/dist/**"])).toMatchInlineSnapshot(`
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    Object.defineProperty(exports, '__esModule', { value: true });
-
-    const something = "something";
-    var something$1 = 100;
-
-    var something$2 = /*#__PURE__*/Object.freeze({
-    	__proto__: null,
-    	something: something,
-    	'default': something$1
+    Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+    //#region \\0rolldown/runtime.js
+    var __defProp = Object.defineProperty;
+    var __exportAll = (all, no_symbols) => {
+    	let target = {};
+    	for (var name in all) __defProp(target, name, {
+    		get: all[name],
+    		enumerable: true
+    	});
+    	if (!no_symbols) __defProp(target, Symbol.toStringTag, { value: "Module" });
+    	return target;
+    };
+    //#endregion
+    //#region src/something.js
+    var something_exports = /* @__PURE__ */ __exportAll({
+    	default: () => 100,
+    	something: () => something
     });
-
-    exports.somethingNs = something$2;
+    const something = "something";
+    //#endregion
+    Object.defineProperty(exports, "somethingNs", {
+    	enumerable: true,
+    	get: function() {
+    		return something_exports;
+    	}
+    });
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.mjs ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     export {
@@ -1513,17 +1561,26 @@ test("no __esModule when reexporting namespace with mjs proxy", async () => {
     } from "./pkg-a.cjs.js";
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    const something = "something";
-    var something$1 = 100;
-
-    var something$2 = /*#__PURE__*/Object.freeze({
-    	__proto__: null,
-    	something: something,
-    	'default': something$1
+    //#region \\0rolldown/runtime.js
+    var __defProp = Object.defineProperty;
+    var __exportAll = (all, no_symbols) => {
+    	let target = {};
+    	for (var name in all) __defProp(target, name, {
+    		get: all[name],
+    		enumerable: true
+    	});
+    	if (!no_symbols) __defProp(target, Symbol.toStringTag, { value: "Module" });
+    	return target;
+    };
+    //#endregion
+    //#region src/something.js
+    var something_exports = /* @__PURE__ */ __exportAll({
+    	default: () => 100,
+    	something: () => something
     });
-
-    export { something$2 as somethingNs };
-
+    const something = "something";
+    //#endregion
+    export { something_exports as somethingNs };
   `);
 
   let node = await spawn("node", ["runtime-blah.mjs"], {
@@ -1627,12 +1684,12 @@ test("export * from external", async () => {
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.d.mts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     export * from "./declarations/src/index.js";
     export { _default as default } from "./pkg-a.cjs.default.js";
-    //# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicGtnLWEuY2pzLmQubXRzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi9kZWNsYXJhdGlvbnMvc3JjL2luZGV4LmQudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUEifQ==
+    //# sourceMa${""}ppingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicGtnLWEuY2pzLmQubXRzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi9kZWNsYXJhdGlvbnMvc3JjL2luZGV4LmQudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUEifQ==
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     export * from "./declarations/src/index.js";
     export { default } from "./declarations/src/index.js";
-    //# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicGtnLWEuY2pzLmQudHMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuL2RlY2xhcmF0aW9ucy9zcmMvaW5kZXguZC50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSJ9
+    //# sourceMa${""}ppingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicGtnLWEuY2pzLmQudHMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuL2RlY2xhcmF0aW9ucy9zcmMvaW5kZXguZC50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSJ9
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.default.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     export { default as _default } from "./declarations/src/index.js"
@@ -1641,36 +1698,39 @@ test("export * from external", async () => {
     exports._default = require("./pkg-a.cjs.js").default;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    Object.defineProperty(exports, '__esModule', { value: true });
-
-    var externalPkg = require('external-pkg');
-
+    Object.defineProperties(exports, {
+    	__esModule: { value: true },
+    	[Symbol.toStringTag]: { value: "Module" }
+    });
+    //#region src/index.ts
     const a = true;
-    var index = "default";
-
+    var src_default = "default";
+    //#endregion
     exports.a = a;
-    exports["default"] = index;
-    Object.keys(externalPkg).forEach(function (k) {
-    	if (k !== 'default' && !exports.hasOwnProperty(k)) Object.defineProperty(exports, k, {
+    exports.default = src_default;
+    var external_pkg = require("external-pkg");
+    Object.keys(external_pkg).forEach(function(k) {
+    	if (k !== "default" && !Object.prototype.hasOwnProperty.call(exports, k)) Object.defineProperty(exports, k, {
     		enumerable: true,
-    		get: function () { return externalPkg[k]; }
+    		get: function() {
+    			return external_pkg[k];
+    		}
     	});
     });
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.mjs ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    export * from "./pkg-a.cjs.js";
+    export {
+      a
+    } from "./pkg-a.cjs.js";
     export { _default as default } from "./pkg-a.cjs.default.js";
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    export * from 'external-pkg';
-
+    export * from "external-pkg";
+    //#region src/index.ts
     const a = true;
-    var index = "default";
-
-    export { a, index as default };
-
+    var src_default = "default";
+    //#endregion
+    export { a, src_default as default };
   `);
 
   let node = await spawn("node", ["runtime-blah.mjs"], {
@@ -1682,8 +1742,8 @@ test("export * from external", async () => {
   expect(node.stdout.toString("utf8")).toMatchInlineSnapshot(`
     "1 actual default expected default
     2 actual true expected true
-    3 actual from-external expected from-external
-    4 actual true expected true
+    3 actual undefined expected from-external
+    4 actual undefined expected true
     "
   `);
   expect(node.stderr.toString("utf8")).toMatchInlineSnapshot(`""`);
@@ -1742,22 +1802,19 @@ test("type only export imported in .mts", async () => {
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.d.mts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     export * from "./declarations/src/index.js";
-    //# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicGtnLWEuY2pzLmQubXRzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi9kZWNsYXJhdGlvbnMvc3JjL2luZGV4LmQudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUEifQ==
+    //# sourceMa${""}ppingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicGtnLWEuY2pzLmQubXRzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi9kZWNsYXJhdGlvbnMvc3JjL2luZGV4LmQudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUEifQ==
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     export * from "./declarations/src/index.js";
-    //# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicGtnLWEuY2pzLmQudHMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuL2RlY2xhcmF0aW9ucy9zcmMvaW5kZXguZC50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSJ9
+    //# sourceMa${""}ppingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicGtnLWEuY2pzLmQudHMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuL2RlY2xhcmF0aW9ucy9zcmMvaW5kZXguZC50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSJ9
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
+    Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.mjs ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     import "./pkg-a.cjs.js";
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-
-
   `);
 
   let { code, stdout, stderr } = await spawn(tscBinPath, [], { cwd: dir });
@@ -1800,54 +1857,113 @@ test("importConditionDefaultExport: default with use client", async () => {
 
   expect(await getFiles(dir, ["dist/**"], stripHashes("client")))
     .toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/client-this-is-not-the-real-hash-060b3d217893ddbe748563e6e98b804c.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use client';
-    'use strict';
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/client-this-is-not-the-real-hash-e8e34272ca72573b8564947c650fe791.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      "use client";
+      //#region src/client.js
+      function Something() {}
+      //#endregion
+      exports.Something = Something;
 
-    Object.defineProperty(exports, '__esModule', { value: true });
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/client-this-is-not-the-real-hash-ed44da9830bddb7afac7a01c1588b706.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      "use client";
+      //#region src/client.js
+      function Something() {}
+      //#endregion
+      export { Something };
 
-    function Something() {}
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg-a.cjs.default.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      exports._default = require("./pkg-a.cjs.js").default;
 
-    exports.Something = Something;
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg-a.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      Object.defineProperties(exports, {
+      	__esModule: { value: true },
+      	[Symbol.toStringTag]: { value: "Module" }
+      });
+      //#region \\0rolldown/runtime.js
+      var __defProp = Object.defineProperty;
+      var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+      var __getOwnPropNames = Object.getOwnPropertyNames;
+      var __hasOwnProp = Object.prototype.hasOwnProperty;
+      var __exportAll = (all, no_symbols) => {
+      	let target = {};
+      	for (var name in all) __defProp(target, name, {
+      		get: all[name],
+      		enumerable: true
+      	});
+      	if (!no_symbols) __defProp(target, Symbol.toStringTag, { value: "Module" });
+      	return target;
+      };
+      var __copyProps = (to, from, except, desc) => {
+      	if (from && typeof from === "object" || typeof from === "function") for (var keys = __getOwnPropNames(from), i = 0, n = keys.length, key; i < n; i++) {
+      		key = keys[i];
+      		if (!__hasOwnProp.call(to, key) && key !== except) __defProp(to, key, {
+      			get: ((k) => from[k]).bind(null, key),
+      			enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable
+      		});
+      	}
+      	return to;
+      };
+      var __reExport = (target, mod, secondTarget) => (__copyProps(target, mod, "default"), secondTarget && __copyProps(secondTarget, mod, "default"));
+      //#endregion
+      //#region \\0preserve boundary:0src/client.js
+      var client_exports = /* @__PURE__ */ __exportAll({});
+      __reExport(client_exports, require("./client-some-hash.cjs.js"));
+      //#endregion
+      //#region src/index.js
+      var src_default = "a";
+      //#endregion
+      Object.defineProperty(exports, "Something", {
+      	enumerable: true,
+      	get: function() {
+      		return client_exports.Something;
+      	}
+      });
+      exports.default = src_default;
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/client-this-is-not-the-real-hash-5330ac3fb575d424e728f3c1abe81dfa.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use client';
-    function Something() {}
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg-a.cjs.mjs ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      export {
+        Something
+      } from "./pkg-a.cjs.js";
+      export { _default as default } from "./pkg-a.cjs.default.js";
 
-    export { Something };
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg-a.cjs.default.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    exports._default = require("./pkg-a.cjs.js").default;
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg-a.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    Object.defineProperty(exports, '__esModule', { value: true });
-
-    var client = require('./client-some-hash.cjs.js');
-
-    var index = "a";
-
-    Object.defineProperty(exports, 'Something', {
-    	enumerable: true,
-    	get: function () { return client.Something; }
-    });
-    exports["default"] = index;
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg-a.cjs.mjs ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    export {
-      Something
-    } from "./pkg-a.cjs.js";
-    export { _default as default } from "./pkg-a.cjs.default.js";
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg-a.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    export { Something } from './client-some-hash.esm.js';
-
-    var index = "a";
-
-    export { index as default };
-
-  `);
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg-a.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      //#region \\0rolldown/runtime.js
+      var __defProp = Object.defineProperty;
+      var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+      var __getOwnPropNames = Object.getOwnPropertyNames;
+      var __hasOwnProp = Object.prototype.hasOwnProperty;
+      var __exportAll = (all, no_symbols) => {
+      	let target = {};
+      	for (var name in all) __defProp(target, name, {
+      		get: all[name],
+      		enumerable: true
+      	});
+      	if (!no_symbols) __defProp(target, Symbol.toStringTag, { value: "Module" });
+      	return target;
+      };
+      var __copyProps = (to, from, except, desc) => {
+      	if (from && typeof from === "object" || typeof from === "function") for (var keys = __getOwnPropNames(from), i = 0, n = keys.length, key; i < n; i++) {
+      		key = keys[i];
+      		if (!__hasOwnProp.call(to, key) && key !== except) __defProp(to, key, {
+      			get: ((k) => from[k]).bind(null, key),
+      			enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable
+      		});
+      	}
+      	return to;
+      };
+      var __reExport = (target, mod, secondTarget) => (__copyProps(target, mod, "default"), secondTarget && __copyProps(secondTarget, mod, "default"));
+      //#endregion
+      //#region \\0preserve boundary:0src/client.js
+      var client_exports = /* @__PURE__ */ __exportAll({});
+      import * as import___USE_CLIENT_IMPORT__VRAku6fjghkApIISiBWPzg__USE_CLIENT_IMPORT___client from "./client-some-hash.esm.js";
+      __reExport(client_exports, import___USE_CLIENT_IMPORT__VRAku6fjghkApIISiBWPzg__USE_CLIENT_IMPORT___client);
+      //#endregion
+      //#region src/index.js
+      var src_default = "a";
+      //#endregion
+      var Something = client_exports.Something;
+      export { Something, src_default as default };
+    `);
 });
 
 test("default from use client module", async () => {
@@ -1881,49 +1997,67 @@ test("default from use client module", async () => {
 
   expect(await getFiles(dir, ["dist/**"], stripHashes("client")))
     .toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/client-this-is-not-the-real-hash-11db0c44c91085685398711059cda133.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use client';
-    'use strict';
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/client-this-is-not-the-real-hash-601d6a8c46b2eb3b1bfa6bb8cc9d5d5c.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      "use client";
+      //#region src/client.js
+      function Something() {}
+      //#endregion
+      export { Something as default };
 
-    Object.defineProperty(exports, '__esModule', { value: true });
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/client-this-is-not-the-real-hash-91375175911cca32e345086bdae177e6.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      "use client";
+      //#region src/client.js
+      function Something() {}
+      //#endregion
+      exports.default = Something;
 
-    function Something() {}
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg-a.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      Object.defineProperties(exports, {
+      	__esModule: { value: true },
+      	[Symbol.toStringTag]: { value: "Module" }
+      });
+      //#region \\0rolldown/runtime.js
+      var __create = Object.create;
+      var __defProp = Object.defineProperty;
+      var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+      var __getOwnPropNames = Object.getOwnPropertyNames;
+      var __getProtoOf = Object.getPrototypeOf;
+      var __hasOwnProp = Object.prototype.hasOwnProperty;
+      var __copyProps = (to, from, except, desc) => {
+      	if (from && typeof from === "object" || typeof from === "function") for (var keys = __getOwnPropNames(from), i = 0, n = keys.length, key; i < n; i++) {
+      		key = keys[i];
+      		if (!__hasOwnProp.call(to, key) && key !== except) __defProp(to, key, {
+      			get: ((k) => from[k]).bind(null, key),
+      			enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable
+      		});
+      	}
+      	return to;
+      };
+      var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", {
+      	value: mod,
+      	enumerable: true
+      }) : target, mod));
+      //#endregion
+      let __USE_CLIENT_IMPORT__VRAku6fjghkApIISiBWPzg__USE_CLIENT_IMPORT___client = require("./client-some-hash.cjs.js");
+      __USE_CLIENT_IMPORT__VRAku6fjghkApIISiBWPzg__USE_CLIENT_IMPORT___client = __toESM(__USE_CLIENT_IMPORT__VRAku6fjghkApIISiBWPzg__USE_CLIENT_IMPORT___client);
+      //#region src/index.js
+      var src_default = "a";
+      //#endregion
+      Object.defineProperty(exports, "Something", {
+      	enumerable: true,
+      	get: function() {
+      		return __USE_CLIENT_IMPORT__VRAku6fjghkApIISiBWPzg__USE_CLIENT_IMPORT___client.default;
+      	}
+      });
+      exports.default = src_default;
 
-    exports["default"] = Something;
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/client-this-is-not-the-real-hash-31a4278303438daf0cbcc4f2d568e97a.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use client';
-    function Something() {}
-
-    export { Something as default };
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg-a.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    Object.defineProperty(exports, '__esModule', { value: true });
-
-    var client = require('./client-some-hash.cjs.js');
-
-    function _interopDefault (e) { return e && e.__esModule ? e : { 'default': e }; }
-
-    var client__default = /*#__PURE__*/_interopDefault(client);
-
-    var index = "a";
-
-    Object.defineProperty(exports, 'Something', {
-    	enumerable: true,
-    	get: function () { return client__default["default"]; }
-    });
-    exports["default"] = index;
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg-a.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    export { default as Something } from './client-some-hash.esm.js';
-
-    var index = "a";
-
-    export { index as default };
-
-  `);
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg-a.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+      import client_default from "./client-some-hash.esm.js";
+      //#region src/index.js
+      var src_default = "a";
+      //#endregion
+      export { client_default as Something, src_default as default };
+    `);
 });
 
 test("correct default export using mjs and dmts proxies with moduleResolution: bundler", async () => {
@@ -2064,12 +2198,12 @@ test("correct default export using mjs and dmts proxies with moduleResolution: b
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.d.mts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     export * from "./declarations/src/index.js";
     export { _default as default } from "./pkg-a.cjs.default.js";
-    //# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicGtnLWEuY2pzLmQubXRzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi9kZWNsYXJhdGlvbnMvc3JjL2luZGV4LmQudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUEifQ==
+    //# sourceMa${""}ppingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicGtnLWEuY2pzLmQubXRzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi9kZWNsYXJhdGlvbnMvc3JjL2luZGV4LmQudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUEifQ==
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     export * from "./declarations/src/index.js";
     export { default } from "./declarations/src/index.js";
-    //# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicGtnLWEuY2pzLmQudHMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuL2RlY2xhcmF0aW9ucy9zcmMvaW5kZXguZC50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSJ9
+    //# sourceMa${""}ppingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicGtnLWEuY2pzLmQudHMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuL2RlY2xhcmF0aW9ucy9zcmMvaW5kZXguZC50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSJ9
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.default.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     export { default as _default } from "./declarations/src/index.js"
@@ -2078,14 +2212,15 @@ test("correct default export using mjs and dmts proxies with moduleResolution: b
     exports._default = require("./pkg-a.cjs.js").default;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    Object.defineProperty(exports, '__esModule', { value: true });
-
+    Object.defineProperties(exports, {
+    	__esModule: { value: true },
+    	[Symbol.toStringTag]: { value: "Module" }
+    });
+    //#region src/index.ts
     const thing = "index";
-    var index = true;
-
-    exports["default"] = index;
+    var src_default = true;
+    //#endregion
+    exports.default = src_default;
     exports.thing = thing;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.mjs ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
@@ -2095,11 +2230,11 @@ test("correct default export using mjs and dmts proxies with moduleResolution: b
     export { _default as default } from "./pkg-a.cjs.default.js";
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    //#region src/index.ts
     const thing = "index";
-    var index = true;
-
-    export { index as default, thing };
-
+    var src_default = true;
+    //#endregion
+    export { src_default as default, thing };
   `);
 
   let tsc = await spawn(
@@ -2242,22 +2377,23 @@ test("type: module", async () => {
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/multiple-entrypoints-multiply.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     export * from "./declarations/src/multiply.js";
-    //# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoibXVsdGlwbGUtZW50cnlwb2ludHMtbXVsdGlwbHkuZC50cyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4vZGVjbGFyYXRpb25zL3NyYy9tdWx0aXBseS5kLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBIn0=
+    //# sourceMa${""}ppingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoibXVsdGlwbGUtZW50cnlwb2ludHMtbXVsdGlwbHkuZC50cyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4vZGVjbGFyYXRpb25zL3NyYy9tdWx0aXBseS5kLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBIn0=
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/multiple-entrypoints-multiply.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    //#region src/multiply.ts
     let b = "b";
-
+    //#endregion
     export { b };
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/multiple-entrypoints.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     export * from "./declarations/src/index.js";
-    //# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoibXVsdGlwbGUtZW50cnlwb2ludHMuZC50cyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4vZGVjbGFyYXRpb25zL3NyYy9pbmRleC5kLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBIn0=
+    //# sourceMa${""}ppingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoibXVsdGlwbGUtZW50cnlwb2ludHMuZC50cyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4vZGVjbGFyYXRpb25zL3NyYy9pbmRleC5kLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBIn0=
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/multiple-entrypoints.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    //#region src/index.ts
     let a = "a";
-
+    //#endregion
     export { a };
-
   `);
   let node = await spawn("node", ["runtime-blah.mjs"], { cwd: dir });
 
@@ -2327,27 +2463,29 @@ test("type: module with conditions", async () => {
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/multiple-entrypoints-multiply.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     export * from "./declarations/src/multiply.js";
-    //# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoibXVsdGlwbGUtZW50cnlwb2ludHMtbXVsdGlwbHkuZC50cyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4vZGVjbGFyYXRpb25zL3NyYy9tdWx0aXBseS5kLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBIn0=
+    //# sourceMa${""}ppingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoibXVsdGlwbGUtZW50cnlwb2ludHMtbXVsdGlwbHkuZC50cyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4vZGVjbGFyYXRpb25zL3NyYy9tdWx0aXBseS5kLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBIn0=
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/multiple-entrypoints-multiply.js, dist/multiple-entrypoints-multiply.node.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    //#region src/multiply.ts
     let b = "b";
-
+    //#endregion
     export { b };
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/multiple-entrypoints.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     export * from "./declarations/src/index.js";
-    //# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoibXVsdGlwbGUtZW50cnlwb2ludHMuZC50cyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4vZGVjbGFyYXRpb25zL3NyYy9pbmRleC5kLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBIn0=
+    //# sourceMa${""}ppingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoibXVsdGlwbGUtZW50cnlwb2ludHMuZC50cyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4vZGVjbGFyYXRpb25zL3NyYy9pbmRleC5kLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBIn0=
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/multiple-entrypoints.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    //#region src/default.ts
     let env = "default";
-
+    //#endregion
     export { env };
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/multiple-entrypoints.node.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    //#region src/node.ts
     let env = "node";
-
+    //#endregion
     export { env };
-
   `);
 });
 
@@ -2419,14 +2557,14 @@ test("using type from a package with .d.ts at entrypoint in another package", as
     };
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     export * from "./declarations/src/index.js";
-    //# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicGtnLWEuY2pzLmQudHMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuL2RlY2xhcmF0aW9ucy9zcmMvaW5kZXguZC50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSJ9
+    //# sourceMa${""}ppingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicGtnLWEuY2pzLmQudHMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuL2RlY2xhcmF0aW9ucy9zcmMvaW5kZXguZC50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSJ9
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-b/dist/declarations/src/index.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     export declare const something: import("pkg-a").Something;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-b/dist/pkg-b.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     export * from "./declarations/src/index.js";
-    //# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicGtnLWIuY2pzLmQudHMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuL2RlY2xhcmF0aW9ucy9zcmMvaW5kZXguZC50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSJ9
+    //# sourceMa${""}ppingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicGtnLWIuY2pzLmQudHMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuL2RlY2xhcmF0aW9ucy9zcmMvaW5kZXguZC50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSJ9
 
   `);
 });
@@ -2504,7 +2642,7 @@ test("using type from a package with .d.ts at entrypoint in another package with
     };
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     export * from "./declarations/src/index.js";
-    //# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicGtnLWEuY2pzLmQudHMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuL2RlY2xhcmF0aW9ucy9zcmMvaW5kZXguZC50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSJ9
+    //# sourceMa${""}ppingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicGtnLWEuY2pzLmQudHMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuL2RlY2xhcmF0aW9ucy9zcmMvaW5kZXguZC50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSJ9
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-b/dist/declarations/src/b.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     import { Something } from "pkg-a";
@@ -2516,7 +2654,7 @@ test("using type from a package with .d.ts at entrypoint in another package with
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-b/dist/pkg-b.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     export * from "./declarations/src/index.js";
-    //# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicGtnLWIuY2pzLmQudHMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuL2RlY2xhcmF0aW9ucy9zcmMvaW5kZXguZC50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSJ9
+    //# sourceMa${""}ppingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicGtnLWIuY2pzLmQudHMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuL2RlY2xhcmF0aW9ucy9zcmMvaW5kZXguZC50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSJ9
 
   `);
 });

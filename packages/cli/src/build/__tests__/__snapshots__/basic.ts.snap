@@ -1,64 +1,74 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`basic: valid-package.cjs.js 1`] = `
-"'use strict';
-
-Object.defineProperty(exports, '__esModule', { value: true });
-
-var index = "something";
-
-exports["default"] = index;
+exports[`basic > valid-package.cjs.js 1`] = `
+"Object.defineProperties(exports, {
+	__esModule: { value: true },
+	[Symbol.toStringTag]: { value: "Module" }
+});
+//#region src/index.js
+var src_default = "something";
+//#endregion
+exports.default = src_default;
 "
 `;
 
-exports[`basic: valid-package.esm.js 1`] = `
-"var index = "something";
-
-export { index as default };
+exports[`basic > valid-package.esm.js 1`] = `
+"//#region src/index.js
+var src_default = "something";
+//#endregion
+export { src_default as default };
 "
 `;
 
-exports[`basic: valid-package.umd.min.js 1`] = `
-"!function(e,n){"object"==typeof exports&&"undefined"!=typeof module?module.exports=n():"function"==typeof define&&define.amd?define(n):(e="undefined"!=typeof globalThis?globalThis:e||self).validPackage=n()}(this,(function(){"use strict";return"something"}));
-//# sourceMappingURL=valid-package.umd.min.js.map
+exports[`basic > valid-package.umd.min.js 1`] = `
+"(function(e, n) {
+	"object" == typeof exports && "undefined" != typeof module ? module.exports = n() : "function" == typeof define && define.amd ? define([], n) : (e = "undefined" != typeof globalThis ? globalThis : e || self).validPackage = n();
+})(this, (function() {
+	return "something";
+}));
+
+//# sourceMappingURL=valid-package.umd.min.js.map//# sourceMappingURL=valid-package.umd.min.js.map
 "
 `;
 
-exports[`basic: valid-package.umd.min.js.map 1`] = `"{"version":3,"file":"valid-package.umd.min.js","sources":["../src/index.js"],"sourcesContent":["export default \\"something\\";\\n"],"names":[],"mappings":"mPAAe"}"`;
+exports[`basic > valid-package.umd.min.js.map 1`] = `"{"version":3,"file":"valid-package.umd.min.js","names":[],"sources":["../src/index.js"],"sourcesContent":["export default \\"something\\";\\n"],"mappings":";;;QAAe;AAAA,EAAA"}"`;
 
-exports[`typescript thing: declarations/src/index.d.ts 1`] = `
+exports[`typescript thing > declarations/src/index.d.ts 1`] = `
 "export declare const thing: "wow";
 "
 `;
 
-exports[`typescript thing: weird-typescript-thing.cjs.d.ts 1`] = `
+exports[`typescript thing > weird-typescript-thing.cjs.d.ts 1`] = `
 "export * from "./declarations/src/index.js";
 //# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoid2VpcmQtdHlwZXNjcmlwdC10aGluZy5janMuZC50cyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4vZGVjbGFyYXRpb25zL3NyYy9pbmRleC5kLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBIn0=
 "
 `;
 
-exports[`typescript thing: weird-typescript-thing.cjs.js 1`] = `
-"'use strict';
-
-Object.defineProperty(exports, '__esModule', { value: true });
-
+exports[`typescript thing > weird-typescript-thing.cjs.js 1`] = `
+"Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+//#region src/other.ts
 const thing$1 = () => "wow";
-
+//#endregion
+//#region src/thing.tsx
 const makeThing = () => thing$1();
-
+//#endregion
+//#region src/index.ts
 const thing = makeThing();
-
+//#endregion
 exports.thing = thing;
 "
 `;
 
-exports[`typescript thing: weird-typescript-thing.esm.js 1`] = `
-"const thing$1 = () => "wow";
-
+exports[`typescript thing > weird-typescript-thing.esm.js 1`] = `
+"//#region src/other.ts
+const thing$1 = () => "wow";
+//#endregion
+//#region src/thing.tsx
 const makeThing = () => thing$1();
-
+//#endregion
+//#region src/index.ts
 const thing = makeThing();
-
+//#endregion
 export { thing };
 "
 `;

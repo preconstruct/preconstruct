@@ -1,42 +1,36 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`browser no module: dist/browser-no-module.browser.cjs.js 1`] = `
-"'use strict';
-
-Object.defineProperty(exports, '__esModule', { value: true });
-
+exports[`browser no module > dist/browser-no-module.browser.cjs.js 1`] = `
+"Object.defineProperties(exports, {
+	__esModule: { value: true },
+	[Symbol.toStringTag]: { value: "Module" }
+});
+//#region src/index.js
 let thing = "wow";
-if (typeof window !== "undefined") {
-  thing = "something";
-}
-if (typeof document !== undefined) {
-  thing += "other";
-}
-var thing$1 = thing;
-
-exports["default"] = thing$1;
+if (typeof window !== "undefined") thing = "something";
+thing += "other";
+var src_default = thing;
+//#endregion
+exports.default = src_default;
 "
 `;
 
-exports[`browser no module: dist/browser-no-module.cjs.js 1`] = `
-"'use strict';
-
-Object.defineProperty(exports, '__esModule', { value: true });
-
+exports[`browser no module > dist/browser-no-module.cjs.js 1`] = `
+"Object.defineProperties(exports, {
+	__esModule: { value: true },
+	[Symbol.toStringTag]: { value: "Module" }
+});
+//#region src/index.js
 let thing = "wow";
-if (typeof window !== "undefined") {
-  thing = "something";
-}
-if (typeof document !== undefined) {
-  thing += "other";
-}
-var thing$1 = thing;
-
-exports["default"] = thing$1;
+if (typeof window !== "undefined") thing = "something";
+thing += "other";
+var src_default = thing;
+//#endregion
+exports.default = src_default;
 "
 `;
 
-exports[`browser no module: package.json 1`] = `
+exports[`browser no module > package.json 1`] = `
 {
   "browser": {
     "./dist/browser-no-module.cjs.js": "./dist/browser-no-module.browser.cjs.js",
@@ -51,7 +45,7 @@ exports[`browser no module: package.json 1`] = `
 }
 `;
 
-exports[`browser no module: src/index.js 1`] = `
+exports[`browser no module > src/index.js 1`] = `
 "let thing = "wow";
 
 if (typeof window !== "undefined") {
@@ -65,26 +59,32 @@ if (typeof document !== undefined) {
 export default thing;"
 `;
 
-exports[`should lazily get globals: dist/umd-unused-peer-dep.cjs.js 1`] = `
-"'use strict';
-
-Object.defineProperty(exports, '__esModule', { value: true });
-
-var index = "something";
-
-exports["default"] = index;
+exports[`should lazily get globals > dist/umd-unused-peer-dep.cjs.js 1`] = `
+"Object.defineProperties(exports, {
+	__esModule: { value: true },
+	[Symbol.toStringTag]: { value: "Module" }
+});
+//#region src/index.js
+var src_default = "something";
+//#endregion
+exports.default = src_default;
 "
 `;
 
-exports[`should lazily get globals: dist/umd-unused-peer-dep.umd.min.js 1`] = `
-"!function(e,n){"object"==typeof exports&&"undefined"!=typeof module?module.exports=n():"function"==typeof define&&define.amd?define(n):(e="undefined"!=typeof globalThis?globalThis:e||self).validPackage=n()}(this,(function(){"use strict";return"something"}));
-//# sourceMappingURL=umd-unused-peer-dep.umd.min.js.map
+exports[`should lazily get globals > dist/umd-unused-peer-dep.umd.min.js 1`] = `
+"(function(e, n) {
+	"object" == typeof exports && "undefined" != typeof module ? module.exports = n() : "function" == typeof define && define.amd ? define([], n) : (e = "undefined" != typeof globalThis ? globalThis : e || self).validPackage = n();
+})(this, (function() {
+	return "something";
+}));
+
+//# sourceMappingURL=umd-unused-peer-dep.umd.min.js.map//# sourceMappingURL=umd-unused-peer-dep.umd.min.js.map
 "
 `;
 
-exports[`should lazily get globals: src/index.js 1`] = `"export default "something";"`;
+exports[`should lazily get globals > src/index.js 1`] = `"export default "something";"`;
 
-exports[`typescript with forced dts emit: dist/declarations/src/create-store.d.ts 1`] = `
+exports[`typescript with forced dts emit > dist/declarations/src/create-store.d.ts 1`] = `
 "import { Action } from "@reduxjs/toolkit";
 import { ThunkAction } from "redux-thunk";
 import { RootState } from "./root-reducer.js";
@@ -93,96 +93,107 @@ export declare function createStore(): any;
 "
 `;
 
-exports[`typescript with forced dts emit: dist/declarations/src/index.d.ts 1`] = `
+exports[`typescript with forced dts emit > dist/declarations/src/index.d.ts 1`] = `
 "export { createStore } from "./create-store.js";
 export type { AppThunk } from "./create-store.js";
 export type { RootState } from "./root-reducer.js";
 "
 `;
 
-exports[`typescript with forced dts emit: dist/declarations/src/root-reducer.d.ts 1`] = `
+exports[`typescript with forced dts emit > dist/declarations/src/root-reducer.d.ts 1`] = `
 "export declare const rootReducer: any;
 export type RootState = ReturnType<typeof rootReducer>;
 "
 `;
 
-exports[`typescript with forced dts emit: dist/typescript-force-dts-emit.cjs.d.ts 1`] = `
+exports[`typescript with forced dts emit > dist/typescript-force-dts-emit.cjs.d.ts 1`] = `
 "export * from "./declarations/src/index.js";
 //# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoidHlwZXNjcmlwdC1mb3JjZS1kdHMtZW1pdC5janMuZC50cyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4vZGVjbGFyYXRpb25zL3NyYy9pbmRleC5kLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBIn0=
 "
 `;
 
-exports[`typescript with forced dts emit: dist/typescript-force-dts-emit.cjs.js 1`] = `
-"'use strict';
-
-Object.defineProperty(exports, '__esModule', { value: true });
-
-var toolkit = require('@reduxjs/toolkit');
-
-// @ts-ignore (installed during test)
-var rootReducer = toolkit.combineReducers({
-  /* blah blah blah */
-});
-
-// @ts-ignore (installed during test)
+exports[`typescript with forced dts emit > dist/typescript-force-dts-emit.cjs.js 1`] = `
+"Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+let _reduxjs_toolkit = require("@reduxjs/toolkit");
+//#region src/root-reducer.ts
+var rootReducer = (0, _reduxjs_toolkit.combineReducers)({});
+//#endregion
+//#region src/create-store.ts
 function createStore() {
-  return toolkit.configureStore({
-    reducer: rootReducer
-  });
+	return (0, _reduxjs_toolkit.configureStore)({ reducer: rootReducer });
 }
-
+//#endregion
 exports.createStore = createStore;
 "
 `;
 
-exports[`typescript with forced dts emit: dist/typescript-force-dts-emit.esm.js 1`] = `
-"import { combineReducers, configureStore } from '@reduxjs/toolkit';
-
-// @ts-ignore (installed during test)
-var rootReducer = combineReducers({
-  /* blah blah blah */
-});
-
-// @ts-ignore (installed during test)
+exports[`typescript with forced dts emit > dist/typescript-force-dts-emit.esm.js 1`] = `
+"import { combineReducers, configureStore } from "@reduxjs/toolkit";
+//#region src/root-reducer.ts
+var rootReducer = combineReducers({});
+//#endregion
+//#region src/create-store.ts
 function createStore() {
-  return configureStore({
-    reducer: rootReducer
-  });
+	return configureStore({ reducer: rootReducer });
 }
-
+//#endregion
 export { createStore };
 "
 `;
 
-exports[`using external @babel/runtime helpers: dist/external-babel-runtime.cjs.js 1`] = `
-"'use strict';
-
-Object.defineProperty(exports, '__esModule', { value: true });
-
-var _createClass = require('@babel/runtime/helpers/createClass');
-var _classCallCheck = require('@babel/runtime/helpers/classCallCheck');
-
-var Foo = /*#__PURE__*/_createClass(function Foo() {
-  _classCallCheck(this, Foo);
+exports[`using external @babel/runtime helpers > dist/external-babel-runtime.cjs.js 1`] = `
+"Object.defineProperties(exports, {
+	__esModule: { value: true },
+	[Symbol.toStringTag]: { value: "Module" }
 });
-
-exports["default"] = Foo;
+//#region \\0rolldown/runtime.js
+var __create = Object.create;
+var __defProp = Object.defineProperty;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __getProtoOf = Object.getPrototypeOf;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __copyProps = (to, from, except, desc) => {
+	if (from && typeof from === "object" || typeof from === "function") for (var keys = __getOwnPropNames(from), i = 0, n = keys.length, key; i < n; i++) {
+		key = keys[i];
+		if (!__hasOwnProp.call(to, key) && key !== except) __defProp(to, key, {
+			get: ((k) => from[k]).bind(null, key),
+			enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable
+		});
+	}
+	return to;
+};
+var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", {
+	value: mod,
+	enumerable: true
+}) : target, mod));
+//#endregion
+let _babel_runtime_helpers_createClass = require("@babel/runtime/helpers/createClass");
+_babel_runtime_helpers_createClass = __toESM(_babel_runtime_helpers_createClass);
+let _babel_runtime_helpers_classCallCheck = require("@babel/runtime/helpers/classCallCheck");
+_babel_runtime_helpers_classCallCheck = __toESM(_babel_runtime_helpers_classCallCheck);
+//#region src/index.js
+var Foo = /*#__PURE__*/ (0, _babel_runtime_helpers_createClass.default)(function Foo() {
+	(0, _babel_runtime_helpers_classCallCheck.default)(this, Foo);
+});
+//#endregion
+exports.default = Foo;
 "
 `;
 
-exports[`using external @babel/runtime helpers: dist/external-babel-runtime.esm.js 1`] = `
-"import _createClass from '@babel/runtime/helpers/esm/createClass';
-import _classCallCheck from '@babel/runtime/helpers/esm/classCallCheck';
-
-var Foo = /*#__PURE__*/_createClass(function Foo() {
-  _classCallCheck(this, Foo);
+exports[`using external @babel/runtime helpers > dist/external-babel-runtime.esm.js 1`] = `
+"import _createClass from "@babel/runtime/helpers/esm/createClass";
+import _classCallCheck from "@babel/runtime/helpers/esm/classCallCheck";
+//#region src/index.js
+var Foo = /*#__PURE__*/ _createClass(function Foo() {
+	_classCallCheck(this, Foo);
 });
-
+//#endregion
 export { Foo as default };
 "
 `;
 
-exports[`using external @babel/runtime helpers: package.json 1`] = `
+exports[`using external @babel/runtime helpers > package.json 1`] = `
 {
   "dependencies": {
     "@babel/runtime": "^7.0.0",
@@ -198,4 +209,4 @@ exports[`using external @babel/runtime helpers: package.json 1`] = `
 }
 `;
 
-exports[`using external @babel/runtime helpers: src/index.js 1`] = `"export default class Foo {}"`;
+exports[`using external @babel/runtime helpers > src/index.js 1`] = `"export default class Foo {}"`;

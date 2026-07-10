@@ -1,12 +1,15 @@
 import { getWorker } from "../worker-client";
-import { AcornNode, Plugin } from "rollup";
+import type { Plugin, PluginContext } from "rolldown";
 import QuickLRU from "quick-lru";
 import resolveFrom from "resolve-from";
 import semver from "semver";
+import { createRequire } from "module";
+
+const require = createRequire(import.meta.url);
 
 const lru = new QuickLRU<
   string,
-  { code: string; promise: Promise<{ code: string; map: any; ast: AcornNode }> }
+  { code: string; promise: Promise<{ code: string; map: any; ast: ParsedAst }> }
 >({
   maxSize: 1000,
 });
@@ -16,10 +19,11 @@ let extensionRegex = /\.[tj]sx?$/;
 let externalHelpersCache = new Map<
   string,
   {
-    ast: AcornNode;
     code: string;
   }
 >();
+
+type ParsedAst = ReturnType<PluginContext["parse"]>;
 
 const resolvedBabelCore = require.resolve("@babel/core");
 
@@ -128,7 +132,7 @@ let rollupPluginBabel = ({
           {
             type: "Program",
             body: helperNodes,
-          }
+          } as any
         ).code;
         if (
           helperNodes.every(
@@ -146,7 +150,6 @@ let rollupPluginBabel = ({
         }
 
         helpersSourceDescription = {
-          ast: this.parse(helpers, undefined),
           code: helpers,
         };
         externalHelpersCache.set(helperName, helpersSourceDescription);
@@ -170,7 +173,6 @@ let rollupPluginBabel = ({
             return {
               code: result.code,
               map: result.map,
-              ast,
               meta: {
                 babel: { ast, codeAtBabelTime: result.code },
               },

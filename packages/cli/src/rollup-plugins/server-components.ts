@@ -1,21 +1,27 @@
-import { Plugin, SourceMapInput } from "rollup";
+import type { Plugin, SourceMapInput } from "rolldown";
 import MagicString from "magic-string";
 import normalizePath from "normalize-path";
 import path from "path";
 import { getModuleDirectives } from "./directives";
+import * as fs from "fs-extra";
 
 const internalModulePrefix = "\0preserve boundary:";
 
 export function serverComponentsPlugin({
   sourceMap,
+  root,
 }: {
   sourceMap: boolean;
+  root: string;
 }): Plugin {
   return {
     name: "server-components",
     async resolveId(source, importer, opts) {
       if (source.startsWith("__USE_CLIENT_IMPORT__")) {
         return { id: source, external: true };
+      }
+      if (source.startsWith("\0")) {
+        return null;
       }
       const resolved = await this.resolve(source, importer, {
         ...opts,
@@ -24,16 +30,34 @@ export function serverComponentsPlugin({
       if (resolved === null || resolved.external) {
         return resolved;
       }
-      const loaded = await this.load(resolved);
-      if (
-        typeof loaded.meta.directivePreservedFile === "string" &&
-        importer !== undefined
-      ) {
+      if (resolved.id.startsWith("\0")) {
+        return resolved;
+      }
+      let code: string;
+      try {
+        code = await fs.readFile(resolved.id, "utf8");
+      } catch (err) {
+        if (err.code === "ENOENT") return resolved;
+        throw err;
+      }
+      const directive = getModuleDirectives(code).find(
+        (item) => item.value === "use client" || item.value === "use server"
+      );
+      if (directive !== undefined && importer !== undefined) {
+        const hasDefaultExport = this.parse(code).body.some((node) => {
+          if (node.type === "ExportDefaultDeclaration") return true;
+          if (node.type !== "ExportNamedDeclaration") return false;
+          return node.specifiers.some(
+            (specifier) =>
+              specifier.exported.type === "Identifier" &&
+              specifier.exported.name === "default"
+          );
+        });
         return {
           id:
             internalModulePrefix +
-            (loaded.hasDefaultExport ? "1" : "0") +
-            resolved.id,
+            (hasDefaultExport ? "1" : "0") +
+            normalizePath(path.relative(root, resolved.id)),
         };
       }
       return resolved;
@@ -41,7 +65,10 @@ export function serverComponentsPlugin({
     load(id) {
       if (id.startsWith(internalModulePrefix)) {
         const hasDefaultExport = id[internalModulePrefix.length] === "1";
-        const innerId = id.slice(internalModulePrefix.length + 1);
+        const innerId = path.resolve(
+          root,
+          id.slice(internalModulePrefix.length + 1)
+        );
         const referenceId = this.emitFile({
           type: "chunk",
           id: innerId,

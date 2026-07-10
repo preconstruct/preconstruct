@@ -2,7 +2,7 @@
 // https://github.com/TrySound/rollup-plugin-terser
 import { codeFrameColumns } from "@babel/code-frame";
 import { getWorker } from "../worker-client";
-import { Plugin } from "rollup";
+import type { Plugin } from "rolldown";
 import { MinifyOptions } from "terser";
 
 export default function terser(options: MinifyOptions): Plugin {

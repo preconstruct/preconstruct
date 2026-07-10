@@ -1,25 +1,32 @@
 import { Project } from "../project";
 import { Package } from "../package";
-import { watch } from "rollup";
 import chalk from "chalk";
 import path from "path";
 import ms from "ms";
-import { getRollupConfigs } from "./config";
+import { getRollupConfigs, prepareUmdGlobals } from "./config";
 import { success, info } from "../logger";
 import { successes } from "../messages";
 import { createWorker } from "../worker-client";
 import { validateProject } from "../validate";
 import { cleanProjectBeforeBuild } from "./utils";
+import { watch } from "rolldown";
 
 function relativePath(id: string) {
   return path.relative(process.cwd(), id);
 }
 
 async function watchPackage(pkg: Package) {
+  await prepareUmdGlobals(pkg);
   const _configs = getRollupConfigs(pkg);
 
   let configs = _configs.map((config) => {
-    return { ...config.config, output: config.outputs };
+    return {
+      ...config.config,
+      output: config.outputs.map((output) => ({
+        ...output,
+        dynamicImportInCjs: pkg.project.dynamicImportInCjs,
+      })),
+    };
   });
   const watcher = watch(configs);
   let reject: (reason?: unknown) => void;
@@ -43,20 +50,26 @@ async function watchPackage(pkg: Package) {
         break;
 
       case "BUNDLE_START": {
+        const bundleStartEvent = event as typeof event & {
+          input?: string | string[] | Record<string, string>;
+          output: string[];
+        };
         info(
           chalk.cyan(
             `bundles ${chalk.bold(
-              typeof event.input === "string"
-                ? relativePath(event.input)
-                : Array.isArray(event.input)
-                ? event.input.map(relativePath).join(", ")
-                : event.input === undefined
+              typeof bundleStartEvent.input === "string"
+                ? relativePath(bundleStartEvent.input)
+                : Array.isArray(bundleStartEvent.input)
+                ? bundleStartEvent.input.map(relativePath).join(", ")
+                : bundleStartEvent.input === undefined
                 ? ""
-                : Object.values(event.input)
+                : Object.values(bundleStartEvent.input)
                     // @ts-ignore
                     .map(relativePath)
                     .join(", ")
-            )} → ${chalk.bold(event.output.map(relativePath).join(", "))}...`
+            )} → ${chalk.bold(
+              bundleStartEvent.output.map(relativePath).join(", ")
+            )}...`
           ),
           pkg.name
         );
@@ -80,7 +93,7 @@ async function watchPackage(pkg: Package) {
       }
     }
   });
-  return { error: errPromise, start: startPromise };
+  return { error: errPromise, start: startPromise, close: () => watcher.close() };
 }
 
 async function retryableWatch(
@@ -89,11 +102,15 @@ async function retryableWatch(
   depth: number
 ) {
   try {
-    let { error, start } = await watchPackage(pkg);
-    if (depth === 0) {
-      getPromises({ start });
+    let { error, start, close } = await watchPackage(pkg);
+    try {
+      if (depth === 0) {
+        getPromises({ start });
+      }
+      await error;
+    } finally {
+      await close();
     }
-    await error;
   } catch (err) {
     if (err instanceof Promise) {
       await err;
@@ -105,7 +122,7 @@ async function retryableWatch(
 }
 
 export default async function build(directory: string) {
-  createWorker();
+  await createWorker();
   let project = await Project.create(directory);
   validateProject(project);
   await cleanProjectBeforeBuild(project);

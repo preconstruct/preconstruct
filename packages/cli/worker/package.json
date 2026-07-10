@@ -1,4 +1,0 @@
-{
-  "main": "dist/preconstruct-cli-worker.cjs.js",
-  "module": "dist/preconstruct-cli-worker.esm.js"
-}
