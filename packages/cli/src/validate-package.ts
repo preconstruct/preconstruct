@@ -31,22 +31,6 @@ export function validatePackage(pkg: Package) {
     if (!fields.module && !pkg.isTypeModule()) {
       throw new FixableError(errors.noModuleFieldWithExportsField, pkg.name);
     }
-    if (exportsFieldConfig.conditions.kind === "legacy") {
-      const hasField = fields.browser;
-      const hasCondition = exportsFieldConfig.conditions.envs.has("browser");
-      if (hasField && !hasCondition) {
-        throw new FixableError(
-          errors.missingBrowserConditionWithFieldPresent,
-          pkg.name
-        );
-      }
-      if (!hasField && hasCondition) {
-        throw new FixableError(
-          errors.missingBrowserFieldWithConditionPresent,
-          pkg.name
-        );
-      }
-    }
   }
 
   if (!isFieldValid.exports(pkg)) {

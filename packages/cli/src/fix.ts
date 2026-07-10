@@ -29,21 +29,6 @@ async function fixPackage(pkg: Package): Promise<() => Promise<boolean>> {
     browser: pkg.entrypoints.some((x) => x.json.browser !== undefined),
   };
 
-  if (exportsFieldConfig?.conditions.kind === "legacy") {
-    if (fields.browser || exportsFieldConfig.conditions.envs.has("browser")) {
-      if (typeof pkg.json.preconstruct.exports !== "object") {
-        pkg.json.preconstruct.exports = {};
-      }
-      if (!pkg.json.preconstruct.exports.envConditions) {
-        pkg.json.preconstruct.exports.envConditions = [];
-      }
-      if (!pkg.json.preconstruct.exports.envConditions.includes("browser")) {
-        pkg.json.preconstruct.exports.envConditions.push("browser");
-      }
-      fields.browser = true;
-    }
-  }
-
   if (pkg.isTypeModule()) {
     keys(fields).forEach((field) => {
       if (fields[field]) {

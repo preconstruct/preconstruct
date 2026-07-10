@@ -5,7 +5,6 @@ import {
   dtsTemplate,
   flowTemplate,
   validFieldsForEntrypoint,
-  getExportsFieldOutputPath,
   getExportsImportUnwrappingDefaultOutputPath,
   dmtsTemplate,
   mjsTemplate,
@@ -362,18 +361,6 @@ export default async function dev(projectDir: string) {
                 path.join(
                   entrypoint.directory,
                   validFieldsForEntrypoint.module(entrypoint)
-                )
-              )
-            );
-          }
-
-          if (exportsFieldConfig?.conditions.envs.has("worker")) {
-            entrypointPromises.push(
-              fs.symlink(
-                entrypoint.source,
-                path.join(
-                  pkg.directory,
-                  getExportsFieldOutputPath(entrypoint, "worker")
                 )
               )
             );

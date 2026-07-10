@@ -1,28 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`basic: valid-package.cjs.dev.js 1`] = `
-"'use strict';
-
-Object.defineProperty(exports, '__esModule', { value: true });
-
-var index = "something";
-
-exports["default"] = index;
-"
-`;
-
 exports[`basic: valid-package.cjs.js 1`] = `
-"'use strict';
-
-if (process.env.NODE_ENV === "production") {
-  module.exports = require("./valid-package.cjs.prod.js");
-} else {
-  module.exports = require("./valid-package.cjs.dev.js");
-}
-"
-`;
-
-exports[`basic: valid-package.cjs.prod.js 1`] = `
 "'use strict';
 
 Object.defineProperty(exports, '__esModule', { value: true });
@@ -59,33 +37,7 @@ exports[`typescript thing: weird-typescript-thing.cjs.d.ts 1`] = `
 "
 `;
 
-exports[`typescript thing: weird-typescript-thing.cjs.dev.js 1`] = `
-"'use strict';
-
-Object.defineProperty(exports, '__esModule', { value: true });
-
-const thing$1 = () => "wow";
-
-const makeThing = () => thing$1();
-
-const thing = makeThing();
-
-exports.thing = thing;
-"
-`;
-
 exports[`typescript thing: weird-typescript-thing.cjs.js 1`] = `
-"'use strict';
-
-if (process.env.NODE_ENV === "production") {
-  module.exports = require("./weird-typescript-thing.cjs.prod.js");
-} else {
-  module.exports = require("./weird-typescript-thing.cjs.dev.js");
-}
-"
-`;
-
-exports[`typescript thing: weird-typescript-thing.cjs.prod.js 1`] = `
 "'use strict';
 
 Object.defineProperty(exports, '__esModule', { value: true });

@@ -734,26 +734,10 @@ describe("exports field config", () => {
         `[Error: the "preconstruct.exports.extra" field must be an object if it is present]`
       );
     });
-    test("envConditions not array", async () => {
+    test("envConditions is no longer supported", async () => {
       const tmpPath = await exportsFieldConfigTestDir({ envConditions: {} });
       await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
-        `[Error: the "preconstruct.exports.envConditions" field must be an array containing zero or more of "worker" and "browser" if it is present]`
-      );
-    });
-    test("envConditions duplicates", async () => {
-      const tmpPath = await exportsFieldConfigTestDir({
-        envConditions: ["worker", "worker"],
-      });
-      await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
-        `[Error: the "preconstruct.exports.envConditions" field must not have duplicates]`
-      );
-    });
-    test("envConditions invalid condition", async () => {
-      const tmpPath = await exportsFieldConfigTestDir({
-        envConditions: ["worker", "asfdasfd"],
-      });
-      await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
-        `[Error: the "preconstruct.exports.envConditions" field must be an array containing zero or more of "worker" and "browser" if it is present]`
+        `[Error: the "preconstruct.exports" field contains an unknown key "envConditions"]`
       );
     });
     test("unknown key", async () => {
@@ -777,15 +761,7 @@ describe("exports field config", () => {
   describe("true", () => {
     const configsEquivalentToTrue = [
       {},
-      { envConditions: [] },
-      { envConditions: [], extra: {} },
       { extra: {} },
-      { envConditions: [], importConditionDefaultExport: "namespace" },
-      {
-        envConditions: [],
-        extra: {},
-        importConditionDefaultExport: "namespace",
-      },
       { extra: {}, importConditionDefaultExport: "namespace" },
       { importConditionDefaultExport: "namespace" },
       true,
@@ -899,7 +875,7 @@ describe("project level exports field config", () => {
         envConditions: ["browser"],
       });
       await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
-        `[Error: the "preconstruct.exports.envConditions" field can only be configured at the package level]`
+        `[Error: the "preconstruct.exports" field contains an unknown key "envConditions"]`
       );
     });
     test("unknown key", async () => {
@@ -998,12 +974,12 @@ test("has browser field but no browser condition", async () => {
     "src/index.js": "",
   });
   await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(`
-          [Error: 🎁 pkg-a the exports field is configured and the browser field exists in this package but it is not specified in the preconstruct.exports.envConditions field
-          🎁 pkg-a browser field is invalid, found \`{"./dist/pkg-a.cjs.js":"./dist/pkg-a.browser.cjs.js","./dist/pkg-a.esm.js":"./dist/pkg-a.browser.esm.js"}\`, expected \`{"./dist/pkg-a.esm.js":"./dist/pkg-a.browser.esm.js"}\`]
-        `);
+    [Error: 🎁 pkg-a exports field was not found, expected \`{".":{"module":"./dist/pkg-a.esm.js","default":"./dist/pkg-a.cjs.js"},"./package.json":"./package.json"}\`
+    🎁 pkg-a browser field is invalid, found \`{"./dist/pkg-a.cjs.js":"./dist/pkg-a.browser.cjs.js","./dist/pkg-a.esm.js":"./dist/pkg-a.browser.esm.js"}\`, expected \`{"./dist/pkg-a.esm.js":"./dist/pkg-a.browser.esm.js"}\`]
+  `);
 });
 
-test("has browser condition but no browser field", async () => {
+test("envConditions is rejected", async () => {
   const tmpPath = await testdir({
     "package.json": JSON.stringify({
       name: "pkg-a",
@@ -1019,7 +995,7 @@ test("has browser condition but no browser field", async () => {
     "src/index.js": "",
   });
   await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
-    `[Error: the exports field is configured and the browser condition is set in preconstruct.exports.envConditions but the field is not present at the top-level]`
+    `[Error: the "preconstruct.exports" field contains an unknown key "envConditions"]`
   );
 });
 

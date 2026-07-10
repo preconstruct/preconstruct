@@ -147,15 +147,13 @@ export type ExportsConditions = {
   default: string;
 };
 
-type EnvCondition = "browser" | "worker";
-
 export class Package extends Item<{
   name?: JSONValue;
   type?: JSONValue;
   preconstruct: {
     exports?: {
       extra?: Record<string, JSONValue>;
-      envConditions?: EnvCondition[];
+      importConditionDefaultExport?: "namespace" | "default";
     };
     tsconfig?: string;
     entrypoints?: JSONValue;
@@ -414,7 +412,7 @@ export type CanonicalExportsFieldConfig = {
   extra: Record<string, JSONValue>;
   importConditionDefaultExport: "namespace" | "default";
   conditions:
-    | { kind: "legacy"; envs: Set<"worker" | "browser"> }
+    | { kind: "legacy" }
     | { kind: "imports"; groups: Map<string[], [string[], ...string[][]]> };
 };
 
@@ -435,7 +433,7 @@ function parseExportsFieldConfig(
   const parsedConfig: CanonicalExportsFieldConfig = {
     conditions:
       importsConditions === false
-        ? { kind: "legacy", envs: new Set() }
+        ? { kind: "legacy" }
         : { kind: "imports", groups: importsConditions },
     extra: {},
     importConditionDefaultExport:
@@ -463,32 +461,6 @@ function parseExportsFieldConfig(
       } else {
         throw new FatalError(
           'the "preconstruct.exports.extra" field must be an object if it is present',
-          name
-        );
-      }
-    } else if (key === "envConditions") {
-      if (parsedConfig.conditions.kind !== "legacy") {
-        throw new FatalError(
-          'the "preconstruct.exports.envConditions" field is not supported when the imports conditions feature is enabled',
-          name
-        );
-      }
-      if (
-        Array.isArray(value) &&
-        value.every(
-          (v): v is "worker" | "browser" => v === "worker" || v === "browser"
-        )
-      ) {
-        parsedConfig.conditions.envs = new Set(value);
-        if (parsedConfig.conditions.envs.size !== value.length) {
-          throw new FatalError(
-            'the "preconstruct.exports.envConditions" field must not have duplicates',
-            name
-          );
-        }
-      } else {
-        throw new FatalError(
-          'the "preconstruct.exports.envConditions" field must be an array containing zero or more of "worker" and "browser" if it is present',
           name
         );
       }

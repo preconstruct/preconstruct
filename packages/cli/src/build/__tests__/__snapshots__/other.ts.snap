@@ -6,24 +6,6 @@ exports[`browser no module: dist/browser-no-module.browser.cjs.js 1`] = `
 Object.defineProperty(exports, '__esModule', { value: true });
 
 let thing = "wow";
-{
-  thing = "something";
-}
-{
-  thing += "other";
-}
-var thing$1 = thing;
-
-exports["default"] = thing$1;
-"
-`;
-
-exports[`browser no module: dist/browser-no-module.cjs.dev.js 1`] = `
-"'use strict';
-
-Object.defineProperty(exports, '__esModule', { value: true });
-
-let thing = "wow";
 if (typeof window !== "undefined") {
   thing = "something";
 }
@@ -37,17 +19,6 @@ exports["default"] = thing$1;
 `;
 
 exports[`browser no module: dist/browser-no-module.cjs.js 1`] = `
-"'use strict';
-
-if (process.env.NODE_ENV === "production") {
-  module.exports = require("./browser-no-module.cjs.prod.js");
-} else {
-  module.exports = require("./browser-no-module.cjs.dev.js");
-}
-"
-`;
-
-exports[`browser no module: dist/browser-no-module.cjs.prod.js 1`] = `
 "'use strict';
 
 Object.defineProperty(exports, '__esModule', { value: true });
@@ -94,29 +65,7 @@ if (typeof document !== undefined) {
 export default thing;"
 `;
 
-exports[`should lazily get globals: dist/umd-unused-peer-dep.cjs.dev.js 1`] = `
-"'use strict';
-
-Object.defineProperty(exports, '__esModule', { value: true });
-
-var index = "something";
-
-exports["default"] = index;
-"
-`;
-
 exports[`should lazily get globals: dist/umd-unused-peer-dep.cjs.js 1`] = `
-"'use strict';
-
-if (process.env.NODE_ENV === "production") {
-  module.exports = require("./umd-unused-peer-dep.cjs.prod.js");
-} else {
-  module.exports = require("./umd-unused-peer-dep.cjs.dev.js");
-}
-"
-`;
-
-exports[`should lazily get globals: dist/umd-unused-peer-dep.cjs.prod.js 1`] = `
 "'use strict';
 
 Object.defineProperty(exports, '__esModule', { value: true });
@@ -163,41 +112,7 @@ exports[`typescript with forced dts emit: dist/typescript-force-dts-emit.cjs.d.t
 "
 `;
 
-exports[`typescript with forced dts emit: dist/typescript-force-dts-emit.cjs.dev.js 1`] = `
-"'use strict';
-
-Object.defineProperty(exports, '__esModule', { value: true });
-
-var toolkit = require('@reduxjs/toolkit');
-
-// @ts-ignore (installed during test)
-var rootReducer = toolkit.combineReducers({
-  /* blah blah blah */
-});
-
-// @ts-ignore (installed during test)
-function createStore() {
-  return toolkit.configureStore({
-    reducer: rootReducer
-  });
-}
-
-exports.createStore = createStore;
-"
-`;
-
 exports[`typescript with forced dts emit: dist/typescript-force-dts-emit.cjs.js 1`] = `
-"'use strict';
-
-if (process.env.NODE_ENV === "production") {
-  module.exports = require("./typescript-force-dts-emit.cjs.prod.js");
-} else {
-  module.exports = require("./typescript-force-dts-emit.cjs.dev.js");
-}
-"
-`;
-
-exports[`typescript with forced dts emit: dist/typescript-force-dts-emit.cjs.prod.js 1`] = `
 "'use strict';
 
 Object.defineProperty(exports, '__esModule', { value: true });
@@ -239,34 +154,7 @@ export { createStore };
 "
 `;
 
-exports[`using external @babel/runtime helpers: dist/external-babel-runtime.cjs.dev.js 1`] = `
-"'use strict';
-
-Object.defineProperty(exports, '__esModule', { value: true });
-
-var _createClass = require('@babel/runtime/helpers/createClass');
-var _classCallCheck = require('@babel/runtime/helpers/classCallCheck');
-
-var Foo = /*#__PURE__*/_createClass(function Foo() {
-  _classCallCheck(this, Foo);
-});
-
-exports["default"] = Foo;
-"
-`;
-
 exports[`using external @babel/runtime helpers: dist/external-babel-runtime.cjs.js 1`] = `
-"'use strict';
-
-if (process.env.NODE_ENV === "production") {
-  module.exports = require("./external-babel-runtime.cjs.prod.js");
-} else {
-  module.exports = require("./external-babel-runtime.cjs.dev.js");
-}
-"
-`;
-
-exports[`using external @babel/runtime helpers: dist/external-babel-runtime.cjs.prod.js 1`] = `
 "'use strict';
 
 Object.defineProperty(exports, '__esModule', { value: true });

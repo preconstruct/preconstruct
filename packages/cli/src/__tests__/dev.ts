@@ -1,7 +1,6 @@
 import spawn from "spawndamnit";
 import path from "path";
 import * as fs from "fs-extra";
-import * as realFs from "fs";
 import {
   getFiles,
   js,
@@ -290,50 +289,6 @@ test("typescript", async () => {
 
     export { obj };
   `);
-});
-
-test("exports field with worker condition", async () => {
-  let tmpPath = realFs.realpathSync.native(
-    await testdir({
-      "package.json": JSON.stringify({
-        name: "@something/blah",
-        main: "dist/something-blah.cjs.js",
-        module: "dist/something-blah.esm.js",
-        exports: {
-          ".": {
-            module: {
-              worker: "./dist/something-blah.worker.esm.js",
-              default: "./dist/something-blah.esm.js",
-            },
-            default: "./dist/something-blah.cjs.js",
-          },
-          "./package.json": "./package.json",
-        },
-        preconstruct: {
-          exports: {
-            envConditions: ["worker"],
-          },
-        },
-      }),
-      "src/index.js": 'console.log("1")',
-    })
-  );
-  await dev(tmpPath);
-  const files = await getFiles(tmpPath, [
-    "dist/**",
-    "!dist/something-blah.cjs.js",
-  ]);
-  expect(files).toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/something-blah.esm.js, dist/something-blah.worker.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    ⎯ symlink to src/index.js
-  `);
-  await Promise.all(
-    Object.keys(files).map(async (filename) => {
-      expect(await fs.realpath(path.join(tmpPath, filename))).toEqual(
-        path.join(tmpPath, "src/index.js")
-      );
-    })
-  );
 });
 
 test("flow and .d.ts", async () => {

@@ -146,7 +146,7 @@ export function getRollupConfigs(pkg: Package) {
     config: getRollupConfig(
       pkg,
       pkg.entrypoints,
-      { kind: "node-dev" },
+      { kind: "node" },
       pkg.project.experimentalFlags.logCompiledFiles
         ? (filename) => {
             logger.info(
@@ -159,8 +159,8 @@ export function getRollupConfigs(pkg: Package) {
     outputs: [
       {
         format: "cjs" as const,
-        entryFileNames: "[name].cjs.dev.js",
-        chunkFileNames: "dist/[name]-[hash].cjs.dev.js",
+        entryFileNames: `[name].${getDistExtension("cjs")}`,
+        chunkFileNames: `dist/[name]-[hash].${getDistExtension("cjs")}`,
         dir: pkg.directory,
         exports: "named" as const,
         interop,
@@ -175,25 +175,6 @@ export function getRollupConfigs(pkg: Package) {
             },
           ]
         : []),
-    ],
-  });
-
-  configs.push({
-    config: getRollupConfig(
-      pkg,
-      pkg.entrypoints,
-      { kind: "node-prod" },
-      () => {}
-    ),
-    outputs: [
-      {
-        format: "cjs",
-        entryFileNames: "[name].cjs.prod.js",
-        chunkFileNames: "dist/[name]-[hash].cjs.prod.js",
-        dir: pkg.directory,
-        exports: "named",
-        interop,
-      },
     ],
   });
 
@@ -229,29 +210,6 @@ export function getRollupConfigs(pkg: Package) {
       ].filter(
         (value): value is Exclude<typeof value, false> => value !== false
       ),
-    });
-  }
-
-  // note module builds always exist when using the exports field
-  if (
-    exportsFieldConfig?.conditions.kind === "legacy" &&
-    exportsFieldConfig?.conditions.envs.has("worker")
-  ) {
-    configs.push({
-      config: getRollupConfig(
-        pkg,
-        pkg.entrypoints,
-        { kind: "worker" },
-        () => {}
-      ),
-      outputs: [
-        {
-          format: "es" as const,
-          entryFileNames: `[name].${getDistExtension("worker")}`,
-          chunkFileNames: `dist/[name]-[hash].${getDistExtension("worker")}`,
-          dir: pkg.directory,
-        },
-      ],
     });
   }
 

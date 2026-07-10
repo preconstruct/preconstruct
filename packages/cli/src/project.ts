@@ -180,7 +180,7 @@ export class Project extends Item<{
         );
         continue;
       }
-      if (key === "extra" || key === "envConditions") {
+      if (key === "extra") {
         throw new FatalError(
           `the "preconstruct.exports.${key}" field can only be configured at the package level`,
           this.name

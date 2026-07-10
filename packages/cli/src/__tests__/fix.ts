@@ -88,9 +88,7 @@ test("set exports field when opt-in", async () => {
       module: "dist/package-exports.esm.js",
       preconstruct: {
         imports: false,
-        exports: {
-          envConditions: ["worker", "browser"],
-        },
+        exports: true,
       },
     }),
     "src/index.js": "",
@@ -104,28 +102,16 @@ test("set exports field when opt-in", async () => {
       "name": "package-exports",
       "main": "dist/package-exports.cjs.js",
       "module": "dist/package-exports.esm.js",
-      "browser": {
-        "./dist/package-exports.esm.js": "./dist/package-exports.browser.esm.js"
-      },
       "exports": {
         ".": {
-          "module": {
-            "worker": "./dist/package-exports.worker.esm.js",
-            "browser": "./dist/package-exports.browser.esm.js",
-            "default": "./dist/package-exports.esm.js"
-          },
+          "module": "./dist/package-exports.esm.js",
           "default": "./dist/package-exports.cjs.js"
         },
         "./package.json": "./package.json"
       },
       "preconstruct": {
         "imports": false,
-        "exports": {
-          "envConditions": [
-            "worker",
-            "browser"
-          ]
-        }
+        "exports": true
       }
     }
 
@@ -140,9 +126,7 @@ test("set exports field when opt-in", async () => {
       module: "dist/package-exports.esm.js",
       preconstruct: {
         imports: false,
-        exports: {
-          envConditions: ["worker", "browser"],
-        },
+        exports: true,
       },
     }),
     "src/index.js": "",
@@ -156,35 +140,23 @@ test("set exports field when opt-in", async () => {
       "name": "package-exports",
       "main": "dist/package-exports.cjs.js",
       "module": "dist/package-exports.esm.js",
-      "browser": {
-        "./dist/package-exports.esm.js": "./dist/package-exports.browser.esm.js"
-      },
       "exports": {
         ".": {
-          "module": {
-            "worker": "./dist/package-exports.worker.esm.js",
-            "browser": "./dist/package-exports.browser.esm.js",
-            "default": "./dist/package-exports.esm.js"
-          },
+          "module": "./dist/package-exports.esm.js",
           "default": "./dist/package-exports.cjs.js"
         },
         "./package.json": "./package.json"
       },
       "preconstruct": {
         "imports": false,
-        "exports": {
-          "envConditions": [
-            "worker",
-            "browser"
-          ]
-        }
+        "exports": true
       }
     }
 
   `);
 });
 
-test("set exports field when opt-in with no env conditions", async () => {
+test("set exports field when opt-in", async () => {
   let tmpPath = await testdir({
     "package.json": JSON.stringify({
       name: "package-exports",
@@ -230,9 +202,7 @@ test("set exports field with multiple entrypoints", async () => {
       preconstruct: {
         entrypoints: ["index.js", "other.js", "deep/something.js"],
         imports: false,
-        exports: {
-          envConditions: ["worker", "browser"],
-        },
+        exports: true,
       },
     }),
     "other/package.json": JSON.stringify({}),
@@ -248,19 +218,13 @@ test("set exports field with multiple entrypoints", async () => {
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ deep/something/package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     {
       "main": "dist/blah-something-deep-something.cjs.js",
-      "module": "dist/blah-something-deep-something.esm.js",
-      "browser": {
-        "./dist/blah-something-deep-something.esm.js": "./dist/blah-something-deep-something.browser.esm.js"
-      }
+      "module": "dist/blah-something-deep-something.esm.js"
     }
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ other/package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     {
       "main": "dist/blah-something-other.cjs.js",
-      "module": "dist/blah-something-other.esm.js",
-      "browser": {
-        "./dist/blah-something-other.esm.js": "./dist/blah-something-other.browser.esm.js"
-      }
+      "module": "dist/blah-something-other.esm.js"
     }
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
@@ -268,32 +232,17 @@ test("set exports field with multiple entrypoints", async () => {
       "name": "@blah/something",
       "main": "dist/blah-something.cjs.js",
       "module": "dist/blah-something.esm.js",
-      "browser": {
-        "./dist/blah-something.esm.js": "./dist/blah-something.browser.esm.js"
-      },
       "exports": {
         ".": {
-          "module": {
-            "worker": "./dist/blah-something.worker.esm.js",
-            "browser": "./dist/blah-something.browser.esm.js",
-            "default": "./dist/blah-something.esm.js"
-          },
+          "module": "./dist/blah-something.esm.js",
           "default": "./dist/blah-something.cjs.js"
         },
         "./other": {
-          "module": {
-            "worker": "./other/dist/blah-something-other.worker.esm.js",
-            "browser": "./other/dist/blah-something-other.browser.esm.js",
-            "default": "./other/dist/blah-something-other.esm.js"
-          },
+          "module": "./other/dist/blah-something-other.esm.js",
           "default": "./other/dist/blah-something-other.cjs.js"
         },
         "./deep/something": {
-          "module": {
-            "worker": "./deep/something/dist/blah-something-deep-something.worker.esm.js",
-            "browser": "./deep/something/dist/blah-something-deep-something.browser.esm.js",
-            "default": "./deep/something/dist/blah-something-deep-something.esm.js"
-          },
+          "module": "./deep/something/dist/blah-something-deep-something.esm.js",
           "default": "./deep/something/dist/blah-something-deep-something.cjs.js"
         },
         "./package.json": "./package.json"
@@ -305,12 +254,7 @@ test("set exports field with multiple entrypoints", async () => {
           "deep/something.js"
         ],
         "imports": false,
-        "exports": {
-          "envConditions": [
-            "worker",
-            "browser"
-          ]
-        }
+        "exports": true
       }
     }
 
@@ -326,9 +270,7 @@ test("set exports field without root entrypoint", async () => {
           preconstruct: {
             entrypoints: ["other.js"],
             imports: false,
-            exports: {
-              envConditions: ["worker", "browser"],
-            },
+            exports: true,
           },
         },
         null,
@@ -344,10 +286,7 @@ test("set exports field without root entrypoint", async () => {
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ other/package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     {
       "main": "dist/blah-something-other.cjs.js",
-      "module": "dist/blah-something-other.esm.js",
-      "browser": {
-        "./dist/blah-something-other.esm.js": "./dist/blah-something-other.browser.esm.js"
-      }
+      "module": "dist/blah-something-other.esm.js"
     }
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
@@ -358,20 +297,11 @@ test("set exports field without root entrypoint", async () => {
           "other.js"
         ],
         "imports": false,
-        "exports": {
-          "envConditions": [
-            "worker",
-            "browser"
-          ]
-        }
+        "exports": true
       },
       "exports": {
         "./other": {
-          "module": {
-            "worker": "./other/dist/blah-something-other.worker.esm.js",
-            "browser": "./other/dist/blah-something-other.browser.esm.js",
-            "default": "./other/dist/blah-something-other.esm.js"
-          },
+          "module": "./other/dist/blah-something-other.esm.js",
           "default": "./other/dist/blah-something-other.cjs.js"
         },
         "./package.json": "./package.json"
@@ -881,28 +811,21 @@ test("has browser field but no browser condition", async () => {
       },
       "exports": {
         ".": {
-          "module": {
-            "browser": "./dist/pkg-a.browser.esm.js",
-            "default": "./dist/pkg-a.esm.js"
-          },
+          "module": "./dist/pkg-a.esm.js",
           "default": "./dist/pkg-a.cjs.js"
         },
         "./package.json": "./package.json"
       },
       "preconstruct": {
         "imports": false,
-        "exports": {
-          "envConditions": [
-            "browser"
-          ]
-        }
+        "exports": true
       }
     }
 
   `);
 });
 
-test("has browser condition but no browser field", async () => {
+test("envConditions is rejected", async () => {
   const tmpPath = await testdir({
     "package.json": JSON.stringify({
       name: "pkg-a",
@@ -918,37 +841,9 @@ test("has browser condition but no browser field", async () => {
     "src/index.js": "",
   });
 
-  await fix(tmpPath);
-  expect(await getFiles(tmpPath, ["package.json"])).toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    {
-      "name": "pkg-a",
-      "main": "dist/pkg-a.cjs.js",
-      "module": "dist/pkg-a.esm.js",
-      "browser": {
-        "./dist/pkg-a.esm.js": "./dist/pkg-a.browser.esm.js"
-      },
-      "exports": {
-        ".": {
-          "module": {
-            "browser": "./dist/pkg-a.browser.esm.js",
-            "default": "./dist/pkg-a.esm.js"
-          },
-          "default": "./dist/pkg-a.cjs.js"
-        },
-        "./package.json": "./package.json"
-      },
-      "preconstruct": {
-        "imports": false,
-        "exports": {
-          "envConditions": [
-            "browser"
-          ]
-        }
-      }
-    }
-
-  `);
+  await expect(fix(tmpPath)).rejects.toMatchInlineSnapshot(
+    `[Error: the "preconstruct.exports" field contains an unknown key "envConditions"]`
+  );
 });
 
 test("preconstruct.exports: true no exports field", async () => {
@@ -1301,7 +1196,7 @@ test("nothing is written when another package's fixing throws an error", async (
     "packages/pkg-b/src/index.js": ``,
   });
   await expect(fix(tmpPath)).rejects.toMatchInlineSnapshot(
-    `[Error: the "preconstruct.exports.envConditions" field is not supported when the imports conditions feature is enabled]`
+    `[Error: the "preconstruct.exports" field contains an unknown key "envConditions"]`
   );
   expect(await getFiles(tmpPath, ["packages/*/package.json"]))
     .toMatchInlineSnapshot(`

@@ -2,7 +2,6 @@ import resolve from "@rollup/plugin-node-resolve";
 // @ts-ignore
 import alias from "@rollup/plugin-alias";
 import cjs from "@rollup/plugin-commonjs";
-import replace from "@rollup/plugin-replace";
 import chalk from "chalk";
 import path from "path";
 import builtInModules from "builtin-modules";
@@ -11,7 +10,6 @@ import { Entrypoint } from "../entrypoint";
 import { RollupOptions, Plugin } from "rollup";
 import { FatalError, BatchError } from "../errors";
 import rewriteBabelRuntimeHelpers from "../rollup-plugins/rewrite-babel-runtime-helpers";
-import nodeDevProdEntry from "../rollup-plugins/prod-dev-entry";
 import typescriptDeclarations from "../rollup-plugins/typescript-declarations";
 import mjsProxy from "../rollup-plugins/mjs-proxy";
 import json from "@rollup/plugin-json";
@@ -19,7 +17,6 @@ import babel from "../rollup-plugins/babel";
 import terser from "../rollup-plugins/terser";
 import { getBaseDistName } from "../utils";
 import { EXTENSIONS } from "../constants";
-import { inlineProcessEnvNodeEnv } from "../rollup-plugins/inline-process-env-node-env";
 import normalizePath from "normalize-path";
 import { serverComponentsPlugin } from "../rollup-plugins/server-components";
 import { resolveErrorsPlugin } from "../rollup-plugins/resolve";
@@ -40,9 +37,7 @@ const makeExternalPredicate = (externalArr: string[]): ExternalPredicate => {
 type BasicRollupConfigType =
   | "umd"
   | "browser"
-  | "worker"
-  | "node-dev"
-  | "node-prod";
+  | "node";
 
 export let getRollupConfig = (
   pkg: Package,
@@ -69,8 +64,7 @@ export let getRollupConfig = (
     inner;
 
   if (
-    options.kind === "node-dev" ||
-    options.kind === "node-prod" ||
+    options.kind === "node" ||
     options.kind === "conditions"
   ) {
     external.push(...builtInModules);
@@ -148,12 +142,11 @@ export let getRollupConfig = (
           }
         },
       } as Plugin,
-      options.kind === "node-prod" && nodeDevProdEntry(),
-      (options.kind === "node-prod" || isDefaultConditionsBuild) && flow(),
+      (options.kind === "node" || isDefaultConditionsBuild) && flow(),
       resolveErrorsPlugin(pkg, warnings, options.kind === "umd"),
-      (options.kind === "node-prod" || isDefaultConditionsBuild) &&
+      (options.kind === "node" || isDefaultConditionsBuild) &&
         typescriptDeclarations(pkg),
-      (options.kind === "node-prod" || options.kind === "conditions") &&
+      (options.kind === "node" || options.kind === "conditions") &&
         pkg.exportsFieldConfig()?.importConditionDefaultExport === "default" &&
         mjsProxy(pkg),
       serverComponentsPlugin({ sourceMap: options.kind === "umd" }),
@@ -194,29 +187,10 @@ export let getRollupConfig = (
         browser: options.kind === "umd",
         moduleDirectories: options.kind === "umd" ? ["node_modules"] : [],
       }),
-      options.kind === "umd" && inlineProcessEnvNodeEnv({ sourceMap: true }),
       options.kind === "umd" &&
         terser({
           sourceMap: true,
           compress: true,
-        }),
-      options.kind === "node-prod" &&
-        inlineProcessEnvNodeEnv({ sourceMap: false }),
-      (options.kind === "browser" || options.kind === "umd") &&
-        replace({
-          values: {
-            ["typeof " + "document"]: JSON.stringify("object"),
-            ["typeof " + "window"]: JSON.stringify("object"),
-          },
-          preventAssignment: true,
-        }),
-      options.kind === "worker" &&
-        replace({
-          values: {
-            ["typeof " + "document"]: JSON.stringify("undefined"),
-            ["typeof " + "window"]: JSON.stringify("undefined"),
-          },
-          preventAssignment: true,
         }),
       pkg.project.dynamicImportInCjs && cjsDynamicImportPlugin,
     ].filter((x): x is Plugin => !!x),

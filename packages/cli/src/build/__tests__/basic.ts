@@ -158,7 +158,7 @@ test("typescript declarationMap", async () => {
     export * from "./declarations/src/index.js";
     //# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoidHlwZXNjcmlwdC1kZWNsYXJhdGlvbk1hcC5janMuZC50cyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4vZGVjbGFyYXRpb25zL3NyYy9pbmRleC5kLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBIn0=
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript-declarationMap.cjs.dev.js, dist/typescript-declarationMap.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript-declarationMap.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     Object.defineProperty(exports, '__esModule', { value: true });
@@ -166,15 +166,6 @@ test("typescript declarationMap", async () => {
     const thing = "wow";
 
     exports.thing = thing;
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript-declarationMap.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    if (process.env.NODE_ENV === "production") {
-      module.exports = require("./typescript-declarationMap.cjs.prod.js");
-    } else {
-      module.exports = require("./typescript-declarationMap.cjs.dev.js");
-    }
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript-declarationMap.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     const thing = "wow";
@@ -184,7 +175,7 @@ test("typescript declarationMap", async () => {
   `);
 });
 
-test("process.env.NODE_ENV reassignment", async () => {
+test("preserves process.env.NODE_ENV reads and assignments", async () => {
   const dir = await testdir({
     "package.json": JSON.stringify({
       name: "test",
@@ -199,72 +190,12 @@ test("process.env.NODE_ENV reassignment", async () => {
   });
   await build(dir);
   expect(await getDist(dir)).toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.dev.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     process.env.NODE_ENV = "development";
     something12.process.env.NODE_ENV = "development";
     console.log(process.env.NODE_ENV);
-    console.log(something.process.env.NODE_ENV);
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    if (process.env.NODE_ENV === "production") {
-      module.exports = require("./test.cjs.prod.js");
-    } else {
-      module.exports = require("./test.cjs.dev.js");
-    }
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    process.env.NODE_ENV = "development";
-    something12.process.env.NODE_ENV = "development";
-    console.log(        "production");
-    console.log(something.process.env.NODE_ENV);
-
-  `);
-});
-
-test("process.env.NODE_ENV reassignment new approach", async () => {
-  const dir = await testdir({
-    "package.json": JSON.stringify({
-      name: "test",
-      main: "dist/test.cjs.js",
-    }),
-    "src/index.js": js`
-      process.env.NODE_ENV = "development";
-      something12.process.env.NODE_ENV = "development";
-      console.log(process.env.NODE_ENV);
-      console.log(something.process.env.NODE_ENV);
-    `,
-  });
-  await build(dir);
-  expect(await getDist(dir)).toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.dev.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    process.env.NODE_ENV = "development";
-    something12.process.env.NODE_ENV = "development";
-    console.log(process.env.NODE_ENV);
-    console.log(something.process.env.NODE_ENV);
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    if (process.env.NODE_ENV === "production") {
-      module.exports = require("./test.cjs.prod.js");
-    } else {
-      module.exports = require("./test.cjs.dev.js");
-    }
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    process.env.NODE_ENV = "development";
-    something12.process.env.NODE_ENV = "development";
-    console.log(        "production");
     console.log(something.process.env.NODE_ENV);
 
   `);
@@ -284,7 +215,7 @@ test("does not duplicate babel helpers", async () => {
   });
   await build(dir);
   expect(await getDist(dir)).toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.dev.js, dist/test.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     Object.defineProperty(exports, '__esModule', { value: true });
@@ -332,15 +263,6 @@ test("does not duplicate babel helpers", async () => {
     exports.Other = Other;
     exports.Thing = Thing;
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    if (process.env.NODE_ENV === "production") {
-      module.exports = require("./test.cjs.prod.js");
-    } else {
-      module.exports = require("./test.cjs.dev.js");
-    }
-
   `);
 });
 
@@ -362,7 +284,7 @@ test("imports helpers from @babel/runtime without @babel/plugin-transform-runtim
   });
   await build(dir);
   expect(await getDist(dir)).toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.dev.js, dist/test.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     Object.defineProperty(exports, '__esModule', { value: true });
@@ -380,15 +302,6 @@ test("imports helpers from @babel/runtime without @babel/plugin-transform-runtim
 
     exports.Other = Other;
     exports.Thing = Thing;
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    if (process.env.NODE_ENV === "production") {
-      module.exports = require("./test.cjs.prod.js");
-    } else {
-      module.exports = require("./test.cjs.dev.js");
-    }
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     import _createClass from '@babel/runtime/helpers/esm/createClass';
@@ -425,7 +338,7 @@ test("imports helpers from @babel/runtime-corejs2 without @babel/plugin-transfor
   });
   await build(dir);
   expect(await getDist(dir)).toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.dev.js, dist/test.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     Object.defineProperty(exports, '__esModule', { value: true });
@@ -443,15 +356,6 @@ test("imports helpers from @babel/runtime-corejs2 without @babel/plugin-transfor
 
     exports.Other = Other;
     exports.Thing = Thing;
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    if (process.env.NODE_ENV === "production") {
-      module.exports = require("./test.cjs.prod.js");
-    } else {
-      module.exports = require("./test.cjs.dev.js");
-    }
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     import _createClass from '@babel/runtime-corejs2/helpers/esm/createClass';
@@ -488,7 +392,7 @@ test("imports helpers from @babel/runtime-corejs3 without @babel/plugin-transfor
   });
   await build(dir);
   expect(await getDist(dir)).toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.dev.js, dist/test.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     Object.defineProperty(exports, '__esModule', { value: true });
@@ -506,15 +410,6 @@ test("imports helpers from @babel/runtime-corejs3 without @babel/plugin-transfor
 
     exports.Other = Other;
     exports.Thing = Thing;
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    if (process.env.NODE_ENV === "production") {
-      module.exports = require("./test.cjs.prod.js");
-    } else {
-      module.exports = require("./test.cjs.dev.js");
-    }
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     import _createClass from '@babel/runtime-corejs3/helpers/esm/createClass';
@@ -551,7 +446,7 @@ test("does not duplicate babel helpers when using @babel/plugin-transform-runtim
   });
   await build(dir);
   expect(await getDist(dir)).toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.dev.js, dist/test.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     function _arrayLikeToArray(r, a) {
@@ -639,15 +534,6 @@ test("does not duplicate babel helpers when using @babel/plugin-transform-runtim
       _iterator.e(err);
     } finally {
       _iterator.f();
-    }
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    if (process.env.NODE_ENV === "production") {
-      module.exports = require("./test.cjs.prod.js");
-    } else {
-      module.exports = require("./test.cjs.dev.js");
     }
 
   `);
@@ -670,7 +556,7 @@ test("does not duplicate babel helpers when not using @babel/plugin-transform-ru
   });
   await build(dir);
   expect(await getDist(dir)).toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.dev.js, dist/test.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     function _arrayLikeToArray(r, a) {
@@ -760,15 +646,6 @@ test("does not duplicate babel helpers when not using @babel/plugin-transform-ru
       _iterator.f();
     }
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    if (process.env.NODE_ENV === "production") {
-      module.exports = require("./test.cjs.prod.js");
-    } else {
-      module.exports = require("./test.cjs.dev.js");
-    }
-
   `);
 });
 
@@ -789,7 +666,7 @@ test("imports helpers for a helper only available in a newer version of @babel/r
   });
   await build(dir);
   expect(await getDist(dir)).toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.dev.js, dist/test.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     var _createForOfIteratorHelper = require('@babel/runtime/helpers/createForOfIteratorHelper');
@@ -818,15 +695,6 @@ test("imports helpers for a helper only available in a newer version of @babel/r
       _iterator.f();
     }
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    if (process.env.NODE_ENV === "production") {
-      module.exports = require("./test.cjs.prod.js");
-    } else {
-      module.exports = require("./test.cjs.dev.js");
-    }
-
   `);
 });
 
@@ -843,7 +711,7 @@ test("new dist filenames", async () => {
   });
   await build(dir);
   await expect(getDist(dir)).resolves.toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.cjs.dev.js, dist/scope-test.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     Object.defineProperty(exports, '__esModule', { value: true });
@@ -851,15 +719,6 @@ test("new dist filenames", async () => {
     var index = "something";
 
     exports["default"] = index;
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    if (process.env.NODE_ENV === "production") {
-      module.exports = require("./scope-test.cjs.prod.js");
-    } else {
-      module.exports = require("./scope-test.cjs.dev.js");
-    }
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     var index = "something";
@@ -895,7 +754,7 @@ test("UMD with dep that uses process.env.NODE_ENV", async () => {
   });
   await build(dir);
   await expect(getDist(dir)).resolves.toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.cjs.dev.js, dist/scope-test.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     Object.defineProperty(exports, '__esModule', { value: true });
@@ -907,21 +766,12 @@ test("UMD with dep that uses process.env.NODE_ENV", async () => {
 
     exports["default"] = index;
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    if (process.env.NODE_ENV === "production") {
-      module.exports = require("./scope-test.cjs.prod.js");
-    } else {
-      module.exports = require("./scope-test.cjs.dev.js");
-    }
-
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.umd.min.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    !function(e,o){"object"==typeof exports&&"undefined"!=typeof module?module.exports=o():"function"==typeof define&&define.amd?define(o):(e="undefined"!=typeof globalThis?globalThis:e||self).test=o()}(this,(function(){"use strict";console.log("production");return"something"}));
+    !function(e,o){"object"==typeof exports&&"undefined"!=typeof module?module.exports=o():"function"==typeof define&&define.amd?define(o):(e="undefined"!=typeof globalThis?globalThis:e||self).test=o()}(this,(function(){"use strict";let e=process.env.NODE_ENV;console.log(e);return"something"}));
     //# sourceMappingURL=scope-test.umd.min.js.map
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.umd.min.js.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    {"version":3,"file":"scope-test.umd.min.js","sources":["../src/index.js","../node_modules/somewhere/index.js"],"sourcesContent":["import { x } from \\"somewhere\\";\\nconsole.log(x);\\nexport default \\"something\\";","export let x = process.env.NODE_ENV;"],"names":["console","log"],"mappings":"qOACAA,QAAQC,ICD2B,oBDEpB"}
+    {"version":3,"file":"scope-test.umd.min.js","sources":["../node_modules/somewhere/index.js","../src/index.js"],"sourcesContent":["export let x = process.env.NODE_ENV;","import { x } from \\"somewhere\\";\\nconsole.log(x);\\nexport default \\"something\\";"],"names":["x","process","env","NODE_ENV","console","log"],"mappings":"qOAAO,IAAIA,EAAIC,QAAQC,IAAIC,SCC3BC,QAAQC,IAAIL,SACG"}
   `);
 });
 
@@ -947,7 +797,7 @@ test("UMD build with process.env.NODE_ENV and typeof document", async () => {
   });
   await build(dir);
   await expect(getDist(dir)).resolves.toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.cjs.dev.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     Object.defineProperty(exports, '__esModule', { value: true });
@@ -958,32 +808,12 @@ test("UMD build with process.env.NODE_ENV and typeof document", async () => {
 
     exports["default"] = thing;
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    if (process.env.NODE_ENV === "production") {
-      module.exports = require("./scope-test.cjs.prod.js");
-    } else {
-      module.exports = require("./scope-test.cjs.dev.js");
-    }
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    Object.defineProperty(exports, '__esModule', { value: true });
-
-    const thing = () => {
-      console.log(        "production");
-    };
-
-    exports["default"] = thing;
-
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.umd.min.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    !function(e,o){"object"==typeof exports&&"undefined"!=typeof module?module.exports=o():"function"==typeof define&&define.amd?define(o):(e="undefined"!=typeof globalThis?globalThis:e||self).x=o()}(this,(function(){"use strict";return()=>{console.log("production")}}));
+    !function(e,o){"object"==typeof exports&&"undefined"!=typeof module?module.exports=o():"function"==typeof define&&define.amd?define(o):(e="undefined"!=typeof globalThis?globalThis:e||self).x=o()}(this,(function(){"use strict";return()=>{console.log(process.env.NODE_ENV)}}));
     //# sourceMappingURL=scope-test.umd.min.js.map
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.umd.min.js.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    {"version":3,"file":"scope-test.umd.min.js","sources":["../src/index.js"],"sourcesContent":["let x = typeof document;\\n\\nconst thing = () => {\\n  console.log(process.env.NODE_ENV);\\n};\\n\\nexport default thing;"],"names":["thing","console","log","process"],"mappings":"wOAEcA,KACZC,QAAQC,IAAIC,aAAqB"}
+    {"version":3,"file":"scope-test.umd.min.js","sources":["../src/index.js"],"sourcesContent":["let x = typeof document;\\n\\nconst thing = () => {\\n  console.log(process.env.NODE_ENV);\\n};\\n\\nexport default thing;"],"names":["thing","console","log","process","env","NODE_ENV"],"mappings":"wOAEcA,KACZC,QAAQC,IAAIC,QAAQC,IAAIC,SAAS"}
   `);
 });
 
@@ -1097,7 +927,7 @@ test("typescript declaration emit with json import", async () => {
     export * from "./declarations/src/index.js";
     //# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoic2NvcGUtdGVzdC5janMuZC50cyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4vZGVjbGFyYXRpb25zL3NyYy9pbmRleC5kLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBIn0=
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.cjs.dev.js, dist/scope-test.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     Object.defineProperty(exports, '__esModule', { value: true });
@@ -1110,15 +940,6 @@ test("typescript declaration emit with json import", async () => {
     const thing = x;
 
     exports.thing = thing;
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    if (process.env.NODE_ENV === "production") {
-      module.exports = require("./scope-test.cjs.prod.js");
-    } else {
-      module.exports = require("./scope-test.cjs.dev.js");
-    }
 
   `);
 });
@@ -1140,7 +961,7 @@ test("bigint usage", async () => {
   });
   await build(dir);
   expect(await getDist(dir)).toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.cjs.dev.js, dist/scope-test.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     Object.defineProperty(exports, '__esModule', { value: true });
@@ -1148,15 +969,6 @@ test("bigint usage", async () => {
     const thing = 5n;
 
     exports.thing = thing;
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    if (process.env.NODE_ENV === "production") {
-      module.exports = require("./scope-test.cjs.prod.js");
-    } else {
-      module.exports = require("./scope-test.cjs.dev.js");
-    }
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     const thing = 5n;
@@ -1180,7 +992,7 @@ test("node: is external", async () => {
   });
   await build(dir);
   expect(await getDist(dir)).toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.cjs.dev.js, dist/scope-test.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     var fs = require('node:fs');
@@ -1190,15 +1002,6 @@ test("node: is external", async () => {
     var fs__default = /*#__PURE__*/_interopDefault(fs);
 
     fs__default["default"].writeFileSync("test.txt", "test");
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    if (process.env.NODE_ENV === "production") {
-      module.exports = require("./scope-test.cjs.prod.js");
-    } else {
-      module.exports = require("./scope-test.cjs.dev.js");
-    }
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     import fs from 'node:fs';
@@ -1267,7 +1070,7 @@ test(".d.ts file with default export", async () => {
     export { default } from "./declarations/src/index.js";
     //# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoidHlwZXNjcmlwdC5janMuZC50cyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4vZGVjbGFyYXRpb25zL3NyYy9pbmRleC5kLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBIn0=
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.cjs.dev.js, dist/typescript.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     Object.defineProperty(exports, '__esModule', { value: true });
@@ -1276,15 +1079,6 @@ test(".d.ts file with default export", async () => {
 
     exports.a = a;
     exports["default"] = a;
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    if (process.env.NODE_ENV === "production") {
-      module.exports = require("./typescript.cjs.prod.js");
-    } else {
-      module.exports = require("./typescript.cjs.dev.js");
-    }
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     const a = true;

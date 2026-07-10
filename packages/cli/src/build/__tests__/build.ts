@@ -75,7 +75,7 @@ test("clears dist folder", async () => {
   await build(dir);
 
   expect(await getDist(dir)).toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/already-has-things-in-dist.cjs.dev.js, dist/already-has-things-in-dist.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/already-has-things-in-dist.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     Object.defineProperty(exports, '__esModule', { value: true });
@@ -83,15 +83,6 @@ test("clears dist folder", async () => {
     var index = "something";
 
     exports["default"] = index;
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/already-has-things-in-dist.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    if (process.env.NODE_ENV === "production") {
-      module.exports = require("./already-has-things-in-dist.cjs.prod.js");
-    } else {
-      module.exports = require("./already-has-things-in-dist.cjs.dev.js");
-    }
 
   `);
 });
@@ -157,7 +148,7 @@ test("flow", async () => {
   await snapshotDistFiles(tmpPath);
 });
 
-test("prod checks", async () => {
+test("preserves process.env.NODE_ENV checks", async () => {
   let tmpPath = await testdir({
     "package.json": JSON.stringify({
       name: "prod-checks",
@@ -540,7 +531,7 @@ test("json", async () => {
   await build(tmpPath);
 
   expect(await getDist(tmpPath)).toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/json-package.cjs.dev.js, dist/json-package.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/json-package.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     Object.defineProperty(exports, '__esModule', { value: true });
@@ -558,15 +549,6 @@ test("json", async () => {
     let schema = changesetsSchema;
 
     exports.schema = schema;
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/json-package.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    if (process.env.NODE_ENV === "production") {
-      module.exports = require("./json-package.cjs.prod.js");
-    } else {
-      module.exports = require("./json-package.cjs.dev.js");
-    }
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/json-package.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     var changesetsSchema = {
@@ -648,21 +630,12 @@ test("dynamicImportInCjs", async () => {
   await build(dir);
 
   expect(await getDist(dir)).toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.dev.js, dist/test.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     require('some-dep');
 
     import('some-dep');
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    if (process.env.NODE_ENV === "production") {
-      module.exports = require("./test.cjs.prod.js");
-    } else {
-      module.exports = require("./test.cjs.dev.js");
-    }
 
   `);
 });
@@ -695,7 +668,7 @@ test("using @babel/plugin-transform-runtime with useESModules: true", async () =
   await build(dir);
 
   expect(await getDist(dir)).toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.dev.js, dist/test.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     Object.defineProperty(exports, '__esModule', { value: true });
@@ -708,15 +681,6 @@ test("using @babel/plugin-transform-runtime with useESModules: true", async () =
     });
 
     exports.Thing = Thing;
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    if (process.env.NODE_ENV === "production") {
-      module.exports = require("./test.cjs.prod.js");
-    } else {
-      module.exports = require("./test.cjs.dev.js");
-    }
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/test.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     import _createClass from '@babel/runtime/helpers/esm/createClass';
@@ -731,7 +695,7 @@ test("using @babel/plugin-transform-runtime with useESModules: true", async () =
   `);
 });
 
-test("worker and browser build", async () => {
+test("browser build preserves environment checks", async () => {
   let dir = await testdir({
     "package.json": JSON.stringify({
       name: "@exports/test",
@@ -742,20 +706,12 @@ test("worker and browser build", async () => {
       },
       exports: {
         ".": {
-          module: {
-            worker: "./dist/exports-test.worker.esm.js",
-            browser: "./dist/exports-test.browser.esm.js",
-            default: "./dist/exports-test.esm.js",
-          },
+          module: "./dist/exports-test.esm.js",
           default: "./dist/exports-test.cjs.js",
         },
         "./package.json": "./package.json",
       },
-      preconstruct: {
-        exports: {
-          envConditions: ["browser", "worker"],
-        },
-      },
+      preconstruct: { exports: true },
     }),
     node_modules: {
       kind: "symlink",
@@ -767,12 +723,12 @@ test("worker and browser build", async () => {
   });
   await build(dir);
   expect(await getDist(dir)).toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/exports-test.browser.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    const thing = "object";
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/exports-test.browser.esm.js, dist/exports-test.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    const thing = typeof window;
 
     export { thing };
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/exports-test.cjs.dev.js, dist/exports-test.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/exports-test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     Object.defineProperty(exports, '__esModule', { value: true });
@@ -780,25 +736,6 @@ test("worker and browser build", async () => {
     const thing = typeof window;
 
     exports.thing = thing;
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/exports-test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    if (process.env.NODE_ENV === "production") {
-      module.exports = require("./exports-test.cjs.prod.js");
-    } else {
-      module.exports = require("./exports-test.cjs.dev.js");
-    }
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/exports-test.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    const thing = typeof window;
-
-    export { thing };
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/exports-test.worker.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    const thing = "undefined";
-
-    export { thing };
 
   `);
 });
@@ -928,7 +865,7 @@ test("self import", async () => {
   await build(dir);
   expect(await getFiles(dir, ["dist/**", "other/dist/**"]))
     .toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/my-test-package.cjs.dev.js, dist/my-test-package.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/my-test-package.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     Object.defineProperty(exports, '__esModule', { value: true });
@@ -937,21 +874,12 @@ test("self import", async () => {
 
     exports.a = a;
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/my-test-package.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    if (process.env.NODE_ENV === "production") {
-      module.exports = require("./my-test-package.cjs.prod.js");
-    } else {
-      module.exports = require("./my-test-package.cjs.dev.js");
-    }
-
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/my-test-package.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     const a = 1;
 
     export { a };
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ other/dist/my-test-package-other.cjs.dev.js, other/dist/my-test-package-other.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ other/dist/my-test-package-other.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     Object.defineProperty(exports, '__esModule', { value: true });
@@ -965,15 +893,6 @@ test("self import", async () => {
     	get: function () { return _package.a; }
     });
     exports.b = b;
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ other/dist/my-test-package-other.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    if (process.env.NODE_ENV === "production") {
-      module.exports = require("./my-test-package-other.cjs.prod.js");
-    } else {
-      module.exports = require("./my-test-package-other.cjs.dev.js");
-    }
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ other/dist/my-test-package-other.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     export { a } from '@my-test/package';
@@ -1128,7 +1047,7 @@ test("correct default export using mjs and dmts proxies", async () => {
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.default.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     exports._default = require("./pkg-a.cjs.js").default;
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.dev.js, packages/pkg-a/dist/pkg-a.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     Object.defineProperty(exports, '__esModule', { value: true });
@@ -1138,15 +1057,6 @@ test("correct default export using mjs and dmts proxies", async () => {
 
     exports["default"] = index;
     exports.thing = thing;
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    if (process.env.NODE_ENV === "production") {
-      module.exports = require("./pkg-a.cjs.prod.js");
-    } else {
-      module.exports = require("./pkg-a.cjs.dev.js");
-    }
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.mjs ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     export {
@@ -1285,7 +1195,7 @@ test("importing a package via dynamic import from another package provides the r
     export * from "./declarations/src/index.js";
     //# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicGtnLWIuY2pzLmQudHMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuL2RlY2xhcmF0aW9ucy9zcmMvaW5kZXguZC50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSJ9
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-b/dist/pkg-b.cjs.dev.js, packages/pkg-b/dist/pkg-b.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-b/dist/pkg-b.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     Object.defineProperty(exports, '__esModule', { value: true });
@@ -1311,15 +1221,6 @@ test("importing a package via dynamic import from another package provides the r
     const thing = Promise.resolve().then(function () { return /*#__PURE__*/_interopNamespace(require('pkg-a')); }).then(x => x.default);
 
     exports.thing = thing;
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-b/dist/pkg-b.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    if (process.env.NODE_ENV === "production") {
-      module.exports = require("./pkg-b.cjs.prod.js");
-    } else {
-      module.exports = require("./pkg-b.cjs.dev.js");
-    }
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-b/dist/pkg-b.cjs.mjs ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     export {
@@ -1590,7 +1491,7 @@ test("no __esModule when reexporting namespace with mjs proxy", async () => {
   await build(dir);
 
   expect(await getFiles(dir, ["packages/*/dist/**"])).toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.dev.js, packages/pkg-a/dist/pkg-a.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     Object.defineProperty(exports, '__esModule', { value: true });
@@ -1605,15 +1506,6 @@ test("no __esModule when reexporting namespace with mjs proxy", async () => {
     });
 
     exports.somethingNs = something$2;
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    if (process.env.NODE_ENV === "production") {
-      module.exports = require("./pkg-a.cjs.prod.js");
-    } else {
-      module.exports = require("./pkg-a.cjs.dev.js");
-    }
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.mjs ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     export {
@@ -1748,7 +1640,7 @@ test("export * from external", async () => {
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.default.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     exports._default = require("./pkg-a.cjs.js").default;
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.dev.js, packages/pkg-a/dist/pkg-a.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     Object.defineProperty(exports, '__esModule', { value: true });
@@ -1766,15 +1658,6 @@ test("export * from external", async () => {
     		get: function () { return externalPkg[k]; }
     	});
     });
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    if (process.env.NODE_ENV === "production") {
-      module.exports = require("./pkg-a.cjs.prod.js");
-    } else {
-      module.exports = require("./pkg-a.cjs.dev.js");
-    }
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.mjs ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     export * from "./pkg-a.cjs.js";
@@ -1865,18 +1748,9 @@ test("type only export imported in .mts", async () => {
     export * from "./declarations/src/index.js";
     //# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicGtnLWEuY2pzLmQudHMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuL2RlY2xhcmF0aW9ucy9zcmMvaW5kZXguZC50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSJ9
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.dev.js, packages/pkg-a/dist/pkg-a.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
-    if (process.env.NODE_ENV === "production") {
-      module.exports = require("./pkg-a.cjs.prod.js");
-    } else {
-      module.exports = require("./pkg-a.cjs.dev.js");
-    }
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.mjs ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     import "./pkg-a.cjs.js";
@@ -1926,7 +1800,7 @@ test("importConditionDefaultExport: default with use client", async () => {
 
   expect(await getFiles(dir, ["dist/**"], stripHashes("client")))
     .toMatchInlineSnapshot(`
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/client-this-is-not-the-real-hash-060b3d217893ddbe748563e6e98b804c.cjs.dev.js, dist/client-this-is-not-the-real-hash-060b3d217893ddbe748563e6e98b804c.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/client-this-is-not-the-real-hash-060b3d217893ddbe748563e6e98b804c.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use client';
     'use strict';
 
@@ -1935,15 +1809,6 @@ test("importConditionDefaultExport: default with use client", async () => {
     function Something() {}
 
     exports.Something = Something;
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/client-this-is-not-the-real-hash-309cc5e233da5126cc473e58b428ae77.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    if (process.env.NODE_ENV === "production") {
-      module.exports = require("./client-some-hash.cjs.prod.js");
-    } else {
-      module.exports = require("./client-some-hash.cjs.dev.js");
-    }
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/client-this-is-not-the-real-hash-5330ac3fb575d424e728f3c1abe81dfa.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use client';
@@ -1954,12 +1819,12 @@ test("importConditionDefaultExport: default with use client", async () => {
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg-a.cjs.default.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     exports._default = require("./pkg-a.cjs.js").default;
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg-a.cjs.dev.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg-a.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     Object.defineProperty(exports, '__esModule', { value: true });
 
-    var client = require('./client-some-hash.cjs.dev.js');
+    var client = require('./client-some-hash.cjs.js');
 
     var index = "a";
 
@@ -1968,36 +1833,12 @@ test("importConditionDefaultExport: default with use client", async () => {
     	get: function () { return client.Something; }
     });
     exports["default"] = index;
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg-a.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    if (process.env.NODE_ENV === "production") {
-      module.exports = require("./pkg-a.cjs.prod.js");
-    } else {
-      module.exports = require("./pkg-a.cjs.dev.js");
-    }
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg-a.cjs.mjs ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     export {
       Something
     } from "./pkg-a.cjs.js";
     export { _default as default } from "./pkg-a.cjs.default.js";
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg-a.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    Object.defineProperty(exports, '__esModule', { value: true });
-
-    var client = require('./client-some-hash.cjs.prod.js');
-
-    var index = "a";
-
-    Object.defineProperty(exports, 'Something', {
-    	enumerable: true,
-    	get: function () { return client.Something; }
-    });
-    exports["default"] = index;
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/pkg-a.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     export { Something } from './client-some-hash.esm.js';
@@ -2236,7 +2077,7 @@ test("correct default export using mjs and dmts proxies with moduleResolution: b
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.default.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     exports._default = require("./pkg-a.cjs.js").default;
 
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.dev.js, packages/pkg-a/dist/pkg-a.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     'use strict';
 
     Object.defineProperty(exports, '__esModule', { value: true });
@@ -2246,15 +2087,6 @@ test("correct default export using mjs and dmts proxies with moduleResolution: b
 
     exports["default"] = index;
     exports.thing = thing;
-
-    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-    'use strict';
-
-    if (process.env.NODE_ENV === "production") {
-      module.exports = require("./pkg-a.cjs.prod.js");
-    } else {
-      module.exports = require("./pkg-a.cjs.dev.js");
-    }
 
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ packages/pkg-a/dist/pkg-a.cjs.mjs ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     export {

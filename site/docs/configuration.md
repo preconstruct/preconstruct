@@ -108,7 +108,7 @@ When enabled, Preconstruct uses each package's [`imports`](https://nodejs.org/ap
 
 This is a project-level option: configure it in the root `package.json`, not in the `preconstruct` config of an individual workspace package. Each workspace package still defines its own top-level `imports` field though.
 
-The `exports` feature must be enabled for packages using this option. `preconstruct.exports.envConditions` cannot be used at the same time because the package's `imports` field becomes the source of build conditions.
+The `exports` feature must be enabled for packages using this option.
 
 Preconstruct supports `imports` entries with:
 
@@ -219,8 +219,8 @@ Packages map 1:1 with npm packages. Along with specifying the `entrypoints` opti
 ```ts
 | boolean
 | {
-    envConditions?: ("browser" | "worker")[];
     extra?: Record<string, JSONValue>;
+    importConditionDefaultExport?: "namespace" | "default";
   };
 ```
 
@@ -236,9 +236,7 @@ Using the `exports` field enables a couple of things:
 
 Note that adding an `exports` field can arguably be a breaking change, you may want to use the `extra` option to add more exports so that imports that worked previously still work or only add the `exports` field in a major version.
 
-The `exports` field feature can be configured at the project or package level. The `envConditions` and `extra` options can only be configured at the package level. The `importConditionDefaultExport` option can be configured at the project or package level.
-
-When the project-level [`imports`](#project-imports) option is enabled, conditions come from each package's top-level `imports` field and `envConditions` is not supported. Because `imports` defaults to `true`, projects using the legacy `envConditions` option must set it to `false`.
+The `exports` field feature can be configured at the project or package level. The `extra` option can only be configured at the package level. The `importConditionDefaultExport` option can be configured at the project or package level.
 
 #### Default {#exports-default}
 
@@ -252,30 +250,6 @@ When the project-level [`imports`](#project-imports) option is enabled, conditio
   "version": "1.0.0",
   "preconstruct": {
     "exports": false
-  }
-}
-```
-
-#### `envConditions` {#envconditions}
-
-`Array<"browser" | "worker">`
-
-Specifying the `envConditions` option adds additional environments that Preconstruct will generate bundles for. This option is currently aimed at generating bundles with `typeof SOME_ENV_SPECIFIC_GLOBAL` replaced with what it would be in that environment. It may be expanded to provide the ability to have Preconstruct resolve a different file or etc. depending on the environment in the future.
-
-Builds
-
-- `browser`: Generates a bundle targeting browsers. When this condition is used, the top-level `browser` field will also be set so that older bundlers that do not understand the `exports` field will be able to use the browser build (though when using the exports field, browser CommonJS builds will not be built). When building with this condition, `typeof document` and `typeof window` will be replaced with `"object"` and dead-code elimination will occur based on that.
-- `worker`: Generates a bundle targeting web workers/server-side JS runtimes that use web APIs. When building with this condition, `typeof document` and `typeof window` will be replaced with `"undefined"` and dead-code elimination will occur based on that.
-
-```json
-{
-  "name": "@sample/package",
-  "version": "1.0.0",
-  "preconstruct": {
-    "imports": false,
-    "exports": {
-      "envConditions": ["browser", "worker"]
-    }
   }
 }
 ```
@@ -475,7 +449,7 @@ Example:
 }
 ```
 
-**Note:** This file actually just reexports either a production or a development bundle (respectively `dist/my-package.cjs.prod.js` or `dist/my-package.cjs.dev.js` in this example) based on the `process.env.NODE_ENV` value. This allows you to use `process.env.NODE_ENV` checks in your code so 2 distinct bundles are created but at runtime only one of them gets loaded.
+Preconstruct produces a single CommonJS bundle at this path. References to `process.env.NODE_ENV` are preserved so that the consuming runtime or bundler can provide or replace the value.
 
 #### `module` {#module}
 
@@ -503,6 +477,4 @@ Example:
 
 ### `browser` {#browser}
 
-The `browser` field specifies alias files exclusive to browsers. This allows you to create different bundles from your source code based on `typeof window` and `typeof document` checks - thanks to that you can, for example, remove server-only code (just for those bundles).
-
-**Note:** Those files are not meant to be consumed by browsers "as is". They just assume browser-like environment, but they still can contain for example references to `process.env.NODE_ENV` as that is meant to be replaced by a consuming bundler.
+The `browser` field specifies alias files exclusive to browsers. Browser builds preserve `typeof window`, `typeof document`, and `process.env.NODE_ENV`; Preconstruct does not replace these expressions or eliminate branches based on them. A consuming bundler may still transform them.

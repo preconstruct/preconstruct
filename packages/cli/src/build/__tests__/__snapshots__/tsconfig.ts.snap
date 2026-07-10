@@ -11,29 +11,7 @@ exports[`should build a monorepo package with custom tsconfig located in a relat
 "
 `;
 
-exports[`should build a monorepo package with custom tsconfig located in a relative folder: pkg-a.cjs.dev.js 1`] = `
-"'use strict';
-
-Object.defineProperty(exports, '__esModule', { value: true });
-
-const thing = "monorepo-custom-config";
-
-exports.thing = thing;
-"
-`;
-
 exports[`should build a monorepo package with custom tsconfig located in a relative folder: pkg-a.cjs.js 1`] = `
-"'use strict';
-
-if (process.env.NODE_ENV === "production") {
-  module.exports = require("./pkg-a.cjs.prod.js");
-} else {
-  module.exports = require("./pkg-a.cjs.dev.js");
-}
-"
-`;
-
-exports[`should build a monorepo package with custom tsconfig located in a relative folder: pkg-a.cjs.prod.js 1`] = `
 "'use strict';
 
 Object.defineProperty(exports, '__esModule', { value: true });
@@ -62,29 +40,7 @@ exports[`should build with custom tsconfig filename in monorepo package: pkg-a.c
 "
 `;
 
-exports[`should build with custom tsconfig filename in monorepo package: pkg-a.cjs.dev.js 1`] = `
-"'use strict';
-
-Object.defineProperty(exports, '__esModule', { value: true });
-
-const thing = "monorepo-custom-config";
-
-exports.thing = thing;
-"
-`;
-
 exports[`should build with custom tsconfig filename in monorepo package: pkg-a.cjs.js 1`] = `
-"'use strict';
-
-if (process.env.NODE_ENV === "production") {
-  module.exports = require("./pkg-a.cjs.prod.js");
-} else {
-  module.exports = require("./pkg-a.cjs.dev.js");
-}
-"
-`;
-
-exports[`should build with custom tsconfig filename in monorepo package: pkg-a.cjs.prod.js 1`] = `
 "'use strict';
 
 Object.defineProperty(exports, '__esModule', { value: true });
@@ -113,29 +69,7 @@ exports[`should build with custom tsconfig filename in standalone package: types
 "
 `;
 
-exports[`should build with custom tsconfig filename in standalone package: typescript-custom-config.cjs.dev.js 1`] = `
-"'use strict';
-
-Object.defineProperty(exports, '__esModule', { value: true });
-
-const thing = "custom-config";
-
-exports.thing = thing;
-"
-`;
-
 exports[`should build with custom tsconfig filename in standalone package: typescript-custom-config.cjs.js 1`] = `
-"'use strict';
-
-if (process.env.NODE_ENV === "production") {
-  module.exports = require("./typescript-custom-config.cjs.prod.js");
-} else {
-  module.exports = require("./typescript-custom-config.cjs.dev.js");
-}
-"
-`;
-
-exports[`should build with custom tsconfig filename in standalone package: typescript-custom-config.cjs.prod.js 1`] = `
 "'use strict';
 
 Object.defineProperty(exports, '__esModule', { value: true });

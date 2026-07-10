@@ -94,7 +94,6 @@ export function exportsField(
   if (exportsFieldConfig.conditions.kind === "legacy") {
     output = exportsFieldForLegacyConditions(
       pkg,
-      exportsFieldConfig.conditions.envs,
       exportsFieldConfig.importConditionDefaultExport
     );
   } else {
@@ -191,26 +190,13 @@ export function exportsField(
 
 function exportsFieldForLegacyConditions(
   pkg: Package,
-  envs: ({
-    kind: "legacy";
-  } & CanonicalExportsFieldConfig["conditions"])["envs"],
   importConditionDefaultExport: CanonicalExportsFieldConfig["importConditionDefaultExport"]
 ) {
   let output: Record<string, ExportsConditions> = {};
   for (const entrypoint of pkg.entrypoints) {
     const esmBuild = getExportsFieldOutputPath(entrypoint, "esm");
     const exportConditions = {
-      module: envs.size
-        ? {
-            ...(envs.has("worker") && {
-              worker: getExportsFieldOutputPath(entrypoint, "worker"),
-            }),
-            ...(envs.has("browser") && {
-              browser: getExportsFieldOutputPath(entrypoint, "browser-esm"),
-            }),
-            default: esmBuild,
-          }
-        : esmBuild,
+      module: esmBuild,
       ...(importConditionDefaultExport === "default" && {
         import: getExportsImportUnwrappingDefaultOutputPath(entrypoint),
       }),
@@ -226,7 +212,6 @@ type BuildTarget =
   | "cjs"
   | "esm"
   | "umd"
-  | "worker"
   | "browser-cjs"
   | "browser-esm";
 
@@ -235,7 +220,6 @@ const buildTargetToExtensionPrefix: Record<BuildTarget, string> = {
   esm: "esm",
   "browser-cjs": "browser.cjs",
   "browser-esm": "browser.esm",
-  worker: "worker.esm",
   umd: "umd.min",
 };
 
@@ -303,7 +287,7 @@ function getExportsFieldEntrypointOutputPrefix(entrypoint: Entrypoint) {
   return `.${entrypoint.afterPackageName}/`;
 }
 
-export function getExportsFieldOutputPath(
+function getExportsFieldOutputPath(
   entrypoint: Entrypoint,
   target: BuildTarget
 ) {
