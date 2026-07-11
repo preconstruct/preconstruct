@@ -182,6 +182,43 @@ Run `preconstruct fix` to remove the old flags. It removes the experimental obje
 
 The `logCompiledFiles` and `checkTypeDependencies` flags remain experimental and are not removed.
 
+### `transform` {#transform}
+
+`"oxc" | "babel" | { "type": "oxc", "target"?: string | string[] } | { "type": "babel" }`
+
+`transform` selects the compiler used for JavaScript, TypeScript, and JSX. Oxc is the default. It discovers the nearest applicable `tsconfig.json` and uses supported compiler options such as the JSX mode and decorator settings. Babel configuration is ignored unless Babel is selected.
+
+The object form configures compiler-specific options. Oxc's `target` accepts a target such as `"es2020"` or an array such as `["es2020", "node18"]`. Oxc cannot target ES5; select Babel when older output or Babel plugins are required.
+
+```json
+{
+  "preconstruct": {
+    "transform": {
+      "type": "oxc",
+      "target": "es2020"
+    }
+  }
+}
+```
+
+To use Babel, install Babel Core in the project and opt in explicitly:
+
+```sh
+yarn add --dev @babel/core
+```
+
+```json
+{
+  "preconstruct": {
+    "transform": "babel"
+  }
+}
+```
+
+Packages may override the project's `transform`. A package override replaces the entire project transform configuration rather than merging with it.
+
+`preconstruct dev` supports Oxc only for packages whose `package.json` contains `"type": "module"`. Non-type-module packages must use Babel for `preconstruct dev`.
+
 ## Packages {#packages}
 
 Packages map 1:1 with npm packages. Along with specifying the `entrypoints` option described below, packages are also responsible for specifying dependencies which is necessary for bundling UMD bundles and ensuring that packages will have all of their required dependencies when installed through npm.

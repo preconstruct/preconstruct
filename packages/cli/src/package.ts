@@ -23,6 +23,7 @@ import {
 import normalizePath from "normalize-path";
 import { parseImportsField } from "./imports";
 import { CONFIGURATION_DEFAULT_TSCONFIG } from "./constants";
+import { parseTransformConfig } from "./transform-config";
 
 function getFieldsUsedInEntrypoints(
   descriptors: { contents: string | undefined; filename: string }[]
@@ -157,6 +158,7 @@ export class Package extends Item<{
     };
     tsconfig?: string;
     entrypoints?: JSONValue;
+    transform?: JSONValue;
   };
   exports?: Record<string, ExportsConditions | string>;
   dependencies?: Record<string, string>;
@@ -168,6 +170,13 @@ export class Package extends Item<{
 
   get configTsconfig(): string {
     return this.json.preconstruct?.tsconfig ?? CONFIGURATION_DEFAULT_TSCONFIG;
+  }
+
+  get configTransform() {
+    if (this.json.preconstruct.transform === undefined) {
+      return this.project.configTransform;
+    }
+    return parseTransformConfig(this.json.preconstruct.transform, this.name);
   }
 
   get configEntrypoints(): Array<string> {

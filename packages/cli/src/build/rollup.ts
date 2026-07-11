@@ -27,10 +27,7 @@ const makeExternalPredicate = (externalArr: string[]): ExternalPredicate => {
   return (id: string) => pattern.test(id);
 };
 
-type BasicRollupConfigType =
-  | "umd"
-  | "browser"
-  | "node";
+type BasicRollupConfigType = "umd" | "browser" | "node";
 
 export let getRollupConfig = (
   pkg: Package,
@@ -56,10 +53,7 @@ export let getRollupConfig = (
   let wrapExternalPredicate = (inner: ExternalPredicate): ExternalPredicate =>
     inner;
 
-  if (
-    options.kind === "node" ||
-    options.kind === "conditions"
-  ) {
+  if (options.kind === "node" || options.kind === "conditions") {
     external.push(...builtInModules);
     wrapExternalPredicate = (inner) => (source) =>
       source.startsWith("node:") || inner(source);
@@ -104,14 +98,18 @@ export let getRollupConfig = (
         options.kind === "umd" ? ["browser", "module", "main"] : undefined,
       modules: options.kind === "umd" ? ["node_modules"] : [],
     },
-    transform:
-      options.kind === "umd"
+    transform: {
+      ...(pkg.configTransform.type === "oxc" && pkg.configTransform.target
+        ? { target: pkg.configTransform.target }
+        : {}),
+      ...(options.kind === "umd"
         ? {
             define: {
               "process.env.NODE_ENV": JSON.stringify("development"),
             },
           }
-        : undefined,
+        : {}),
+    },
     input,
     external: wrapExternalPredicate(makeExternalPredicate(external)),
     onwarn: (warning) => {
@@ -172,23 +170,23 @@ export let getRollupConfig = (
         sourceMap: options.kind === "umd",
         root: pkg.directory,
       }),
-      babel({
-        cwd: pkg.project.directory,
-        reportTransformedFile,
-        babelRuntime: (() => {
-          for (const dep of [
-            "@babel/runtime",
-            "@babel/runtime-corejs2",
-            "@babel/runtime-corejs3",
-          ]) {
-            const range = pkg.json.dependencies?.[dep];
-            if (range !== undefined) {
-              return { range, name: dep };
+      pkg.configTransform.type === "babel" &&
+        // Kept lazy so the default Oxc path never loads Babel or its helpers.
+        babel({
+          cwd: pkg.project.directory,
+          reportTransformedFile,
+          babelRuntime: (() => {
+            for (const dep of [
+              "@babel/runtime",
+              "@babel/runtime-corejs2",
+              "@babel/runtime-corejs3",
+            ]) {
+              const range = pkg.json.dependencies?.[dep];
+              if (range !== undefined) return { range, name: dep };
             }
-          }
-        })(),
-      }),
-      rewriteBabelRuntimeHelpers(),
+          })(),
+        }),
+      pkg.configTransform.type === "babel" && rewriteBabelRuntimeHelpers(),
     ].filter((x): x is Plugin => !!x),
   };
 

@@ -21,8 +21,17 @@ import path from "path";
 import normalizePath from "normalize-path";
 import { Entrypoint } from "./entrypoint";
 import { validateProject } from "./validate";
+import { FatalError } from "./errors";
+import resolveFrom from "resolve-from";
 
 const require = createRequire(import.meta.url);
+const { parseSync } = require("rolldown/utils") as {
+  parseSync: (
+    filename: string,
+    source: string,
+    options: { sourceType: "module" }
+  ) => { program: { body: any[] }; errors: Array<{ message: string }> };
+};
 
 let tsExtensionPattern = /\.tsx?$/;
 
@@ -56,19 +65,37 @@ export async function entrypointHasDefaultExport(
   ) {
     return false;
   }
-  const babel = require("@babel/core") as typeof import("@babel/core");
-  let ast = (await babel.parseAsync(content, {
-    filename: entrypoint.source,
-    sourceType: "module",
-    cwd: entrypoint.package.project.directory,
-  }))! as babel.types.File;
+  let body: any[];
+  if (entrypoint.package.configTransform.type === "oxc") {
+    const result = parseSync(entrypoint.source, content, {
+      sourceType: "module",
+    });
+    if (result.errors.length) {
+      throw new FatalError(result.errors[0].message, entrypoint.name);
+    }
+    body = result.program.body;
+  } else {
+    const resolvedBabelCore = resolveFrom(
+      entrypoint.package.project.directory,
+      "@babel/core"
+    );
+    const babel = createRequire(resolvedBabelCore)(
+      "@babel/core"
+    ) as typeof import("@babel/core");
+    const ast = (await babel.parseAsync(content, {
+      filename: entrypoint.source,
+      sourceType: "module",
+      cwd: entrypoint.package.project.directory,
+    }))! as babel.types.File;
+    body = ast.program.body;
+  }
 
-  for (let statement of ast.program.body) {
+  for (let statement of body) {
     if (
       statement.type === "ExportDefaultDeclaration" ||
       (statement.type === "ExportNamedDeclaration" &&
         statement.specifiers.some(
-          (specifier) =>
+          (specifier: any) =>
             (specifier.type === "ExportDefaultSpecifier" ||
               specifier.type === "ExportNamespaceSpecifier" ||
               specifier.type === "ExportSpecifier") &&
@@ -155,6 +182,15 @@ export async function writeDevTSFiles(
 export default async function dev(projectDir: string) {
   let project = await Project.create(projectDir);
   validateProject(project);
+  const unsupportedPackage = project.packages.find(
+    (pkg) => pkg.configTransform.type === "oxc" && !pkg.isTypeModule()
+  );
+  if (unsupportedPackage) {
+    throw new FatalError(
+      'preconstruct dev only supports the Oxc transform for packages with "type": "module"; set "type": "module" or select the Babel transform',
+      unsupportedPackage.name
+    );
+  }
   info("project is valid!");
 
   await Promise.all(

@@ -1,6 +1,8 @@
 # Building TypeScript packages
 
-Preconstruct uses Babel to compile code so you have to [configure Babel](/guides/configuring-babel) to use [`@babel/preset-typescript`](https://babeljs.io/docs/en/babel-preset-typescript).
+Preconstruct uses Oxc to strip TypeScript syntax by default and reads supported compiler settings from the nearest applicable `tsconfig.json`.
+
+If you select the [Babel transform](/guides/configuring-babel), configure [`@babel/preset-typescript`](https://babeljs.io/docs/en/babel-preset-typescript):
 
 ```json
 {
@@ -14,7 +16,7 @@ Preconstruct automatically generates TypeScript declarations for all entrypoints
 
 ## Configuring TypeScript {#configuring-typescript}
 
-Because Preconstruct uses Babel to compile TypeScript packages, it is recommended to set the `isolatedModules` compiler option to ensure your TypeScript source can be built with Babel.
+Preconstruct compiles TypeScript one file at a time in both Oxc and Babel modes, so it is recommended to set the `isolatedModules` compiler option.
 
 In your `tsconfig.json`:
 
@@ -26,5 +28,4 @@ In your `tsconfig.json`:
 }
 ```
 
-See the [TypeScript documentation on the `isolatedModules` option](https://www.typescriptlang.org/tsconfig#isolatedModules) and the [Babel documentation on TypeScript compiler options](https://babeljs.io/docs/en/babel-plugin-transform-typescript#typescript-compiler-options) for more information.
-
+See the [TypeScript documentation on the `isolatedModules` option](https://www.typescriptlang.org/tsconfig#isolatedModules) for more information.

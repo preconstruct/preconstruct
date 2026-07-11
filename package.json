@@ -61,6 +61,7 @@
     "defaultBranch": "main"
   },
   "preconstruct": {
+    "transform": "babel",
     "packages": [
       "packages/*",
       "!packages/next",

@@ -393,11 +393,21 @@ export function testdirWithLegacyPreconstructDefaults(dir: Fixture) {
     exports: false,
     imports: false,
     dynamicImportInCjs: false,
+    transform: "babel",
     ...parsed.preconstruct,
   };
   return testdir({
     ...dir,
     "package.json": JSON.stringify(parsed),
+    ...(Object.prototype.hasOwnProperty.call(dir, "node_modules") ||
+    Object.prototype.hasOwnProperty.call(dir, "node_modules/@babel/core")
+      ? {}
+      : {
+          "node_modules/@babel/core": {
+            kind: "symlink" as const,
+            path: path.join(repoNodeModules, "@babel/core"),
+          },
+        }),
   });
 }
 

@@ -7,6 +7,7 @@ import { Package } from "./package";
 import { validateIncludedFiles } from "./validate-included-files";
 import { FatalError } from "./errors";
 import { JSONValue, parseImportConditionDefaultExportOption } from "./utils";
+import { parseTransformConfig } from "./transform-config";
 
 const allSettled = (promises: Promise<any>[]) =>
   Promise.all(
@@ -28,6 +29,7 @@ export class Project extends Item<{
     exports?: JSONValue;
     imports?: JSONValue;
     dynamicImportInCjs?: JSONValue;
+    transform?: JSONValue;
     ___experimentalFlags_WILL_CHANGE_IN_PATCH: {
       logCompiledFiles?: JSONValue;
       keepDynamicImportAsDynamicImportInCommonJS?: JSONValue;
@@ -51,6 +53,9 @@ export class Project extends Item<{
   }
   get dynamicImportInCjs() {
     return this.json.preconstruct.dynamicImportInCjs !== false;
+  }
+  get configTransform() {
+    return parseTransformConfig(this.json.preconstruct.transform, this.name);
   }
   get configPackages(): Array<string> {
     if (this.json.preconstruct.packages === undefined) {

@@ -143,6 +143,12 @@ export const EXPERIMENTAL_FLAGS = new Set([
 
 export function validateProject(project: Project, log = false) {
   let errors: FatalError[] = [];
+  try {
+    project.configTransform;
+  } catch (err) {
+    if (err instanceof FatalError) errors.push(err);
+    else throw err;
+  }
   if (project.json.preconstruct.___experimentalFlags_WILL_CHANGE_IN_PATCH) {
     Object.keys(
       project.json.preconstruct.___experimentalFlags_WILL_CHANGE_IN_PATCH
@@ -171,6 +177,7 @@ export function validateProject(project: Project, log = false) {
 
   for (let pkg of project.packages) {
     try {
+      pkg.configTransform;
       validatePackage(pkg);
     } catch (err) {
       if (err instanceof BatchError) {

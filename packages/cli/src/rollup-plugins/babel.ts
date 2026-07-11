@@ -1,11 +1,10 @@
 import { getWorker } from "../worker-client";
 import type { Plugin, PluginContext } from "rolldown";
 import QuickLRU from "quick-lru";
-import resolveFrom from "resolve-from";
 import semver from "semver";
 import { createRequire } from "module";
-
-const require = createRequire(import.meta.url);
+import resolveFrom from "resolve-from";
+import { FatalError } from "../errors";
 
 const lru = new QuickLRU<
   string,
@@ -25,18 +24,6 @@ let externalHelpersCache = new Map<
 
 type ParsedAst = ReturnType<PluginContext["parse"]>;
 
-const resolvedBabelCore = require.resolve("@babel/core");
-
-const babelHelpers: typeof import("@babel/helpers") = require(resolveFrom(
-  resolvedBabelCore,
-  "@babel/helpers"
-));
-
-const babelGenerator: typeof import("@babel/generator") = require(resolveFrom(
-  resolvedBabelCore,
-  "@babel/generator"
-));
-
 const babelHelpersModuleStart = "\0rollupPluginBabelHelpers/";
 
 // from https://github.com/babel/babel/blob/9808d2566e6a2b2d9e4c7890d8efbc9af180c683/packages/babel-core/src/transformation/file/file.js#L129-L164
@@ -44,7 +31,8 @@ const babelHelpersModuleStart = "\0rollupPluginBabelHelpers/";
 // because the version of semver that @babel/core uses fails on semver.intersects calls with "*"
 function babelRuntimeVersionRangeHasHelper(
   name: string,
-  versionRange: string
+  versionRange: string,
+  babelHelpers: typeof import("@babel/helpers")
 ): boolean {
   // babel's version has a try catch around this to handle unknown helpers
   // but if we're in here, we know that this version of @babel/helpers
@@ -66,6 +54,25 @@ let rollupPluginBabel = ({
   babelRuntime: { range: string; name: string } | undefined;
   reportTransformedFile: (filename: string) => void;
 }): Plugin => {
+  const resolvedBabelCore = resolveFrom.silent(cwd, "@babel/core");
+  if (resolvedBabelCore === undefined) {
+    throw new FatalError(
+      'Babel was selected with "preconstruct.transform" but @babel/core is not installed in the project',
+      cwd
+    );
+  }
+  const babelRequire = createRequire(resolvedBabelCore);
+  let babelHelpers: typeof import("@babel/helpers");
+  let babelGenerator: typeof import("@babel/generator");
+  try {
+    babelHelpers = babelRequire("@babel/helpers");
+    babelGenerator = babelRequire("@babel/generator");
+  } catch {
+    throw new FatalError(
+      "the installed @babel/core is incompatible because its helpers could not be loaded",
+      cwd
+    );
+  }
   // semver.intersects() has some surprising behavior with comparing ranges
   // with pre-release versions. We add '^' to ensure that we are always
   // comparing ranges with ranges, which sidesteps this logic.
@@ -92,7 +99,13 @@ let rollupPluginBabel = ({
     !semver.validRange(babelRuntimeVersion)
       ? (helper: string) => `${babelHelpersModuleStart}${helper}`
       : (helper: string) => {
-          if (babelRuntimeVersionRangeHasHelper(helper, babelRuntimeVersion)) {
+          if (
+            babelRuntimeVersionRangeHasHelper(
+              helper,
+              babelRuntimeVersion,
+              babelHelpers
+            )
+          ) {
             return `${babelRuntime.name}/helpers/${helper}`;
           }
           return `${babelHelpersModuleStart}${helper}`;

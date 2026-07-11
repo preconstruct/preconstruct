@@ -41,6 +41,7 @@ exports[`browser no module > package.json 1`] = `
     "dynamicImportInCjs": false,
     "exports": false,
     "imports": false,
+    "transform": "babel",
   },
 }
 `;
@@ -200,6 +201,7 @@ exports[`using external @babel/runtime helpers > package.json 1`] = `
     "dynamicImportInCjs": false,
     "exports": false,
     "imports": false,
+    "transform": "babel",
   },
 }
 `;

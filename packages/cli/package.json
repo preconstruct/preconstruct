@@ -21,10 +21,6 @@
     "node": "^20.19.0 || >=22.12.0"
   },
   "dependencies": {
-    "@babel/code-frame": "^7.5.5",
-    "@babel/core": "^7.7.7",
-    "@babel/helper-module-imports": "^7.10.4",
-    "@babel/runtime": "^7.7.7",
     "@preconstruct/hook": "^0.4.0",
     "builtin-modules": "^3.1.0",
     "chalk": "^4.1.0",
@@ -49,6 +45,14 @@
     "semver": "^7.3.4",
     "v8-compile-cache": "^2.1.1",
     "zod": "^3.21.4"
+  },
+  "peerDependencies": {
+    "@babel/core": "^7.7.7"
+  },
+  "peerDependenciesMeta": {
+    "@babel/core": {
+      "optional": true
+    }
   },
   "preconstruct": {
     "entrypoints": [

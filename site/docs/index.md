@@ -28,7 +28,7 @@ If you're in a monorepo, you should also run `yarn preconstruct dev` and add it 
 
 ## Publishing packages {#publishing-packages}
 
-Before you publish packages to npm, run `preconstruct build`. Preconstruct will use your Babel config and build flat bundles so make sure to [configure Babel](/guides/configuring-babel) with the transforms you want.
+Before you publish packages to npm, run `preconstruct build`. Preconstruct uses Oxc by default to compile source and build flat bundles. Projects that need Babel plugins or ES5 output can opt into and [configure Babel](/guides/configuring-babel).
 
 > We strongly recommend making a single script in your package.json that runs both build and publish, to stop broken publishes, such as `"release": "preconstruct build && yarn publish:packages`. If you're in a single-package repo, you could also run `preconstruct build` in a `prepare` or `prepublishOnly` script.
 

@@ -1,8 +1,5 @@
 import { createRequire } from "module";
-// @ts-ignore
-import { addDefault } from "@babel/helper-module-imports";
-
-const require = createRequire(import.meta.url);
+import resolveFrom from "resolve-from";
 
 function importHelperPlugin(babel: typeof import("@babel/core")) {
   return {
@@ -22,11 +19,15 @@ function importHelperPlugin(babel: typeof import("@babel/core")) {
           return babel.types.identifier(cachedHelpers[name].name);
         }
 
-        return (cachedHelpers[name] = addDefault(
-          file.path,
-          `\0rollupPluginBabelHelpers/${name}`,
-          { nameHint: name }
-        ));
+        const identifier = file.scope.generateUidIdentifier(name);
+        file.path.unshiftContainer(
+          "body",
+          babel.types.importDeclaration(
+            [babel.types.importDefaultSpecifier(identifier)],
+            babel.types.stringLiteral(`\0rollupPluginBabelHelpers/${name}`)
+          )
+        );
+        return (cachedHelpers[name] = identifier);
       });
     },
   };
@@ -37,7 +38,10 @@ export async function transformBabel(
   cwd: string,
   filename: string
 ) {
-  const babel = require("@babel/core") as typeof import("@babel/core");
+  const resolvedBabelCore = resolveFrom(cwd, "@babel/core");
+  const babel = createRequire(resolvedBabelCore)(
+    "@babel/core"
+  ) as typeof import("@babel/core");
 
   return babel
     .transformAsync(code, {

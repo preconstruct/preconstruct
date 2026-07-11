@@ -1135,7 +1135,7 @@ test("importing css fails with a nice error", async () => {
     🎁 @scope/test
     🎁 @scope/test [plugin throw-warnings]
     🎁 @scope/test Error: 🎁 @scope/test only .ts, .tsx, .js, .jsx, and .json files can be imported but "./blah.css" is imported in "src/index.js"
-    🎁 @scope/test     at PluginContextImpl.buildEnd (/Users/emma/projects/preconstruct/packages/cli/src/build/rollup.ts:159:19)
+    🎁 @scope/test     at PluginContextImpl.buildEnd (/Users/emma/projects/preconstruct/packages/cli/src/build/rollup.ts:157:19)
     🎁 @scope/test     at plugin (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/bindingify-input-options-XPJLJOD0.mjs:1406:18)
     🎁 @scope/test     at plugin.<computed> (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/bindingify-input-options-XPJLJOD0.mjs:1959:18)
     🎁 @scope/test     at aggregateBindingErrorsIntoJsError (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/error-BHRSI0R7.mjs:48:18)

@@ -400,6 +400,7 @@ test("imports conditions", async () => {
     "package.json": JSON.stringify({
       name: "@scope/pkg",
       preconstruct: {
+        transform: "babel",
         exports: {
           importConditionDefaultExport: "default",
         },
@@ -459,6 +460,7 @@ test("imports conditions", async () => {
         "./package.json": "./package.json",
       },
     }),
+    node_modules: { kind: "symlink", path: repoNodeModules },
     "src/index.js": js`
       export {};
     `,
@@ -577,6 +579,7 @@ test("multiple entrypoints with default imports and exports", async () => {
         "./package.json": "./package.json",
       },
       preconstruct: {
+        transform: "babel",
         exports: {
           importConditionDefaultExport: "default",
         },
@@ -587,6 +590,7 @@ test("multiple entrypoints with default imports and exports", async () => {
       main: "dist/multiple-entrypoints-multiply.cjs.js",
       module: "dist/multiple-entrypoints-multiply.esm.js",
     }),
+    node_modules: { kind: "symlink", path: repoNodeModules },
     "src/index.js": js`
       export let sum = (a, b) => a + b;
     `,
@@ -647,6 +651,24 @@ test("type: module", async () => {
     ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/multiple-entrypoints.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
     ⎯ symlink to src/index.ts
   `);
+});
+
+test("Oxc dev rejects packages without type: module", async () => {
+  const dir = await testdirWithNextMajorDefaults({
+    "package.json": JSON.stringify({
+      name: "oxc-commonjs",
+      main: "dist/oxc-commonjs.cjs.js",
+      module: "dist/oxc-commonjs.esm.js",
+      preconstruct: { exports: false, imports: false },
+    }),
+    "src/index.js": js`
+      export const value = true;
+    `,
+  });
+
+  await expect(dev(dir)).rejects.toThrow(
+    'preconstruct dev only supports the Oxc transform for packages with "type": "module"'
+  );
 });
 
 test("type: module running", async () => {

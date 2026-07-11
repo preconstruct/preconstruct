@@ -349,7 +349,7 @@ test("package resolvable but not in deps", async () => {
       🎁 package-resolvable-but-not-in-deps
       🎁 package-resolvable-but-not-in-deps [plugin throw-warnings]
       🎁 package-resolvable-but-not-in-deps Error: 🎁 package-resolvable-but-not-in-deps "react" is imported by "src/index.js" but the package is not specified in dependencies or peerDependencies
-      🎁 package-resolvable-but-not-in-deps     at PluginContextImpl.buildEnd (/Users/emma/projects/preconstruct/packages/cli/src/build/rollup.ts:159:19)
+      🎁 package-resolvable-but-not-in-deps     at PluginContextImpl.buildEnd (/Users/emma/projects/preconstruct/packages/cli/src/build/rollup.ts:157:19)
       🎁 package-resolvable-but-not-in-deps     at plugin (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/bindingify-input-options-XPJLJOD0.mjs:1406:18)
       🎁 package-resolvable-but-not-in-deps     at plugin.<computed> (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/bindingify-input-options-XPJLJOD0.mjs:1959:18)
       🎁 package-resolvable-but-not-in-deps     at aggregateBindingErrorsIntoJsError (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/error-BHRSI0R7.mjs:48:18)
@@ -483,7 +483,7 @@ test("module imported outside package directory", async () => {
       🎁 @imports-outside-pkg-dir/pkg-a
       🎁 @imports-outside-pkg-dir/pkg-a [plugin throw-warnings]
       🎁 @imports-outside-pkg-dir/pkg-a Error: 🎁 @imports-outside-pkg-dir/pkg-a all relative imports in a package should only import modules inside of their package directory but "src/index.js" is importing "../../some-file"
-      🎁 @imports-outside-pkg-dir/pkg-a     at PluginContextImpl.buildEnd (/Users/emma/projects/preconstruct/packages/cli/src/build/rollup.ts:159:19)
+      🎁 @imports-outside-pkg-dir/pkg-a     at PluginContextImpl.buildEnd (/Users/emma/projects/preconstruct/packages/cli/src/build/rollup.ts:157:19)
       🎁 @imports-outside-pkg-dir/pkg-a     at plugin (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/bindingify-input-options-XPJLJOD0.mjs:1406:18)
       🎁 @imports-outside-pkg-dir/pkg-a     at plugin.<computed> (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/bindingify-input-options-XPJLJOD0.mjs:1959:18)
       🎁 @imports-outside-pkg-dir/pkg-a     at aggregateBindingErrorsIntoJsError (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/error-BHRSI0R7.mjs:48:18)
@@ -620,7 +620,7 @@ test("batches build errors", async () => {
     🎁 @errors/package-one [plugin throw-warnings]
     🎁 @errors/package-one Error: 🎁 @errors/package-one "something" is imported by "src/index.js" but the package is not specified in dependencies or peerDependencies
     🎁 @errors/package-one 🎁 @errors/package-one "something-2" is imported by "src/index.js" but the package is not specified in dependencies or peerDependencies
-    🎁 @errors/package-one     at PluginContextImpl.buildEnd (/Users/emma/projects/preconstruct/packages/cli/src/build/rollup.ts:159:19)
+    🎁 @errors/package-one     at PluginContextImpl.buildEnd (/Users/emma/projects/preconstruct/packages/cli/src/build/rollup.ts:157:19)
     🎁 @errors/package-one     at plugin (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/bindingify-input-options-XPJLJOD0.mjs:1406:18)
     🎁 @errors/package-one     at plugin.<computed> (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/bindingify-input-options-XPJLJOD0.mjs:1959:18)
     🎁 @errors/package-one     at aggregateBindingErrorsIntoJsError (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/error-BHRSI0R7.mjs:48:18)
@@ -640,7 +640,7 @@ test("batches build errors", async () => {
     🎁 @errors/package-two [plugin throw-warnings]
     🎁 @errors/package-two Error: 🎁 @errors/package-two "something" is imported by "src/index.js" but the package is not specified in dependencies or peerDependencies
     🎁 @errors/package-two 🎁 @errors/package-two "something-2" is imported by "src/index.js" but the package is not specified in dependencies or peerDependencies
-    🎁 @errors/package-two     at PluginContextImpl.buildEnd (/Users/emma/projects/preconstruct/packages/cli/src/build/rollup.ts:159:19)
+    🎁 @errors/package-two     at PluginContextImpl.buildEnd (/Users/emma/projects/preconstruct/packages/cli/src/build/rollup.ts:157:19)
     🎁 @errors/package-two     at plugin (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/bindingify-input-options-XPJLJOD0.mjs:1406:18)
     🎁 @errors/package-two     at plugin.<computed> (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/bindingify-input-options-XPJLJOD0.mjs:1959:18)
     🎁 @errors/package-two     at aggregateBindingErrorsIntoJsError (file:///Users/emma/projects/preconstruct/node_modules/rolldown/dist/shared/error-BHRSI0R7.mjs:48:18)

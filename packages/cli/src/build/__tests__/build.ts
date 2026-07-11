@@ -172,6 +172,7 @@ test("umd with dep on other module", async () => {
           "react": "React",
         },
         "imports": false,
+        "transform": "babel",
         "umdName": "umdWithDep",
       },
       "umd:main": "dist/umd-with-dep.umd.min.js",
@@ -358,6 +359,7 @@ test("monorepo umd with dep on other module", async () => {
         "packages": [
           "packages/*",
         ],
+        "transform": "babel",
       },
       "workspaces": [
         "packages/*",
@@ -1271,7 +1273,7 @@ test("importing another package via dynamic import and exporting the namespace p
     🎁 pkg-b     at retryableBuild (/Users/emma/projects/preconstruct/packages/cli/src/build/index.ts:102:5)
     🎁 pkg-b     at /Users/emma/projects/preconstruct/packages/cli/src/build/index.ts:140:11
     🎁 pkg-b     at Module.build (/Users/emma/projects/preconstruct/packages/cli/src/build/index.ts:137:5)
-    🎁 pkg-b     at /Users/emma/projects/preconstruct/packages/cli/src/build/__tests__/build.ts:1251:17
+    🎁 pkg-b     at /Users/emma/projects/preconstruct/packages/cli/src/build/__tests__/build.ts:1253:17
     🎁 pkg-b     at file:///Users/emma/projects/preconstruct/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20 {
     🎁 pkg-b   errors: [Getter/Setter]
     🎁 pkg-b }"
