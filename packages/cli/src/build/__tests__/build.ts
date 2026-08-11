@@ -6,7 +6,6 @@ import {
   initBasic,
   getPkg,
   snapshotDistFiles,
-  install,
   testdir,
   js,
   getDist,
@@ -34,7 +33,6 @@ let unsafeRequire = require;
 test("monorepo", async () => {
   let tmpPath = f.copy("monorepo");
   await initBasic(tmpPath);
-  await install(tmpPath);
   await build(tmpPath);
   let counter = 1;
   for (let pkg of ["package-one", "package-two"]) {
@@ -121,8 +119,6 @@ test("flow", async () => {
     `,
   });
 
-  await install(tmpPath);
-
   await build(tmpPath);
 
   await snapshotDistFiles(tmpPath);
@@ -148,8 +144,6 @@ test("flow", async () => {
       export default "wow";
     `,
   });
-
-  await install(tmpPath);
 
   await build(tmpPath);
 
@@ -499,7 +493,6 @@ test("monorepo umd with dep on multi-entrypoint module subpath", async () => {
 test("monorepo single package", async () => {
   let tmpPath = f.copy("monorepo-single-package");
   await initBasic(tmpPath);
-  await install(tmpPath);
 
   await build(tmpPath);
   let pkgPath = path.join(tmpPath, "packages", "package-two");

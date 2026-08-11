@@ -260,7 +260,7 @@ test("monorepo umd with dep on other module incorrect peerDeps", async () => {
     },
     "node_modules/react": {
       kind: "symlink",
-      path: path.join(repoNodeModules, "react"),
+      path: path.join(repoNodeModules, "..", "site", "node_modules", "react"),
     },
     "packages/package-four/package.json": JSON.stringify({
       name: "@some-scope-incorrect-peerdeps/package-four-umd-with-dep",
