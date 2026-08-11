@@ -1,3 +1,4 @@
+import assert from "node:assert/strict";
 import path from "path";
 import build from "../";
 import {
@@ -54,7 +55,7 @@ test("basic", async () => {
     {"version":3,"file":"valid-package.umd.min.js","sources":["../src/index.js"],"sourcesContent":["export default \\"something\\";\\n"],"names":[],"mappings":"mPAAe"}
   `);
 
-  expect(unsafeRequire(tmpPath).default).toBe("something");
+  assert.strictEqual(unsafeRequire(tmpPath).default, "something");
 });
 
 test("typescript thing", async () => {
@@ -1094,7 +1095,7 @@ test("typescript declaration emit with unreferencable types emits diagnostic", a
     `,
   });
   const error = await build(dir).catch((x) => x);
-  expect(error).toBeInstanceOf(BatchError);
+  assert.ok(error instanceof BatchError);
   expect(
     stripAnsi(
       error.message.replace(

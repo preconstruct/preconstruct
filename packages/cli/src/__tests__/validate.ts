@@ -1,3 +1,4 @@
+import assert from "node:assert/strict";
 import path from "path";
 import validate from "../validate";
 import {
@@ -63,7 +64,7 @@ test("no main field", async () => {
     return;
   }
 
-  expect(true).toBe(false);
+  assert.strictEqual(true, false);
 });
 
 test("no module", async () => {
@@ -221,7 +222,7 @@ test("create package.json for an entrypoint", async () => {
 
   await validate(tmpPath);
 
-  expect(createEntrypointPkgJson.calls).toHaveLength(1);
+  assert.strictEqual(createEntrypointPkgJson.calls.length, 1);
 
   expect(await getPkg(path.join(tmpPath, "other"))).toMatchInlineSnapshot(`
     {
@@ -359,7 +360,7 @@ test("monorepo umd with dep on other module incorrect peerDeps", async () => {
     );
     return;
   }
-  expect(true).toBe(false);
+  assert.strictEqual(true, false);
 });
 
 test("dist not included in package", async () => {
@@ -384,7 +385,7 @@ test("dist not included in package", async () => {
     );
     return;
   }
-  expect(true).toBe(false);
+  assert.strictEqual(true, false);
 });
 
 test("entrypoint not included in package", async () => {
@@ -423,7 +424,7 @@ test("entrypoint not included in package", async () => {
     );
     return;
   }
-  expect(true).toBe(false);
+  assert.strictEqual(true, false);
 });
 
 test("root dist directory not included in package without entrypoint at root", async () => {

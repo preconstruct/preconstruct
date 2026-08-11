@@ -1,3 +1,4 @@
+import assert from "node:assert/strict";
 import spawn from "spawndamnit";
 import build from "..";
 import {
@@ -378,8 +379,11 @@ describe("imports conditions runtime check with importConditionDefaultExport: de
         }
       );
 
-      expect(node.code).toBe(0);
-      expect(node.stdout.toString("utf8")).toBe(expected.join("\n") + "\n");
+      assert.strictEqual(node.code, 0);
+      assert.strictEqual(
+        node.stdout.toString("utf8"),
+        expected.join("\n") + "\n"
+      );
       expect(node.stderr.toString("utf8")).toMatchInlineSnapshot(`""`);
     });
   });

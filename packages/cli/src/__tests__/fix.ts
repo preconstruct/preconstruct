@@ -1,3 +1,4 @@
+import assert from "node:assert/strict";
 import fix from "../fix";
 import path from "path";
 import { inputs } from "../messages";
@@ -36,7 +37,7 @@ test("only main", async () => {
 
   await fix(tmpPath);
 
-  expect(origJson).toEqual(await getPkg(tmpPath));
+  assert.deepEqual(origJson, await getPkg(tmpPath));
 });
 
 test("set main and module field", async () => {
@@ -438,7 +439,7 @@ test("does not modify if already valid", async () => {
 
   await fix(tmpPath);
   let current = await getPkg(tmpPath);
-  expect(original).toEqual(current);
+  assert.deepEqual(original, current);
   expect(logMock.log.calls).toMatchInlineSnapshot(`
     [
       [
@@ -514,8 +515,8 @@ testFix(
   },
   async (run) => {
     let promptInput = stub(async (message: string, item: { name: string }) => {
-      expect(message).toBe(inputs.getUmdName);
-      expect(item.name).toBe("something");
+      assert.strictEqual(message, inputs.getUmdName);
+      assert.strictEqual(item.name, "something");
       return "somethingUmdName";
     });
     setPromptInput(promptInput.handler);
@@ -534,10 +535,10 @@ testFix(
         },
       }
     `);
-    expect(contents[""].preconstruct.umdName).toBe("somethingUmdName");
-    expect(contents[""]["umd:main"]).toBe("dist/something.umd.min.js");
+    assert.strictEqual(contents[""].preconstruct.umdName, "somethingUmdName");
+    assert.strictEqual(contents[""]["umd:main"], "dist/something.umd.min.js");
 
-    expect(promptInput.calls).toHaveLength(1);
+    assert.strictEqual(promptInput.calls.length, 1);
   }
 );
 
@@ -557,8 +558,8 @@ test("create entrypoint", async () => {
       defaultAnswer?: string
     ) => {
       if (x === 0) {
-        expect(message).toBe(inputs.getUmdName);
-        expect(name).toBe("valid-package/another");
+        assert.strictEqual(message, inputs.getUmdName);
+        assert.strictEqual(name, "valid-package/another");
         return "another";
       }
       throw new Error("unexpected call");
@@ -571,7 +572,7 @@ test("create entrypoint", async () => {
   });
   await fix(tmpPath);
 
-  expect(promptInput.calls).toHaveLength(1);
+  assert.strictEqual(promptInput.calls.length, 1);
 
   expect(
     await fs.readFile(path.join(tmpPath, "another", "package.json"), "utf8")

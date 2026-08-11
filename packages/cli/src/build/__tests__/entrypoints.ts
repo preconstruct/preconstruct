@@ -1,3 +1,4 @@
+import assert from "node:assert/strict";
 import build from "../";
 import path from "path";
 import { stripHashes, testdir, js, getFiles } from "../../../test-utils";
@@ -263,8 +264,8 @@ test("two entrypoints with a common dependency", async () => {
   `);
   let root = require(tmpPath);
   let other = require(path.join(tmpPath, "multiply"));
-  expect(typeof root.identity).toBe("function");
-  expect(root.identity).toBe(other.identity);
+  assert.strictEqual(typeof root.identity, "function");
+  assert.strictEqual(root.identity, other.identity);
 });
 
 test("two entrypoints where one requires the other entrypoint", async () => {
@@ -356,11 +357,11 @@ test("two entrypoints where one requires the other entrypoint", async () => {
   `);
 
   let { identity } = require(tmpPath);
-  expect(identity(20)).toBe(20);
+  assert.strictEqual(identity(20), 20);
 
   let { multiply } = require(path.join(tmpPath, "multiply"));
 
-  expect(multiply(2, 3)).toBe(6);
+  assert.strictEqual(multiply(2, 3), 6);
 });
 
 test("multiple entrypoints", async () => {
@@ -446,5 +447,5 @@ test("multiple entrypoints", async () => {
     "
   `);
   expect(node.stderr.toString("utf8")).toMatchInlineSnapshot(`""`);
-  expect(node.code).toBe(0);
+  assert.strictEqual(node.code, 0);
 });

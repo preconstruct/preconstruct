@@ -1,3 +1,4 @@
+import assert from "node:assert/strict";
 import build from "../";
 import {
   testdir,
@@ -506,7 +507,7 @@ test("package resolvable but not in deps", async () => {
     );
     return;
   }
-  expect(true).toBe(false);
+  assert.strictEqual(true, false);
 });
 
 test("package with exports resolvable", async () => {
@@ -587,7 +588,7 @@ test("entrypoint outside package directory", async () => {
     );
     return;
   }
-  expect(true).toBe(false);
+  assert.strictEqual(true, false);
 });
 
 test("module imported outside package directory", async () => {
@@ -621,7 +622,7 @@ test("module imported outside package directory", async () => {
     );
     return;
   }
-  expect(true).toBe(false);
+  assert.strictEqual(true, false);
 });
 
 test("using external @babel/runtime helpers", async () => {
@@ -936,7 +937,7 @@ test("fails for source files containing top-level this", async () => {
     `);
     return;
   }
-  expect(true).toBe(false);
+  assert.strictEqual(true, false);
 });
 
 test(".d.ts", async () => {

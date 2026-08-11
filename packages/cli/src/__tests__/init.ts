@@ -1,3 +1,4 @@
+import assert from "node:assert/strict";
 import path from "path";
 import init from "../init";
 import { errors } from "../messages";
@@ -19,7 +20,7 @@ test("no entrypoint", async () => {
   try {
     await init(tmpPath);
   } catch (error) {
-    expect(error.message).toBe(errors.noSource("src/index"));
+    assert.strictEqual(error.message, errors.noSource("src/index"));
   }
 });
 
@@ -32,9 +33,9 @@ test("do not allow write", async () => {
   try {
     await init(tmpPath);
   } catch (error) {
-    expect(error.message).toBe(errors.deniedWriteMainField);
+    assert.strictEqual(error.message, errors.deniedWriteMainField);
   }
-  expect(writeMainField.calls).toHaveLength(1);
+  assert.strictEqual(writeMainField.calls.length, 1);
 });
 
 test("set only main field", async () => {
@@ -46,8 +47,8 @@ test("set only main field", async () => {
   setConfirm("writeModuleField", writeModuleField.handler);
 
   await init(tmpPath);
-  expect(writeMainField.calls).toHaveLength(1);
-  expect(writeModuleField.calls).toHaveLength(1);
+  assert.strictEqual(writeMainField.calls.length, 1);
+  assert.strictEqual(writeModuleField.calls.length, 1);
 
   let pkg = await getPkg(tmpPath);
   expect(pkg).toMatchInlineSnapshot(`
@@ -67,8 +68,8 @@ test("set main and module field", async () => {
   setConfirm("writeModuleField", writeModuleField.handler);
 
   await init(tmpPath);
-  expect(writeMainField.calls).toHaveLength(1);
-  expect(writeModuleField.calls).toHaveLength(1);
+  assert.strictEqual(writeMainField.calls.length, 1);
+  assert.strictEqual(writeModuleField.calls.length, 1);
 
   let pkg = await getPkg(tmpPath);
 
@@ -104,8 +105,8 @@ test("scoped package", async () => {
   setConfirm("writeModuleField", writeModuleField.handler);
 
   await init(tmpPath);
-  expect(writeMainField.calls).toHaveLength(1);
-  expect(writeModuleField.calls).toHaveLength(1);
+  assert.strictEqual(writeMainField.calls.length, 1);
+  assert.strictEqual(writeModuleField.calls.length, 1);
   let pkg = await getPkg(tmpPath);
 
   expect(pkg).toMatchInlineSnapshot(`
@@ -129,8 +130,8 @@ test("monorepo", async () => {
   setConfirm("writeModuleField", writeModuleField.handler);
 
   await init(tmpPath);
-  expect(writeMainField.calls).toHaveLength(2);
-  expect(writeModuleField.calls).toHaveLength(2);
+  assert.strictEqual(writeMainField.calls.length, 2);
+  assert.strictEqual(writeModuleField.calls.length, 2);
 
   let pkg1 = await getPkg(path.join(tmpPath, "packages", "package-one"));
   let pkg2 = await getPkg(path.join(tmpPath, "packages", "package-two"));
@@ -166,7 +167,7 @@ test("does not prompt or modify if already valid", async () => {
 
   await init(tmpPath);
   let current = await getPkg(tmpPath);
-  expect(original).toEqual(current);
+  assert.deepEqual(original, current);
   expect(logMock.log.calls).toMatchInlineSnapshot(`
     [
       [
@@ -192,8 +193,8 @@ test("invalid fields", async () => {
 
   await init(tmpPath);
 
-  expect(writeMainField.calls).toHaveLength(1);
-  expect(writeModuleField.calls).toHaveLength(1);
+  assert.strictEqual(writeMainField.calls.length, 1);
+  assert.strictEqual(writeModuleField.calls.length, 1);
 
   let pkg = await getPkg(tmpPath);
 
