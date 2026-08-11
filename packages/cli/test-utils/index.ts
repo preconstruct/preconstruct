@@ -7,6 +7,8 @@ import outdent from "outdent";
 import crypto from "crypto";
 // import profiler from "v8-profiler-next";
 import chalk from "chalk";
+import { resetPromptOverrides, setPromptOverrides } from "../src/prompt";
+import { confirms } from "../src/messages";
 
 export const js = outdent;
 export const ts = outdent;
@@ -132,17 +134,80 @@ export const fixtures = {
 
 chalk.level = 0;
 
-console.error = jest.fn();
-console.log = jest.fn();
-
-export let logMock = {
-  log: (console.log as any) as jest.MockInstance<void, any>,
-  error: (console.error as any) as jest.MockInstance<void, any>,
+type CallSpy<Arguments extends unknown[]> = ((...args: Arguments) => void) & {
+  calls: Arguments[];
+  reset: () => void;
 };
 
+function createCallSpy<Arguments extends unknown[]>(): CallSpy<Arguments> {
+  let spy = ((...args: Arguments) => {
+    spy.calls.push(args);
+  }) as CallSpy<Arguments>;
+  spy.calls = [];
+  spy.reset = () => {
+    spy.calls = [];
+  };
+  return spy;
+}
+
+let log = createCallSpy<any[]>();
+let error = createCallSpy<any[]>();
+console.log = log;
+console.error = error;
+
+export let logMock = {
+  log,
+  error,
+};
+
+const defaultConfirms = (Object.fromEntries(
+  Object.keys(confirms).map((name) => [
+    name,
+    async (): Promise<boolean> => {
+      throw new Error(`Confirm "${name}" was called but not stubbed`);
+    },
+  ])
+) as unknown) as typeof confirms;
+
+Object.assign(confirms, defaultConfirms);
+
+export function setConfirm(
+  name: keyof typeof confirms,
+  value: (pkg: { readonly name: string }) => Promise<boolean>
+) {
+  confirms[name] = value;
+}
+
+export function setPromptInput(
+  value: (
+    message: string,
+    pkg: { name: string },
+    defaultAnswer?: string
+  ) => Promise<string>
+) {
+  setPromptOverrides({ input: value });
+}
+
+export function stub<Arguments extends unknown[], Result>(
+  implementation: (...args: Arguments) => Result
+) {
+  let calls: Arguments[] = [];
+  let handler = (...args: Arguments) => {
+    calls.push(args);
+    return implementation(...args);
+  };
+  return { handler, calls };
+}
+
 afterEach(() => {
-  logMock.log.mockReset();
-  logMock.error.mockReset();
+  logMock.log.reset();
+  logMock.error.reset();
+  Object.assign(confirms, defaultConfirms);
+  resetPromptOverrides();
+  setPromptOverrides({
+    confirm: async () => undefined as any,
+    input: async () => undefined as any,
+  });
 });
 
 const temporaryDirectories: string[] = [];
@@ -154,18 +219,19 @@ afterAll(async () => {
 });
 
 import init from "../src/init";
-import { confirms } from "../src/messages";
 import normalizePath from "normalize-path";
 
-let mockedConfirms = confirms as jest.Mocked<typeof confirms>;
-
 export async function initBasic(directory: string) {
-  mockedConfirms.writeMainField.mockReturnValue(Promise.resolve(true));
-  mockedConfirms.writeModuleField.mockReturnValue(Promise.resolve(true));
-
-  await init(directory);
-  mockedConfirms.writeMainField.mockReset();
-  mockedConfirms.writeModuleField.mockReset();
+  let writeMainField = confirms.writeMainField;
+  let writeModuleField = confirms.writeModuleField;
+  confirms.writeMainField = async () => true;
+  confirms.writeModuleField = async () => true;
+  try {
+    await init(directory);
+  } finally {
+    confirms.writeMainField = writeMainField;
+    confirms.writeModuleField = writeModuleField;
+  }
 }
 
 // export function profile(name: string) {

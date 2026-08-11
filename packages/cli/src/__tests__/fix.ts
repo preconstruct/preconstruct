@@ -1,6 +1,6 @@
 import fix from "../fix";
 import path from "path";
-import { confirms as _confirms, inputs } from "../messages";
+import { inputs } from "../messages";
 import {
   getPkg,
   modifyPkg,
@@ -11,21 +11,13 @@ import {
   getFiles,
   ts,
   fixtures,
+  setConfirm,
+  setPromptInput,
+  stub,
 } from "../../test-utils";
-import { promptInput as _promptInput } from "../prompt";
 import fs from "fs-extra";
 
-jest.mock("../prompt");
-
-let confirms = _confirms as jest.Mocked<typeof _confirms>;
-
-let promptInput = _promptInput as jest.MockedFunction<typeof _promptInput>;
-
 let testFix = createPackageCheckTestCreator(fix);
-
-afterEach(() => {
-  jest.resetAllMocks();
-});
 
 test("no entrypoint", async () => {
   let tmpPath = await testdir(fixtures.noEntrypoint);
@@ -36,7 +28,7 @@ test("no entrypoint", async () => {
 
 test("only main", async () => {
   let tmpPath = await testdir(fixtures.noModule);
-  confirms.writeMainField.mockReturnValue(Promise.resolve(true));
+  setConfirm("writeMainField", async () => true);
   let origJson = await getPkg(tmpPath);
   await modifyPkg(tmpPath, (json) => {
     json.main = "bad";
@@ -447,7 +439,7 @@ test("does not modify if already valid", async () => {
   await fix(tmpPath);
   let current = await getPkg(tmpPath);
   expect(original).toEqual(current);
-  expect(logMock.log.mock.calls).toMatchInlineSnapshot(`
+  expect(logMock.log.calls).toMatchInlineSnapshot(`
     [
       [
         "🎁 success project already valid!",
@@ -502,7 +494,7 @@ test("monorepo single package", async () => {
   let tmpPath = await testdir(fixtures.monorepoSinglePackage);
 
   await fix(tmpPath);
-  expect(logMock.log.mock.calls).toMatchInlineSnapshot(`
+  expect(logMock.log.calls).toMatchInlineSnapshot(`
     [
       [
         "🎁 success project already valid!",
@@ -521,11 +513,12 @@ testFix(
     },
   },
   async (run) => {
-    promptInput.mockImplementation(async (message, item) => {
+    let promptInput = stub(async (message: string, item: { name: string }) => {
       expect(message).toBe(inputs.getUmdName);
       expect(item.name).toBe("something");
       return "somethingUmdName";
     });
+    setPromptInput(promptInput.handler);
 
     let contents = await run();
 
@@ -544,7 +537,7 @@ testFix(
     expect(contents[""].preconstruct.umdName).toBe("somethingUmdName");
     expect(contents[""]["umd:main"]).toBe("dist/something.umd.min.js");
 
-    expect(promptInput).toBeCalledTimes(1);
+    expect(promptInput.calls).toHaveLength(1);
   }
 );
 
@@ -557,21 +550,28 @@ test("create entrypoint", async () => {
 
   let x = 0;
 
-  promptInput.mockImplementation(async (message, { name }, defaultAnswer) => {
-    if (x === 0) {
-      expect(message).toBe(inputs.getUmdName);
-      expect(name).toBe("valid-package/another");
-      return "another";
+  let promptInput = stub(
+    async (
+      message: string,
+      { name }: { name: string },
+      defaultAnswer?: string
+    ) => {
+      if (x === 0) {
+        expect(message).toBe(inputs.getUmdName);
+        expect(name).toBe("valid-package/another");
+        return "another";
+      }
+      throw new Error("unexpected call");
     }
-    throw new Error("unexpected call");
-  });
+  );
+  setPromptInput(promptInput.handler);
 
   await modifyPkg(tmpPath, (pkg) => {
     pkg.preconstruct.entrypoints = ["index.js", "another.js"];
   });
   await fix(tmpPath);
 
-  expect(promptInput).toBeCalledTimes(1);
+  expect(promptInput.calls).toHaveLength(1);
 
   expect(
     await fs.readFile(path.join(tmpPath, "another", "package.json"), "utf8")

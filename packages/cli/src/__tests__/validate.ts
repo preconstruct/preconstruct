@@ -9,23 +9,16 @@ import {
   repoNodeModules,
   getFiles,
   fixtures,
+  setConfirm,
+  stub,
 } from "../../test-utils";
-import { confirms as _confirms } from "../messages";
 import { JSONValue } from "../utils";
-
-jest.mock("../prompt");
-
-afterEach(() => {
-  jest.resetAllMocks();
-});
-
-let confirms = _confirms as jest.Mocked<typeof _confirms>;
 
 test("reports correct result on valid package", async () => {
   let tmpPath = await testdir(fixtures.validPackage);
 
   await validate(tmpPath);
-  expect(logMock.log.mock.calls).toMatchInlineSnapshot(`
+  expect(logMock.log.calls).toMatchInlineSnapshot(`
     [
       [
         "🎁 info valid-package a valid entry point exists.",
@@ -77,7 +70,7 @@ test("no module", async () => {
   let tmpPath = await testdir(fixtures.noModule);
 
   await validate(tmpPath);
-  expect(logMock.log.mock.calls).toMatchInlineSnapshot(`
+  expect(logMock.log.calls).toMatchInlineSnapshot(`
     [
       [
         "🎁 info no-module a valid entry point exists.",
@@ -114,7 +107,7 @@ test("valid browser", async () => {
   });
 
   await validate(tmpPath);
-  expect(logMock.log.mock.calls).toMatchInlineSnapshot(`
+  expect(logMock.log.calls).toMatchInlineSnapshot(`
     [
       [
         "🎁 info valid-package a valid entry point exists.",
@@ -142,7 +135,7 @@ test("monorepo single package", async () => {
   let tmpPath = await testdir(fixtures.monorepoSinglePackage);
 
   await validate(tmpPath);
-  expect(logMock.log.mock.calls).toMatchInlineSnapshot(`
+  expect(logMock.log.calls).toMatchInlineSnapshot(`
     [
       [
         "🎁 info @some-scope/package-two-single-package a valid entry point exists.",
@@ -223,11 +216,12 @@ test("create package.json for an entrypoint", async () => {
       export default "something";
     `,
   });
-  confirms.createEntrypointPkgJson.mockReturnValue(Promise.resolve(true));
+  let createEntrypointPkgJson = stub(async () => true);
+  setConfirm("createEntrypointPkgJson", createEntrypointPkgJson.handler);
 
   await validate(tmpPath);
 
-  expect(confirms.createEntrypointPkgJson).toBeCalledTimes(1);
+  expect(createEntrypointPkgJson.calls).toHaveLength(1);
 
   expect(await getPkg(path.join(tmpPath, "other"))).toMatchInlineSnapshot(`
     {
@@ -619,7 +613,7 @@ test("old dist filenames", async () => {
   await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
     `[Error: main field is invalid, found \`"dist/pkg-a.cjs.js"\`, expected \`"dist/something-pkg-a.cjs.js"\`]`
   );
-  expect(logMock.log.mock.calls).toMatchInlineSnapshot(`
+  expect(logMock.log.calls).toMatchInlineSnapshot(`
     [
       [
         "🎁 info @something/pkg-a a valid entry point exists.",
@@ -649,7 +643,7 @@ test("just wrong dist filenames doesn't report about the changed dist filename s
   await expect(validate(tmpPath)).rejects.toMatchInlineSnapshot(
     `[Error: main field is invalid, found \`"dist/pkg-a-blah.cjs.js"\`, expected \`"dist/something-pkg-a.cjs.js"\`]`
   );
-  expect(logMock.log.mock.calls).toMatchInlineSnapshot(`
+  expect(logMock.log.calls).toMatchInlineSnapshot(`
     [
       [
         "🎁 info @something/pkg-a a valid entry point exists.",
@@ -1067,7 +1061,7 @@ test("type: module removes package.json", async () => {
     `,
   });
 
-  await confirms.deleteEntrypointPkgJson.mockResolvedValue(true);
+  setConfirm("deleteEntrypointPkgJson", async () => true);
 
   await validate(dir);
 
@@ -1122,7 +1116,7 @@ test("type: module errors on main/module/browser/umd:main fields in package.json
     `,
   });
 
-  confirms.deleteEntrypointPkgJson.mockResolvedValue(true);
+  setConfirm("deleteEntrypointPkgJson", async () => true);
 
   await expect(validate(dir)).rejects.toMatchInlineSnapshot(
     `[Error: "type": "module" packages should not use the "module" field.]`

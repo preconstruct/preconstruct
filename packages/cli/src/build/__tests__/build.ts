@@ -13,17 +13,10 @@ import {
   ts,
   stripHashes,
   fixtures,
+  setPromptInput,
 } from "../../../test-utils";
-import { doPromptInput as _doPromptInput } from "../../prompt";
-import { confirms as _confirms } from "../../messages";
 import spawn from "spawndamnit";
 import stripAnsi from "strip-ansi";
-
-jest.mock("../../prompt");
-
-let doPromptInput = _doPromptInput as jest.MockedFunction<
-  typeof _doPromptInput
->;
 
 let unsafeRequire = require;
 
@@ -379,7 +372,7 @@ test("umd with dep on other module", async () => {
     `,
   });
 
-  doPromptInput.mockImplementation(async (question) => {
+  setPromptInput(async (question) => {
     if (question === `What should the umdName of react be?`) {
       return "React";
     }
@@ -545,7 +538,7 @@ test("monorepo umd with dep on other module", async () => {
     `,
   });
   let asked = false;
-  doPromptInput.mockImplementation(async (question) => {
+  setPromptInput(async (question) => {
     if (asked) {
       throw new Error("only one prompt should happen: " + question);
     }

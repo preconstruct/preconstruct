@@ -5,8 +5,6 @@ import spawn from "spawndamnit";
 
 jest.setTimeout(10000);
 
-jest.mock("../../prompt");
-
 test("multiple entrypoints", async () => {
   let dir = await testdir({
     "package.json": JSON.stringify({

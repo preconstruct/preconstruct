@@ -15,8 +15,6 @@ import stripAnsi from "strip-ansi";
 
 jest.setTimeout(6000000);
 
-jest.mock("../../prompt");
-
 let unsafeRequire = require;
 
 test("basic", async () => {

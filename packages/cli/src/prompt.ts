@@ -11,6 +11,25 @@ let prefix = `🎁 ${chalk.green("?")}`;
 
 type NamedThing = { readonly name: string };
 
+type PromptOverrides = {
+  confirm?: (message: string, pkg: NamedThing) => Promise<boolean>;
+  input?: (
+    message: string,
+    pkg: { name: string },
+    defaultAnswer?: string
+  ) => Promise<string>;
+};
+
+let overrides: PromptOverrides = {};
+
+export function setPromptOverrides(next: PromptOverrides) {
+  overrides = { ...overrides, ...next };
+}
+
+export function resetPromptOverrides() {
+  overrides = {};
+}
+
 export function createPromptConfirmLoader(
   message: string
 ): (pkg: NamedThing) => Promise<boolean> {
@@ -50,14 +69,15 @@ export function createPromptConfirmLoader(
     )
   );
 
-  return (pkg: NamedThing) => loader.load(pkg);
+  return (pkg: NamedThing) =>
+    overrides.confirm ? overrides.confirm(message, pkg) : loader.load(pkg);
 }
 
-export let doPromptInput = async (
+async function promptForInput(
   message: string,
   pkg: { name: string },
   defaultAnswer?: string
-): Promise<string> => {
+): Promise<string> {
   // @ts-ignore
   let { input } = await enquirer.prompt([
     {
@@ -71,7 +91,16 @@ export let doPromptInput = async (
     },
   ]);
   return input;
-};
+}
+
+export let doPromptInput = (
+  message: string,
+  pkg: { name: string },
+  defaultAnswer?: string
+): Promise<string> =>
+  overrides.input
+    ? overrides.input(message, pkg, defaultAnswer)
+    : promptForInput(message, pkg, defaultAnswer);
 
 export let promptInput = (
   message: string,
