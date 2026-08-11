@@ -2,14 +2,13 @@ import path from "path";
 import build from "../";
 import fixturez from "fixturez";
 import {
-  snapshotDistFiles,
-  snapshotDirectory,
   testdir,
   getDist,
   tsx,
   ts,
   repoNodeModules,
   js,
+  getFiles,
 } from "../../../test-utils";
 import { BatchError } from "../../errors";
 import stripAnsi from "strip-ansi";
@@ -27,7 +26,37 @@ test("basic", async () => {
 
   await build(tmpPath);
 
-  await snapshotDistFiles(tmpPath);
+  expect(await getFiles(tmpPath, ["dist/*"])).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/valid-package.cjs.dev.js, dist/valid-package.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    var index = "something";
+
+    exports["default"] = index;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/valid-package.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./valid-package.cjs.prod.js");
+    } else {
+      module.exports = require("./valid-package.cjs.dev.js");
+    }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/valid-package.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    var index = "something";
+
+    export { index as default };
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/valid-package.umd.min.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    !function(e,n){"object"==typeof exports&&"undefined"!=typeof module?module.exports=n():"function"==typeof define&&define.amd?define(n):(e="undefined"!=typeof globalThis?globalThis:e||self).validPackage=n()}(this,(function(){"use strict";return"something"}));
+    //# sourceMappingURL=valid-package.umd.min.js.map
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/valid-package.umd.min.js.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {"version":3,"file":"valid-package.umd.min.js","sources":["../src/index.js"],"sourcesContent":["export default \\"something\\";\\n"],"names":[],"mappings":"mPAAe"}
+  `);
 
   expect(unsafeRequire(tmpPath).default).toBe("something");
 });
@@ -100,7 +129,46 @@ test("typescript thing", async () => {
   });
   await build(tmpPath);
 
-  await snapshotDirectory(path.join(tmpPath, "dist"), { files: "all" });
+  expect(await getFiles(path.join(tmpPath, "dist"))).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ declarations/src/index.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export declare const thing: "wow";
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ weird-typescript-thing.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export * from "./declarations/src/index.js";
+    //# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoid2VpcmQtdHlwZXNjcmlwdC10aGluZy5janMuZC50cyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4vZGVjbGFyYXRpb25zL3NyYy9pbmRleC5kLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBIn0=
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ weird-typescript-thing.cjs.dev.js, weird-typescript-thing.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    const thing$1 = () => "wow";
+
+    const makeThing = () => thing$1();
+
+    const thing = makeThing();
+
+    exports.thing = thing;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ weird-typescript-thing.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./weird-typescript-thing.cjs.prod.js");
+    } else {
+      module.exports = require("./weird-typescript-thing.cjs.dev.js");
+    }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ weird-typescript-thing.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    const thing$1 = () => "wow";
+
+    const makeThing = () => thing$1();
+
+    const thing = makeThing();
+
+    export { thing };
+
+  `);
 });
 
 test("typescript declarationMap", async () => {
