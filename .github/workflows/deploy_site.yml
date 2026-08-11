@@ -17,7 +17,7 @@ jobs:
 
       - uses: ./.github/actions/setup-deps
 
-      - run: yarn build:site
+      - run: pnpm build:site
 
       - name: Upload Build Artifact
         uses: actions/upload-pages-artifact@v3

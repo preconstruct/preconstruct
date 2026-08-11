@@ -23,7 +23,7 @@ jobs:
       - uses: ./.github/actions/setup-deps
 
       - name: Run Tests
-        run: yarn cross-env CI=true yarn jest --coverage --color
+        run: pnpm exec cross-env CI=true jest --coverage --color
 
       - name: Upload coverage to Codecov
         run: bash <(curl -s https://codecov.io/bash) -C $GITHUB_SHA -B ${GITHUB_REF#refs/heads/} -Z
@@ -39,7 +39,7 @@ jobs:
       - uses: ./.github/actions/setup-deps
 
       - name: Check Types
-        run: yarn tsc
+        run: pnpm exec tsc
   eslint:
     name: ESLint
     runs-on: ubuntu-latest
@@ -49,7 +49,7 @@ jobs:
       - uses: ./.github/actions/setup-deps
 
       - name: Run ESLint
-        run: yarn lint
+        run: pnpm lint
   knip:
     name: Knip
     runs-on: ubuntu-latest
@@ -59,7 +59,7 @@ jobs:
       - uses: ./.github/actions/setup-deps
 
       - name: Run Knip
-        run: yarn lint:knip
+        run: pnpm lint:knip
   build_site:
     name: Build Site
     runs-on: ubuntu-latest
@@ -69,4 +69,4 @@ jobs:
       - uses: ./.github/actions/setup-deps
 
       - name: Build Site
-        run: yarn build:site
+        run: pnpm build:site

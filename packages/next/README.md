@@ -5,7 +5,7 @@ A [Next.js](https://nextjs.org/) plugin to make Next sites work with [`preconstr
 ## Install
 
 ```bash
-yarn add @preconstruct/next
+pnpm add @preconstruct/next
 ```
 
 ## Usage

@@ -27,20 +27,20 @@
 
 ## Getting Started
 
-Assuming you already have a source file at src/index.js (or src/index.ts) or you're using Yarn Workspaces and have packages with src/index.js (or src/index.ts), you can setup Preconstruct like this.
+Assuming you already have a source file at src/index.js (or src/index.ts) or you're using pnpm workspaces and have packages with src/index.js (or src/index.ts), you can setup Preconstruct like this.
 
 ```bash
-yarn add --dev @preconstruct/cli
-yarn preconstruct init
+pnpm add --save-dev @preconstruct/cli
+pnpm preconstruct init
 ```
 
-If you're in a monorepo, you should also run `yarn preconstruct dev` and add it to a postinstall script(`"postinstall": "preconstruct dev"`) that runs preconstruct dev so that you can import your code without having to rebuild your project every time in changes.
+If you're in a monorepo, you should also run `pnpm preconstruct dev` and add it to a postinstall script(`"postinstall": "preconstruct dev"`) that runs preconstruct dev so that you can import your code without having to rebuild your project every time in changes.
 
 ## Publishing packages
 
 Before you publish packages to npm, run `preconstruct build`. Preconstruct will use your Babel config and build flat bundles so make sure to [configure Babel](https://preconstruct.tools/guides/configuring-babel) with the transforms you want.
 
-> We strongly recomment making a single script in your package.json that runs both build and publish, to stop broken publishes, such as `"release": "preconstruct build && yarn publish:packages`. If you're in a single-package repo, you could also run `preconstruct build` in a `prepare` or `prepublishOnly` script.
+> We strongly recomment making a single script in your package.json that runs both build and publish, to stop broken publishes, such as `"release": "preconstruct build && pnpm publish:packages`. If you're in a single-package repo, you could also run `preconstruct build` in a `prepare` or `prepublishOnly` script.
 
 ## Further Guides
 

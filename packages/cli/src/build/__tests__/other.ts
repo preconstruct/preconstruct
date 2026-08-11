@@ -1,7 +1,6 @@
 import build from "../";
 import {
   snapshotDirectory,
-  install,
   testdir,
   js,
   getDist,
@@ -383,7 +382,6 @@ test("package resolvable but not in deps", async () => {
       export default React.createContext("something");
     `,
   });
-  await install(tmpPath);
   try {
     await build(tmpPath);
   } catch (err) {
@@ -530,7 +528,6 @@ test("using external @babel/runtime helpers", async () => {
     `,
   });
 
-  await install(tmpPath);
   await build(tmpPath);
 
   await snapshotDirectory(tmpPath, { files: "all" });

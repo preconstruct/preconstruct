@@ -2,12 +2,17 @@ name: "Setup Dependencies"
 runs:
   using: "composite"
   steps:
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: 11.21.0
+
     - name: Setup Node.js LTS
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
         node-version: lts/*
-        cache: yarn
+        cache: pnpm
 
     - name: Install Dependencies
-      run: yarn install
+      run: pnpm install --frozen-lockfile
       shell: bash
