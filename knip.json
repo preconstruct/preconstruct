@@ -3,26 +3,12 @@
   "ignoreWorkspaces": ["site/**"],
   "workspaces": {
     ".": {
-      "ignoreDependencies": [
-        "@preconstruct/cli",
-        "@preconstruct/eslint-plugin-format-js-tag"
-      ],
-      "ignoreBinaries": ["start"]
+      "ignoreDependencies": ["@preconstruct/eslint-plugin-format-js-tag"]
     },
     "packages/*": {},
     "packages/cli": {
       "entry": ["src/cli.ts", "src/build/watch.ts", "src/worker.ts"],
-      "ignore": ["src/__mocks__/prompt.ts"],
-      "ignoreDependencies": [
-        "@preconstruct/hook",
-        "@babel/runtime",
-        "@babel/generator",
-        "@babel/helpers"
-      ]
-    },
-    "packages/hook": {
-      "entry": ["noop.js"]
+      "ignoreDependencies": ["@babel/runtime", "@babel/helpers"]
     }
-  },
-  "ignore": ["__fixtures__/**"]
+  }
 }

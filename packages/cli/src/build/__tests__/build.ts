@@ -1,5 +1,4 @@
 import build from "../";
-import fixturez from "fixturez";
 import path from "path";
 import fs from "fs-extra";
 import {
@@ -13,13 +12,12 @@ import {
   getFiles,
   ts,
   stripHashes,
+  fixtures,
 } from "../../../test-utils";
 import { doPromptInput as _doPromptInput } from "../../prompt";
 import { confirms as _confirms } from "../../messages";
 import spawn from "spawndamnit";
 import stripAnsi from "strip-ansi";
-
-const f = fixturez(__dirname);
 
 jest.mock("../../prompt");
 
@@ -30,7 +28,7 @@ let doPromptInput = _doPromptInput as jest.MockedFunction<
 let unsafeRequire = require;
 
 test("monorepo", async () => {
-  let tmpPath = f.copy("monorepo");
+  let tmpPath = await testdir(fixtures.monorepo);
   await initBasic(tmpPath);
   await build(tmpPath);
   let packageOnePath = path.join(tmpPath, "packages", "package-one");
@@ -91,7 +89,7 @@ test("monorepo", async () => {
 });
 
 test("no module", async () => {
-  let tmpPath = f.copy("no-module");
+  let tmpPath = await testdir(fixtures.noModule);
 
   await build(tmpPath);
 
@@ -786,7 +784,7 @@ test("monorepo umd with dep on multi-entrypoint module subpath", async () => {
 });
 
 test("monorepo single package", async () => {
-  let tmpPath = f.copy("monorepo-single-package");
+  let tmpPath = await testdir(fixtures.monorepoSinglePackage);
   await initBasic(tmpPath);
 
   await build(tmpPath);

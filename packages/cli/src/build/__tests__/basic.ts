@@ -1,6 +1,5 @@
 import path from "path";
 import build from "../";
-import fixturez from "fixturez";
 import {
   testdir,
   getDist,
@@ -9,11 +8,10 @@ import {
   repoNodeModules,
   js,
   getFiles,
+  fixtures,
 } from "../../../test-utils";
 import { BatchError } from "../../errors";
 import stripAnsi from "strip-ansi";
-
-const f = fixturez(__dirname);
 
 jest.setTimeout(6000000);
 
@@ -22,7 +20,7 @@ jest.mock("../../prompt");
 let unsafeRequire = require;
 
 test("basic", async () => {
-  let tmpPath = f.copy("valid-package");
+  let tmpPath = await testdir(fixtures.validPackage);
 
   await build(tmpPath);
 

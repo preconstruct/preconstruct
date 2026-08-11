@@ -1,4 +1,3 @@
-import fixturez from "fixturez";
 import fix from "../fix";
 import path from "path";
 import { confirms as _confirms, inputs } from "../messages";
@@ -11,11 +10,10 @@ import {
   js,
   getFiles,
   ts,
+  fixtures,
 } from "../../test-utils";
 import { promptInput as _promptInput } from "../prompt";
 import fs from "fs-extra";
-
-const f = fixturez(__dirname);
 
 jest.mock("../prompt");
 
@@ -30,14 +28,14 @@ afterEach(() => {
 });
 
 test("no entrypoint", async () => {
-  let tmpPath = f.copy("no-entrypoint");
+  let tmpPath = await testdir(fixtures.noEntrypoint);
   await expect(fix(tmpPath)).rejects.toMatchInlineSnapshot(
     `[Error: packages must have at least one entrypoint, this package has no entrypoints]`
   );
 });
 
 test("only main", async () => {
-  let tmpPath = f.copy("no-module");
+  let tmpPath = await testdir(fixtures.noModule);
   confirms.writeMainField.mockReturnValue(Promise.resolve(true));
   let origJson = await getPkg(tmpPath);
   await modifyPkg(tmpPath, (json) => {
@@ -50,7 +48,7 @@ test("only main", async () => {
 });
 
 test("set main and module field", async () => {
-  let tmpPath = f.copy("basic-package");
+  let tmpPath = await testdir(fixtures.basicPackage);
 
   await modifyPkg(tmpPath, (json) => {
     json.module = "bad.js";
@@ -62,12 +60,9 @@ test("set main and module field", async () => {
 
   expect(pkg).toMatchInlineSnapshot(`
     {
-      "license": "MIT",
       "main": "dist/basic-package.cjs.js",
       "module": "dist/basic-package.esm.js",
       "name": "basic-package",
-      "private": true,
-      "version": "1.0.0",
     }
   `);
 });
@@ -365,7 +360,7 @@ test("set exports field without root entrypoint", async () => {
 });
 
 test("new dist filenames", async () => {
-  let tmpPath = f.copy("basic-package");
+  let tmpPath = await testdir(fixtures.basicPackage);
 
   await modifyPkg(tmpPath, (json) => {
     json.name = "@scope/something";
@@ -379,18 +374,15 @@ test("new dist filenames", async () => {
 
   expect(pkg).toMatchInlineSnapshot(`
     {
-      "license": "MIT",
       "main": "dist/scope-something.cjs.js",
       "module": "dist/scope-something.esm.js",
       "name": "@scope/something",
-      "private": true,
-      "version": "1.0.0",
     }
   `);
 });
 
 test("new dist filenames only-unscoped-package-name strategy", async () => {
-  let tmpPath = f.copy("basic-package");
+  let tmpPath = await testdir(fixtures.basicPackage);
 
   await modifyPkg(tmpPath, (json) => {
     json.name = "@scope/something";
@@ -407,21 +399,18 @@ test("new dist filenames only-unscoped-package-name strategy", async () => {
 
   expect(pkg).toMatchInlineSnapshot(`
     {
-      "license": "MIT",
       "main": "dist/something.cjs.js",
       "module": "dist/something.esm.js",
       "name": "@scope/something",
       "preconstruct": {
         "distFilenameStrategy": "unscoped-package-name",
       },
-      "private": true,
-      "version": "1.0.0",
     }
   `);
 });
 
 test("monorepo", async () => {
-  let tmpPath = f.copy("monorepo");
+  let tmpPath = await testdir(fixtures.monorepo);
 
   for (let name of ["package-one", "package-two"]) {
     await modifyPkg(path.join(tmpPath, "packages", name), (pkg) => {
@@ -436,29 +425,23 @@ test("monorepo", async () => {
 
   expect(pkg1).toMatchInlineSnapshot(`
     {
-      "license": "MIT",
       "main": "dist/some-scope-package-one.cjs.js",
       "module": "dist/some-scope-package-one.esm.js",
       "name": "@some-scope/package-one",
-      "private": true,
-      "version": "1.0.0",
     }
   `);
 
   expect(pkg2).toMatchInlineSnapshot(`
     {
-      "license": "MIT",
       "main": "dist/some-scope-package-two.cjs.js",
       "module": "dist/some-scope-package-two.esm.js",
       "name": "@some-scope/package-two",
-      "private": true,
-      "version": "1.0.0",
     }
   `);
 });
 
 test("does not modify if already valid", async () => {
-  let tmpPath = f.copy("valid-package");
+  let tmpPath = await testdir(fixtures.validPackage);
   let original = await getPkg(tmpPath);
 
   await fix(tmpPath);
@@ -474,7 +457,7 @@ test("does not modify if already valid", async () => {
 });
 
 test("invalid fields", async () => {
-  let tmpPath = f.copy("invalid-fields");
+  let tmpPath = await testdir(fixtures.invalidFields);
 
   await fix(tmpPath);
 
@@ -482,18 +465,15 @@ test("invalid fields", async () => {
 
   expect(pkg).toMatchInlineSnapshot(`
     {
-      "license": "MIT",
       "main": "dist/invalid-fields.cjs.js",
       "module": "dist/invalid-fields.esm.js",
       "name": "invalid-fields",
-      "private": true,
-      "version": "1.0.0",
     }
   `);
 });
 
 test("fix browser", async () => {
-  let tmpPath = f.copy("valid-package");
+  let tmpPath = await testdir(fixtures.validPackage);
 
   await modifyPkg(tmpPath, (pkg) => {
     pkg.browser = "bad.js";
@@ -507,22 +487,19 @@ test("fix browser", async () => {
         "./dist/valid-package.cjs.js": "./dist/valid-package.browser.cjs.js",
         "./dist/valid-package.esm.js": "./dist/valid-package.browser.esm.js",
       },
-      "license": "MIT",
       "main": "dist/valid-package.cjs.js",
       "module": "dist/valid-package.esm.js",
       "name": "valid-package",
       "preconstruct": {
         "umdName": "validPackage",
       },
-      "private": true,
       "umd:main": "dist/valid-package.umd.min.js",
-      "version": "1.0.0",
     }
   `);
 });
 
 test("monorepo single package", async () => {
-  let tmpPath = f.copy("monorepo-single-package");
+  let tmpPath = await testdir(fixtures.monorepoSinglePackage);
 
   await fix(tmpPath);
   expect(logMock.log.mock.calls).toMatchInlineSnapshot(`
@@ -572,7 +549,7 @@ testFix(
 );
 
 test("create entrypoint", async () => {
-  let tmpPath = f.copy("valid-package");
+  let tmpPath = await testdir(fixtures.validPackage);
   await fs.writeFile(
     path.join(tmpPath, "src", "another.js"),
     "export let x = 1"
@@ -612,7 +589,6 @@ test("create entrypoint", async () => {
 
   expect(await getPkg(tmpPath)).toMatchInlineSnapshot(`
     {
-      "license": "MIT",
       "main": "dist/valid-package.cjs.js",
       "module": "dist/valid-package.esm.js",
       "name": "valid-package",
@@ -623,15 +599,13 @@ test("create entrypoint", async () => {
         ],
         "umdName": "validPackage",
       },
-      "private": true,
       "umd:main": "dist/valid-package.umd.min.js",
-      "version": "1.0.0",
     }
   `);
 });
 
 test("create entrypoint no umd/no prompts", async () => {
-  let tmpPath = f.copy("valid-package");
+  let tmpPath = await testdir(fixtures.validPackage);
   await fs.writeFile(
     path.join(tmpPath, "src", "another.js"),
     "export let x = 1"
@@ -651,7 +625,6 @@ test("create entrypoint no umd/no prompts", async () => {
 
   expect(await getPkg(tmpPath)).toMatchInlineSnapshot(`
     {
-      "license": "MIT",
       "main": "dist/valid-package.cjs.js",
       "module": "dist/valid-package.esm.js",
       "name": "valid-package",
@@ -662,8 +635,6 @@ test("create entrypoint no umd/no prompts", async () => {
         ],
         "umdName": "validPackage",
       },
-      "private": true,
-      "version": "1.0.0",
     }
   `);
 });
