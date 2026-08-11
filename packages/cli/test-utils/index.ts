@@ -202,7 +202,11 @@ export async function snapshotDirectory(
   } = {}
 ) {
   let paths = await fastGlob(
-    [`**/${files === "js" ? "*.js" : "*"}`, "!node_modules/**", "!yarn.lock"],
+    [
+      `**/${files === "js" ? "*.js" : "*"}`,
+      "!node_modules/**",
+      "!pnpm-lock.yaml",
+    ],
     {
       cwd: tmpPath,
     }
@@ -226,7 +230,7 @@ export async function snapshotDirectory(
 }
 
 export async function install(tmpPath: string) {
-  await spawn("yarn", ["install"], { cwd: tmpPath });
+  await spawn("pnpm", ["install"], { cwd: tmpPath });
 }
 
 export const repoRoot = path.resolve(__dirname, "..", "..", "..");

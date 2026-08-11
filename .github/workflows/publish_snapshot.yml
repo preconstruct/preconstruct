@@ -19,7 +19,7 @@ jobs:
       - uses: ./.github/actions/setup-deps
 
       - name: version packages
-        run: yarn changeset version --snapshot ${{ inputs.tag }}
+        run: pnpm changeset version --snapshot ${{ inputs.tag }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -29,7 +29,7 @@ jobs:
           git config --global user.email 'automation+github@thinkmill.com.au'
           git commit -a -m 'rc'
 
-      - run: yarn build
+      - run: pnpm build
 
       - name: Creating .npmrc
         run: |
@@ -40,7 +40,7 @@ jobs:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: npm publish, git tag
-        run: yarn changeset publish --tag ${{ inputs.tag }}
+        run: pnpm changeset publish --tag ${{ inputs.tag }}
 
       # reset, then push the dangling commit
       - name: git push

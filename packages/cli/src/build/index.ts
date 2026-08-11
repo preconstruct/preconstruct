@@ -111,7 +111,7 @@ async function retryableBuild(pkg: Package) {
 }
 
 export default async function build(directory: string) {
-  // do more stuff with checking whether the repo is using yarn workspaces or bolt
+  // do more stuff with checking which workspace tool the repo is using
   try {
     createWorker();
     let project = await Project.create(directory);

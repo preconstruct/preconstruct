@@ -1,0 +1,24 @@
+packages:
+  - "packages/*"
+  - "site"
+
+overrides:
+  "@babel/core": 7.24.7
+  "@babel/generator": 7.24.7
+  "@babel/plugin-transform-runtime": 7.24.7
+  "@babel/preset-env": 7.24.7
+  "@babel/preset-flow": 7.24.7
+  "@babel/preset-typescript": 7.24.7
+  "@rollup/plugin-replace": 2.4.1
+  "@types/minimatch": 3.0.3
+  "@typescript-eslint/experimental-utils": 5.4.0
+  "@typescript-eslint/parser": 5.4.0
+  prettier: 2.1.2
+  rollup: 2.79.1
+  terser: 5.16.8
+  typescript: 5.0.4
+  webpack: 5.73.0
+
+allowBuilds:
+  core-js: false
+  core-js-pure: false
