@@ -1,18 +1,134 @@
 import path from "path";
 import realFs from "fs";
+import os from "os";
 import * as fs from "fs-extra";
 import fastGlob from "fast-glob";
-import fixturez from "fixturez";
 import outdent from "outdent";
 import crypto from "crypto";
 // import profiler from "v8-profiler-next";
 import chalk from "chalk";
 
-let f = fixturez(__dirname);
-
 export const js = outdent;
 export const ts = outdent;
 export const tsx = outdent;
+
+type FixtureEntry = string | { kind: "symlink"; path: string };
+type Fixture = Readonly<Record<string, FixtureEntry>>;
+
+const packageJson = (contents: Record<string, unknown>) =>
+  JSON.stringify(contents, null, 2);
+
+const packageSource = 'export default "something";\n';
+
+const monorepoPackage = (name: string, value: number, main = "index.js") => ({
+  "package.json": packageJson({
+    name,
+    main,
+  }),
+  "src/index.js": js`
+    export default ${value};
+  `,
+});
+
+export const fixtures = {
+  basicPackage: {
+    "package.json": packageJson({
+      name: "basic-package",
+      main: "index.js",
+    }),
+    "src/index.js": js`
+      // @flow
+
+      export default "something";
+    `,
+  },
+  invalidFields: {
+    "package.json": packageJson({
+      name: "invalid-fields",
+      main: "dist/index.js",
+      module: "dist/index.mjs",
+    }),
+    "src/index.js": "",
+  },
+  monorepo: {
+    "package.json": packageJson({
+      name: "monorepo",
+      main: "index.js",
+      preconstruct: { packages: ["packages/*"] },
+      workspaces: ["packages/*"],
+    }),
+    ...Object.fromEntries(
+      Object.entries({
+        "package-one": monorepoPackage("@some-scope/package-one", 1),
+        "package-two": monorepoPackage("@some-scope/package-two", 2),
+      }).flatMap(([directory, fixture]) =>
+        Object.entries(fixture).map(([filename, contents]) => [
+          `packages/${directory}/${filename}`,
+          contents,
+        ])
+      )
+    ),
+  },
+  monorepoSinglePackage: {
+    "package.json": packageJson({
+      name: "monorepo-single-package",
+      main: "index.js",
+      preconstruct: { packages: ["packages/package-two"] },
+      workspaces: ["packages/*"],
+    }),
+    ...Object.fromEntries(
+      Object.entries({
+        "package-one": monorepoPackage(
+          "@some-scope/package-one-single-package",
+          1,
+          "dist/some-scope-package-one-single-package.cjs.js"
+        ),
+        "package-two": monorepoPackage(
+          "@some-scope/package-two-single-package",
+          2,
+          "dist/some-scope-package-two-single-package.cjs.js"
+        ),
+      }).flatMap(([directory, fixture]) =>
+        Object.entries(fixture).map(([filename, contents]) => [
+          `packages/${directory}/${filename}`,
+          contents,
+        ])
+      )
+    ),
+  },
+  noEntrypoint: {
+    "package.json": packageJson({
+      name: "no-entrypoint",
+      main: "index.js",
+    }),
+  },
+  noModule: {
+    "package.json": packageJson({
+      name: "no-module",
+      main: "dist/no-module.cjs.js",
+    }),
+    "src/index.js": js`
+      export default "this does not have a module build";
+    `,
+  },
+  templateSimplePackage: {
+    "package.json": packageJson({
+      name: "template-package-json",
+      main: "dist/template-package-json.cjs.js",
+    }),
+    "src/index.js": "",
+  },
+  validPackage: {
+    "package.json": packageJson({
+      name: "valid-package",
+      main: "dist/valid-package.cjs.js",
+      module: "dist/valid-package.esm.js",
+      "umd:main": "dist/valid-package.umd.min.js",
+      preconstruct: { umdName: "validPackage" },
+    }),
+    "src/index.js": packageSource,
+  },
+} as const;
 
 chalk.level = 0;
 
@@ -27,6 +143,14 @@ export let logMock = {
 afterEach(() => {
   logMock.log.mockReset();
   logMock.error.mockReset();
+});
+
+const temporaryDirectories: string[] = [];
+
+afterAll(async () => {
+  await Promise.all(
+    temporaryDirectories.map((directory) => fs.remove(directory))
+  );
 });
 
 import init from "../src/init";
@@ -99,7 +223,7 @@ export let createPackageCheckTestCreator = (
     ) => Promise<void>
   ) => {
     testFn(testName, async () => {
-      let tmpPath = f.copy("template-simple-package");
+      let tmpPath = await testdir(fixtures.templateSimplePackage);
       let things = Object.keys(entrypoints);
       await Promise.all(
         things.map(async (entrypointPath) => {
@@ -270,10 +394,6 @@ export const typescriptFixture = {
   `,
 } as const;
 
-type Fixture = {
-  [key: string]: string | { kind: "symlink"; path: string };
-};
-
 // basically replicating https://github.com/nodejs/node/blob/72f9c53c0f5cc03000f9a4eb1cf31f43e1d30b89/lib/fs.js#L1163-L1174
 // for some reason the builtin auto-detection doesn't work, the code probably doesn't land go into that logic or something
 async function getSymlinkType(targetPath: string): Promise<"dir" | "file"> {
@@ -282,7 +402,10 @@ async function getSymlinkType(targetPath: string): Promise<"dir" | "file"> {
 }
 
 export async function testdir(dir: Fixture) {
-  const temp = realFs.realpathSync.native(f.temp());
+  const temp = realFs.realpathSync.native(
+    realFs.mkdtempSync(path.join(os.tmpdir(), "preconstruct-"))
+  );
+  temporaryDirectories.push(temp);
   const fileEntries: Array<[string, string]> = [];
   const symlinkEntries: Array<[string, { kind: "symlink"; path: string }]> = [];
 

@@ -112,9 +112,6 @@ importers:
       eslint-plugin-react:
         specifier: ^7.26.1
         version: 7.37.5(eslint@8.57.1(supports-color@8.1.1))
-      fixturez:
-        specifier: ^1.1.0
-        version: 1.1.0
       jest:
         specifier: ^29.5.0
         version: 29.7.0(@types/node@18.19.130)(babel-plugin-macros@2.8.0)(supports-color@8.1.1)
@@ -3368,9 +3365,6 @@ packages:
   find-up@5.0.0:
     resolution: {integrity: sha512-78/PXT1wlLLDgTzDs7sjq9hzz0vXD+zn+7wypEe4fXQxCmdmqfGsEPQxmiCSQI3ajFV91bVSsvNtrJRiW6nGng==}
     engines: {node: '>=10'}
-
-  fixturez@1.1.0:
-    resolution: {integrity: sha512-c4q9eZsAmCzj9gkrEO/YwIRlrHWt/TXQiX9jR9WeLFOqeeV6EyzdiiV28CpSzF6Ip+gyYrSv5UeOHqyzfcNTVA==}
 
   flat-cache@3.2.0:
     resolution: {integrity: sha512-CYcENa+FtcUKLmhhqyctpclsq7QF38pKjZHsGNiSQF5r4FtoKDWabFDl3hzaEQMvT1LHEysw5twgLvpYYb4vbw==}
@@ -10998,13 +10992,6 @@ snapshots:
     dependencies:
       locate-path: 6.0.0
       path-exists: 4.0.0
-
-  fixturez@1.1.0:
-    dependencies:
-      fs-extra: 5.0.0
-      globby: 7.1.1
-      signal-exit: 3.0.7
-      tempy: 0.2.1
 
   flat-cache@3.2.0:
     dependencies:

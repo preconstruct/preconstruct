@@ -1,4 +1,3 @@
-import fixturez from "fixturez";
 import path from "path";
 import validate from "../validate";
 import {
@@ -9,11 +8,10 @@ import {
   js,
   repoNodeModules,
   getFiles,
+  fixtures,
 } from "../../test-utils";
 import { confirms as _confirms } from "../messages";
 import { JSONValue } from "../utils";
-
-const f = fixturez(__dirname);
 
 jest.mock("../prompt");
 
@@ -24,7 +22,7 @@ afterEach(() => {
 let confirms = _confirms as jest.Mocked<typeof _confirms>;
 
 test("reports correct result on valid package", async () => {
-  let tmpPath = f.find("valid-package");
+  let tmpPath = await testdir(fixtures.validPackage);
 
   await validate(tmpPath);
   expect(logMock.log.mock.calls).toMatchInlineSnapshot(`
@@ -76,7 +74,7 @@ test("no main field", async () => {
 });
 
 test("no module", async () => {
-  let tmpPath = f.find("no-module");
+  let tmpPath = await testdir(fixtures.noModule);
 
   await validate(tmpPath);
   expect(logMock.log.mock.calls).toMatchInlineSnapshot(`
@@ -95,7 +93,7 @@ test("no module", async () => {
 });
 
 test("invalid browser", async () => {
-  let tmpPath = f.copy("no-module");
+  let tmpPath = await testdir(fixtures.noModule);
 
   await modifyPkg(tmpPath, (pkg) => {
     pkg.browser = "invalid.js";
@@ -106,7 +104,7 @@ test("invalid browser", async () => {
 });
 
 test("valid browser", async () => {
-  let tmpPath = f.copy("valid-package");
+  let tmpPath = await testdir(fixtures.validPackage);
 
   await modifyPkg(tmpPath, (pkg) => {
     pkg.browser = {
@@ -141,7 +139,7 @@ test("valid browser", async () => {
 });
 
 test("monorepo single package", async () => {
-  let tmpPath = f.copy("monorepo-single-package");
+  let tmpPath = await testdir(fixtures.monorepoSinglePackage);
 
   await validate(tmpPath);
   expect(logMock.log.mock.calls).toMatchInlineSnapshot(`
