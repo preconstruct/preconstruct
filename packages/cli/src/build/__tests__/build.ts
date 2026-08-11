@@ -5,7 +5,6 @@ import fs from "fs-extra";
 import {
   initBasic,
   getPkg,
-  snapshotDistFiles,
   testdir,
   js,
   getDist,
@@ -34,13 +33,61 @@ test("monorepo", async () => {
   let tmpPath = f.copy("monorepo");
   await initBasic(tmpPath);
   await build(tmpPath);
-  let counter = 1;
-  for (let pkg of ["package-one", "package-two"]) {
-    let pkgPath = path.join(tmpPath, "packages", pkg);
-    await snapshotDistFiles(pkgPath);
+  let packageOnePath = path.join(tmpPath, "packages", "package-one");
+  expect(await getFiles(packageOnePath, ["dist/*"])).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/some-scope-package-one.cjs.dev.js, dist/some-scope-package-one.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
 
-    expect(unsafeRequire(pkgPath).default).toBe(counter++);
-  }
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    var index = 1;
+
+    exports["default"] = index;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/some-scope-package-one.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./some-scope-package-one.cjs.prod.js");
+    } else {
+      module.exports = require("./some-scope-package-one.cjs.dev.js");
+    }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/some-scope-package-one.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    var index = 1;
+
+    export { index as default };
+
+  `);
+  expect(unsafeRequire(packageOnePath).default).toBe(1);
+
+  let packageTwoPath = path.join(tmpPath, "packages", "package-two");
+  expect(await getFiles(packageTwoPath, ["dist/*"])).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/some-scope-package-two.cjs.dev.js, dist/some-scope-package-two.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    var index = 2;
+
+    exports["default"] = index;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/some-scope-package-two.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./some-scope-package-two.cjs.prod.js");
+    } else {
+      module.exports = require("./some-scope-package-two.cjs.dev.js");
+    }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/some-scope-package-two.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    var index = 2;
+
+    export { index as default };
+
+  `);
+  expect(unsafeRequire(packageTwoPath).default).toBe(2);
 });
 
 test("no module", async () => {
@@ -48,7 +95,26 @@ test("no module", async () => {
 
   await build(tmpPath);
 
-  await snapshotDistFiles(tmpPath);
+  expect(await getFiles(tmpPath, ["dist/*"])).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/no-module.cjs.dev.js, dist/no-module.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    var index = "this does not have a module build";
+
+    exports["default"] = index;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/no-module.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./no-module.cjs.prod.js");
+    } else {
+      module.exports = require("./no-module.cjs.dev.js");
+    }
+
+  `);
 
   expect(unsafeRequire(tmpPath).default).toBe(
     "this does not have a module build"
@@ -121,7 +187,44 @@ test("flow", async () => {
 
   await build(tmpPath);
 
-  await snapshotDistFiles(tmpPath);
+  expect(await getFiles(tmpPath, ["dist/*"])).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/flow.cjs.dev.js, dist/flow.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    var a = "wow";
+
+    function doSomething(arg) {
+      return "something" + arg;
+    }
+
+    exports.doSomething = doSomething;
+    exports.something = a;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/flow.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./flow.cjs.prod.js");
+    } else {
+      module.exports = require("./flow.cjs.dev.js");
+    }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/flow.cjs.js.flow ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    // @flow
+    export * from "../src/index.js";
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/flow.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    var a = "wow";
+
+    function doSomething(arg) {
+      return "something" + arg;
+    }
+
+    export { doSomething, a as something };
+
+  `);
 });
 
 test("flow", async () => {
@@ -147,7 +250,43 @@ test("flow", async () => {
 
   await build(tmpPath);
 
-  await snapshotDistFiles(tmpPath);
+  expect(await getFiles(tmpPath, ["dist/*"])).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/flow-export-default.cjs.dev.js, dist/flow-export-default.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    function doSomething(arg) {
+      return "something" + arg;
+    }
+    var index = "wow";
+
+    exports["default"] = index;
+    exports.doSomething = doSomething;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/flow-export-default.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./flow-export-default.cjs.prod.js");
+    } else {
+      module.exports = require("./flow-export-default.cjs.dev.js");
+    }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/flow-export-default.cjs.js.flow ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    // @flow
+    export * from "../src/index.js";
+    export { default } from "../src/index.js";
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/flow-export-default.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    function doSomething(arg) {
+      return "something" + arg;
+    }
+    var index = "wow";
+
+    export { index as default, doSomething };
+
+  `);
 });
 
 test("prod checks", async () => {
@@ -171,7 +310,42 @@ test("prod checks", async () => {
 
   await build(tmpPath);
 
-  await snapshotDistFiles(tmpPath);
+  expect(await getFiles(tmpPath, ["dist/*"])).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/prod-checks.cjs.dev.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    function thing() {
+      if (process.env.NODE_ENV !== "production") {
+        return "not prod";
+      }
+      return "prod";
+    }
+
+    exports.thing = thing;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/prod-checks.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./prod-checks.cjs.prod.js");
+    } else {
+      module.exports = require("./prod-checks.cjs.dev.js");
+    }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/prod-checks.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    function thing() {
+      return "prod";
+    }
+
+    exports.thing = thing;
+
+  `);
 });
 
 // TODO: make it faster so this isn't required
@@ -216,7 +390,30 @@ test("umd with dep on other module", async () => {
 
   await build(tmpPath);
 
-  await snapshotDistFiles(tmpPath);
+  expect(await getFiles(tmpPath, ["dist/*"])).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/umd-with-dep.cjs.dev.js, dist/umd-with-dep.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    var react = require('react');
+
+    react.createElement("div", null);
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/umd-with-dep.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./umd-with-dep.cjs.prod.js");
+    } else {
+      module.exports = require("./umd-with-dep.cjs.dev.js");
+    }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/umd-with-dep.umd.min.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    !function(e,t){"object"==typeof exports&&"undefined"!=typeof module?t(require("react")):"function"==typeof define&&define.amd?define(["react"],t):t((e="undefined"!=typeof globalThis?globalThis:e||self).React)}(this,(function(e){"use strict";e.createElement("div",null)}));
+    //# sourceMappingURL=umd-with-dep.umd.min.js.map
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/umd-with-dep.umd.min.js.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {"version":3,"file":"umd-with-dep.umd.min.js","sources":["../src/index.js"],"sourcesContent":["import { createElement } from \\"react\\";\\n\\ncreateElement(\\"div\\", null);"],"names":["createElement"],"mappings":"iPAEAA,EAAAA,cAAc,MAAO"}
+  `);
   expect(await getPkg(tmpPath)).toMatchInlineSnapshot(`
     {
       "devDependencies": {
@@ -362,10 +559,108 @@ test("monorepo umd with dep on other module", async () => {
   });
   await build(tmpPath);
 
-  await snapshotDistFiles(path.join(tmpPath, "packages", "package-one"));
-  await snapshotDistFiles(path.join(tmpPath, "packages", "package-two"));
-  await snapshotDistFiles(path.join(tmpPath, "packages", "package-three"));
-  await snapshotDistFiles(path.join(tmpPath, "packages", "package-four"));
+  expect(
+    await getFiles(path.join(tmpPath, "packages", "package-one"), ["dist/*"])
+  ).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/some-scope-package-one-umd-with-dep.cjs.dev.js, dist/some-scope-package-one-umd-with-dep.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    var react = require('react');
+
+    react.createElement("div", null);
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/some-scope-package-one-umd-with-dep.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./some-scope-package-one-umd-with-dep.cjs.prod.js");
+    } else {
+      module.exports = require("./some-scope-package-one-umd-with-dep.cjs.dev.js");
+    }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/some-scope-package-one-umd-with-dep.umd.min.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    !function(e,t){"object"==typeof exports&&"undefined"!=typeof module?t(require("react")):"function"==typeof define&&define.amd?define(["react"],t):t((e="undefined"!=typeof globalThis?globalThis:e||self).React)}(this,(function(e){"use strict";e.createElement("div",null)}));
+    //# sourceMappingURL=some-scope-package-one-umd-with-dep.umd.min.js.map
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/some-scope-package-one-umd-with-dep.umd.min.js.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {"version":3,"file":"some-scope-package-one-umd-with-dep.umd.min.js","sources":["../src/index.js"],"sourcesContent":["import { createElement } from \\"react\\";\\n\\ncreateElement(\\"div\\", null);"],"names":["createElement"],"mappings":"iPAEAA,EAAAA,cAAc,MAAO"}
+  `);
+  expect(
+    await getFiles(path.join(tmpPath, "packages", "package-two"), ["dist/*"])
+  ).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/some-scope-package-two-umd-with-dep.cjs.dev.js, dist/some-scope-package-two-umd-with-dep.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    var react = require('react');
+
+    react.createElement("h1", null);
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/some-scope-package-two-umd-with-dep.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./some-scope-package-two-umd-with-dep.cjs.prod.js");
+    } else {
+      module.exports = require("./some-scope-package-two-umd-with-dep.cjs.dev.js");
+    }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/some-scope-package-two-umd-with-dep.umd.min.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    !function(e,t){"object"==typeof exports&&"undefined"!=typeof module?t(require("react")):"function"==typeof define&&define.amd?define(["react"],t):t((e="undefined"!=typeof globalThis?globalThis:e||self).React)}(this,(function(e){"use strict";e.createElement("h1",null)}));
+    //# sourceMappingURL=some-scope-package-two-umd-with-dep.umd.min.js.map
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/some-scope-package-two-umd-with-dep.umd.min.js.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {"version":3,"file":"some-scope-package-two-umd-with-dep.umd.min.js","sources":["../src/index.js"],"sourcesContent":["import { createElement } from \\"react\\";\\n\\ncreateElement(\\"h1\\", null);"],"names":["createElement"],"mappings":"iPAEAA,EAAAA,cAAc,KAAM"}
+  `);
+  expect(
+    await getFiles(path.join(tmpPath, "packages", "package-three"), ["dist/*"])
+  ).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/some-scope-package-three-umd-with-dep.cjs.dev.js, dist/some-scope-package-three-umd-with-dep.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    require('@some-scope/package-one-umd-with-dep');
+
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/some-scope-package-three-umd-with-dep.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./some-scope-package-three-umd-with-dep.cjs.prod.js");
+    } else {
+      module.exports = require("./some-scope-package-three-umd-with-dep.cjs.dev.js");
+    }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/some-scope-package-three-umd-with-dep.umd.min.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    !function(e){"function"==typeof define&&define.amd?define(["@some-scope/package-one-umd-with-dep"],e):e()}((function(){}));
+    //# sourceMappingURL=some-scope-package-three-umd-with-dep.umd.min.js.map
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/some-scope-package-three-umd-with-dep.umd.min.js.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {"version":3,"file":"some-scope-package-three-umd-with-dep.umd.min.js","sources":[],"sourcesContent":[],"names":[],"mappings":""}
+  `);
+  expect(
+    await getFiles(path.join(tmpPath, "packages", "package-four"), ["dist/*"])
+  ).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/some-scope-package-four-umd-with-dep.cjs.dev.js, dist/some-scope-package-four-umd-with-dep.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    require('@some-scope/package-one-umd-with-dep');
+
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/some-scope-package-four-umd-with-dep.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./some-scope-package-four-umd-with-dep.cjs.prod.js");
+    } else {
+      module.exports = require("./some-scope-package-four-umd-with-dep.cjs.dev.js");
+    }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/some-scope-package-four-umd-with-dep.umd.min.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    !function(e,t){"object"==typeof exports&&"undefined"!=typeof module?t(require("react")):"function"==typeof define&&define.amd?define(["react"],t):t((e="undefined"!=typeof globalThis?globalThis:e||self).React)}(this,(function(e){"use strict";e.createElement("div",null)}));
+    //# sourceMappingURL=some-scope-package-four-umd-with-dep.umd.min.js.map
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/some-scope-package-four-umd-with-dep.umd.min.js.map ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {"version":3,"file":"some-scope-package-four-umd-with-dep.umd.min.js","sources":["../../package-one/src/index.js"],"sourcesContent":["import { createElement } from \\"react\\";\\n\\ncreateElement(\\"div\\", null);"],"names":["createElement"],"mappings":"iPAEAA,EAAAA,cAAc,MAAO"}
+  `);
 
   expect(await getPkg(path.join(tmpPath, "packages", "package-one")))
     .toMatchInlineSnapshot(`
@@ -496,7 +791,31 @@ test("monorepo single package", async () => {
 
   await build(tmpPath);
   let pkgPath = path.join(tmpPath, "packages", "package-two");
-  await snapshotDistFiles(pkgPath);
+  expect(await getFiles(pkgPath, ["dist/*"])).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/some-scope-package-two-single-package.cjs.dev.js, dist/some-scope-package-two-single-package.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    var index = 2;
+
+    exports["default"] = index;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/some-scope-package-two-single-package.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./some-scope-package-two-single-package.cjs.prod.js");
+    } else {
+      module.exports = require("./some-scope-package-two-single-package.cjs.dev.js");
+    }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/some-scope-package-two-single-package.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    var index = 2;
+
+    export { index as default };
+
+  `);
 
   expect(unsafeRequire(pkgPath).default).toBe(2);
 });

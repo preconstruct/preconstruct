@@ -1,6 +1,5 @@
 import build from "../";
 import {
-  snapshotDirectory,
   testdir,
   js,
   getDist,
@@ -145,7 +144,65 @@ test("browser no module", async () => {
   });
 
   await build(tmpPath);
-  await snapshotDirectory(tmpPath, { files: "all" });
+  expect(
+    await getFiles(tmpPath, ["**/*", "!node_modules/**", "!pnpm-lock.yaml"])
+  ).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/browser-no-module.browser.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    let thing = "wow";
+    {
+      thing = "something";
+    }
+    {
+      thing += "other";
+    }
+    var thing$1 = thing;
+
+    exports["default"] = thing$1;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/browser-no-module.cjs.dev.js, dist/browser-no-module.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    let thing = "wow";
+    if (typeof window !== "undefined") {
+      thing = "something";
+    }
+    if (typeof document !== undefined) {
+      thing += "other";
+    }
+    var thing$1 = thing;
+
+    exports["default"] = thing$1;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/browser-no-module.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./browser-no-module.cjs.prod.js");
+    } else {
+      module.exports = require("./browser-no-module.cjs.dev.js");
+    }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {"name":"browser-no-module","main":"dist/browser-no-module.cjs.js","browser":{"./dist/browser-no-module.cjs.js":"./dist/browser-no-module.browser.cjs.js"}}
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ src/index.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    let thing = "wow";
+
+    if (typeof window !== "undefined") {
+      thing = "something";
+    }
+
+    if (typeof document !== undefined) {
+      thing += "other";
+    }
+
+    export default thing;
+  `);
 });
 
 test("typescript", async () => {
@@ -359,10 +416,75 @@ test("typescript with forced dts emit", async () => {
 
   await build(tmpPath);
 
-  await snapshotDirectory(tmpPath, {
-    files: "all",
-    filterPath: (fp) => fp.startsWith("dist/"),
-  });
+  expect(await getFiles(tmpPath, ["dist/**"])).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/create-store.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    import { Action } from "@reduxjs/toolkit";
+    import { ThunkAction } from "redux-thunk";
+    import { RootState } from "./root-reducer.js";
+    export type AppThunk = ThunkAction<void, RootState, unknown, Action<string>>;
+    export declare function createStore(): any;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/index.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export { createStore } from "./create-store.js";
+    export type { AppThunk } from "./create-store.js";
+    export type { RootState } from "./root-reducer.js";
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/declarations/src/root-reducer.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export declare const rootReducer: any;
+    export type RootState = ReturnType<typeof rootReducer>;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript-force-dts-emit.cjs.d.ts ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export * from "./declarations/src/index.js";
+    //# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoidHlwZXNjcmlwdC1mb3JjZS1kdHMtZW1pdC5janMuZC50cyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4vZGVjbGFyYXRpb25zL3NyYy9pbmRleC5kLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBIn0=
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript-force-dts-emit.cjs.dev.js, dist/typescript-force-dts-emit.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    var toolkit = require('@reduxjs/toolkit');
+
+    // @ts-ignore (installed during test)
+    var rootReducer = toolkit.combineReducers({
+      /* blah blah blah */
+    });
+
+    // @ts-ignore (installed during test)
+    function createStore() {
+      return toolkit.configureStore({
+        reducer: rootReducer
+      });
+    }
+
+    exports.createStore = createStore;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript-force-dts-emit.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./typescript-force-dts-emit.cjs.prod.js");
+    } else {
+      module.exports = require("./typescript-force-dts-emit.cjs.dev.js");
+    }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/typescript-force-dts-emit.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    import { combineReducers, configureStore } from '@reduxjs/toolkit';
+
+    // @ts-ignore (installed during test)
+    var rootReducer = combineReducers({
+      /* blah blah blah */
+    });
+
+    // @ts-ignore (installed during test)
+    function createStore() {
+      return configureStore({
+        reducer: rootReducer
+      });
+    }
+
+    export { createStore };
+
+  `);
 });
 
 test("package resolvable but not in deps", async () => {
@@ -530,7 +652,47 @@ test("using external @babel/runtime helpers", async () => {
 
   await build(tmpPath);
 
-  await snapshotDirectory(tmpPath, { files: "all" });
+  expect(
+    await getFiles(tmpPath, ["**/*", "!node_modules/**", "!pnpm-lock.yaml"])
+  ).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/external-babel-runtime.cjs.dev.js, dist/external-babel-runtime.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    var _createClass = require('@babel/runtime/helpers/createClass');
+    var _classCallCheck = require('@babel/runtime/helpers/classCallCheck');
+
+    var Foo = /*#__PURE__*/_createClass(function Foo() {
+      _classCallCheck(this, Foo);
+    });
+
+    exports["default"] = Foo;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/external-babel-runtime.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./external-babel-runtime.cjs.prod.js");
+    } else {
+      module.exports = require("./external-babel-runtime.cjs.dev.js");
+    }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/external-babel-runtime.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    import _createClass from '@babel/runtime/helpers/esm/createClass';
+    import _classCallCheck from '@babel/runtime/helpers/esm/classCallCheck';
+
+    var Foo = /*#__PURE__*/_createClass(function Foo() {
+      _classCallCheck(this, Foo);
+    });
+
+    export { Foo as default };
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ package.json ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    {"name":"external-babel-runtime","main":"dist/external-babel-runtime.cjs.js","module":"dist/external-babel-runtime.esm.js","dependencies":{"@babel/runtime":"^7.0.0"}}
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ src/index.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export default class Foo {}
+  `);
 });
 
 test("should lazily get globals", async () => {
@@ -569,7 +731,34 @@ test("should lazily get globals", async () => {
 
   await build(tmpPath);
 
-  await snapshotDirectory(tmpPath);
+  expect(
+    await getFiles(tmpPath, ["**/*.js", "!node_modules/**", "!pnpm-lock.yaml"])
+  ).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/umd-unused-peer-dep.cjs.dev.js, dist/umd-unused-peer-dep.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    var index = "something";
+
+    exports["default"] = index;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/umd-unused-peer-dep.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./umd-unused-peer-dep.cjs.prod.js");
+    } else {
+      module.exports = require("./umd-unused-peer-dep.cjs.dev.js");
+    }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/umd-unused-peer-dep.umd.min.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    !function(e,n){"object"==typeof exports&&"undefined"!=typeof module?module.exports=n():"function"==typeof define&&define.amd?define(n):(e="undefined"!=typeof globalThis?globalThis:e||self).validPackage=n()}(this,(function(){"use strict";return"something"}));
+    //# sourceMappingURL=umd-unused-peer-dep.umd.min.js.map
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ src/index.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export default "something";
+  `);
 });
 
 test("batches build errors", async () => {

@@ -140,27 +140,6 @@ export let createPackageCheckTestCreator = (
   return testFn as typeof testFn & { only: typeof testFn; skip: typeof testFn };
 };
 
-export async function snapshotDistFiles(tmpPath: string) {
-  let distPath = path.join(tmpPath, "dist");
-  let distFiles;
-  try {
-    distFiles = await fs.readdir(distPath);
-  } catch (err) {
-    if (err.code === "ENOENT") {
-      throw new Error(distPath + " does not exist");
-    }
-    throw err;
-  }
-
-  await Promise.all(
-    distFiles.map(async (x) => {
-      expect(await readNormalizedFile(path.join(distPath, x))).toMatchSnapshot(
-        normalizePath(x)
-      );
-    })
-  );
-}
-
 function hash(content: string) {
   return crypto.createHash("md5").update(content).digest("hex");
 }
@@ -184,48 +163,6 @@ export function stripHashes(...chunkNames: string[]) {
       });
     },
   };
-}
-
-export async function snapshotDirectory(
-  tmpPath: string,
-  {
-    files = "js",
-    filterPath = (x) => true,
-    transformPath = (x) => x,
-    transformContent = (x) => x,
-  }: {
-    files?: "all" | "js";
-    filterPath?: (path: string) => boolean;
-    transformPath?: (path: string, contents: string) => string;
-    transformContent?: (content: string) => string;
-  } = {}
-) {
-  let paths = await fastGlob(
-    [
-      `**/${files === "js" ? "*.js" : "*"}`,
-      "!node_modules/**",
-      "!pnpm-lock.yaml",
-    ],
-    {
-      cwd: tmpPath,
-    }
-  );
-
-  await Promise.all(
-    paths
-      .filter((fp) => filterPath(fp))
-      .map(async (x) => {
-        let content = transformContent(
-          await readNormalizedFile(path.join(tmpPath, x))
-        );
-        if (x.endsWith(".json") && !x.endsWith("tsconfig.json")) {
-          content = JSON.parse(content);
-        }
-        expect(content).toMatchSnapshot(
-          normalizePath(transformPath(x, content))
-        );
-      })
-  );
 }
 
 export const repoRoot = path.resolve(__dirname, "..", "..", "..");

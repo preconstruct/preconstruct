@@ -1,12 +1,6 @@
 import build from "../";
 import path from "path";
-import {
-  snapshotDirectory,
-  stripHashes,
-  testdir,
-  js,
-  getFiles,
-} from "../../../test-utils";
+import { stripHashes, testdir, js, getFiles } from "../../../test-utils";
 import spawn from "spawndamnit";
 
 jest.setTimeout(10000);
@@ -153,7 +147,122 @@ test("two entrypoints with a common dependency", async () => {
 
   await build(tmpPath);
 
-  await snapshotDirectory(tmpPath, await stripHashes("identity"));
+  expect(
+    await getFiles(
+      tmpPath,
+      ["**/*.js", "!node_modules/**", "!pnpm-lock.yaml"],
+      await stripHashes("identity")
+    )
+  ).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/common-dependency-two-entrypoints.cjs.dev.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    var identity = require('./identity-some-hash.cjs.dev.js');
+
+    let sum = (a, b) => identity.identity(a + b);
+
+    exports.identity = identity.identity;
+    exports.sum = sum;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/common-dependency-two-entrypoints.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./common-dependency-two-entrypoints.cjs.prod.js");
+    } else {
+      module.exports = require("./common-dependency-two-entrypoints.cjs.dev.js");
+    }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/common-dependency-two-entrypoints.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    var identity = require('./identity-some-hash.cjs.prod.js');
+
+    let sum = (a, b) => identity.identity(a + b);
+
+    exports.identity = identity.identity;
+    exports.sum = sum;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/common-dependency-two-entrypoints.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    import { i as identity } from './identity-some-hash.esm.js';
+    export { i as identity } from './identity-some-hash.esm.js';
+
+    let sum = (a, b) => identity(a + b);
+
+    export { sum };
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/identity-this-is-not-the-real-hash-09d8aa2cd41dd37e55ea1ca5c8546d35.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    let identity = x => x;
+
+    export { identity as i };
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/identity-this-is-not-the-real-hash-f57161fefd97e3101601d153708a46b8.cjs.dev.js, dist/identity-this-is-not-the-real-hash-f57161fefd97e3101601d153708a46b8.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    let identity = x => x;
+
+    exports.identity = identity;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ multiply/dist/common-dependency-two-entrypoints-multiply.cjs.dev.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    var identity = require('../../dist/identity-some-hash.cjs.dev.js');
+
+    let multiply = (a, b) => identity.identity(a * b);
+
+    exports.identity = identity.identity;
+    exports.multiply = multiply;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ multiply/dist/common-dependency-two-entrypoints-multiply.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./common-dependency-two-entrypoints-multiply.cjs.prod.js");
+    } else {
+      module.exports = require("./common-dependency-two-entrypoints-multiply.cjs.dev.js");
+    }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ multiply/dist/common-dependency-two-entrypoints-multiply.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    var identity = require('../../dist/identity-some-hash.cjs.prod.js');
+
+    let multiply = (a, b) => identity.identity(a * b);
+
+    exports.identity = identity.identity;
+    exports.multiply = multiply;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ multiply/dist/common-dependency-two-entrypoints-multiply.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    import { i as identity } from '../../dist/identity-some-hash.esm.js';
+    export { i as identity } from '../../dist/identity-some-hash.esm.js';
+
+    let multiply = (a, b) => identity(a * b);
+
+    export { multiply };
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ src/identity.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export let identity = (x) => x;
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ src/index.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    import { identity } from "./identity";
+
+    export let sum = (a, b) => identity(a + b);
+
+    export { identity };
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ src/multiply.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    import { identity } from "./identity";
+
+    export let multiply = (a, b) => identity(a * b);
+
+    export { identity };
+  `);
   let root = require(tmpPath);
   let other = require(path.join(tmpPath, "multiply"));
   expect(typeof root.identity).toBe("function");
@@ -188,7 +297,65 @@ test("two entrypoints where one requires the other entrypoint", async () => {
 
   await build(tmpPath);
 
-  await snapshotDirectory(tmpPath);
+  expect(
+    await getFiles(tmpPath, ["**/*.js", "!node_modules/**", "!pnpm-lock.yaml"])
+  ).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/importing-another-entrypoint.cjs.dev.js, dist/importing-another-entrypoint.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    let identity = x => x;
+
+    exports.identity = identity;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/importing-another-entrypoint.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./importing-another-entrypoint.cjs.prod.js");
+    } else {
+      module.exports = require("./importing-another-entrypoint.cjs.dev.js");
+    }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ multiply/dist/importing-another-entrypoint-multiply.cjs.dev.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    var dist_importingAnotherEntrypoint = require('../../dist/importing-another-entrypoint.cjs.dev.js');
+
+    let multiply = (a, b) => dist_importingAnotherEntrypoint.identity(a * b);
+
+    exports.multiply = multiply;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ multiply/dist/importing-another-entrypoint-multiply.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./importing-another-entrypoint-multiply.cjs.prod.js");
+    } else {
+      module.exports = require("./importing-another-entrypoint-multiply.cjs.dev.js");
+    }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ multiply/dist/importing-another-entrypoint-multiply.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    var dist_importingAnotherEntrypoint = require('../../dist/importing-another-entrypoint.cjs.prod.js');
+
+    let multiply = (a, b) => dist_importingAnotherEntrypoint.identity(a * b);
+
+    exports.multiply = multiply;
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ src/index.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    export let identity = (x) => x;
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ src/multiply.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    import { identity } from "./index";
+
+    export let multiply = (a, b) => identity(a * b);
+  `);
 
   let { identity } = require(tmpPath);
   expect(identity(20)).toBe(20);
