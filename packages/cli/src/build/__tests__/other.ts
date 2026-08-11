@@ -9,16 +9,10 @@ import {
   typescriptFixture,
   getFiles,
   stripHashes,
+  setPromptInput,
 } from "../../../test-utils";
-import { doPromptInput } from "../../prompt";
-
-jest.mock("../../prompt");
 
 jest.setTimeout(30000);
-
-afterEach(() => {
-  jest.resetAllMocks();
-});
 
 test("browser", async () => {
   let dir = await testdir({
@@ -716,9 +710,7 @@ test("should lazily get globals", async () => {
     `,
   });
 
-  (doPromptInput as jest.MockedFunction<
-    typeof doPromptInput
-  >).mockImplementation((question, { name }, thing) => {
+  setPromptInput((question, { name }, thing) => {
     console.log("called");
     throw new Error(
       `this should never be called: ${JSON.stringify({

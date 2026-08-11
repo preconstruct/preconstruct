@@ -4,8 +4,6 @@ import { testdir, ts, repoNodeModules, getFiles } from "../../../test-utils";
 
 jest.setTimeout(6000000);
 
-jest.mock("../../prompt");
-
 test("should build with custom tsconfig filename in standalone package", async () => {
   let tmpPath = await testdir({
     "package.json": JSON.stringify({

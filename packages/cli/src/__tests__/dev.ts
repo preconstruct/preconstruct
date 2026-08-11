@@ -15,8 +15,6 @@ import dev from "../dev";
 import normalizePath from "normalize-path";
 import escapeStringRegexp from "escape-string-regexp";
 
-jest.mock("../prompt");
-
 // TODO: make it so we don't have to do this
 jest.setTimeout(20000);
 

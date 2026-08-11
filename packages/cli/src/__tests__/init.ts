@@ -1,6 +1,6 @@
 import path from "path";
 import init from "../init";
-import { confirms as _confirms, errors } from "../messages";
+import { errors } from "../messages";
 import {
   logMock,
   modifyPkg,
@@ -9,18 +9,13 @@ import {
   testdir,
   getFiles,
   fixtures,
+  setConfirm,
+  stub,
 } from "../../test-utils";
-
-jest.mock("../prompt");
-
-let confirms = _confirms as jest.Mocked<typeof _confirms>;
-
-afterEach(() => {
-  jest.resetAllMocks();
-});
 
 test("no entrypoint", async () => {
   let tmpPath = await testdir(fixtures.noEntrypoint);
+  setConfirm("writeModuleField", async () => false);
   try {
     await init(tmpPath);
   } catch (error) {
@@ -31,25 +26,28 @@ test("no entrypoint", async () => {
 test("do not allow write", async () => {
   let tmpPath = await testdir(fixtures.basicPackage);
 
-  confirms.writeMainField.mockReturnValue(Promise.resolve(true));
+  let writeMainField = stub(async () => false);
+  setConfirm("writeMainField", writeMainField.handler);
 
   try {
     await init(tmpPath);
   } catch (error) {
     expect(error.message).toBe(errors.deniedWriteMainField);
   }
-  expect(confirms.writeMainField).toBeCalledTimes(1);
+  expect(writeMainField.calls).toHaveLength(1);
 });
 
 test("set only main field", async () => {
   let tmpPath = await testdir(fixtures.basicPackage);
 
-  confirms.writeMainField.mockReturnValue(Promise.resolve(true));
-  confirms.writeModuleField.mockReturnValue(Promise.resolve(false));
+  let writeMainField = stub(async () => true);
+  let writeModuleField = stub(async () => false);
+  setConfirm("writeMainField", writeMainField.handler);
+  setConfirm("writeModuleField", writeModuleField.handler);
 
   await init(tmpPath);
-  expect(confirms.writeMainField).toBeCalledTimes(1);
-  expect(confirms.writeModuleField).toBeCalledTimes(1);
+  expect(writeMainField.calls).toHaveLength(1);
+  expect(writeModuleField.calls).toHaveLength(1);
 
   let pkg = await getPkg(tmpPath);
   expect(pkg).toMatchInlineSnapshot(`
@@ -63,12 +61,14 @@ test("set only main field", async () => {
 test("set main and module field", async () => {
   let tmpPath = await testdir(fixtures.basicPackage);
 
-  confirms.writeMainField.mockReturnValue(Promise.resolve(true));
-  confirms.writeModuleField.mockReturnValue(Promise.resolve(true));
+  let writeMainField = stub(async () => true);
+  let writeModuleField = stub(async () => true);
+  setConfirm("writeMainField", writeMainField.handler);
+  setConfirm("writeModuleField", writeModuleField.handler);
 
   await init(tmpPath);
-  expect(confirms.writeMainField).toBeCalledTimes(1);
-  expect(confirms.writeModuleField).toBeCalledTimes(1);
+  expect(writeMainField.calls).toHaveLength(1);
+  expect(writeModuleField.calls).toHaveLength(1);
 
   let pkg = await getPkg(tmpPath);
 
@@ -98,12 +98,14 @@ test("scoped package", async () => {
     `,
   });
 
-  confirms.writeMainField.mockReturnValue(Promise.resolve(true));
-  confirms.writeModuleField.mockReturnValue(Promise.resolve(true));
+  let writeMainField = stub(async () => true);
+  let writeModuleField = stub(async () => true);
+  setConfirm("writeMainField", writeMainField.handler);
+  setConfirm("writeModuleField", writeModuleField.handler);
 
   await init(tmpPath);
-  expect(confirms.writeMainField).toBeCalledTimes(1);
-  expect(confirms.writeModuleField).toBeCalledTimes(1);
+  expect(writeMainField.calls).toHaveLength(1);
+  expect(writeModuleField.calls).toHaveLength(1);
   let pkg = await getPkg(tmpPath);
 
   expect(pkg).toMatchInlineSnapshot(`
@@ -121,12 +123,14 @@ test("scoped package", async () => {
 test("monorepo", async () => {
   let tmpPath = await testdir(fixtures.monorepo);
 
-  confirms.writeMainField.mockReturnValue(Promise.resolve(true));
-  confirms.writeModuleField.mockReturnValue(Promise.resolve(true));
+  let writeMainField = stub(async () => true);
+  let writeModuleField = stub(async () => true);
+  setConfirm("writeMainField", writeMainField.handler);
+  setConfirm("writeModuleField", writeModuleField.handler);
 
   await init(tmpPath);
-  expect(confirms.writeMainField).toBeCalledTimes(2);
-  expect(confirms.writeModuleField).toBeCalledTimes(2);
+  expect(writeMainField.calls).toHaveLength(2);
+  expect(writeModuleField.calls).toHaveLength(2);
 
   let pkg1 = await getPkg(path.join(tmpPath, "packages", "package-one"));
   let pkg2 = await getPkg(path.join(tmpPath, "packages", "package-two"));
@@ -163,7 +167,7 @@ test("does not prompt or modify if already valid", async () => {
   await init(tmpPath);
   let current = await getPkg(tmpPath);
   expect(original).toEqual(current);
-  expect(logMock.log.mock.calls).toMatchInlineSnapshot(`
+  expect(logMock.log.calls).toMatchInlineSnapshot(`
     [
       [
         "🎁 info valid-package main field is valid",
@@ -181,13 +185,15 @@ test("does not prompt or modify if already valid", async () => {
 test("invalid fields", async () => {
   let tmpPath = await testdir(fixtures.invalidFields);
 
-  confirms.writeMainField.mockReturnValue(Promise.resolve(true));
-  confirms.writeModuleField.mockReturnValue(Promise.resolve(true));
+  let writeMainField = stub(async () => true);
+  let writeModuleField = stub(async () => true);
+  setConfirm("writeMainField", writeMainField.handler);
+  setConfirm("writeModuleField", writeModuleField.handler);
 
   await init(tmpPath);
 
-  expect(confirms.writeMainField).toBeCalledTimes(1);
-  expect(confirms.writeModuleField).toBeCalledTimes(1);
+  expect(writeMainField.calls).toHaveLength(1);
+  expect(writeModuleField.calls).toHaveLength(1);
 
   let pkg = await getPkg(tmpPath);
 
@@ -203,7 +209,7 @@ test("invalid fields", async () => {
 test("fix browser", async () => {
   let tmpPath = await testdir(fixtures.validPackage);
 
-  confirms.fixBrowserField.mockReturnValue(Promise.resolve(true));
+  setConfirm("fixBrowserField", async () => true);
 
   await modifyPkg(tmpPath, (pkg) => {
     pkg.browser = "invalid.js";
@@ -250,8 +256,8 @@ let basicThreeEntrypoints = {
 
 test("three entrypoints, no main, only add main", async () => {
   const dir = await testdir(basicThreeEntrypoints);
-  confirms.writeMainField.mockReturnValue(Promise.resolve(true));
-  confirms.writeModuleField.mockReturnValue(Promise.resolve(false));
+  setConfirm("writeMainField", async () => true);
+  setConfirm("writeModuleField", async () => false);
 
   await init(dir);
 
@@ -285,8 +291,8 @@ test("three entrypoints, no main, only add main", async () => {
 test("three entrypoints, no main, add main and module", async () => {
   const dir = await testdir(basicThreeEntrypoints);
 
-  confirms.writeMainField.mockReturnValue(Promise.resolve(true));
-  confirms.writeModuleField.mockReturnValue(Promise.resolve(true));
+  setConfirm("writeMainField", async () => true);
+  setConfirm("writeModuleField", async () => true);
 
   await init(dir);
 
@@ -328,9 +334,9 @@ test("three entrypoints, no main, add main and fix browser", async () => {
       browser: "",
     }),
   });
-  confirms.writeMainField.mockReturnValue(Promise.resolve(true));
-  confirms.writeModuleField.mockReturnValue(Promise.resolve(false));
-  confirms.fixBrowserField.mockReturnValue(Promise.resolve(true));
+  setConfirm("writeMainField", async () => true);
+  setConfirm("writeModuleField", async () => false);
+  setConfirm("fixBrowserField", async () => true);
 
   await init(dir);
 
