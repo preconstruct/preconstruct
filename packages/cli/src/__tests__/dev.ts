@@ -1,3 +1,4 @@
+import assert from "node:assert/strict";
 import spawn from "spawndamnit";
 import path from "path";
 import * as fs from "fs-extra";
@@ -66,14 +67,14 @@ test("dev command works in node", async () => {
   let { code, stdout, stderr } = await spawn("node", [
     path.join(tmpPath, "packages", "package-one"),
   ]);
-  expect(code).toBe(0);
-  expect(stdout.toString().split("\n")).toEqual([
+  assert.strictEqual(code, 0);
+  assert.deepEqual(stdout.toString().split("\n"), [
     "message from package two",
     "message from package one",
     "message from package two but logged by package one",
     "",
   ]);
-  expect(stderr.toString()).toBe("");
+  assert.strictEqual(stderr.toString(), "");
 });
 
 test("all the build types", async () => {
@@ -98,12 +99,15 @@ test("all the build types", async () => {
   await dev(tmpPath);
 
   let distPath = path.join(tmpPath, "dist");
-  expect(await fs.readdir(distPath)).toEqual([
-    "all-the-build-types.browser.cjs.js",
-    "all-the-build-types.browser.esm.js",
-    "all-the-build-types.cjs.js",
-    "all-the-build-types.esm.js",
-  ]);
+  assert.deepEqual(
+    [...(await fs.readdir(distPath))],
+    [
+      "all-the-build-types.browser.cjs.js",
+      "all-the-build-types.browser.esm.js",
+      "all-the-build-types.cjs.js",
+      "all-the-build-types.esm.js",
+    ]
+  );
 
   expect(
     (
@@ -149,7 +153,8 @@ test("all the build types", async () => {
 
   await Promise.all(
     shouldBeCjsThingsToSource.map(async (filename) => {
-      expect(await fs.realpath(path.join(distPath, filename))).toBe(
+      assert.strictEqual(
+        await fs.realpath(path.join(distPath, filename)),
         path.join(tmpPath, "src/index.js")
       );
     })
@@ -190,10 +195,9 @@ test("source maps work", async () => {
     },
   });
 
-  expect(code).toBe(1);
-  expect(stdout.toString()).toBe("");
-  expect(
-    // this is easier than using a stack trace parser
+  assert.strictEqual(code, 1);
+  assert.strictEqual(stdout.toString(), "");
+  assert.match(
     stderr
       .toString()
       .replace(
@@ -201,12 +205,8 @@ test("source maps work", async () => {
         ""
       )
       .trim()
-      .split("\n")[0]
-  ).toEqual(
-    // the important thing we're checking is that it's mapping to line 5
-    expect.stringMatching(
-      new RegExp(`${escapeStringRegexp(path.join("src", "index.js"))}:5$`)
-    )
+      .split("\n")[0],
+    new RegExp(`${escapeStringRegexp(path.join("src", "index.js"))}:5$`)
   );
 });
 
@@ -326,7 +326,8 @@ test("exports field with worker condition", async () => {
   `);
   await Promise.all(
     Object.keys(files).map(async (filename) => {
-      expect(await fs.realpath(path.join(tmpPath, filename))).toEqual(
+      assert.deepEqual(
+        await fs.realpath(path.join(tmpPath, filename)),
         path.join(tmpPath, "src/index.js")
       );
     })
@@ -681,9 +682,12 @@ test("dev command entrypoint", async () => {
   let { code, stdout, stderr } = await spawn("node", [
     path.join(tmpPath, "something"),
   ]);
-  expect(stderr.toString()).toBe("");
-  expect(stdout.toString().split("\n")).toEqual(["message from something", ""]);
-  expect(code).toBe(0);
+  assert.strictEqual(stderr.toString(), "");
+  assert.deepEqual(stdout.toString().split("\n"), [
+    "message from something",
+    "",
+  ]);
+  assert.strictEqual(code, 0);
 });
 
 test("multiple entrypoints", async () => {
@@ -746,9 +750,9 @@ test("multiple entrypoints", async () => {
   let { code, stdout, stderr } = await spawn("node", [
     path.join(dir, "something"),
   ]);
-  expect(stderr.toString()).toBe("");
-  expect(stdout.toString().split("\n")).toEqual(["4", ""]);
-  expect(code).toBe(0);
+  assert.strictEqual(stderr.toString(), "");
+  assert.deepEqual(stdout.toString().split("\n"), ["4", ""]);
+  assert.strictEqual(code, 0);
 });
 
 test("type: module", async () => {
@@ -834,9 +838,9 @@ test("type: module running", async () => {
   let { code, stdout, stderr } = await spawn("node", [
     path.join(dir, "runtime-blah.mjs"),
   ]);
-  expect(stderr.toString()).toBe("");
-  expect(stdout.toString().split("\n")).toEqual(["b", ""]);
-  expect(code).toBe(0);
+  assert.strictEqual(stderr.toString(), "");
+  assert.deepEqual(stdout.toString().split("\n"), ["b", ""]);
+  assert.strictEqual(code, 0);
 });
 
 test(".d.ts", async () => {

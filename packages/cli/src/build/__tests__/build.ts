@@ -1,3 +1,4 @@
+import assert from "node:assert/strict";
 import build from "../";
 import path from "path";
 import fs from "fs-extra";
@@ -50,7 +51,7 @@ test("monorepo", async () => {
     export { index as default };
 
   `);
-  expect(unsafeRequire(packageOnePath).default).toBe(1);
+  assert.strictEqual(unsafeRequire(packageOnePath).default, 1);
 
   let packageTwoPath = path.join(tmpPath, "packages", "package-two");
   expect(await getFiles(packageTwoPath, ["dist/*"])).toMatchInlineSnapshot(`
@@ -78,7 +79,7 @@ test("monorepo", async () => {
     export { index as default };
 
   `);
-  expect(unsafeRequire(packageTwoPath).default).toBe(2);
+  assert.strictEqual(unsafeRequire(packageTwoPath).default, 2);
 });
 
 test("no module", async () => {
@@ -107,7 +108,8 @@ test("no module", async () => {
 
   `);
 
-  expect(unsafeRequire(tmpPath).default).toBe(
+  assert.strictEqual(
+    unsafeRequire(tmpPath).default,
     "this does not have a module build"
   );
 });
@@ -808,7 +810,7 @@ test("monorepo single package", async () => {
 
   `);
 
-  expect(unsafeRequire(pkgPath).default).toBe(2);
+  assert.strictEqual(unsafeRequire(pkgPath).default, 2);
 });
 
 test("json", async () => {
@@ -1197,7 +1199,7 @@ test("typescript with nodenext module resolution", async () => {
   );
   await build(dir);
   let { code, stdout, stderr } = await spawn(tscBinPath, [], { cwd: dir });
-  expect(code).toBe(2);
+  assert.strictEqual(code, 2);
   expect(stdout.toString("utf8")).toMatchInlineSnapshot(`
     "blah.ts(3,29): error TS2307: Cannot find module 'pkg-a/not-exported' or its corresponding type declarations.
     blah.ts(11,22): error TS2345: Argument of type '"index"' is not assignable to parameter of type '"other"'.
@@ -1474,7 +1476,7 @@ test("correct default export using mjs and dmts proxies", async () => {
     [],
     { cwd: dir }
   );
-  expect(tsc.code).toBe(2);
+  assert.strictEqual(tsc.code, 2);
   expect(tsc.stdout.toString("utf8")).toMatchInlineSnapshot(`
     "blah.mts(5,29): error TS2307: Cannot find module 'pkg-a/not-exported' or its corresponding type declarations.
     blah.mts(11,22): error TS2345: Argument of type '"index"' is not assignable to parameter of type '"other"'.
@@ -1494,7 +1496,7 @@ test("correct default export using mjs and dmts proxies", async () => {
     env: { ...process.env, FORCE_COLOR: undefined, NO_COLOR: "1" },
   });
 
-  expect(node.code).toBe(0);
+  assert.strictEqual(node.code, 0);
   expect(node.stdout.toString("utf8")).toMatchInlineSnapshot(`
     "1 actual index expected index
     2 actual something expected something
@@ -1943,7 +1945,7 @@ test("no __esModule when reexporting namespace with mjs proxy", async () => {
     env: { ...process.env, FORCE_COLOR: undefined, NO_COLOR: "1" },
   });
 
-  expect(node.code).toBe(0);
+  assert.strictEqual(node.code, 0);
   expect(node.stdout.toString("utf8")).toMatchInlineSnapshot(`
     "1 actual something expected something
     2 actual 100 expected 100
@@ -2099,7 +2101,7 @@ test("export * from external", async () => {
     env: { ...process.env, FORCE_COLOR: undefined, NO_COLOR: "1" },
   });
 
-  expect(node.code).toBe(0);
+  assert.strictEqual(node.code, 0);
   expect(node.stdout.toString("utf8")).toMatchInlineSnapshot(`
     "1 actual default expected default
     2 actual true expected true
@@ -2109,7 +2111,7 @@ test("export * from external", async () => {
   `);
   expect(node.stderr.toString("utf8")).toMatchInlineSnapshot(`""`);
   let { code, stdout, stderr } = await spawn(tscBinPath, [], { cwd: dir });
-  expect(code).toBe(2);
+  assert.strictEqual(code, 2);
   expect(stdout.toString("utf8")).toMatchInlineSnapshot(`
     "blah.mts(10,22): error TS2345: Argument of type 'string' is not assignable to parameter of type 'boolean'.
     blah.mts(11,10): error TS2614: Module '"pkg-a"' has no exported member '__esModule'. Did you mean to use 'import __esModule from "pkg-a"' instead?
@@ -2191,7 +2193,7 @@ test("type only export imported in .mts", async () => {
   `);
 
   let { code, stdout, stderr } = await spawn(tscBinPath, [], { cwd: dir });
-  expect(code).toBe(2);
+  assert.strictEqual(code, 2);
   expect(stdout.toString("utf8")).toMatchInlineSnapshot(`
     "blah.mts(4,23): error TS2345: Argument of type 'boolean' is not assignable to parameter of type 'string'.
     "
@@ -2585,7 +2587,7 @@ test("correct default export using mjs and dmts proxies with moduleResolution: b
     [],
     { cwd: dir }
   );
-  expect(tsc.code).toBe(2);
+  assert.strictEqual(tsc.code, 2);
   expect(tsc.stdout.toString("utf8")).toMatchInlineSnapshot(`
     "blah.mts(5,29): error TS2307: Cannot find module 'pkg-a/not-exported' or its corresponding type declarations.
     blah.mts(11,22): error TS2345: Argument of type '"index"' is not assignable to parameter of type '"other"'.
@@ -2605,7 +2607,7 @@ test("correct default export using mjs and dmts proxies with moduleResolution: b
     env: { ...process.env, FORCE_COLOR: undefined, NO_COLOR: "1" },
   });
 
-  expect(node.code).toBe(0);
+  assert.strictEqual(node.code, 0);
   expect(node.stdout.toString("utf8")).toMatchInlineSnapshot(`
     "1 actual index expected index
     2 actual something expected something
@@ -2661,7 +2663,7 @@ test("module with no runtime exports but with init-time side-effects with import
 
   let node = await spawn("node", ["runtime-blah.mjs"], { cwd: dir });
 
-  expect(node.code).toBe(0);
+  assert.strictEqual(node.code, 0);
   expect(node.stdout.toString("utf8")).toMatchInlineSnapshot(`
     "hey!
     "
@@ -2670,7 +2672,7 @@ test("module with no runtime exports but with init-time side-effects with import
 
   node = await spawn("node", ["runtime-blah.cjs"], { cwd: dir });
 
-  expect(node.code).toBe(0);
+  assert.strictEqual(node.code, 0);
   expect(node.stdout.toString("utf8")).toMatchInlineSnapshot(`
     "hey!
     "
@@ -2746,7 +2748,7 @@ test("type: module", async () => {
     "
   `);
   expect(node.stderr.toString("utf8")).toMatchInlineSnapshot(`""`);
-  expect(node.code).toBe(0);
+  assert.strictEqual(node.code, 0);
 });
 
 test("type: module with conditions", async () => {

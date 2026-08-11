@@ -1,3 +1,4 @@
+import assert from "node:assert/strict";
 import path from "path";
 import build from "..";
 import { testdir, ts, repoNodeModules, getFiles } from "../../../test-utils";
@@ -339,7 +340,7 @@ test("should fail to build a monorepo package with relative folder and invalid t
       export const thing = "monorepo-custom-config";
     `,
   });
-  await expect(build(tmpPath)).rejects.toThrowError();
+  await assert.rejects(build(tmpPath));
 });
 
 test("should fail to build with invalid custom tsconfig filename in monorepo package", async () => {
