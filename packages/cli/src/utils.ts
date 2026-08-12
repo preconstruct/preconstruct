@@ -449,12 +449,16 @@ export function dtsDefaultForDmtsTemplate(relativePath: string) {
 export function mjsTemplate(
   exports: string[],
   relativePath: string,
-  mjsPath: string
+  mjsPath: string,
+  directive?: "use client" | "use server"
 ) {
   const escapedPath = JSON.stringify(relativePath);
   const nonDefaultExports = exports.filter((name) => name !== "default");
   const hasDefaultExport = exports.length !== nonDefaultExports.length;
-  return `${getReexportStatement(nonDefaultExports, escapedPath)}\n${
+  return `${directive ? `'${directive}';\n` : ""}${getReexportStatement(
+    nonDefaultExports,
+    escapedPath
+  )}\n${
     hasDefaultExport
       ? `export { _default as default } from ${JSON.stringify(
           "./" + getJsDefaultForMjsFilepath(nodePath.basename(mjsPath))
