@@ -13,6 +13,7 @@ import {
 } from "../../../test-utils";
 import { BatchError } from "../../errors";
 import stripAnsi from "strip-ansi";
+import { isSchemeImport } from "../rollup";
 
 jest.setTimeout(6000000);
 
@@ -1270,6 +1271,60 @@ test("node: is external", async () => {
 
     fs.writeFileSync("test.txt", "test");
 
+  `);
+});
+
+test("imports with arbitrary schemes are external", async () => {
+  let dir = await testdir({
+    "package.json": JSON.stringify({
+      name: "@scope/test",
+      main: "dist/scope-test.cjs.js",
+      module: "dist/scope-test.esm.js",
+    }),
+    "src/index.js": ts`
+      import "cloudflare:workers";
+      import "astro:content";
+      import "custom+scheme.1:module";
+    `,
+  });
+  await build(dir);
+  expect(await getDist(dir)).toMatchInlineSnapshot(`
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.cjs.dev.js, dist/scope-test.cjs.prod.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    require('cloudflare:workers');
+    require('astro:content');
+    require('custom+scheme.1:module');
+
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.cjs.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    'use strict';
+
+    if (process.env.NODE_ENV === "production") {
+      module.exports = require("./scope-test.cjs.prod.js");
+    } else {
+      module.exports = require("./scope-test.cjs.dev.js");
+    }
+
+    ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ dist/scope-test.esm.js ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+    import 'cloudflare:workers';
+    import 'astro:content';
+    import 'custom+scheme.1:module';
+
+  `);
+});
+
+test("Windows paths are not imports with schemes", () => {
+  expect({
+    scheme: isSchemeImport("custom+scheme.1:module"),
+    windowsBackslashPath: isSchemeImport("C:\\project\\src\\index.js"),
+    windowsSlashPath: isSchemeImport("C:/project/src/index.js"),
+  }).toMatchInlineSnapshot(`
+    {
+      "scheme": true,
+      "windowsBackslashPath": false,
+      "windowsSlashPath": false,
+    }
   `);
 });
 

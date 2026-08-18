@@ -28,6 +28,9 @@ import flow from "../rollup-plugins/flow";
 
 type ExternalPredicate = (source: string) => boolean;
 
+export const isSchemeImport = (source: string) =>
+  !path.win32.isAbsolute(source) && /^[a-z][a-z\d+.-]*:/i.test(source);
+
 // this makes sure nested imports of external packages are external
 const makeExternalPredicate = (externalArr: string[]): ExternalPredicate => {
   if (externalArr.length === 0) {
@@ -75,7 +78,7 @@ export let getRollupConfig = (
   ) {
     external.push(...builtInModules);
     wrapExternalPredicate = (inner) => (source) =>
-      source.startsWith("node:") || inner(source);
+      isSchemeImport(source) || inner(source);
   }
 
   let input: Record<string, string> = {};
