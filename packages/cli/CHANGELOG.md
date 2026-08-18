@@ -1,5 +1,11 @@
 # preconstruct
 
+## 2.9.0
+
+### Minor Changes
+
+- [#632](https://github.com/preconstruct/preconstruct/pull/632) [`0ac0f1e`](https://github.com/preconstruct/preconstruct/commit/0ac0f1e6ff9675a69d6caeb9011af2233e8da1e8) Thanks [@emmatown](https://github.com/emmatown)! - Allow imports with arbitrary schemes like e.g. `cloudflare:` and `astro:` beyond the existing support for `node:`
+
 ## 2.8.13
 
 ### Patch Changes
