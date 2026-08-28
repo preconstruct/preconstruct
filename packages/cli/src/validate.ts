@@ -42,6 +42,14 @@ export const isFieldValid = {
     // JSON.stringify to make sure conditions are in proper order
     return JSON.stringify(pkg.json.exports) === JSON.stringify(generated);
   },
+  types(entrypoint: Entrypoint) {
+    return entrypoint.json.types === validFieldsForEntrypoint.types(entrypoint);
+  },
+  typings(entrypoint: Entrypoint) {
+    return (
+      entrypoint.json.typings === validFieldsForEntrypoint.typings(entrypoint)
+    );
+  },
 };
 
 export function isUmdNameSpecified(entrypoint: Entrypoint) {
@@ -58,7 +66,14 @@ function validateEntrypoint(entrypoint: Entrypoint, log: boolean) {
     return;
   }
   const fatalErrors: FatalError[] = [];
-  for (const field of ["main", "module", "umd:main", "browser"] as const) {
+  for (const field of [
+    "main",
+    "module",
+    "umd:main",
+    "browser",
+    "types",
+    "typings",
+  ] as const) {
     if (field !== "main" && entrypoint.json[field] === undefined) {
       continue;
     }
