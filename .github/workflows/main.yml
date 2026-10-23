@@ -7,10 +7,11 @@ on:
   pull_request:
 jobs:
   test:
-    name: "Tests on ${{matrix.platform}}"
+    name: "Tests using Node ${{ matrix.node_version }} on ${{ matrix.platform }}"
     strategy:
       fail-fast: false
       matrix:
+        node_version: [22, 24, 26]
         platform:
           - ubuntu-latest
           - windows-latest
@@ -21,13 +22,15 @@ jobs:
           fetch-depth: 0
 
       - uses: ./.github/actions/setup-deps
+        with:
+          node-version: ${{ matrix.node_version }}
 
       - name: Run Tests
         run: pnpm exec cross-env CI=true jest --coverage --color
 
       - name: Upload coverage to Codecov
         run: bash <(curl -s https://codecov.io/bash) -C $GITHUB_SHA -B ${GITHUB_REF#refs/heads/} -Z
-        if: ${{ matrix.platform == 'ubuntu-latest' && always() }}
+        if: ${{ matrix.platform == 'ubuntu-latest' && matrix.node_version == 24 && always() }}
         env:
           CODECOV_TOKEN: dc4ed93e-11a9-421e-b141-8a2f11913593
   typescript:
