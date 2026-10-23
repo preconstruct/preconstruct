@@ -7,10 +7,10 @@ runs:
       with:
         version: 11.21.0
 
-    - name: Setup Node.js LTS
+    - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: lts/*
+        node-version-file: .node-version
         cache: pnpm
 
     - name: Install Dependencies
